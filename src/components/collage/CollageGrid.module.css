@@ -1,0 +1,19 @@
+.grid {
+  display: grid;
+  width: 100%;
+  height: 100%;
+
+  /* CSS 커스텀 프로퍼티로 동적 행/열 설정 */
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+
+  /* 셀 구분선 역할 */
+  gap: 2px;
+  background: #000;
+}
+
+.cellWrap {
+  position: relative;
+  overflow: hidden;
+  /* grid-row/column span은 인라인 스타일로 설정 */
+}

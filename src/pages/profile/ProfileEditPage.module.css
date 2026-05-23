@@ -1,0 +1,125 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--color-bg);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
+  flex-shrink: 0;
+}
+
+.backBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+}
+
+.headerTitle {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.saveBtn {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-6) var(--sp-5) var(--sp-8);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-6);
+}
+
+/* ── 아바타 섹션 ──────────────────────────────────────────────────────────── */
+.avatarSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.avatar {
+  width: 96px;
+  height: 96px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--color-border);
+}
+
+.avatarEmoji {
+  font-size: 56px;
+  line-height: 1;
+}
+
+.changePhotoBtn {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+/* ── 입력 필드 ────────────────────────────────────────────────────────────── */
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.fieldLabel {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-sub);
+  padding-left: var(--sp-1);
+}
+
+.fieldInput {
+  width: 100%;
+  padding: 14px var(--sp-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  color: var(--color-text);
+  font-size: var(--text-base);
+  font-family: inherit;
+  transition: border-color var(--dur-fast);
+}
+
+.fieldInput:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.fieldReadonly {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 14px var(--sp-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.fieldPrefix {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+.fieldValue {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}

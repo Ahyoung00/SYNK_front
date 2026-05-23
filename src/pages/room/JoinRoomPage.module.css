@@ -1,0 +1,110 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--color-bg);
+}
+
+/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
+  flex-shrink: 0;
+}
+
+.backBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+}
+
+.headerTitle {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.headerRight { width: 36px; }
+
+/* ── 본문 ─────────────────────────────────────────────────────────────────── */
+.body {
+  flex: 1;
+  padding: var(--sp-8) var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── 입력 행 ──────────────────────────────────────────────────────────────── */
+.inputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0 var(--sp-4);
+  transition: border-color var(--dur-fast);
+}
+
+.inputRow:focus-within {
+  border-color: var(--color-primary);
+}
+
+.inputPrefix {
+  font-size: var(--text-xl);
+  font-weight: 900;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.codeInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: var(--text-xl);
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--color-text);
+  padding: 16px 0;
+}
+
+.codeInput::placeholder {
+  font-size: var(--text-base);
+  font-weight: 500;
+  letter-spacing: normal;
+  color: var(--color-text-muted);
+}
+
+.joinBtn {
+  padding: 10px 18px;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background: var(--color-surface-2);
+  flex-shrink: 0;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+
+.joinBtnActive {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+/* ── 힌트 ─────────────────────────────────────────────────────────────────── */
+.hint {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}

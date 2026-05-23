@@ -1,0 +1,120 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--color-bg);
+}
+
+/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
+  flex-shrink: 0;
+}
+
+.backBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+}
+
+.headerTitle {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.headerRight { width: 36px; }
+
+/* ── 서브타이틀 ───────────────────────────────────────────────────────────── */
+.subtitle {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  padding: 0 var(--sp-5) var(--sp-3);
+}
+
+/* ── 앨범 목록 ────────────────────────────────────────────────────────────── */
+.list {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.entry {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  text-align: left;
+  transition: background var(--dur-fast);
+}
+
+.entry:active {
+  background: var(--color-surface-2);
+}
+
+/* 썸네일 */
+.thumb {
+  width: 80px;
+  height: 72px;
+  flex-shrink: 0;
+}
+
+/* 정보 */
+.info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-3) 0;
+}
+
+.date {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* 아바타 스택 */
+.avatarStack {
+  display: flex;
+  flex-direction: row;
+}
+
+.avatarBubble {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  border: 2px solid var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  margin-left: -6px;
+  flex-shrink: 0;
+}
+
+.avatarBubble:first-child {
+  margin-left: 0;
+}
+
+.arrow {
+  font-size: 20px;
+  color: var(--color-text-muted);
+  padding-right: var(--sp-4);
+}
