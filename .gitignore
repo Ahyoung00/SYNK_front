@@ -1,0 +1,51 @@
+# ── 의존성
+node_modules/
+
+# ── 빌드 결과물
+dist/
+dist-ssr/
+
+# ── TypeScript 빌드 캐시
+*.tsbuildinfo
+
+# ── Capacitor 네이티브 프로젝트
+ios/
+android/
+.capacitor/
+
+# ── 환경 변수
+.env
+.env.local
+.env.*.local
+
+# ── 에디터
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ── OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ── 로그
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# ── 테스트 커버리지
+coverage/
+.nyc_output/
+
+# ── 기타
+*.pem
+.cache/

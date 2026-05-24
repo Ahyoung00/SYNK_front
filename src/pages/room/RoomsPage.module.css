@@ -198,9 +198,9 @@
 
 /* ── FAB ─────────────────────────────────────────────────────────────────── */
 .fab {
-  position: fixed;
+  position: absolute;  /* fixed는 viewport 기준 → 데스크톱 centered 환경에서 밀림. absolute는 .page 기준 */
   right: var(--sp-5);
-  bottom: calc(var(--bottom-nav-height) + var(--sp-5));
+  bottom: var(--sp-5);
   width: 56px;
   height: 56px;
   border-radius: 50%;

@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
-import { useNotificationStore } from '@/store/notificationStore'
 import { ROUTES } from '@/constants'
+import AppHeader from '@/components/layout/AppHeader'
 import styles from './RoomsPage.module.css'
 
 const MOCK_ACTIVE_ROOMS = [
@@ -34,31 +34,12 @@ const MOCK_WAITING_ROOMS = [
 
 export default function RoomsPage() {
   const navigate = useNavigate()
-  const myUser   = useAuthStore((s) => s.user)
-  const unread   = useNotificationStore((s) => s.notifications.filter((n) => !n.is_read).length)
   const [sheet, setSheet] = useState(false)
 
   return (
     <div className={styles.page}>
       {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
-      <div className={styles.header}>
-        <div>
-          <span className={styles.brand}>SYNK</span>
-          <p className={styles.greeting}>
-            안녕하세요,{' '}
-            <span className={styles.greetingName}>{myUser?.name ?? '아영'}님</span>
-          </p>
-        </div>
-        <button
-          className={styles.bellBtn}
-          onClick={() => navigate(ROUTES.NOTIFICATIONS)}
-          aria-label="알림"
-        >
-          <BellIcon />
-          {unread > 0 && <span className={styles.bellDot} />}
-        </button>
-      </div>
-
+      <AppHeader subtitle="방 목록" />
       {/* ── 스크롤 ──────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
         {/* 참여중 */}
@@ -179,12 +160,3 @@ function RoomCard({ room, onClick }: { room: Room; onClick: () => void }) {
   )
 }
 
-function BellIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-      <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-    </svg>
-  )
-}
