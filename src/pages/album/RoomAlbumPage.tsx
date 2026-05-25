@@ -1,16 +1,29 @@
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { albumApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
+import type { AlbumItem } from '@/types'
 import styles from './RoomAlbumPage.module.css'
 
-const MOCK_ALBUM = [
-  { id: 1, date: '2026.05.07', members: ['😊', '😺', '🐥', '🥷'], thumbColor: '#2a2535' },
-  { id: 2, date: '2026.05.03', members: ['😊', '😺', '🐥'],        thumbColor: '#1e2a35' },
-  { id: 3, date: '2026.05.01', members: ['😊', '😺', '🌸'],        thumbColor: '#352a1e' },
-]
+/** "YYYY.MM.DD" → "YYYY-MM-DD" (URL 파라미터용) */
+function toUrlDate(dotDate: string): string {
+  return dotDate.replace(/\./g, '-')
+}
 
 export default function RoomAlbumPage() {
   const { roomId } = useParams<{ roomId: string }>()
   const navigate   = useNavigate()
+  const numRoomId  = Number(roomId)
+
+  const [albums, setAlbums]     = useState<AlbumItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    albumApi.getAlbums(numRoomId)
+      .then((res) => setAlbums(res.data))
+      .catch(console.error)
+      .finally(() => setIsLoading(false))
+  }, [numRoomId])
 
   return (
     <div className={styles.page}>
@@ -27,30 +40,50 @@ export default function RoomAlbumPage() {
       <p className={styles.subtitle}>우리의 소중한 추억들</p>
 
       {/* ── 목록 ────────────────────────────────────────────────────────────── */}
-      <div className={styles.list}>
-        {MOCK_ALBUM.map((entry) => (
-          <button
-            key={entry.id}
-            className={styles.entry}
-            onClick={() => navigate(ROUTES.ROOM_SYNKLOG(Number(roomId), entry.id))}
-          >
-            {/* 썸네일 */}
-            <div className={styles.thumb} style={{ background: entry.thumbColor }} />
-
-            {/* 정보 */}
-            <div className={styles.info}>
-              <span className={styles.date}>{entry.date}</span>
-              <div className={styles.avatarStack}>
-                {entry.members.map((emoji, i) => (
-                  <span key={i} className={styles.avatarBubble}>{emoji}</span>
-                ))}
+      {isLoading ? (
+        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+          불러오는 중...
+        </p>
+      ) : albums.length === 0 ? (
+        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+          아직 앨범이 없어요
+        </p>
+      ) : (
+        <div className={styles.list}>
+          {albums.map((entry) => (
+            <button
+              key={entry.date}
+              className={styles.entry}
+              onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, toUrlDate(entry.date)))}
+            >
+              {/* 썸네일 */}
+              <div className={styles.thumb}>
+                {entry.thumbnail
+                  ? <img src={entry.thumbnail} alt={entry.date} className={styles.thumbImg} />
+                  : <div className={styles.thumbPlaceholder} />
+                }
               </div>
-            </div>
 
-            <span className={styles.arrow}>›</span>
-          </button>
-        ))}
-      </div>
+              {/* 정보 */}
+              <div className={styles.info}>
+                <span className={styles.date}>{entry.date}</span>
+                <div className={styles.avatarStack}>
+                  {entry.memberProfiles.slice(0, 5).map((p) => (
+                    p.profileImage
+                      ? <img key={p.userId} src={p.profileImage} alt="" className={styles.avatarBubble} />
+                      : <span key={p.userId} className={styles.avatarBubble}>👤</span>
+                  ))}
+                  {entry.memberProfiles.length > 5 && (
+                    <span className={styles.avatarBubble}>+{entry.memberProfiles.length - 5}</span>
+                  )}
+                </div>
+              </div>
+
+              <span className={styles.arrow}>›</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

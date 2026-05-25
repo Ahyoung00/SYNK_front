@@ -1,52 +1,84 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ROUTES } from '@/constants'
+import { roomApi, albumApi } from '@/services/api/endpoints'
+import type { Room, RoomMember, AlbumItem } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './RoomPage.module.css'
-
-const MOCK_ROOM = {
-  id: 1,
-  name: '새벽반',
-  code: '7X8K2',
-  members: [
-    { id: 1, name: '유현', emoji: '😊' },
-    { id: 2, name: '아영', emoji: '😺' },
-    { id: 3, name: '지민', emoji: '🐥' },
-    { id: 4, name: '수현', emoji: '🥷' },
-    { id: 5, name: '대주', emoji: '🌸' },
-  ],
-  album: [
-    { id: 1, thumb: null, date: '2026.05.07', members: ['😊', '😺', '🐥', '🥷'] },
-    { id: 2, thumb: null, date: '2026.05.03', members: ['😊', '😺', '🐥'] },
-  ],
-}
 
 export default function RoomPage() {
   const { roomId } = useParams<{ roomId: string }>()
   const navigate   = useNavigate()
+  const id = Number(roomId)
+
+  const [room, setRoom]           = useState<Room | null>(null)
+  const [members, setMembers]     = useState<RoomMember[]>([])
+  const [albums, setAlbums]       = useState<AlbumItem[]>([])
   const [codeCopied, setCodeCopied] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    if (!id) return
+    Promise.all([
+      roomApi.getRoom(id),
+      roomApi.getMembers(id),
+      albumApi.getAlbums(id),
+    ])
+      .then(([roomRes, membersRes, albumsRes]) => {
+        setRoom(roomRes.data)
+        setMembers(membersRes.data)
+        setAlbums(albumsRes.data)
+      })
+      .catch(console.error)
+      .finally(() => setIsLoading(false))
+  }, [id])
 
   function copyCode() {
-    navigator.clipboard?.writeText(MOCK_ROOM.code).catch(() => {})
+    if (!room) return
+    navigator.clipboard?.writeText(room.code).catch(() => {})
     setCodeCopied(true)
     setTimeout(() => setCodeCopied(false), 2000)
   }
 
   function handleLeave() {
     if (!window.confirm('방에서 나가시겠어요?')) return
-    navigate(ROUTES.ROOMS, { replace: true })
+    roomApi.leaveRoom(id)
+      .then(() => navigate(ROUTES.ROOMS, { replace: true }))
+      .catch(console.error)
+  }
+
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <NavHeader title="방" onBack={() => navigate(ROUTES.ROOMS)} />
+        <div className={styles.scroll}>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>불러오는 중...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!room) {
+    return (
+      <div className={styles.page}>
+        <NavHeader title="방" onBack={() => navigate(ROUTES.ROOMS)} />
+        <div className={styles.scroll}>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>방을 찾을 수 없어요</p>
+        </div>
+      </div>
+    )
   }
 
   return (
     <div className={styles.page}>
       {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <NavHeader
-        title={MOCK_ROOM.name}
+        title={room.name}
         onBack={() => navigate(ROUTES.ROOMS)}
         titleExtra={
           <button
             className={styles.chatBtn}
-            onClick={() => navigate(ROUTES.ROOM_CHAT(Number(roomId)))}
+            onClick={() => navigate(ROUTES.ROOM_CHAT(id))}
             aria-label="채팅"
           >
             💬
@@ -57,10 +89,10 @@ export default function RoomPage() {
       {/* ── 스크롤 영역 ─────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
 
-        {/* ── 초대 코드 ────────────────────────────────────────────────────────── */}
+        {/* ── 초대 코드 ────────────────────────────────────────────────────── */}
         <div className={styles.codeRow}>
           <span className={styles.codeLabel}>코드</span>
-          <span className={styles.codeValue}>{MOCK_ROOM.code}</span>
+          <span className={styles.codeValue}>{room.code}</span>
           <button className={styles.copyBtn} onClick={copyCode}>
             {codeCopied ? <CheckIcon /> : <CopyIcon />}
           </button>
@@ -68,54 +100,68 @@ export default function RoomPage() {
 
         <div className={styles.divider} />
 
-        {/* ── 멤버 ─────────────────────────────────────────────────────────────── */}
+        {/* ── 멤버 ─────────────────────────────────────────────────────────── */}
         <div className={styles.section}>
           <span className={styles.sectionIcon}>👤</span>
-          <span className={styles.sectionTitle}>멤버</span>
+          <span className={styles.sectionTitle}>멤버 {members.length}/{room.max_members}</span>
         </div>
         <div className={styles.memberRow}>
-          {MOCK_ROOM.members.map((m) => (
+          {members.map((m) => (
             <div key={m.id} className={styles.memberItem}>
-              <div className={styles.memberAvatar}>{m.emoji}</div>
-              <span className={styles.memberName}>{m.name}</span>
+              <div className={styles.memberAvatar}>
+                {m.user?.name?.charAt(0) ?? '?'}
+              </div>
+              <span className={styles.memberName}>{m.user?.name ?? '알 수 없음'}</span>
             </div>
           ))}
         </div>
 
         <div className={styles.divider} />
 
-        {/* ── 앨범 ─────────────────────────────────────────────────────────────── */}
+        {/* ── 앨범 ─────────────────────────────────────────────────────────── */}
         <div className={styles.albumHeader}>
           <div className={styles.section}>
             <span className={styles.sectionTitle}>앨범</span>
           </div>
           <button
             className={styles.viewAllBtn}
-            onClick={() => navigate(ROUTES.ROOM_ALBUM(Number(roomId)))}
+            onClick={() => navigate(ROUTES.ROOM_ALBUM(id))}
           >
             전체 보기
           </button>
         </div>
-        <div className={styles.albumGrid}>
-          {MOCK_ROOM.album.map((a) => (
-            <button
-              key={a.id}
-              className={styles.albumThumb}
-              onClick={() => navigate(ROUTES.ROOM_SYNKLOG(Number(roomId), a.id))}
-            >
-              <div className={styles.albumPlaceholder}>
-                <span className={styles.albumDate}>{a.date}</span>
-              </div>
-            </button>
-          ))}
-        </div>
+
+        {albums.length === 0 ? (
+          <p style={{ padding: '12px 20px', color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+            아직 앨범이 없어요
+          </p>
+        ) : (
+          <div className={styles.albumGrid}>
+            {albums.slice(0, 4).map((log) => (
+              <button
+                key={log.date}
+                className={styles.albumThumb}
+                onClick={() => navigate(ROUTES.ROOM_SYNKLOG(id, log.date.replace(/\./g, '-')))}
+              >
+                {log.thumbnail
+                  ? <img src={log.thumbnail} alt={log.date} className={styles.albumThumbImg} />
+                  : (
+                    <div className={styles.albumPlaceholder}>
+                      <span className={styles.albumDate}>{log.date}</span>
+                    </div>
+                  )
+                }
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className={styles.divider} />
 
-        {/* ── 방 설정 ──────────────────────────────────────────────────────────── */}
+        {/* ── 방 설정 ────────────────────────────────────────────────────────── */}
         <button
           className={styles.settingsBtn}
-          onClick={() => navigate(ROUTES.ROOM_SETTINGS(Number(roomId)))}
+          onClick={() => navigate(ROUTES.ROOM_SETTINGS(id))}
         >
           <span className={styles.settingsBtnIcon}>📋</span>
           <span className={styles.settingsBtnLabel}>방 설정</span>
@@ -123,7 +169,7 @@ export default function RoomPage() {
         </button>
       </div>
 
-      {/* ── 방 나가기 ────────────────────────────────────────────────────────── */}
+      {/* ── 방 나가기 ─────────────────────────────────────────────────────────── */}
       <div className={styles.footer}>
         <button className={styles.leaveBtn} onClick={handleLeave}>
           <LeaveIcon />

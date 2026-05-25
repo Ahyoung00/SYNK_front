@@ -5,127 +5,277 @@ import type {
   RoomMember,
   Mission,
   Submission,
-  Collage,
+  AlbumItem,
+  SynklogDetailResponse,
   SynkLog,
-  RoomChat,
-  CollectionEntry,
+  RoomChatListResponse,
+  CollectionListResponse,
+  CollectionDetailResponse,
   AppNotification,
-  PaginatedResponse,
+  LoginResponse,
+  RoomCreatedResponse,
+  RoomJoinedResponse,
+  RoomUpdateRequest,
+  SynklogCreatedResponse,
+  ChatSentResponse,
+  SubmissionCreatedResponse,
+  MissionParticipantsResponse,
+  NotificationsResponse,
+  ActiveMissionItem,
 } from '@/types'
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
+// POST /auth/kakao  — 카카오 액세스 토큰으로 로그인/회원가입
+// POST /auth/google — Google 액세스 토큰으로 로그인/회원가입
+// POST /auth/logout — 로그아웃
+//
+// Request body:  { "accessToken": "ya29.a0AfH6..." }  ← camelCase
+// Response data: { token, isNewUser, userId, name, profileImage }
 
 export const authApi = {
-  kakaoLogin: (code: string) =>
-    api.post<{ user: User; token: string; refresh_token: string }>('/auth/kakao', { code }),
+  /** 카카오 OAuth 액세스 토큰으로 로그인/회원가입 */
+  kakaoLogin: (accessToken: string) =>
+    api.post<LoginResponse>('/auth/kakao', { accessToken }),
 
-  googleLogin: (idToken: string) =>
-    api.post<{ user: User; token: string; refresh_token: string }>('/auth/google', { id_token: idToken }),
+  /** Google OAuth 액세스 토큰으로 로그인/회원가입 */
+  googleLogin: (accessToken: string) =>
+    api.post<LoginResponse>('/auth/google', { accessToken }),
 
-  refreshToken: (refresh_token: string) =>
-    api.post<{ token: string }>('/auth/refresh', { refresh_token }),
+  logout: () => api.post<void>('/auth/logout'),
+}
 
-  getMe: () => api.get<User>('/auth/me'),
+// ── User ──────────────────────────────────────────────────────────────────────
+// GET    /users/me                  — 내 프로필 조회
+// PATCH  /users/me                  — 프로필 수정
+// PATCH  /users/me/notifications    — 알림 설정 수정
+// DELETE /users/me                  — 회원 탈퇴
 
-  updateProfile: (data: { name?: string; profile_image?: string }) =>
-    api.patch<User>('/auth/me', data),
+export const userApi = {
+  getMe: () => api.get<User>('/users/me'),
 
+  /**
+   * 프로필 수정 — PATCH /users/me
+   * Request (모두 optional): { name, username, profileImage }
+   * Response: data 없음 — { success, message: "프로필 수정 완료" }
+   */
+  updateProfile: (data: { name?: string; profileImage?: string }) =>
+    api.patch<void>('/users/me', data),
+
+  /**
+   * 알림 설정 수정 — PATCH /users/me/notifications
+   * Request (모두 optional): { missionNotification, resultNotification, highlightNotification }
+   * Response: data 없음 — { success, message: "알림 설정 변경 완료" }
+   */
   updateNotificationSettings: (data: {
-    mission_alert?: boolean
-    result_alert?: boolean
-    highlight_alert?: boolean
-  }) => api.patch<User>('/auth/me/notifications', data),
+    missionNotification?: boolean
+    resultNotification?: boolean
+    highlightNotification?: boolean
+  }) => api.patch<void>('/users/me/notifications', data),
 
-  withdraw: () => api.delete<void>('/auth/me'),
+  withdraw: () => api.delete<void>('/users/me'),
 }
 
 // ── Room ──────────────────────────────────────────────────────────────────────
+// GET    /rooms/my               — 내가 참여한 방 목록 (참여중/대기중 구분)
+// GET    /rooms/{roomId}         — 방 상세 조회
+// POST   /rooms                  — 방 생성
+// PATCH  /rooms/{roomId}         — 방 설정 수정 (방장만)
+// POST   /rooms/join             — 초대 코드로 방 참여
+// DELETE /rooms/{roomId}/leave   — 방 나가기
+// GET    /rooms/{roomId}/invite  — 초대 정보 조회
+//
+// 멤버 관리 (스펙 미확정 — 추후 백엔드 추가 예정)
+// GET    /rooms/{roomId}/members
+// DELETE /rooms/{roomId}/members/{userId}  — 강퇴
 
 export const roomApi = {
-  getMyRooms: () => api.get<Room[]>('/rooms'),
+  getMyRooms: () => api.get<Room[]>('/rooms/my'),
 
   getRoom: (roomId: number) => api.get<Room>(`/rooms/${roomId}`),
 
+  /**
+   * 방 생성
+   * Request (camelCase):  { name, maxMembers, dailyMissionCount, missionStartTime(HH:mm), missionEndTime(HH:mm) }
+   * Response: RoomCreatedResponse { roomId, code, name, createdAt, thumbnail }
+   */
   createRoom: (data: {
     name: string
-    max_members: number
-    daily_mission_count: number
-    mission_start_time: string
-    mission_end_time: string
-  }) => api.post<Room>('/rooms', data),
+    maxMembers: number
+    dailyMissionCount: number
+    /** HH:mm 형식 e.g. "10:00" */
+    missionStartTime: string
+    /** HH:mm 형식 e.g. "22:00" */
+    missionEndTime: string
+  }) => api.post<RoomCreatedResponse>('/rooms', data),
 
-  joinRoom: (code: string) => api.post<Room>('/rooms/join', { code }),
+  /**
+   * 초대 코드로 방 참가
+   * Request: { code } — 최대 6자리
+   * Response: RoomJoinedResponse { roomId, roomName, currentMembers, maxMembers }
+   */
+  joinRoom: (code: string) => api.post<RoomJoinedResponse>('/rooms/join', { code }),
 
-  leaveRoom: (roomId: number) => api.delete<void>(`/rooms/${roomId}/members/me`),
+  leaveRoom: (roomId: number) => api.delete<void>(`/rooms/${roomId}/leave`),
 
+  /** 방 삭제 (방장 전용) */
   deleteRoom: (roomId: number) => api.delete<void>(`/rooms/${roomId}`),
 
-  updateRoom: (roomId: number, data: Partial<Room>) =>
-    api.patch<Room>(`/rooms/${roomId}`, data),
+  /**
+   * 방 설정 수정 (방장만)
+   * Request (camelCase, 모두 optional): { name, thumbnail, dailyMissionCount, missionStartTime, missionEndTime }
+   * Response: data 없음 — { success, message: "방 설정 수정 완료" }
+   */
+  updateRoom: (roomId: number, data: RoomUpdateRequest) =>
+    api.patch<void>(`/rooms/${roomId}`, data),
 
+  getInvite: (roomId: number) =>
+    api.get<{ code: string; url: string }>(`/rooms/${roomId}/invite`),
+
+  /** 스펙 미확정 */
   getMembers: (roomId: number) => api.get<RoomMember[]>(`/rooms/${roomId}/members`),
 
+  /** 스펙 미확정 */
   kickMember: (roomId: number, userId: number) =>
     api.delete<void>(`/rooms/${roomId}/members/${userId}`),
 }
 
 // ── Mission ───────────────────────────────────────────────────────────────────
+// GET /missions/active?roomId={roomId}
+//   roomId 없으면 내 모든 방의 진행 중인 미션
+//   roomId 있으면 특정 방의 진행 중인 미션
+//   응답이 1개면 첫 번째 사진, 2개 이상이면 두 번째 사진 (프론트에서 분기)
 
 export const missionApi = {
-  getActiveMission: (roomId: number) =>
-    api.get<Mission>(`/rooms/${roomId}/missions/active`),
+  /**
+   * 진행 중인 미션 조회 — GET /missions/active
+   * 항상 배열로 반환 (내가 속한 모든 방의 active 미션)
+   *
+   * data.length === 0 → 대기 화면
+   * data.length === 1 → 미션 상세 화면 바로 표시
+   * data.length  > 1 → 방 선택 화면
+   */
+  getActiveMission: () =>
+    api.get<ActiveMissionItem[]>('/missions/active'),
 
-  submitVideo: (missionId: number, videoBlob: Blob) =>
-    api.upload<Submission>(`/missions/${missionId}/submit`, videoBlob, 'video'),
+  /**
+   * 미션 영상 제출 — POST /submissions
+   * 영상은 스토리지(S3 등)에 먼저 업로드 후 videoUrl을 body에 담아 전송
+   * Request (camelCase): { missionId, videoUrl, roomId }
+   * Response: { id, submittedAt }
+   */
+  submitVideo: (data: {
+    missionId: number
+    /** 스토리지 업로드 완료 후 받은 URL (3~5초 영상) */
+    videoUrl: string
+    roomId: number
+  }) => api.post<SubmissionCreatedResponse>('/submissions', data),
 
-  getMissionParticipations: (missionId: number) =>
-    api.get<Submission[]>(`/missions/${missionId}/submissions`),
+  /**
+   * 미션 제출 현황 조회 — GET /submissions/missions/{missionId}
+   * Path: missionId (필수), roomId (선택)
+   * Response: { remainingSeconds, participants: [{ name, profileImage, status }] }
+   */
+  getMissionSubmissions: (missionId: number) =>
+    api.get<MissionParticipantsResponse>(`/submissions/missions/${missionId}`),
 
-  getCollage: (missionId: number) =>
-    api.get<Collage>(`/missions/${missionId}/collage`),
+  /** 콜라주에서 특정 사용자의 영상 조회 — GET /submissions/{submissionId} */
+  getSubmission: (submissionId: number) =>
+    api.get<Submission>(`/submissions/${submissionId}`),
 }
 
-// ── SynkLog / Album ───────────────────────────────────────────────────────────
+// ── Album / SynkLog ───────────────────────────────────────────────────────────
+// GET  /rooms/{roomId}/albums                        — 날짜별 앨범 목록
+// GET  /rooms/{roomId}/albums/{date}/collages         — 특정 날짜 SYNKLOG (릴스 영상)
+// POST /rooms/{roomId}/albums/{date}/synklog          — SYNKLOG 생성 요청
 
 export const albumApi = {
-  getSynklogs: (roomId: number) =>
-    api.get<SynkLog[]>(`/rooms/${roomId}/synklogs`),
+  /**
+   * 방의 날짜별 앨범 목록 — GET /rooms/{roomId}/albums
+   * Response: { date("YYYY.MM.DD"), thumbnail, memberProfiles[] }[]
+   */
+  getAlbums: (roomId: number) =>
+    api.get<AlbumItem[]>(`/rooms/${roomId}/albums`),
 
-  getSynklog: (synklogId: number) =>
-    api.get<SynkLog>(`/synklogs/${synklogId}`),
+  /**
+   * 특정 날짜 SYNKLOG 조회 — GET /rooms/{roomId}/albums/{date}/collages
+   * Response: { synklogId, date("YYYY.MM.DD"), synklogVideoUrl, thumbnail, missions[] }
+   */
+  getCollages: (roomId: number, date: string) =>
+    api.get<SynklogDetailResponse>(`/rooms/${roomId}/albums/${date}/collages`),
+
+  /**
+   * SYNKLOG 생성 요청
+   * Request body: { roomId, date }  (path param과 동일 값을 body에도 전송)
+   * Response: { synklogId, status: "PROCESSING" | "COMPLETED" }
+   */
+  createSynklog: (roomId: number, date: string) =>
+    api.post<SynklogCreatedResponse>(`/rooms/${roomId}/albums/${date}/synklog`, { roomId, date }),
 }
 
 // ── Chat ──────────────────────────────────────────────────────────────────────
+// GET  /rooms/{roomId}/chats                             — 채팅 메시지 목록
+// POST /rooms/{roomId}/chats                             — 채팅 메시지 전송
+// POST /rooms/{roomId}/chats/{messageId}/reactions       — 리액션 추가
 
 export const chatApi = {
-  getMessages: (roomId: number, page = 0, size = 50) =>
-    api.get<PaginatedResponse<RoomChat>>(
-      `/rooms/${roomId}/chats?page=${page}&size=${size}`,
-    ),
+  /**
+   * 채팅 메시지 목록 조회 — GET /rooms/{roomId}/chats
+   * Response: { roomName, memberCount, todayMissionCompleted, todayMissionDate, messages[] }
+   */
+  getMessages: (roomId: number) =>
+    api.get<RoomChatListResponse>(`/rooms/${roomId}/chats`),
 
-  addReaction: (chatId: number, emoji: string) =>
-    api.post<void>(`/chats/${chatId}/reactions`, { emoji }),
+  /**
+   * 채팅 메시지 전송
+   * Request: { content }  (message_type 없음 — 스펙에 없음)
+   * Response: { messageId, createdAt }
+   */
+  sendMessage: (roomId: number, content: string) =>
+    api.post<ChatSentResponse>(`/rooms/${roomId}/chats`, { content }),
 
-  removeReaction: (chatId: number) =>
-    api.delete<void>(`/chats/${chatId}/reactions/me`),
+  /**
+   * 리액션 추가
+   * Request: { emoji }
+   * Response: data 없음 — { success, message: "리액션 추가 완료" }
+   */
+  addReaction: (roomId: number, messageId: number, emoji: string) =>
+    api.post<void>(`/rooms/${roomId}/chats/${messageId}/reactions`, { emoji }),
 }
 
 // ── Collection (도감) ─────────────────────────────────────────────────────────
+// GET /collections                       — 내가 완료한 미션 도감 목록
+// GET /collections/missions/{missionId}  — 특정 미션 상세 + 내 기록
 
 export const collectionApi = {
-  getMyCollection: () => api.get<CollectionEntry[]>('/collection'),
+  /**
+   * 도감 목록 조회 — GET /collections
+   * Response: { completionRate, completedCount, totalCount, missions[] }
+   */
+  getMyCollection: () => api.get<CollectionListResponse>('/collections'),
 
-  getMissionDetail: (missionTemplateId: number) =>
-    api.get<CollectionEntry>(`/collection/${missionTemplateId}`),
+  /**
+   * 미션 상세 조회 — GET /collections/missions/{missionId}
+   * Response: { missionId, title, category, description, completedTimes, lastCompletedDate, records[] }
+   */
+  getMissionDetail: (missionId: number) =>
+    api.get<CollectionDetailResponse>(`/collections/missions/${missionId}`),
 }
 
 // ── Notifications ─────────────────────────────────────────────────────────────
+// GET /notifications — 알림 목록 (오늘/이번 주 구분은 프론트에서 처리)
 
 export const notificationApi = {
-  getNotifications: () => api.get<AppNotification[]>('/notifications'),
+  /**
+   * 알림 목록 조회 — GET /notifications
+   * 서버에서 today / thisWeek 로 미리 그룹핑
+   * Response: { today: AppNotification[], thisWeek: AppNotification[] }
+   */
+  getNotifications: () => api.get<NotificationsResponse>('/notifications'),
 
+  /** 스펙 미확정 */
   markRead: (notificationId: number) =>
     api.patch<void>(`/notifications/${notificationId}/read`),
 
+  /** 스펙 미확정 */
   markAllRead: () => api.patch<void>('/notifications/read-all'),
 }

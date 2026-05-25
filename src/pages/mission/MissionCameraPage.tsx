@@ -1,7 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCamera, VIDEO_MIN_S, VIDEO_MAX_S } from '@/hooks/useCamera'
 import { useMissionStore } from '@/store/missionStore'
+import { missionApi } from '@/services/api/endpoints'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import { ROUTES } from '@/constants'
 import { formatTime } from '@/hooks/useTimer'
@@ -10,8 +11,9 @@ import styles from './MissionCameraPage.module.css'
 export default function MissionCameraPage() {
   const { roomId } = useParams<{ roomId: string }>()
   const navigate = useNavigate()
-  const active = useMissionStore((s) => s.active)
+  const active          = useMissionStore((s) => s.active)
   const setRecordedBlob = useMissionStore((s) => s.setRecordedBlob)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const camera = useCamera()
   const previewVideoRef = camera.previewRef as React.RefObject<HTMLVideoElement>
@@ -46,9 +48,21 @@ export default function MissionCameraPage() {
   const title = mission.template?.title ?? '미션'
   const secondsLeft = active.seconds_left
 
-  function handleSubmit() {
+  async function handleSubmit() {
+    if (isSubmitting) return
+    setIsSubmitting(true)
     if (camera.recordedBlob) {
       setRecordedBlob(camera.recordedBlob)
+    }
+    try {
+      // mock에서는 실제 파일 업로드 대신 placeholder URL 사용
+      await missionApi.submitVideo({
+        missionId: mission.id,
+        videoUrl:  'mock://recorded-video',
+        roomId:    Number(roomId) || room.id,
+      })
+    } catch (e) {
+      console.error('제출 실패:', e)
     }
     navigate(ROUTES.MISSION_WAITING(Number(roomId) || room.id))
   }
@@ -159,8 +173,9 @@ export default function MissionCameraPage() {
             <button
               className={styles.submitBtn}
               onClick={handleSubmit}
+              disabled={isSubmitting}
             >
-              제출하기
+              {isSubmitting ? '제출 중...' : '제출하기'}
             </button>
           </div>
         )}

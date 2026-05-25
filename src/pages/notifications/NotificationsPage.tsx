@@ -1,4 +1,7 @@
+import { useEffect, useState } from 'react'
 import { useNotificationStore } from '@/store/notificationStore'
+import { notificationApi } from '@/services/api/endpoints'
+import type { AppNotification, NotificationsResponse } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './NotificationsPage.module.css'
 
@@ -11,70 +14,80 @@ const TYPE_META: Record<string, { icon: string; bg: string }> = {
   ACHIEVEMENT:      { icon: '🔥', bg: 'rgba(249, 115, 22, 0.15)'  },
 }
 
-// 목업 알림 (백엔드 연동 전)
-const MOCK_GROUPS: { label: string; items: NotifItem[] }[] = [
-  {
-    label: '오늘',
-    items: [
-      { id: 1, type: 'MISSION_START',    title: '새벽반에서 미션이 올랐어요',   sub: '지금 네 표정 그대로 찍기 · 22:30', unread: true  },
-      { id: 2, type: 'MISSION_COMPLETE', title: '결과가 도착했어요',             sub: '새벽반 · 5명 모두 참여 · 22:35',  unread: false },
-      { id: 3, type: 'SYNKLOG_CREATED',  title: 'SYNKLOG 생성 완료',            sub: '새벽반 · 2026.05.07 · 22:40',    unread: false },
-    ],
-  },
-  {
-    label: '이번 주',
-    items: [
-      { id: 4, type: 'MEMBER_JOIN',  title: '지민님이 대학동기에 들어왔어요', sub: '2일 전',  unread: false },
-      { id: 5, type: 'ACHIEVEMENT',  title: '이번 주 도감 5개 완료!',         sub: '3일 전',  unread: false },
-    ],
-  },
-]
-
-interface NotifItem {
-  id: number
-  type: string
-  title: string
-  sub: string
-  unread: boolean
+function NotifGroup({ label, items }: { label: string; items: AppNotification[] }) {
+  if (items.length === 0) return null
+  return (
+    <div className={styles.group}>
+      <p className={styles.groupLabel}>{label}</p>
+      <div className={styles.groupList}>
+        {items.map((item) => {
+          const meta = TYPE_META[item.type] ?? TYPE_META['MEMBER_JOIN']
+          return (
+            <div key={item.id} className={styles.notifRow}>
+              <div className={styles.iconWrap} style={{ background: meta.bg }}>
+                <span className={styles.notifIcon}>{meta.icon}</span>
+              </div>
+              <div className={styles.notifText}>
+                <span className={styles.notifTitle}>{item.title}</span>
+                <span className={styles.notifSub}>{item.content}</span>
+              </div>
+              {!item.isRead && <span className={styles.unreadDot} />}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
 }
 
 export default function NotificationsPage() {
-  const markAllRead = useNotificationStore((s) => s.markAllRead)
+  const { setNotifications, markAllRead } = useNotificationStore()
+  const [data, setData] = useState<NotificationsResponse | null>(null)
+
+  useEffect(() => {
+    notificationApi
+      .getNotifications()
+      .then((res) => {
+        setData(res.data)
+        // 스토어엔 flat 배열로 저장 (unreadCount 계산용)
+        setNotifications([...res.data.today, ...res.data.thisWeek])
+      })
+      .catch(console.error)
+  }, [setNotifications])
+
+  const isEmpty = !data || (data.today.length === 0 && data.thisWeek.length === 0)
 
   return (
     <div className={styles.page}>
       {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <NavHeader
         title="알림"
-        right={<button style={{ color: '#3b82f6', fontWeight: 700, fontSize: 'var(--text-sm)' }} onClick={markAllRead}>모두 읽음</button>}
+        right={
+          <button
+            style={{ color: '#3b82f6', fontWeight: 700, fontSize: 'var(--text-sm)' }}
+            onClick={() => {
+              notificationApi.markAllRead().catch(console.error)
+              markAllRead()
+            }}
+          >
+            모두 읽음
+          </button>
+        }
       />
 
-      {/* ── 알림 목록 ────────────────────────────────────────────────────────── */}
+      {/* ── 알림 목록 ─────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
-        {MOCK_GROUPS.map((group) => (
-          <div key={group.label} className={styles.group}>
-            <p className={styles.groupLabel}>{group.label}</p>
-            <div className={styles.groupList}>
-              {group.items.map((item) => {
-                const meta = TYPE_META[item.type] ?? TYPE_META['MEMBER_JOIN']
-                return (
-                  <div key={item.id} className={styles.notifRow}>
-                    <div className={styles.iconWrap} style={{ background: meta.bg }}>
-                      <span className={styles.notifIcon}>{meta.icon}</span>
-                    </div>
-                    <div className={styles.notifText}>
-                      <span className={styles.notifTitle}>{item.title}</span>
-                      <span className={styles.notifSub}>{item.sub}</span>
-                    </div>
-                    {item.unread && <span className={styles.unreadDot} />}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        ))}
+        {isEmpty ? (
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+            알림이 없어요
+          </p>
+        ) : (
+          <>
+            <NotifGroup label="오늘"    items={data?.today    ?? []} />
+            <NotifGroup label="이번 주" items={data?.thisWeek ?? []} />
+          </>
+        )}
       </div>
     </div>
   )
 }
-

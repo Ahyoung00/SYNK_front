@@ -272,3 +272,39 @@
 .deleteRoomBtn:active {
   opacity: 0.7;
 }
+
+/* ── 시간 선택 ────────────────────────────────────────────────────────────── */
+.settingRowTime {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+}
+
+.timeInputRow {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.timeInput {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+  color-scheme: dark;
+  outline: none;
+  transition: border-color var(--dur-fast);
+}
+
+.timeInput:focus {
+  border-color: var(--color-primary);
+}
+
+.timeDash {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { userApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './WithdrawPage.module.css'
@@ -14,17 +15,24 @@ const DELETE_ITEMS = [
 ]
 
 export default function WithdrawPage() {
-  const navigate = useNavigate()
-  const logout   = useAuthStore((s) => s.logout)
-  const [input, setInput] = useState('')
+  const navigate  = useNavigate()
+  const logout    = useAuthStore((s) => s.logout)
+  const [input, setInput]   = useState('')
+  const [loading, setLoading] = useState(false)
 
   const confirmed = input === CONFIRM_PHRASE
 
-  function handleWithdraw() {
-    if (!confirmed) return
-    // TODO: API 호출
-    logout()
-    navigate(ROUTES.ONBOARDING, { replace: true })
+  async function handleWithdraw() {
+    if (!confirmed || loading) return
+    setLoading(true)
+    try {
+      await userApi.withdraw()
+      logout()
+      navigate(ROUTES.ONBOARDING, { replace: true })
+    } catch (e) {
+      console.error(e)
+      setLoading(false)
+    }
   }
 
   return (
@@ -71,7 +79,7 @@ export default function WithdrawPage() {
           <button
             className={[styles.withdrawBtn, confirmed ? styles.withdrawBtnActive : ''].filter(Boolean).join(' ')}
             onClick={handleWithdraw}
-            disabled={!confirmed}
+            disabled={!confirmed || loading}
           >
             탈퇴하기
           </button>

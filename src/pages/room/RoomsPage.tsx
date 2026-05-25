@@ -1,79 +1,97 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
-import { useAuthStore } from '@/store/authStore'
 import { ROUTES } from '@/constants'
+import { roomApi } from '@/services/api/endpoints'
+import type { Room } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
 import styles from './RoomsPage.module.css'
 
-const MOCK_ACTIVE_ROOMS = [
-  {
-    id: 1,
-    name: '아침반',
-    status: 'active' as const,
-    statusText: '2/5 개 완료 · 조금 더 힘내요',
-    members: ['😊', '😺', '🥷', '🐱', '🌸'],
-  },
-  {
-    id: 2,
-    name: 'zz반',
-    status: 'done' as const,
-    statusText: '오늘 미션 모두 완료🔥',
-    members: ['😊', '😺', '🥷', '🐱', '🌸'],
-  },
-]
-
-const MOCK_WAITING_ROOMS = [
-  {
-    id: 3,
-    name: '축구부',
-    status: 'waiting' as const,
-    statusText: '2명 더 기다리는 중..',
-    members: ['😊', '😺', '😱'],
-  },
-]
+// 서버에서 내려오는 enriched Room (mock 서버 /rooms 전용 필드 포함)
+interface RoomWithUI extends Room {
+  ui_status: 'active' | 'done' | 'waiting'
+  ui_status_text: string
+  members_detail: Array<{ userId: number; name: string; profileImage: string | null }>
+  member_count: number
+}
 
 export default function RoomsPage() {
   const navigate = useNavigate()
+  const [rooms, setRooms] = useState<RoomWithUI[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [sheet, setSheet] = useState(false)
+
+  useEffect(() => {
+    roomApi
+      .getMyRooms()
+      .then((res) => setRooms(res.data as RoomWithUI[]))
+      .catch(console.error)
+      .finally(() => setIsLoading(false))
+  }, [])
+
+  const activeRooms  = rooms.filter((r) => r.ui_status !== 'waiting')
+  const waitingRooms = rooms.filter((r) => r.ui_status === 'waiting')
 
   return (
     <div className={styles.page}>
       {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <AppHeader subtitle="방 목록" />
+
       {/* ── 스크롤 ──────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
+
+        {isLoading && (
+          <div className={styles.empty}>
+            <span className={styles.emptyIcon}>⏳</span>
+            <p className={styles.emptyTitle}>불러오는 중...</p>
+          </div>
+        )}
+
         {/* 참여중 */}
-        {MOCK_ACTIVE_ROOMS.length > 0 && (
+        {!isLoading && activeRooms.length > 0 && (
           <div className={styles.section}>
             <span className={styles.sectionLabel}>참여중</span>
             <div className={styles.roomList}>
-              {MOCK_ACTIVE_ROOMS.map((room) => (
-                <RoomCard key={room.id} room={room} onClick={() => navigate(ROUTES.ROOM(room.id))} />
+              {activeRooms.map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  onClick={() => navigate(ROUTES.ROOM(room.id))}
+                />
               ))}
             </div>
           </div>
         )}
 
         {/* 대기중 */}
-        {MOCK_WAITING_ROOMS.length > 0 && (
+        {!isLoading && waitingRooms.length > 0 && (
           <div className={styles.section}>
             <span className={styles.sectionLabel}>
               대기중{' '}
               <span className={styles.sectionDesc}>인원이 다 차면 참여중인 방으로 이동</span>
             </span>
             <div className={styles.roomList}>
-              {MOCK_WAITING_ROOMS.map((room) => (
-                <RoomCard key={room.id} room={room} onClick={() => navigate(ROUTES.ROOM(room.id))} />
+              {waitingRooms.map((room) => (
+                <RoomCard
+                  key={room.id}
+                  room={room}
+                  onClick={() => navigate(ROUTES.ROOM(room.id))}
+                />
               ))}
             </div>
           </div>
         )}
 
-        {MOCK_ACTIVE_ROOMS.length === 0 && MOCK_WAITING_ROOMS.length === 0 && (
+        {/* 빈 상태 */}
+        {!isLoading && rooms.length === 0 && (
           <div className={styles.empty}>
             <span className={styles.emptyIcon}>🚪</span>
             <p className={styles.emptyTitle}>아직 참여한 방이 없어요</p>
-            <p className={styles.emptyDesc}>친구들과 새 방을 만들거나<br />초대 코드로 들어가보세요</p>
+            <p className={styles.emptyDesc}>
+              친구들과 새 방을 만들거나
+              <br />
+              초대 코드로 들어가보세요
+            </p>
           </div>
         )}
       </div>
@@ -83,8 +101,8 @@ export default function RoomsPage() {
         <span className={styles.fabIcon}>+</span>
       </button>
 
-      {/* ── 방 추가 바텀시트 ─────────────────────────────────────────────────── */}
-      {sheet && (
+      {/* ── 방 추가 바텀시트 — #root 기준으로 Portal 렌더링 ──────────────────── */}
+      {sheet && createPortal(
         <div className={styles.overlay} onClick={() => setSheet(false)}>
           <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
             <div className={styles.sheetHandle} />
@@ -116,15 +134,21 @@ export default function RoomsPage() {
             </div>
             <button className={styles.sheetCancel} onClick={() => setSheet(false)}>취소</button>
           </div>
-        </div>
+        </div>,
+        document.getElementById('root')!,
       )}
     </div>
   )
 }
 
-type Room = { id: number; name: string; status: string; statusText: string; members: string[] }
+// ── RoomCard ──────────────────────────────────────────────────────────────────
 
-function RoomCard({ room, onClick }: { room: Room; onClick: () => void }) {
+interface RoomCardProps {
+  room: RoomWithUI
+  onClick: () => void
+}
+
+function RoomCard({ room, onClick }: RoomCardProps) {
   return (
     <button className={styles.roomCard} onClick={onClick}>
       <div className={styles.cardTop}>
@@ -132,31 +156,31 @@ function RoomCard({ room, onClick }: { room: Room; onClick: () => void }) {
         <span
           className={[
             styles.statusText,
-            room.status === 'done' ? styles.statusDone :
-            room.status === 'waiting' ? styles.statusWaiting :
+            room.ui_status === 'done'    ? styles.statusDone :
+            room.ui_status === 'waiting' ? styles.statusWaiting :
             styles.statusActive,
           ].join(' ')}
         >
-          {room.statusText}
+          {room.ui_status_text}
         </span>
       </div>
       <div className={styles.avatarStack}>
-        {room.members.slice(0, 5).map((emoji, i) => (
+        {room.members_detail.slice(0, 5).map((m, i) => (
           <span
-            key={i}
+            key={m.userId}
             className={styles.avatarBubble}
-            style={{ zIndex: room.members.length - i }}
+            style={{ zIndex: room.members_detail.length - i }}
+            title={m.name}
           >
-            {emoji}
+            {m.name.charAt(0)}
           </span>
         ))}
-        {room.members.length > 5 && (
+        {room.members_detail.length > 5 && (
           <span className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
-            +{room.members.length - 5}
+            +{room.members_detail.length - 5}
           </span>
         )}
       </div>
     </button>
   )
 }
-

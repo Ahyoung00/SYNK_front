@@ -7,20 +7,17 @@
 
 export type AuthProvider = 'KAKAO' | 'GOOGLE'
 
+/**
+ * GET /users/me 응답 (camelCase)
+ * 스펙 확정 필드만 포함
+ */
 export interface User {
-  id: number
-  auth_provider: AuthProvider
-  auth_provider_id: string
+  userId: number
   name: string
-  profile_image?: string
-  fcm_token?: string
-  status: string
-  deleted_at?: string
-  mission_alert: boolean
-  result_alert: boolean
-  highlight_alert: boolean
-  created_at: string
-  updated_at: string
+  profileImage: string | null
+  missionNotification: boolean
+  resultNotification: boolean
+  highlightNotification: boolean
 }
 
 // ── Room ──────────────────────────────────────────────────────────────────────
@@ -29,26 +26,26 @@ export interface Room {
   id: number
   name: string
   code: string
-  thumbnail?: string
+  thumbnail: string | null    // ERD: nullable
   owner_id: number
   max_members: number
-  current_members: number
+  current_members: number | null  // ERD: nullable
   daily_mission_count: number
   /** "HH:mm:ss" */
   mission_start_time: string
   /** "HH:mm:ss" */
   mission_end_time: string
-  created_at: string
+  created_at: string | null   // ERD: nullable
 }
 
 export interface RoomMember {
   id: number
   user_id: number
   room_id: number
-  is_owner: boolean
-  joined_at: string
-  /** Joined from user table for UI */
-  user?: Pick<User, 'id' | 'name' | 'profile_image'>
+  is_owner: boolean | null    // ERD: nullable
+  joined_at: string | null    // ERD: nullable
+  /** Joined from user table for UI (camelCase) */
+  user?: Pick<User, 'userId' | 'name' | 'profileImage'>
 }
 
 // ── Mission ───────────────────────────────────────────────────────────────────
@@ -75,6 +72,37 @@ export interface Mission {
   template?: MissionTemplate
 }
 
+// ── GET /missions/active 응답 ─────────────────────────────────────────────────
+
+/** GET /missions/active — participants 배열 내 참여자 */
+export interface ActiveMissionParticipant {
+  userId: number
+  name: string
+  profileImage: string | null
+  /** "완료" | "찍는중" | "대기" */
+  status: '완료' | '찍는중' | '대기'
+}
+
+/**
+ * GET /missions/active — 배열 내 미션 항목 (방 정보 + 참여 현황 포함)
+ *
+ * data.length === 0 → 대기 화면
+ * data.length === 1 → 미션 상세 화면 바로 표시
+ * data.length  > 1 → 방 선택 화면
+ */
+export interface ActiveMissionItem {
+  id: number              // mission ID
+  roomId: number
+  roomName: string
+  roomThumbnail: string | null
+  title: string
+  description: string
+  remainingSeconds: number
+  totalMembers: number
+  submittedCount: number
+  participants: ActiveMissionParticipant[]
+}
+
 // ── Submission ────────────────────────────────────────────────────────────────
 
 export type SubmissionStatus = 'SUBMITTED' | 'MISSED'
@@ -84,14 +112,14 @@ export interface Submission {
   user_id: number
   room_id: number
   mission_id: number
-  video_url?: string
-  status: SubmissionStatus
-  submitted_at?: string
+  video_url: string           // ERD: NN (필수)
+  status: SubmissionStatus | null  // ERD: nullable
+  submitted_at: string | null      // ERD: nullable
 }
 
 /** Per-member participation view used in the collage / waiting screen */
 export interface MemberParticipation {
-  user: Pick<User, 'id' | 'name' | 'profile_image'>
+  user: Pick<User, 'userId' | 'name' | 'profileImage'>
   submission?: Submission
   /** 'done' | 'recording' | 'waiting' */
   state: 'done' | 'recording' | 'waiting'
@@ -103,15 +131,34 @@ export interface Collage {
   id: number
   mission_id: number
   room_id: number
-  collage_video_url: string
-  thumbnail?: string
-  /** 0–100 */
-  participation_rate: number
-  /** seconds from mission start to last submission */
-  completion_time: number
-  total_members: number
-  submitted_count: number
-  created_at: string
+  collage_video_url: string   // ERD: NN
+  thumbnail: string | null    // ERD: nullable
+  /** 0–100, ERD: nullable */
+  participation_rate: number | null
+  /** seconds, ERD: nullable */
+  completion_time: number | null
+  total_members: number | null     // ERD: nullable
+  submitted_count: number | null   // ERD: nullable
+  created_at: string | null        // ERD: nullable
+}
+
+// ── Album (앨범 목록) ──────────────────────────────────────────────────────────
+
+/** GET /rooms/{roomId}/albums — memberProfiles 배열 내 항목 */
+export interface AlbumMemberProfile {
+  userId: number
+  profileImage: string | null   // Nullable (O)
+}
+
+/**
+ * GET /rooms/{roomId}/albums — data 배열 내 앨범 항목
+ * ERD 우선: thumbnail nullable 유지
+ */
+export interface AlbumItem {
+  /** "YYYY.MM.DD" */
+  date: string
+  thumbnail: string | null      // ERD: nullable
+  memberProfiles: AlbumMemberProfile[]
 }
 
 // ── SynkLog ───────────────────────────────────────────────────────────────────
@@ -123,15 +170,47 @@ export interface SynkLog {
   room_id: number
   /** "YYYY-MM-DD" */
   date: string
-  synklog_video_url?: string
-  thumbnail?: string
-  status: SynkLogStatus
+  synklog_video_url: string | null  // ERD: nullable
+  thumbnail: string | null          // ERD: nullable
+  status: SynkLogStatus | null      // ERD: nullable
+}
+
+/** GET /rooms/{roomId}/albums/{date}/collages — missions 배열 내 참여자 */
+export interface SynklogParticipant {
+  userId: number
+  name: string
+  profileImage: string | null
+  videoUrl: string | null
+  submittedAt: string | null
+  state: 'done' | 'waiting'
+}
+
+/** GET /rooms/{roomId}/albums/{date}/collages — missions 배열 내 항목 */
+export interface SynklogMission {
+  missionId: number
+  missionTitle: string
+  createdAt: string
+  participants: SynklogParticipant[]
+}
+
+/**
+ * GET /rooms/{roomId}/albums/{date}/collages — 특정 날짜 SYNKLOG 조회 응답
+ * ERD 우선: synklogVideoUrl / thumbnail 은 nullable 유지
+ */
+export interface SynklogDetailResponse {
+  synklogId: number
+  /** "YYYY.MM.DD" */
+  date: string
+  synklogVideoUrl: string | null   // ERD: nullable
+  thumbnail: string | null         // ERD: nullable
+  missions: SynklogMission[]
 }
 
 // ── Chat ──────────────────────────────────────────────────────────────────────
 
 export type MessageType = 'TEXT' | 'IMAGE' | 'EMOJI'
 
+/** WS CHAT_REACTION 이벤트 페이로드 (개별 리액션 레코드) */
 export interface ChatReaction {
   id: number
   chat_id: number
@@ -140,16 +219,40 @@ export interface ChatReaction {
   created_at: string
 }
 
-export interface RoomChat {
-  id: number
-  room_id: number
-  user_id: number
-  message_type: MessageType
+/**
+ * GET /rooms/{roomId}/chats — reactions 배열 내 집계 리액션
+ * emoji: Nullable (spec: O)
+ */
+export interface ChatReactionSummary {
+  emoji: string | null
+  count: number
+}
+
+/**
+ * GET /rooms/{roomId}/chats — messages 배열 내 메시지 항목
+ */
+export interface RoomChatMessage {
+  messageId: number
+  userId: number
+  userName: string
+  profileImage: string | null
   content: string
-  created_at: string
-  reactions?: ChatReaction[]
-  /** Joined for UI */
-  user?: Pick<User, 'id' | 'name' | 'profile_image'>
+  /** ISO 8601 */
+  createdAt: string
+  isMyMessage: boolean
+  reactions: ChatReactionSummary[]
+}
+
+/**
+ * GET /rooms/{roomId}/chats — 채팅 목록 조회 응답
+ */
+export interface RoomChatListResponse {
+  roomName: string
+  memberCount: number
+  todayMissionCompleted: boolean
+  /** YYYY-MM-DD, Nullable */
+  todayMissionDate: string | null
+  messages: RoomChatMessage[]
 }
 
 // ── Collection (도감) ─────────────────────────────────────────────────────────
@@ -166,14 +269,52 @@ export interface CollectionRecord {
   created_at: string
 }
 
-/** Enriched template used on the 도감 list page */
-export interface CollectionEntry {
-  template: MissionTemplate
-  records: CollectionRecord[]
-  completion_count: number
-  last_completed_at?: string
-  /** true if user has completed at least once */
-  unlocked: boolean
+// ── Collection (도감) API 응답 ─────────────────────────────────────────────────
+
+/** GET /collections — missions 배열 내 개별 미션 항목 */
+export interface CollectionMissionItem {
+  missionId: number
+  title: string
+  thumbnail: string         // collection_records.thumbnail
+  completedTimes: number    // 완료 횟수
+  /** "YYYY.MM.DD" */
+  lastCompletedDate: string
+}
+
+/**
+ * GET /collections — 도감 목록 조회 응답
+ * { completionRate, completedCount, totalCount, missions[] }
+ */
+export interface CollectionListResponse {
+  /** 수집률 (%) */
+  completionRate: number
+  completedCount: number
+  totalCount: number
+  missions: CollectionMissionItem[]
+}
+
+/** GET /collections/missions/{missionId} — records 배열 내 개별 기록 */
+export interface CollectionRecordItem {
+  recordId: number         // collection_records.id
+  roomName: string         // rooms.name (joined)
+  /** "YYYY.MM.DD" — collection_records.date */
+  date: string
+  thumbnail: string        // collection_records.thumbnail
+  videoUrl: string         // submissions.video_url (joined via submission_id)
+}
+
+/**
+ * GET /collections/missions/{missionId} — 미션 상세 조회 응답
+ * ERD 기준: mission_templates(title, description) + collection_records + rooms + submissions
+ */
+export interface CollectionDetailResponse {
+  missionId: number
+  title: string
+  description: string
+  completedTimes: number
+  /** "YYYY.MM.DD" */
+  lastCompletedDate: string
+  records: CollectionRecordItem[]
 }
 
 // ── Notification ──────────────────────────────────────────────────────────────
@@ -185,31 +326,144 @@ export type NotificationType =
   | 'MEMBER_JOIN'
   | 'ACHIEVEMENT'
 
+/** GET /notifications — today/thisWeek 배열 내 알림 객체 (camelCase) */
 export interface AppNotification {
   id: number
-  user_id: number
   type: NotificationType
   title: string
   content: string
-  related_id?: number
-  is_read: boolean
-  created_at: string
+  /** ISO 8601 */
+  createdAt: string
+  isRead: boolean
+  relatedId: number | null  // Nullable
+}
+
+/**
+ * GET /notifications — 알림 목록 조회 응답
+ * 서버에서 today / thisWeek 로 미리 그룹핑해서 내려줌
+ */
+export interface NotificationsResponse {
+  today: AppNotification[]
+  thisWeek: AppNotification[]
 }
 
 // ── API wrappers ──────────────────────────────────────────────────────────────
 
+/**
+ * 실제 백엔드 응답 공통 래퍼
+ * { "success": true, "data": {...}, "message": "로그인 성공" }
+ */
 export interface ApiResponse<T> {
+  success: boolean
   data: T
-  message?: string
-  status: number
+  message: string
 }
 
-export interface PaginatedResponse<T> {
-  data: T[]
-  total: number
-  page: number
-  size: number
-  has_next: boolean
+// ── Auth 응답 ─────────────────────────────────────────────────────────────────
+
+/**
+ * POST /auth/kakao  |  POST /auth/google 응답
+ * 기존 회원: isNewUser=false  /  신규 회원: isNewUser=true
+ */
+export interface LoginResponse {
+  token: string
+  isNewUser: boolean
+  userId: number
+  name: string
+  profileImage: string | null
+}
+
+// ── Room 응답 ─────────────────────────────────────────────────────────────────
+
+/**
+ * POST /rooms — 방 생성 응답
+ * { roomId, code, name, createdAt, thumbnail }
+ */
+export interface RoomCreatedResponse {
+  roomId: number
+  code: string
+  name: string
+  /** ISO 8601 e.g. "2026-05-07T22:30:00" */
+  createdAt: string
+  thumbnail: string | null
+}
+
+/**
+ * POST /rooms/join — 방 참가 응답
+ * { roomId, roomName, currentMembers, maxMembers }
+ */
+export interface RoomJoinedResponse {
+  roomId: number
+  roomName: string
+  currentMembers: number
+  maxMembers: number
+}
+
+/**
+ * PATCH /rooms/{roomId} — 방 설정 수정 요청 (모두 optional, camelCase)
+ * 응답은 data 없이 { success, message } 만 반환
+ */
+export interface RoomUpdateRequest {
+  name?: string
+  thumbnail?: string
+  /** 1~5 */
+  dailyMissionCount?: number
+  /** HH:mm e.g. "10:00" */
+  missionStartTime?: string
+  /** HH:mm e.g. "22:00" */
+  missionEndTime?: string
+}
+
+/**
+ * POST /rooms/{roomId}/albums/{date}/synklog — SYNKLOG 생성 응답
+ * { synklogId, status }
+ */
+export interface SynklogCreatedResponse {
+  synklogId: number
+  status: 'PROCESSING' | 'COMPLETED'
+}
+
+/**
+ * POST /rooms/{roomId}/chats — 채팅 메시지 전송 응답
+ * { messageId, createdAt }
+ */
+export interface ChatSentResponse {
+  messageId: number
+  /** ISO 8601 e.g. "2026-05-07T22:36:00" */
+  createdAt: string
+}
+
+/**
+ * POST /submissions — 미션 제출 응답
+ * { id, submittedAt }
+ *
+ * 영상은 스토리지에 먼저 업로드 후 URL을 body에 담아 전송
+ * Request: { missionId, videoUrl, roomId }
+ */
+export interface SubmissionCreatedResponse {
+  id: number
+  /** ISO 8601 e.g. "2026-05-11T23:30:45" */
+  submittedAt: string
+}
+
+// ── Mission 참여 현황 ─────────────────────────────────────────────────────────
+
+/** GET /missions/{missionId}/participants — 개별 참여자 */
+export interface MissionParticipant {
+  name: string
+  profileImage: string | null
+  /** "완료" | "미완료" */
+  status: '완료' | '미완료'
+}
+
+/**
+ * GET /missions/{missionId}/participants — 미션 참여 현황 응답
+ * { remainingSeconds, participants }
+ */
+export interface MissionParticipantsResponse {
+  /** 마감까지 남은 시간(초) */
+  remainingSeconds: number
+  participants: MissionParticipant[]
 }
 
 // ── WebSocket ─────────────────────────────────────────────────────────────────

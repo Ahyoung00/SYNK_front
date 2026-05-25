@@ -1,21 +1,43 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
+import { roomApi } from '@/services/api/endpoints'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './CreateRoomPage.module.css'
 
 export default function CreateRoomPage() {
   const navigate = useNavigate()
-  const [name, setName]           = useState('')
-  const [maxMembers, setMaxMembers] = useState(5)
-  const [missionCount, setMissionCount] = useState(3)
 
-  const canCreate = name.trim().length > 0
+  const [name, setName]                   = useState('')
+  const [maxMembers, setMaxMembers]       = useState(5)
+  const [missionCount, setMissionCount]   = useState(3)
+  const [missionStartTime, setMissionStartTime] = useState('10:00')
+  const [missionEndTime,   setMissionEndTime]   = useState('22:00')
+  const [isLoading, setIsLoading]         = useState(false)
+  const [error, setError]                 = useState<string | null>(null)
 
-  function handleCreate() {
+  const canCreate = name.trim().length > 0 && !isLoading
+
+  async function handleCreate() {
     if (!canCreate) return
-    // TODO: API call
-    navigate(ROUTES.ROOM_CREATED(1), { replace: true })
+    setIsLoading(true)
+    setError(null)
+    try {
+      const res = await roomApi.createRoom({
+        name: name.trim(),
+        maxMembers,
+        dailyMissionCount: missionCount,
+        missionStartTime,
+        missionEndTime,
+      })
+      // res.data.roomId 로 생성된 방 페이지 이동
+      navigate(ROUTES.ROOM_CREATED(res.data.roomId), { replace: true })
+    } catch (err) {
+      console.error(err)
+      setError('방 생성에 실패했어요. 다시 시도해주세요.')
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -29,7 +51,7 @@ export default function CreateRoomPage() {
             onClick={handleCreate}
             disabled={!canCreate}
           >
-            생성
+            {isLoading ? '생성 중...' : '생성'}
           </button>
         }
       />
@@ -60,7 +82,7 @@ export default function CreateRoomPage() {
           <span className={styles.sectionTitle}>방 설정</span>
 
           <div className={styles.settingCard}>
-            {/* 최대 인원수 */}
+            {/* 최대 인원수 (2~10) */}
             <div className={styles.settingRow}>
               <div className={styles.settingIcon}><span>👥</span></div>
               <span className={styles.settingLabel}>최대 인원수</span>
@@ -81,7 +103,7 @@ export default function CreateRoomPage() {
 
             <div className={styles.rowDivider} />
 
-            {/* 일일 미션 횟수 */}
+            {/* 일일 미션 횟수 (1~10) */}
             <div className={styles.settingRow}>
               <div className={styles.settingIcon}><span>⚡</span></div>
               <span className={styles.settingLabel}>일일 미션 횟수</span>
@@ -103,15 +125,34 @@ export default function CreateRoomPage() {
             <div className={styles.rowDivider} />
 
             {/* 미션 알림 시간대 */}
-            <div className={styles.settingRow}>
-              <div className={styles.settingIconGray}><span>🕐</span></div>
+            <div className={styles.settingRowTime}>
               <span className={styles.settingLabel}>미션 알림 시간대</span>
-              <span className={styles.settingValue}>10:00–22:00</span>
+              <div className={styles.timeInputRow}>
+                <input
+                  type="time"
+                  className={styles.timeInput}
+                  value={missionStartTime}
+                  onChange={(e) => setMissionStartTime(e.target.value)}
+                />
+                <span className={styles.timeDash}>–</span>
+                <input
+                  type="time"
+                  className={styles.timeInput}
+                  value={missionEndTime}
+                  onChange={(e) => setMissionEndTime(e.target.value)}
+                />
+              </div>
             </div>
           </div>
         </div>
+
+        {/* 에러 메시지 */}
+        {error && (
+          <p style={{ padding: '0 20px', color: '#ef4444', fontSize: 13, textAlign: 'center' }}>
+            {error}
+          </p>
+        )}
       </div>
     </div>
   )
 }
-

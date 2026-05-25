@@ -75,7 +75,7 @@ export const router = createBrowserRouter([
       { path: '/room/:roomId',                      element: <RoomPage /> },
       { path: '/room/:roomId/created',              element: <RoomCreatedPage /> },
       { path: '/room/:roomId/album',                element: <RoomAlbumPage /> },
-      { path: '/room/:roomId/album/:synklogId',     element: <SynkLogDetailPage /> },
+      { path: '/room/:roomId/album/:date',           element: <SynkLogDetailPage /> },
       { path: '/room/:roomId/chat',                 element: <RoomChatPage /> },
       { path: '/room/:roomId/settings',             element: <RoomSettingsPage /> },
       { path: '/room/:roomId/settings/members',     element: <RoomMembersPage /> },

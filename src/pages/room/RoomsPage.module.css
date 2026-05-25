@@ -146,6 +146,7 @@
 .avatarStack {
   display: flex;
   flex-direction: row;
+  gap: var(--sp-2);
 }
 
 .avatarBubble {
@@ -153,17 +154,13 @@
   height: 34px;
   border-radius: 50%;
   background: var(--color-surface-2);
-  border: 2px solid var(--color-bg);
+  border: 1.5px solid var(--color-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  margin-left: -8px;
+  font-size: 15px;
+  font-weight: 700;
   flex-shrink: 0;
-}
-
-.avatarBubble:first-child {
-  margin-left: 0;
 }
 
 .avatarMore {
@@ -228,7 +225,9 @@
 
 /* ── 바텀시트 ─────────────────────────────────────────────────────────────── */
 .overlay {
-  position: fixed;
+  /* fixed가 아닌 absolute — #root(position:relative)에 Portal로 마운트되므로
+     앱 컨테이너(max-width 390px) 경계 안에 정확히 맞춰짐 */
+  position: absolute;
   inset: 0;
   background: rgba(0, 0, 0, 0.55);
   z-index: 50;

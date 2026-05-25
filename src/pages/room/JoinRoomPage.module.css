@@ -5,32 +5,6 @@
   background: var(--color-bg);
 }
 
-/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
-  flex-shrink: 0;
-}
-
-.backBtn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text);
-}
-
-.headerTitle {
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.headerRight { width: 36px; }
-
 /* ── 본문 ─────────────────────────────────────────────────────────────────── */
 .body {
   flex: 1;
@@ -51,7 +25,7 @@
   align-items: center;
   gap: var(--sp-2);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1.5px solid var(--color-border);
   border-radius: var(--radius-lg);
   padding: 0 var(--sp-4);
   transition: border-color var(--dur-fast);
@@ -59,6 +33,10 @@
 
 .inputRow:focus-within {
   border-color: var(--color-primary);
+}
+
+.inputRowError {
+  border-color: #ef4444;
 }
 
 .inputPrefix {
@@ -77,7 +55,7 @@
   font-weight: 800;
   letter-spacing: 4px;
   color: var(--color-text);
-  padding: 16px 0;
+  padding: 18px 0;
 }
 
 .codeInput::placeholder {
@@ -87,15 +65,28 @@
   color: var(--color-text-muted);
 }
 
-.joinBtn {
-  padding: 10px 18px;
-  border-radius: var(--radius-lg);
-  font-size: var(--text-sm);
-  font-weight: 700;
+/* ── 힌트 / 에러 ──────────────────────────────────────────────────────────── */
+.hint {
+  font-size: var(--text-xs);
   color: var(--color-text-muted);
+}
+
+.errorMsg {
+  font-size: var(--text-xs);
+  color: #ef4444;
+}
+
+/* ── 참가하기 버튼 — 독립 전체 너비 ──────────────────────────────────────── */
+.joinBtn {
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: 700;
   background: var(--color-surface-2);
-  flex-shrink: 0;
-  transition: background var(--dur-fast), color var(--dur-fast);
+  color: var(--color-text-muted);
+  transition: background var(--dur-fast), color var(--dur-fast), opacity var(--dur-fast);
+  margin-top: var(--sp-2);
 }
 
 .joinBtnActive {
@@ -103,8 +94,6 @@
   color: #fff;
 }
 
-/* ── 힌트 ─────────────────────────────────────────────────────────────────── */
-.hint {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+.joinBtnActive:active {
+  opacity: 0.85;
 }

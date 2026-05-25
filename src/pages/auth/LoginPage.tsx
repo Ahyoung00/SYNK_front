@@ -1,33 +1,61 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { useChatStore } from '@/store/chatStore'
+import { api } from '@/services/api/client'
+import { userApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
+import type { User } from '@/types'
 
-// mock 유저 — 백엔드 연동 전 개발용
-const DEV_MOCK_USER = {
-  id: 1,
-  auth_provider: 'KAKAO' as const,
-  auth_provider_id: 'dev-001',
-  name: '유현',
-  profile_image: undefined,
-  fcm_token: undefined,
-  status: 'active',
-  deleted_at: undefined,
-  mission_alert: true,
-  result_alert: true,
-  highlight_alert: true,
-  created_at: new Date().toISOString(),
-  updated_at: new Date().toISOString(),
-}
+// DEV 전용 — db.json users 목록
+const DEV_USERS = [
+  { id: 1, name: '아영' },
+  { id: 2, name: '유현' },
+  { id: 3, name: '지민' },
+  { id: 4, name: '수현' },
+  { id: 5, name: '대주' },
+]
 
 export default function LoginPage() {
-  const navigate = useNavigate()
-  const setAuth = useAuthStore((s) => s.setAuth)
+  const navigate  = useNavigate()
+  const setAuth   = useAuthStore((s) => s.setAuth)
+  const isDev     = import.meta.env.DEV
+  const [loading, setLoading] = useState<number | null>(null)
 
-  const isDev = import.meta.env.DEV
+  async function handleDevLogin(userId: number) {
+    if (loading !== null) return
+    setLoading(userId)
+    // 유저 전환 시 이전 유저의 채팅 캐시 초기화
+    useChatStore.getState().clearAll()
+    try {
+      // 1) 유저 선택 로그인 → 토큰 발급
+      const loginRes = await api.post<{
+        token: string; userId: number; name: string; profileImage: string | null
+      }>('/auth/dev-login', { userId })
+      const { token } = loginRes.data
 
-  function handleDevLogin() {
-    setAuth(DEV_MOCK_USER, 'dev-token', 'dev-refresh-token')
-    navigate(ROUTES.HOME, { replace: true })
+      // 2) 토큰을 임시 저장 후 /users/me 로 전체 프로필 로드
+      //    (setAuth를 먼저 호출해야 이후 API 요청에 Authorization 헤더가 붙음)
+      const tempUser: User = {
+        userId,
+        name:                  loginRes.data.name,
+        profileImage:          loginRes.data.profileImage,
+        missionNotification:   true,
+        resultNotification:    true,
+        highlightNotification: true,
+      }
+      setAuth(tempUser, token, `mock-refresh-${userId}`)
+
+      // 3) /users/me 로 정확한 프로필로 덮어쓰기
+      const meRes = await userApi.getMe()
+      setAuth(meRes.data, token, `mock-refresh-${userId}`)
+
+      navigate(ROUTES.HOME, { replace: true })
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setLoading(null)
+    }
   }
 
   return (
@@ -61,31 +89,50 @@ export default function LoginPage() {
         Google 계정으로 로그인
       </button>
 
-      {/* 개발용 바이패스 — DEV 모드에서만 노출 */}
+      {/* DEV 전용 — 유저 선택 로그인 */}
       {isDev && (
         <div style={{ marginTop: 40, width: '100%', maxWidth: 320 }}>
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12,
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
             <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
             <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap' }}>
-              DEV ONLY
+              DEV — 유저 선택
             </span>
             <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
           </div>
-          <button
-            onClick={handleDevLogin}
-            style={{
-              width: '100%', padding: '14px 24px',
-              background: 'rgba(108, 99, 255, 0.15)',
-              border: '1px dashed rgba(108, 99, 255, 0.5)',
-              color: '#6c63ff', borderRadius: 12,
-              fontWeight: 600, fontSize: 15,
-            }}
-          >
-            🛠️ 개발용 바로 입장
-          </button>
-          <p style={{ marginTop: 8, fontSize: 11, color: 'rgba(255,255,255,0.2)', textAlign: 'center' }}>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {DEV_USERS.map((u) => (
+              <button
+                key={u.id}
+                onClick={() => handleDevLogin(u.id)}
+                disabled={loading !== null}
+                style={{
+                  width: '100%', padding: '12px 20px',
+                  background: loading === u.id
+                    ? 'rgba(108, 99, 255, 0.25)'
+                    : 'rgba(108, 99, 255, 0.1)',
+                  border: '1px dashed rgba(108, 99, 255, 0.4)',
+                  color: '#6c63ff', borderRadius: 12,
+                  fontWeight: 600, fontSize: 14,
+                  display: 'flex', alignItems: 'center', gap: 10,
+                  opacity: loading !== null && loading !== u.id ? 0.4 : 1,
+                  transition: 'opacity 0.15s',
+                }}
+              >
+                <span style={{
+                  width: 28, height: 28, borderRadius: '50%',
+                  background: 'rgba(108,99,255,0.25)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 12, fontWeight: 700, color: '#a59fff', flexShrink: 0,
+                }}>
+                  {u.name.charAt(0)}
+                </span>
+                {loading === u.id ? '로그인 중...' : `${u.name}으로 로그인`}
+              </button>
+            ))}
+          </div>
+
+          <p style={{ marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.2)', textAlign: 'center' }}>
             빌드 시 자동으로 사라짐
           </p>
         </div>

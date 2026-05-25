@@ -41,8 +41,9 @@ export const ROUTES = {
   // Room
   ROOM: (roomId: number | string) => `/room/${roomId}`,
   ROOM_ALBUM: (roomId: number | string) => `/room/${roomId}/album`,
-  ROOM_SYNKLOG: (roomId: number | string, synklogId: number | string) =>
-    `/room/${roomId}/album/${synklogId}`,
+  /** date: "YYYY-MM-DD" (URL 파라미터) */
+  ROOM_SYNKLOG: (roomId: number | string, date: string) =>
+    `/room/${roomId}/album/${date}`,
   ROOM_CHAT: (roomId: number | string) => `/room/${roomId}/chat`,
   ROOM_SETTINGS: (roomId: number | string) => `/room/${roomId}/settings`,
   ROOM_MEMBERS: (roomId: number | string) => `/room/${roomId}/settings/members`,

@@ -1,18 +1,31 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { roomApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import styles from './RoomCreatedPage.module.css'
 
-const ROOM_CODE = '7X8K2'
-const ROOM_NAME = '새벽반'
-
 export default function RoomCreatedPage() {
-  const navigate = useNavigate()
-  const [copied, setCopied] = useState(false)
+  const { roomId } = useParams<{ roomId: string }>()
+  const navigate   = useNavigate()
+  const id         = Number(roomId)
+
+  const [roomName, setRoomName] = useState('')
+  const [roomCode, setRoomCode] = useState('')
+  const [copied, setCopied]     = useState(false)
   const [inviteSheet, setInviteSheet] = useState(false)
 
+  useEffect(() => {
+    if (!id) return
+    roomApi.getRoom(id)
+      .then((res) => {
+        setRoomName(res.data.name)
+        setRoomCode(res.data.code)
+      })
+      .catch(console.error)
+  }, [id])
+
   function handleCopyCode() {
-    navigator.clipboard?.writeText(ROOM_CODE).catch(() => {})
+    navigator.clipboard?.writeText(roomCode).catch(() => {})
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -31,14 +44,14 @@ export default function RoomCreatedPage() {
 
         {/* 완료 메시지 */}
         <div className={styles.textBlock}>
-          <p className={styles.subTitle}>⚡ {ROOM_NAME} 생성 완료!</p>
+          <p className={styles.subTitle}>⚡ {roomName} 생성 완료!</p>
           <p className={styles.desc}>친구에게 아래 코드를 공유해 초대해보세요</p>
         </div>
 
         {/* 초대 코드 카드 */}
         <div className={styles.codeCard}>
           <span className={styles.codeLabel}>초대 코드</span>
-          <span className={styles.codeValue}># {ROOM_CODE}</span>
+          <span className={styles.codeValue}># {roomCode}</span>
           <button className={styles.copyBtn} onClick={handleCopyCode}>
             {copied ? '✓ 복사됨' : '코드 복사'}
           </button>
@@ -54,7 +67,7 @@ export default function RoomCreatedPage() {
       <div className={styles.footer}>
         <button
           className={styles.startBtn}
-          onClick={() => navigate(ROUTES.ROOM(1), { replace: true })}
+          onClick={() => navigate(ROUTES.ROOM(id), { replace: true })}
         >
           방으로 이동
         </button>
@@ -69,7 +82,7 @@ export default function RoomCreatedPage() {
 
             {/* 코드 + 복사 */}
             <div className={styles.sheetCodeRow}>
-              <span className={styles.sheetCode}># {ROOM_CODE}</span>
+              <span className={styles.sheetCode}># {roomCode}</span>
               <button className={styles.sheetCopyBtn} onClick={handleCopyCode}>
                 {copied ? '✓' : '복사'}
               </button>
@@ -77,7 +90,7 @@ export default function RoomCreatedPage() {
 
             {/* 공유 링크 */}
             <div className={styles.sheetLinkRow}>
-              <span className={styles.sheetLink}>synk.app/join/{ROOM_CODE}</span>
+              <span className={styles.sheetLink}>synk.app/join/{roomCode}</span>
               <button className={styles.sheetLinkCopy} onClick={handleCopyCode}>복사</button>
             </div>
 
