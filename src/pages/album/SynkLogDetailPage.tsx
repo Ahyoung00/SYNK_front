@@ -73,7 +73,7 @@ export default function SynkLogDetailPage() {
         } : undefined,
       })),
     })
-    navigate(ROUTES.MISSION_RESULT(mission.missionId))
+    navigate(ROUTES.MISSION_RESULT(mission.missionId), { state: { returnTo: 'album' } })
   }
 
   if (isLoading) {

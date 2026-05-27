@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
 import { useAuthStore } from '@/store/authStore'
 import { CollageGrid } from '@/components/collage/CollageGrid'
@@ -10,6 +10,7 @@ import styles from './MissionResultPage.module.css'
 
 export default function MissionResultPage() {
   const navigate     = useNavigate()
+  const location     = useLocation()
   const active       = useMissionStore((s) => s.active)
   const clearMission = useMissionStore((s) => s.clearMission)
   const previewUrl   = useMissionStore((s) => s.previewUrl)
@@ -46,6 +47,12 @@ export default function MissionResultPage() {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleBack() {
+    // 앨범에서 "SYNK 보기"로 진입한 경우 → 앨범으로 돌아가기
+    if ((location.state as { returnTo?: string } | null)?.returnTo === 'album') {
+      navigate(-1)
+      return
+    }
+    // 일반 미션 완료 후 진입한 경우 → 홈으로 (미션 히스토리 정리)
     navigate(ROUTES.HOME, { replace: true })
     clearMission()
   }

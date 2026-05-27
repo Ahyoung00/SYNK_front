@@ -80,22 +80,22 @@
       "owner_id": 2,
       "max_members": 5,
       "current_members": 5,
-      "daily_mission_count": 8,
-      "mission_start_time": "20:00",
-      "mission_end_time": "23:34",
+      "daily_mission_count": 5,
+      "mission_start_time": "13:00",
+      "mission_end_time": "17:34",
       "created_at": "2026-03-01T00:00:00Z"
     },
     {
       "id": 2,
-      "name": "zz반",
+      "name": "새벽반",
       "code": "ZZZ22",
       "thumbnail": null,
       "owner_id": 1,
       "max_members": 5,
       "current_members": 5,
       "daily_mission_count": 6,
-      "mission_start_time": "20:00",
-      "mission_end_time": "23:00",
+      "mission_start_time": "13:00",
+      "mission_end_time": "16:05",
       "created_at": "2026-03-15T00:00:00Z"
     },
     {
@@ -264,126 +264,560 @@
       "description": "커피? 물? 뭐든 ok"
     }
   ],
+  "mission_time_slots": [
+    {
+      "id": 1,
+      "slot_time": "06:00"
+    },
+    {
+      "id": 2,
+      "slot_time": "06:30"
+    },
+    {
+      "id": 3,
+      "slot_time": "07:00"
+    },
+    {
+      "id": 4,
+      "slot_time": "07:30"
+    },
+    {
+      "id": 5,
+      "slot_time": "08:00"
+    },
+    {
+      "id": 6,
+      "slot_time": "08:30"
+    },
+    {
+      "id": 7,
+      "slot_time": "09:00"
+    },
+    {
+      "id": 8,
+      "slot_time": "09:30"
+    },
+    {
+      "id": 9,
+      "slot_time": "10:00"
+    },
+    {
+      "id": 10,
+      "slot_time": "10:30"
+    },
+    {
+      "id": 11,
+      "slot_time": "11:00"
+    },
+    {
+      "id": 12,
+      "slot_time": "11:30"
+    },
+    {
+      "id": 13,
+      "slot_time": "12:00"
+    },
+    {
+      "id": 14,
+      "slot_time": "12:30"
+    },
+    {
+      "id": 15,
+      "slot_time": "13:00"
+    },
+    {
+      "id": 16,
+      "slot_time": "13:30"
+    },
+    {
+      "id": 17,
+      "slot_time": "14:00"
+    },
+    {
+      "id": 18,
+      "slot_time": "14:30"
+    },
+    {
+      "id": 19,
+      "slot_time": "15:00"
+    },
+    {
+      "id": 20,
+      "slot_time": "15:30"
+    },
+    {
+      "id": 21,
+      "slot_time": "16:00"
+    },
+    {
+      "id": 22,
+      "slot_time": "16:30"
+    },
+    {
+      "id": 23,
+      "slot_time": "17:00"
+    },
+    {
+      "id": 24,
+      "slot_time": "17:30"
+    },
+    {
+      "id": 25,
+      "slot_time": "18:00"
+    },
+    {
+      "id": 26,
+      "slot_time": "18:30"
+    },
+    {
+      "id": 27,
+      "slot_time": "19:00"
+    },
+    {
+      "id": 28,
+      "slot_time": "19:30"
+    },
+    {
+      "id": 29,
+      "slot_time": "20:00"
+    },
+    {
+      "id": 30,
+      "slot_time": "20:30"
+    },
+    {
+      "id": 31,
+      "slot_time": "21:00"
+    },
+    {
+      "id": 32,
+      "slot_time": "21:30"
+    },
+    {
+      "id": 33,
+      "slot_time": "22:00"
+    },
+    {
+      "id": 34,
+      "slot_time": "22:30"
+    },
+    {
+      "id": 35,
+      "slot_time": "23:00"
+    },
+    {
+      "id": 36,
+      "slot_time": "23:30"
+    }
+  ],
   "missions": [
     {
       "id": 1,
       "room_id": 2,
       "mission_template_id": 8,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T12:01:15.890Z",
-      "created_at": "2026-05-25T11:56:15.890Z"
+      "time_slot_id": 13,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 2,
       "room_id": 3,
       "mission_template_id": 4,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T12:01:15.892Z",
-      "created_at": "2026-05-25T11:56:15.892Z"
+      "time_slot_id": 13,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 3,
       "room_id": 1,
       "mission_template_id": 4,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T12:01:45.910Z",
-      "created_at": "2026-05-25T11:56:45.910Z"
+      "time_slot_id": 13,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 4,
       "room_id": 1,
       "mission_template_id": 7,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T12:10:24.042Z",
-      "created_at": "2026-05-25T12:05:24.042Z"
+      "time_slot_id": 14,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 5,
       "room_id": 2,
       "mission_template_id": 1,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T12:10:24.075Z",
-      "created_at": "2026-05-25T12:05:24.075Z"
+      "time_slot_id": 14,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 6,
       "room_id": 2,
       "mission_template_id": 1,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T12:17:23.188Z",
-      "created_at": "2026-05-25T12:12:23.188Z"
+      "time_slot_id": 15,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 7,
       "room_id": 1,
       "mission_template_id": 1,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T12:40:02.853Z",
-      "created_at": "2026-05-25T12:35:02.853Z"
+      "time_slot_id": 15,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 8,
       "room_id": 1,
       "mission_template_id": 3,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T12:45:03.358Z",
-      "created_at": "2026-05-25T12:40:03.358Z"
+      "time_slot_id": 16,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 9,
       "room_id": 2,
       "mission_template_id": 6,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T13:07:44.066Z",
-      "created_at": "2026-05-25T13:02:44.066Z"
+      "time_slot_id": 16,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 10,
       "room_id": 2,
       "mission_template_id": 1,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T13:13:22.308Z",
-      "created_at": "2026-05-25T13:08:22.308Z"
+      "time_slot_id": 17,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 11,
       "room_id": 2,
       "mission_template_id": 5,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T13:19:52.398Z",
-      "created_at": "2026-05-25T13:14:52.398Z"
+      "time_slot_id": 18,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 12,
       "room_id": 1,
       "mission_template_id": 4,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T13:53:53.051Z",
-      "created_at": "2026-05-25T13:48:53.051Z"
+      "time_slot_id": 17,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 13,
       "room_id": 1,
       "mission_template_id": 8,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T13:58:53.122Z",
-      "created_at": "2026-05-25T13:53:53.122Z"
+      "time_slot_id": 18,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 14,
       "room_id": 1,
       "mission_template_id": 4,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T14:15:53.470Z",
-      "created_at": "2026-05-25T14:10:53.470Z"
+      "time_slot_id": 19,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
     },
     {
       "id": 15,
       "room_id": 1,
       "mission_template_id": 1,
-      "status": "CLOSED",
-      "deadline": "2026-05-25T14:31:53.690Z",
-      "created_at": "2026-05-25T14:26:53.690Z"
+      "time_slot_id": 20,
+      "date": "2026-05-25",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 16,
+      "room_id": 2,
+      "mission_template_id": 9,
+      "time_slot_id": 13,
+      "date": "2026-05-26",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 17,
+      "room_id": 1,
+      "mission_template_id": 3,
+      "time_slot_id": 14,
+      "date": "2026-05-26",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 18,
+      "room_id": 1,
+      "mission_template_id": 4,
+      "time_slot_id": 22,
+      "date": "2026-05-26",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 19,
+      "room_id": 1,
+      "mission_template_id": 1,
+      "time_slot_id": 18,
+      "date": "2026-05-26",
+      "status": "EXPIRED"
+    },
+    {
+      "id": 20,
+      "room_id": 2,
+      "mission_template_id": 6,
+      "time_slot_id": 15,
+      "date": "2026-05-26",
+      "status": "EXPIRED"
+    },
+    {
+      "id": 21,
+      "room_id": 2,
+      "mission_template_id": 7,
+      "time_slot_id": 19,
+      "date": "2026-05-26",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 22,
+      "room_id": 3,
+      "mission_template_id": 4,
+      "time_slot_id": 29,
+      "date": "2026-05-26",
+      "status": "EXPIRED"
+    },
+    {
+      "id": 23,
+      "room_id": 1,
+      "mission_template_id": 9,
+      "time_slot_id": 24,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 24,
+      "room_id": 1,
+      "mission_template_id": 3,
+      "time_slot_id": 15,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 25,
+      "room_id": 1,
+      "mission_template_id": 2,
+      "time_slot_id": 20,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 26,
+      "room_id": 2,
+      "mission_template_id": 10,
+      "time_slot_id": 21,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 27,
+      "room_id": 2,
+      "mission_template_id": 5,
+      "time_slot_id": 17,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 28,
+      "room_id": 3,
+      "mission_template_id": 5,
+      "time_slot_id": 34,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 29,
+      "room_id": 1,
+      "mission_template_id": 4,
+      "time_slot_id": 19,
+      "date": "2026-05-26",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 30,
+      "room_id": 1,
+      "mission_template_id": 1,
+      "time_slot_id": 24,
+      "date": "2026-05-26",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 31,
+      "room_id": 2,
+      "mission_template_id": 4,
+      "time_slot_id": 16,
+      "date": "2026-05-26",
+      "status": "EXPIRED"
+    },
+    {
+      "id": 32,
+      "room_id": 2,
+      "mission_template_id": 1,
+      "time_slot_id": 21,
+      "date": "2026-05-26",
+      "status": "COMPLETED"
+    },
+    {
+      "id": 33,
+      "room_id": 1,
+      "mission_template_id": 5,
+      "time_slot_id": 16,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 34,
+      "room_id": 1,
+      "mission_template_id": 7,
+      "time_slot_id": 22,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 35,
+      "room_id": 2,
+      "mission_template_id": 8,
+      "time_slot_id": 18,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 36,
+      "room_id": 2,
+      "mission_template_id": 5,
+      "time_slot_id": 18,
+      "date": "2026-05-26",
+      "status": "EXPIRED"
+    },
+    {
+      "id": 37,
+      "room_id": 2,
+      "mission_template_id": 6,
+      "time_slot_id": 20,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 38,
+      "room_id": 2,
+      "mission_template_id": 5,
+      "time_slot_id": 16,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 39,
+      "room_id": 2,
+      "mission_template_id": 1,
+      "time_slot_id": 15,
+      "date": "2026-05-27",
+      "status": "PENDING"
+    },
+    {
+      "id": 40,
+      "room_id": 1,
+      "mission_template_id": 6,
+      "time_slot_id": 21,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 41,
+      "room_id": 1,
+      "mission_template_id": 5,
+      "time_slot_id": 15,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 42,
+      "room_id": 2,
+      "mission_template_id": 1,
+      "time_slot_id": 15,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 43,
+      "room_id": 2,
+      "mission_template_id": 10,
+      "time_slot_id": 20,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 44,
+      "room_id": 3,
+      "mission_template_id": 7,
+      "time_slot_id": 30,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 45,
+      "room_id": 1,
+      "mission_template_id": 7,
+      "time_slot_id": 20,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 46,
+      "room_id": 1,
+      "mission_template_id": 3,
+      "time_slot_id": 16,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 47,
+      "room_id": 1,
+      "mission_template_id": 7,
+      "time_slot_id": 24,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 48,
+      "room_id": 2,
+      "mission_template_id": 9,
+      "time_slot_id": 19,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 49,
+      "room_id": 2,
+      "mission_template_id": 7,
+      "time_slot_id": 17,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 50,
+      "room_id": 2,
+      "mission_template_id": 5,
+      "time_slot_id": 21,
+      "date": "2026-05-28",
+      "status": "PENDING"
+    },
+    {
+      "id": 51,
+      "room_id": 2,
+      "mission_template_id": 1,
+      "time_slot_id": 16,
+      "date": "2026-05-28",
+      "status": "PENDING"
     }
   ],
   "submissions": [
@@ -638,6 +1072,321 @@
       "status": "SUBMITTED",
       "video_url": "mock://recorded-video",
       "submitted_at": "2026-05-25T14:28:25.846Z"
+    },
+    {
+      "id": 29,
+      "user_id": 1,
+      "room_id": 2,
+      "mission_id": 16,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-26T04:39:35.123Z"
+    },
+    {
+      "id": 30,
+      "user_id": 2,
+      "room_id": 2,
+      "mission_id": 16,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-26T04:40:09.485Z"
+    },
+    {
+      "id": 31,
+      "user_id": 3,
+      "room_id": 2,
+      "mission_id": 16,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-26T04:40:39.168Z"
+    },
+    {
+      "id": 32,
+      "user_id": 4,
+      "room_id": 2,
+      "mission_id": 16,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-26T04:40:57.276Z"
+    },
+    {
+      "id": 33,
+      "user_id": 5,
+      "room_id": 2,
+      "mission_id": 16,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T04:41:11.943Z"
+    },
+    {
+      "id": 34,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 17,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-26T04:47:55.862Z"
+    },
+    {
+      "id": 35,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 17,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T04:48:04.232Z"
+    },
+    {
+      "id": 36,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 17,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T04:48:30.648Z"
+    },
+    {
+      "id": 37,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 17,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T04:49:36.399Z"
+    },
+    {
+      "id": 38,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 17,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T04:50:08.674Z"
+    },
+    {
+      "id": 39,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 29,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:01:41.228Z"
+    },
+    {
+      "id": 40,
+      "user_id": 2,
+      "room_id": 2,
+      "mission_id": 21,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:02:25.421Z"
+    },
+    {
+      "id": 41,
+      "user_id": 4,
+      "room_id": 2,
+      "mission_id": 21,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:02:39.024Z"
+    },
+    {
+      "id": 42,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 29,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:02:40.089Z"
+    },
+    {
+      "id": 43,
+      "user_id": 3,
+      "room_id": 2,
+      "mission_id": 21,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:03:05.546Z"
+    },
+    {
+      "id": 44,
+      "user_id": 5,
+      "room_id": 2,
+      "mission_id": 21,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:03:05.652Z"
+    },
+    {
+      "id": 45,
+      "user_id": 1,
+      "room_id": 2,
+      "mission_id": 21,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:03:19.923Z"
+    },
+    {
+      "id": 46,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 29,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:03:34.677Z"
+    },
+    {
+      "id": 47,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 29,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:04:19.123Z"
+    },
+    {
+      "id": 48,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 29,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T06:04:30.500Z"
+    },
+    {
+      "id": 49,
+      "user_id": 2,
+      "room_id": 2,
+      "mission_id": 32,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:01:34.900Z"
+    },
+    {
+      "id": 50,
+      "user_id": 1,
+      "room_id": 2,
+      "mission_id": 32,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:02:23.445Z"
+    },
+    {
+      "id": 51,
+      "user_id": 4,
+      "room_id": 2,
+      "mission_id": 32,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:02:34.857Z"
+    },
+    {
+      "id": 52,
+      "user_id": 3,
+      "room_id": 2,
+      "mission_id": 32,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:03:28.265Z"
+    },
+    {
+      "id": 53,
+      "user_id": 5,
+      "room_id": 2,
+      "mission_id": 32,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:03:54.830Z"
+    },
+    {
+      "id": 54,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 18,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:31:53.133Z"
+    },
+    {
+      "id": 55,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 18,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:32:26.700Z"
+    },
+    {
+      "id": 56,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 18,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:32:30.095Z"
+    },
+    {
+      "id": 57,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 18,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:34:23.848Z"
+    },
+    {
+      "id": 58,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 18,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T07:34:24.336Z"
+    },
+    {
+      "id": 59,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 30,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T08:31:14.064Z"
+    },
+    {
+      "id": 60,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 30,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T08:32:47.749Z"
+    },
+    {
+      "id": 61,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 30,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T08:32:55.642Z"
+    },
+    {
+      "id": 62,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 30,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T08:32:58.511Z"
+    },
+    {
+      "id": 63,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 30,
+      "status": "SUBMITTED",
+      "video_url": null,
+      "submitted_at": "2026-05-26T08:33:03.051Z"
     }
   ],
   "collages": [],
@@ -652,7 +1401,498 @@
       "created_at": "2026-05-25T08:45:52.304Z"
     }
   ],
-  "notifications": [],
+  "notifications": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 19,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.870Z"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 19,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.870Z"
+    },
+    {
+      "id": 3,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 19,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.870Z"
+    },
+    {
+      "id": 4,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 19,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.870Z"
+    },
+    {
+      "id": 5,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 19,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.870Z"
+    },
+    {
+      "id": 6,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기",
+      "related_id": 20,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.886Z"
+    },
+    {
+      "id": 7,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기",
+      "related_id": 20,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.886Z"
+    },
+    {
+      "id": 8,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기",
+      "related_id": 20,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.886Z"
+    },
+    {
+      "id": 9,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기",
+      "related_id": 20,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.886Z"
+    },
+    {
+      "id": 10,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기",
+      "related_id": 20,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:10.886Z"
+    },
+    {
+      "id": 11,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 31,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:40.887Z"
+    },
+    {
+      "id": 12,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 31,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:40.887Z"
+    },
+    {
+      "id": 13,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 31,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:40.887Z"
+    },
+    {
+      "id": 14,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 31,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:40.887Z"
+    },
+    {
+      "id": 15,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 31,
+      "is_read": false,
+      "created_at": "2026-05-26T05:36:40.887Z"
+    },
+    {
+      "id": 16,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "아침 식사 찍기",
+      "related_id": 36,
+      "is_read": false,
+      "created_at": "2026-05-26T05:37:10.904Z"
+    },
+    {
+      "id": 17,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "아침 식사 찍기",
+      "related_id": 36,
+      "is_read": false,
+      "created_at": "2026-05-26T05:37:10.904Z"
+    },
+    {
+      "id": 18,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "아침 식사 찍기",
+      "related_id": 36,
+      "is_read": false,
+      "created_at": "2026-05-26T05:37:10.904Z"
+    },
+    {
+      "id": 19,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "아침 식사 찍기",
+      "related_id": 36,
+      "is_read": false,
+      "created_at": "2026-05-26T05:37:10.904Z"
+    },
+    {
+      "id": 20,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "아침 식사 찍기",
+      "related_id": 36,
+      "is_read": false,
+      "created_at": "2026-05-26T05:37:10.904Z"
+    },
+    {
+      "id": 21,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 앉아 있는 곳 찍기",
+      "related_id": 21,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.011Z"
+    },
+    {
+      "id": 22,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 앉아 있는 곳 찍기",
+      "related_id": 21,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.011Z"
+    },
+    {
+      "id": 23,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 앉아 있는 곳 찍기",
+      "related_id": 21,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.011Z"
+    },
+    {
+      "id": 24,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 앉아 있는 곳 찍기",
+      "related_id": 21,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.011Z"
+    },
+    {
+      "id": 25,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 앉아 있는 곳 찍기",
+      "related_id": 21,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.011Z"
+    },
+    {
+      "id": 26,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 29,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.446Z"
+    },
+    {
+      "id": 27,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 29,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.446Z"
+    },
+    {
+      "id": 28,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 29,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.446Z"
+    },
+    {
+      "id": 29,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 29,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.446Z"
+    },
+    {
+      "id": 30,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 29,
+      "is_read": false,
+      "created_at": "2026-05-26T06:00:32.446Z"
+    },
+    {
+      "id": 31,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 32,
+      "is_read": false,
+      "created_at": "2026-05-26T07:00:22.406Z"
+    },
+    {
+      "id": 32,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 32,
+      "is_read": false,
+      "created_at": "2026-05-26T07:00:22.406Z"
+    },
+    {
+      "id": 33,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 32,
+      "is_read": false,
+      "created_at": "2026-05-26T07:00:22.406Z"
+    },
+    {
+      "id": 34,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 32,
+      "is_read": false,
+      "created_at": "2026-05-26T07:00:22.406Z"
+    },
+    {
+      "id": 35,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 32,
+      "is_read": false,
+      "created_at": "2026-05-26T07:00:22.406Z"
+    },
+    {
+      "id": 36,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 18,
+      "is_read": false,
+      "created_at": "2026-05-26T07:30:29.838Z"
+    },
+    {
+      "id": 37,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 18,
+      "is_read": false,
+      "created_at": "2026-05-26T07:30:29.838Z"
+    },
+    {
+      "id": 38,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 18,
+      "is_read": false,
+      "created_at": "2026-05-26T07:30:29.838Z"
+    },
+    {
+      "id": 39,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 18,
+      "is_read": false,
+      "created_at": "2026-05-26T07:30:29.838Z"
+    },
+    {
+      "id": 40,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 18,
+      "is_read": false,
+      "created_at": "2026-05-26T07:30:29.838Z"
+    },
+    {
+      "id": 41,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 30,
+      "is_read": false,
+      "created_at": "2026-05-26T08:30:04.340Z"
+    },
+    {
+      "id": 42,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 30,
+      "is_read": false,
+      "created_at": "2026-05-26T08:30:04.340Z"
+    },
+    {
+      "id": 43,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 30,
+      "is_read": false,
+      "created_at": "2026-05-26T08:30:04.340Z"
+    },
+    {
+      "id": 44,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 30,
+      "is_read": false,
+      "created_at": "2026-05-26T08:30:04.340Z"
+    },
+    {
+      "id": 45,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기",
+      "related_id": 30,
+      "is_read": false,
+      "created_at": "2026-05-26T08:30:04.340Z"
+    },
+    {
+      "id": 46,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 22,
+      "is_read": false,
+      "created_at": "2026-05-27T02:30:05.799Z"
+    },
+    {
+      "id": 47,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 22,
+      "is_read": false,
+      "created_at": "2026-05-27T02:30:05.799Z"
+    },
+    {
+      "id": 48,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 22,
+      "is_read": false,
+      "created_at": "2026-05-27T02:30:05.799Z"
+    },
+    {
+      "id": 49,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "하늘 찍기",
+      "related_id": 22,
+      "is_read": false,
+      "created_at": "2026-05-27T02:30:05.799Z"
+    }
+  ],
   "collection_records": [
     {
       "id": 1,
@@ -787,6 +2027,231 @@
       "room_id": 1,
       "submission_id": 26,
       "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 16,
+      "user_id": 1,
+      "mission_template_id": 9,
+      "room_id": 2,
+      "submission_id": 29,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 17,
+      "user_id": 2,
+      "mission_template_id": 9,
+      "room_id": 2,
+      "submission_id": 30,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 18,
+      "user_id": 3,
+      "mission_template_id": 9,
+      "room_id": 2,
+      "submission_id": 31,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 19,
+      "user_id": 4,
+      "mission_template_id": 9,
+      "room_id": 2,
+      "submission_id": 32,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 20,
+      "user_id": 5,
+      "mission_template_id": 9,
+      "room_id": 2,
+      "submission_id": 33,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 21,
+      "user_id": 1,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 34,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 22,
+      "user_id": 5,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 35,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 23,
+      "user_id": 2,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 36,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 24,
+      "user_id": 4,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 37,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 25,
+      "user_id": 3,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 38,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 26,
+      "user_id": 2,
+      "mission_template_id": 7,
+      "room_id": 2,
+      "submission_id": 40,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 27,
+      "user_id": 4,
+      "mission_template_id": 7,
+      "room_id": 2,
+      "submission_id": 41,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 28,
+      "user_id": 3,
+      "mission_template_id": 7,
+      "room_id": 2,
+      "submission_id": 43,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 29,
+      "user_id": 5,
+      "mission_template_id": 7,
+      "room_id": 2,
+      "submission_id": 44,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 30,
+      "user_id": 1,
+      "mission_template_id": 7,
+      "room_id": 2,
+      "submission_id": 45,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 31,
+      "user_id": 1,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 39,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 32,
+      "user_id": 3,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 42,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 33,
+      "user_id": 5,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 46,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 34,
+      "user_id": 2,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 47,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 35,
+      "user_id": 4,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 48,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 36,
+      "user_id": 2,
+      "mission_template_id": 1,
+      "room_id": 2,
+      "submission_id": 49,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 37,
+      "user_id": 1,
+      "mission_template_id": 1,
+      "room_id": 2,
+      "submission_id": 50,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 38,
+      "user_id": 4,
+      "mission_template_id": 1,
+      "room_id": 2,
+      "submission_id": 51,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 39,
+      "user_id": 3,
+      "mission_template_id": 1,
+      "room_id": 2,
+      "submission_id": 52,
+      "date": "2026-05-26",
+      "thumbnail": null
+    },
+    {
+      "id": 40,
+      "user_id": 5,
+      "mission_template_id": 1,
+      "room_id": 2,
+      "submission_id": 53,
+      "date": "2026-05-26",
       "thumbnail": null
     }
   ]

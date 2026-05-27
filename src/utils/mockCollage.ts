@@ -22,25 +22,17 @@ export function buildCollageCells(
   participations: MemberParticipation[],
   missionStartAt: string,
 ): CollageCellData[] {
-  // mock 제출 시각 (mission start + N초)
-  const MOCK_SUBMIT_OFFSETS = [47, 123, 198, 215, 289, 301, 180, 90, 255, 310]
-
-  return participations.map((p, i) => {
-    const offset = MOCK_SUBMIT_OFFSETS[i % MOCK_SUBMIT_OFFSETS.length]
-    const submittedAt =
-      p.state === 'done'
-        ? new Date(new Date(missionStartAt).getTime() + offset * 1000).toISOString()
-        : undefined
-
-    return {
-      user: p.user,
-      videoUrl: p.submission?.video_url,
-      missionStartAt,
-      submittedAt,
-      status: p.state === 'done' ? 'submitted' : 'missed',
-      gradient: CELL_GRADIENTS[i % CELL_GRADIENTS.length],
-    }
-  })
+  return participations.map((p, i) => ({
+    user: p.user,
+    videoUrl:      p.submission?.video_url ?? undefined,
+    missionStartAt,
+    // 실제 submitted_at 사용 — mock 오프셋 제거
+    submittedAt:   p.state === 'done' && p.submission?.submitted_at
+      ? p.submission.submitted_at
+      : undefined,
+    status:        p.state === 'done' ? 'submitted' : 'missed',
+    gradient:      CELL_GRADIENTS[i % CELL_GRADIENTS.length],
+  }))
 }
 
 /** mock 미션 참여자 (결과 화면 직접 진입용) */
