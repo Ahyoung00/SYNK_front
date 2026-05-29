@@ -50,6 +50,12 @@ export default function RoomMembersPage() {
           return (
             <div key={m.id} className={styles.memberRow}>
               <div className={styles.memberInfo}>
+                <div className={styles.memberAvatar}>
+                  {m.user?.profileImage
+                    ? <img src={m.user.profileImage} alt={name} className={styles.memberAvatarImg} />
+                    : <span className={styles.memberAvatarInitial}>👤</span>
+                  }
+                </div>
                 <span className={styles.memberName}>{name}</span>
               </div>
               {m.is_owner && <span className={styles.ownerBadge}>방장</span>}
