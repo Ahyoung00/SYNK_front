@@ -2,11 +2,14 @@ import { api } from './client'
 import type {
   User,
   Room,
+  RoomDetail,
+  RoomsMyResponse,
   RoomMember,
   Mission,
   Submission,
   AlbumItem,
   SynklogDetailResponse,
+  CollageItem,
   SynkLog,
   RoomChatListResponse,
   CollectionListResponse,
@@ -89,9 +92,11 @@ export const userApi = {
 // DELETE /rooms/{roomId}/members/{userId}  — 강퇴
 
 export const roomApi = {
-  getMyRooms: () => api.get<Room[]>('/rooms/my'),
+  /** GET /rooms/my — { active[], waiting[] } */
+  getMyRooms: () => api.get<RoomsMyResponse>('/rooms/my'),
 
-  getRoom: (roomId: number) => api.get<Room>(`/rooms/${roomId}`),
+  /** GET /rooms/{roomId} — 방 상세 (camelCase, members 포함) */
+  getRoom: (roomId: number) => api.get<RoomDetail>(`/rooms/${roomId}`),
 
   /**
    * 방 생성
@@ -128,8 +133,9 @@ export const roomApi = {
   updateRoom: (roomId: number, data: RoomUpdateRequest) =>
     api.patch<void>(`/rooms/${roomId}`, data),
 
+  /** GET /rooms/{roomId}/invite — { roomId, roomName, code, inviteUrl, thumbnail } */
   getInvite: (roomId: number) =>
-    api.get<{ code: string; url: string }>(`/rooms/${roomId}/invite`),
+    api.get<{ roomId: number; roomName: string; code: string; inviteUrl: string; thumbnail: string | null }>(`/rooms/${roomId}/invite`),
 
   /** 스펙 미확정 */
   getMembers: (roomId: number) => api.get<RoomMember[]>(`/rooms/${roomId}/members`),
@@ -183,9 +189,10 @@ export const missionApi = {
     api.get<Submission>(`/submissions/${submissionId}`),
 }
 
-// ── Album / SynkLog ───────────────────────────────────────────────────────────
+// ── Album / SynkLog / Collage ─────────────────────────────────────────────────
 // GET  /rooms/{roomId}/albums                        — 날짜별 앨범 목록
-// GET  /rooms/{roomId}/albums/{date}/collages         — 특정 날짜 SYNKLOG (릴스 영상)
+// GET  /rooms/{roomId}/albums/{date}/collages         — 날짜별 미션 콜라주 + 참여자 (신규)
+// GET  /rooms/{roomId}/albums/{date}/synklog          — SYNKLOG 조회 (폴링용)
 // POST /rooms/{roomId}/albums/{date}/synklog          — SYNKLOG 생성 요청
 
 export const albumApi = {
@@ -197,19 +204,28 @@ export const albumApi = {
     api.get<AlbumItem[]>(`/rooms/${roomId}/albums`),
 
   /**
-   * 특정 날짜 SYNKLOG 조회 — GET /rooms/{roomId}/albums/{date}/collages
-   * Response: { synklogId, date("YYYY.MM.DD"), synklogVideoUrl, thumbnail, missions[] }
+   * 날짜별 미션 콜라주 + 참여자 조회 — GET /rooms/{roomId}/albums/{date}/collages
+   * Response: CollageItem[] (missionId, missionTitle, status, collageVideoUrl, participants[])
    */
   getCollages: (roomId: number, date: string) =>
-    api.get<SynklogDetailResponse>(`/rooms/${roomId}/albums/${date}/collages`),
+    api.get<CollageItem[]>(`/rooms/${roomId}/albums/${date}/collages`),
 
   /**
-   * SYNKLOG 생성 요청
-   * Request body: { roomId, date }  (path param과 동일 값을 body에도 전송)
+   * 특정 날짜 SYNKLOG 조회 (폴링용) — GET /rooms/{roomId}/albums/{date}/synklog
+   * PROCESSING: { synklogId, date, status, synklogVideoUrl: null }
+   * COMPLETED:  { synklogId, date, status, synklogVideoUrl, thumbnail, missions[{missionTitle}] }
+   * 없으면 404
+   */
+  getSynklog: (roomId: number, date: string) =>
+    api.get<SynklogDetailResponse>(`/rooms/${roomId}/albums/${date}/synklog`),
+
+  /**
+   * SYNKLOG 생성 요청 — POST /rooms/{roomId}/albums/{date}/synklog
+   * Request: 없음
    * Response: { synklogId, status: "PROCESSING" | "COMPLETED" }
    */
   createSynklog: (roomId: number, date: string) =>
-    api.post<SynklogCreatedResponse>(`/rooms/${roomId}/albums/${date}/synklog`, { roomId, date }),
+    api.post<SynklogCreatedResponse>(`/rooms/${roomId}/albums/${date}/synklog`),
 }
 
 // ── Chat ──────────────────────────────────────────────────────────────────────
@@ -259,6 +275,18 @@ export const collectionApi = {
    */
   getMissionDetail: (missionId: number) =>
     api.get<CollectionDetailResponse>(`/collections/missions/${missionId}`),
+}
+
+// ── Debug (개발 전용) ──────────────────────────────────────────────────────────
+
+export const debugApi = {
+  /**
+   * 미션 강제 발동 — POST /debug/rooms/{roomId}/trigger-mission
+   * mock 서버 전용. 즉시 ACTIVE 미션 생성 (5분 타이머)
+   * Response: { missionId, title }
+   */
+  triggerMission: (roomId: number) =>
+    api.post<{ missionId: number; title: string }>(`/debug/rooms/${roomId}/trigger-mission`),
 }
 
 // ── Notifications ─────────────────────────────────────────────────────────────

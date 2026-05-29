@@ -116,8 +116,8 @@ export default function CreateRoomPage() {
                 <span className={styles.stepValue}>{missionCount}회</span>
                 <button
                   className={styles.stepBtn}
-                  onClick={() => setMissionCount((v) => Math.min(10, v + 1))}
-                  disabled={missionCount >= 10}
+                  onClick={() => setMissionCount((v) => Math.min(5, v + 1))}
+                  disabled={missionCount >= 5}
                 >+</button>
               </div>
             </div>

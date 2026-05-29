@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ROUTES } from '@/constants'
-import { roomApi, albumApi } from '@/services/api/endpoints'
-import type { Room, RoomMember, AlbumItem } from '@/types'
+import { roomApi, albumApi, debugApi } from '@/services/api/endpoints'
+import type { RoomDetail, AlbumItem } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './RoomPage.module.css'
 
@@ -11,22 +11,20 @@ export default function RoomPage() {
   const navigate   = useNavigate()
   const id = Number(roomId)
 
-  const [room, setRoom]           = useState<Room | null>(null)
-  const [members, setMembers]     = useState<RoomMember[]>([])
-  const [albums, setAlbums]       = useState<AlbumItem[]>([])
-  const [codeCopied, setCodeCopied] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [room, setRoom]               = useState<RoomDetail | null>(null)
+  const [albums, setAlbums]           = useState<AlbumItem[]>([])
+  const [codeCopied, setCodeCopied]   = useState(false)
+  const [isLoading, setIsLoading]     = useState(true)
+  const [triggering, setTriggering]   = useState(false)
 
   useEffect(() => {
     if (!id) return
     Promise.all([
-      roomApi.getRoom(id),
-      roomApi.getMembers(id),
+      roomApi.getRoom(id),   // members 포함
       albumApi.getAlbums(id),
     ])
-      .then(([roomRes, membersRes, albumsRes]) => {
+      .then(([roomRes, albumsRes]) => {
         setRoom(roomRes.data)
-        setMembers(membersRes.data)
         setAlbums(albumsRes.data)
       })
       .catch(console.error)
@@ -45,6 +43,20 @@ export default function RoomPage() {
     roomApi.leaveRoom(id)
       .then(() => navigate(ROUTES.ROOMS, { replace: true }))
       .catch(console.error)
+  }
+
+  async function handleTriggerMission() {
+    if (triggering) return
+    setTriggering(true)
+    try {
+      const res = await debugApi.triggerMission(id)
+      alert(`✅ 미션 발동!\n"${res.data.title}"\n\n홈으로 이동하면 미션 카드가 떠요.`)
+      navigate(ROUTES.HOME)
+    } catch (e) {
+      alert('미션 발동 실패 (이미 활성 미션이 있을 수 있어요)')
+    } finally {
+      setTriggering(false)
+    }
   }
 
   if (isLoading) {
@@ -103,15 +115,15 @@ export default function RoomPage() {
         {/* ── 멤버 ─────────────────────────────────────────────────────────── */}
         <div className={styles.section}>
           <span className={styles.sectionIcon}>👤</span>
-          <span className={styles.sectionTitle}>멤버 {members.length}/{room.max_members}</span>
+          <span className={styles.sectionTitle}>멤버 {room.currentMembers}/{room.maxMembers}</span>
         </div>
         <div className={styles.memberRow}>
-          {members.map((m) => (
-            <div key={m.id} className={styles.memberItem}>
+          {room.members.map((m) => (
+            <div key={m.userId} className={styles.memberItem}>
               <div className={styles.memberAvatar}>
-                {m.user?.name?.charAt(0) ?? '?'}
+                {m.name?.charAt(0) ?? '?'}
               </div>
-              <span className={styles.memberName}>{m.user?.name ?? '알 수 없음'}</span>
+              <span className={styles.memberName}>{m.name ?? '알 수 없음'}</span>
             </div>
           ))}
         </div>
@@ -171,6 +183,19 @@ export default function RoomPage() {
 
       {/* ── 방 나가기 ─────────────────────────────────────────────────────────── */}
       <div className={styles.footer}>
+        {import.meta.env.DEV && (
+          <button
+            onClick={handleTriggerMission}
+            disabled={triggering}
+            style={{
+              width: '100%', padding: '10px', marginBottom: 8,
+              background: 'rgba(250,204,21,0.15)', border: '1px dashed #facc15',
+              borderRadius: 10, color: '#facc15', fontSize: 13, cursor: 'pointer',
+            }}
+          >
+            {triggering ? '발동 중...' : '🧪 미션 강제 발동 (개발용)'}
+          </button>
+        )}
         <button className={styles.leaveBtn} onClick={handleLeave}>
           <LeaveIcon />
           방 나가기

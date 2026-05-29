@@ -69,8 +69,8 @@ export const useMissionStore = create<MissionStore>()((set, get) => ({
   },
 
   clearMission: () => {
-    const old = get().previewUrl
-    if (old) URL.revokeObjectURL(old)
-    set({ active: null, recordedBlob: null, previewUrl: null })
+    // previewUrl은 여기서 지우지 않음 — 앨범에서 콜라주 볼 때 재사용
+    // 새 영상을 녹화하면 setRecordedBlob에서 이전 URL이 자동으로 revoke됨
+    set({ active: null, recordedBlob: null })
   },
 }))
