@@ -262,6 +262,8 @@ export interface CollageParticipant {
 export interface CollageItem {
   missionId: number
   missionTitle: string
+  /** 미션 시작 시각 (ISO) — 제출 경과 시간 계산에 사용 */
+  missionStartAt: string | null
   /** 콜라주 영상 생성 상태 */
   status: 'PROCESSING' | 'COMPLETED'
   /** 생성된 콜라주 영상 URL (생성 전 null) */

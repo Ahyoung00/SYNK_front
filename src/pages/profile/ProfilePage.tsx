@@ -32,7 +32,7 @@ export default function ProfilePage() {
             {user?.profileImage ? (
               <img src={user.profileImage} alt="프로필" className={styles.avatarImg} />
             ) : (
-              <span className={styles.avatarEmoji}>😊</span>
+              <span className={styles.avatarEmoji}>👤</span>
             )}
           </div>
           <div className={styles.profileInfo}>
