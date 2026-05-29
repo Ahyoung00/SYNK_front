@@ -82,6 +82,15 @@ html, body {
   overflow: hidden;          /* Capacitor: prevent overscroll bounce */
 }
 
+/* ── 스크롤바 숨기기 (모바일 앱 느낌) ────────────────────────────────────── */
+* {
+  scrollbar-width: none;          /* Firefox */
+  -ms-overflow-style: none;       /* IE / Edge legacy */
+}
+*::-webkit-scrollbar {
+  display: none;                  /* Chrome / Safari / Chromium */
+}
+
 body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
