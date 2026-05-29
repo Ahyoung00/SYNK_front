@@ -43,7 +43,7 @@ export default function RoomMembersPage() {
       {/* ── 멤버 목록 ─────────────────────────────────────────────────────────── */}
       <div className={styles.memberList}>
         {isLoading && (
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>불러오는 중...</p>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>불러오는 중...</p>
         )}
         {members.map((m) => {
           const name = m.user?.name ?? '알 수 없음'

@@ -10,7 +10,7 @@ const TYPE_META: Record<string, { icon: string; bg: string }> = {
   MISSION_START:    { icon: '⚡', bg: 'rgba(250, 204, 21, 0.15)'  },
   MISSION_COMPLETE: { icon: '✅', bg: 'rgba(74, 222, 128, 0.15)'  },
   SYNKLOG_CREATED:  { icon: '🎬', bg: 'rgba(168, 85, 247, 0.15)'  },
-  MEMBER_JOIN:      { icon: '👤', bg: 'rgba(255,255,255, 0.07)'   },
+  MEMBER_JOIN:      { icon: '👤', bg: 'var(--color-surface-2)'     },
   ACHIEVEMENT:      { icon: '🔥', bg: 'rgba(249, 115, 22, 0.15)'  },
 }
 
@@ -110,7 +110,7 @@ export default function NotificationsPage() {
       {/* ── 알림 목록 ─────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
         {isEmpty ? (
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
             알림이 없어요
           </p>
         ) : (

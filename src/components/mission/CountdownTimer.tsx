@@ -47,7 +47,7 @@ export function CountdownTimer({ secondsLeft, size = 'lg', showLabel = true }: P
         <span
           ref={timeRef}
           className={styles.time}
-          style={{ color: isExpired ? 'rgba(255,255,255,0.3)' : color }}
+          style={{ color: isExpired ? 'var(--color-text-muted)' : color }}
         >
           {isExpired ? '00:00' : formatTime(secondsLeft)}
         </span>
@@ -76,7 +76,7 @@ function TimerRing({ secondsLeft, color }: { secondsLeft: number; color: string 
       <circle
         cx="80" cy="80" r={radius}
         fill="none"
-        stroke="rgba(255,255,255,0.06)"
+        stroke="var(--color-timer-ring)"
         strokeWidth="6"
       />
       {/* 진행 링 */}
@@ -92,7 +92,7 @@ function TimerRing({ secondsLeft, color }: { secondsLeft: number; color: string 
           transform: 'rotate(-90deg)',
           transformOrigin: 'center',
           transition: 'stroke-dashoffset 0.9s linear, stroke 0.6s ease',
-          filter: `drop-shadow(0 0 6px ${color}66)`,
+          filter: 'drop-shadow(0 0 6px var(--color-timer-glow))',
         }}
       />
     </svg>

@@ -104,7 +104,7 @@ export default function SynkLogDetailPage() {
     return (
       <div className={styles.page}>
         <SynkHeader date={date ?? ''} onBack={() => navigate(-1)} />
-        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
           불러오는 중...
         </p>
       </div>
@@ -115,7 +115,7 @@ export default function SynkLogDetailPage() {
     return (
       <div className={styles.page}>
         <SynkHeader date={date ?? ''} onBack={() => navigate(-1)} />
-        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
           데이터를 불러올 수 없어요
         </p>
       </div>

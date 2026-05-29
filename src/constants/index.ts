@@ -77,17 +77,9 @@ export const STORAGE_KEYS = {
 
 // ── Timer colors (based on remaining seconds) ─────────────────────────────────
 
-export const TIMER_COLORS = {
-  /** > 3 min remaining: safe */
-  SAFE: '#4ade80',    // green
-  /** 1–3 min: caution */
-  WARN: '#facc15',    // yellow
-  /** < 1 min: danger */
-  DANGER: '#ef4444',  // red
-} as const
-
+/** Returns a CSS variable reference — resolves correctly in both light & dark mode */
 export function getTimerColor(secondsLeft: number): string {
-  if (secondsLeft > 180) return TIMER_COLORS.SAFE
-  if (secondsLeft > 60) return TIMER_COLORS.WARN
-  return TIMER_COLORS.DANGER
+  if (secondsLeft > 180) return 'var(--color-timer-safe)'
+  if (secondsLeft > 60)  return 'var(--color-timer-warn)'
+  return 'var(--color-timer-danger)'
 }

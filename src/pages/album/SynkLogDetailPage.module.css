@@ -81,7 +81,7 @@
 .collageBtn {
   flex-shrink: 0;
   padding: 5px 12px;
-  background: #3b82f6;
+  background: var(--color-primary);
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
   font-weight: 700;
@@ -119,11 +119,11 @@
 }
 
 .avatarDone {
-  border-color: #4ade80;
+  border-color: var(--color-status-done);
 }
 
 .avatarMissed {
-  border-color: rgba(255,255,255,0.1);
+  border-color: var(--color-border);
   opacity: 0.5;
 }
 
@@ -148,7 +148,7 @@
 .synkBtn {
   margin-top: var(--sp-3);
   padding: 12px 40px;
-  background: #3b82f6;
+  background: var(--color-primary);
   border-radius: var(--radius-lg);
   font-size: var(--text-base);
   font-weight: 900;
@@ -227,7 +227,7 @@
 .photoSaveBtn {
   flex: 1;
   padding: 14px;
-  background: #3b82f6;
+  background: var(--color-primary);
   border-radius: var(--radius-lg);
   font-size: var(--text-base);
   font-weight: 700;

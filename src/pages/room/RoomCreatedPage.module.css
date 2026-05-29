@@ -11,7 +11,7 @@
 .heroBg {
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 50% -10%, rgba(124, 58, 237, 0.35) 0%, transparent 65%);
+  background: radial-gradient(ellipse at 50% -10%, rgba(122, 181, 103, 0.25) 0%, transparent 65%);
   pointer-events: none;
 }
 
@@ -33,11 +33,11 @@
   width: 100px;
   height: 100px;
   border-radius: var(--radius-xl);
-  background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #5CA84E 0%, #7AB567 100%);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 32px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 8px 32px rgba(122, 181, 103, 0.4);
 }
 
 .thumbEmoji {
@@ -88,7 +88,7 @@
   font-size: 36px;
   font-weight: 900;
   letter-spacing: 6px;
-  color: #3b82f6;
+  color: var(--color-primary);
 }
 
 .copyBtn {
@@ -109,7 +109,7 @@
 .inviteLink {
   font-size: var(--text-sm);
   font-weight: 700;
-  color: #3b82f6;
+  color: var(--color-primary);
   padding: var(--sp-2);
 }
 
@@ -197,7 +197,7 @@
   font-size: var(--text-2xl);
   font-weight: 900;
   letter-spacing: 4px;
-  color: #3b82f6;
+  color: var(--color-primary);
 }
 
 .sheetCopyBtn {
@@ -230,7 +230,7 @@
 .sheetLinkCopy {
   font-size: var(--text-sm);
   font-weight: 700;
-  color: #3b82f6;
+  color: var(--color-primary);
   flex-shrink: 0;
 }
 

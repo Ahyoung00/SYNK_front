@@ -5,24 +5,47 @@
 /* ── Design tokens ────────────────────────────────────────────────────────── */
 :root {
   /* Brand colors */
-  --color-bg:          #0f0f14;
-  --color-surface:     #1a1a24;
-  --color-surface-2:   #24243a;
-  --color-border:      rgba(255, 255, 255, 0.08);
+  --color-bg:          #FEFCF5;
+  --color-surface:     #F4EDE0;
+  --color-surface-2:   #EAE4D2;
+  --color-border:      rgba(100, 140, 60, 0.15);
 
-  --color-primary:     #6c63ff;
-  --color-primary-dim: rgba(108, 99, 255, 0.2);
+  --color-primary:     #7AB567;
+  --color-primary-dim: rgba(122, 181, 103, 0.15);
 
-  --color-accent:      #ff6b6b;
+  --color-accent:      #E5704A;
 
-  --color-text:        #ffffff;
-  --color-text-sub:    rgba(255, 255, 255, 0.55);
-  --color-text-muted:  rgba(255, 255, 255, 0.30);
+  --color-text:        #263A1A;
+  --color-text-sub:    rgba(38, 58, 26, 0.62);
+  --color-text-muted:  rgba(38, 58, 26, 0.38);
 
   /* Timer states */
-  --color-timer-safe:   #4ade80;
-  --color-timer-warn:   #facc15;
-  --color-timer-danger: #ef4444;
+  --color-timer-safe:   #2D8A45;
+  --color-timer-warn:   #B87A0A;
+  --color-timer-danger: #DC2626;
+
+  /* Status / badge colors */
+  --color-status-done:        #2D8A45;
+  --color-status-done-bg:     rgba(45, 138, 69, 0.12);
+  --color-status-done-border: rgba(45, 138, 69, 0.3);
+  --color-status-warn:        #B87A0A;
+  --color-status-warn-bg:     rgba(184, 122, 10, 0.12);
+  --color-status-neutral-bg:  rgba(100, 140, 60, 0.10);
+
+  /* Timer ring / glow */
+  --color-timer-ring:   rgba(100, 140, 60, 0.15);
+  --color-timer-glow:   rgba(45, 138, 69, 0.4);
+
+  /* Pulse animation */
+  --color-pulse:        rgba(122, 181, 103, 0.4);
+  --color-pulse-0:      rgba(122, 181, 103, 0);
+
+  /* Done CTA button */
+  --color-done-cta:     #3D7A50;
+  --color-done-cta-text: #fff;
+
+  /* FAB shadow */
+  --color-fab-shadow:   rgba(122, 181, 103, 0.45);
 
   /* Spacing (4px grid) */
   --sp-1: 4px;
@@ -97,7 +120,7 @@ body {
   line-height: 1.5;
   color: var(--color-text);
   /* 데스크톱에서 앱 바깥 배경 */
-  background-color: #07070b;
+  background-color: #E8E2D0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;         /* Feels native */
@@ -123,8 +146,8 @@ body {
   #root {
     max-width: 390px;
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.06),
-      0 24px 80px rgba(0, 0, 0, 0.8);
+      0 0 0 1px rgba(0, 0, 0, 0.06),
+      0 24px 80px rgba(0, 0, 0, 0.25);
   }
 }
 
@@ -182,4 +205,55 @@ img, video {
   transform: translateY(0);
   transition: opacity var(--dur-base) var(--ease-out),
               transform var(--dur-base) var(--ease-out);
+}
+
+/* ── Dark mode theme ──────────────────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --color-bg:          #0f0f14;
+  --color-surface:     #1a1a24;
+  --color-surface-2:   #24243a;
+  --color-border:      rgba(255, 255, 255, 0.08);
+
+  --color-primary:     #6c63ff;
+  --color-primary-dim: rgba(108, 99, 255, 0.2);
+
+  --color-accent:      #ff6b6b;
+
+  --color-text:        #ffffff;
+  --color-text-sub:    rgba(255, 255, 255, 0.55);
+  --color-text-muted:  rgba(255, 255, 255, 0.30);
+
+  --color-timer-safe:   #4ade80;
+  --color-timer-warn:   #facc15;
+  --color-timer-danger: #ef4444;
+
+  --color-status-done:        #4ade80;
+  --color-status-done-bg:     rgba(74, 222, 128, 0.2);
+  --color-status-done-border: rgba(74, 222, 128, 0.3);
+  --color-status-warn:        #facc15;
+  --color-status-warn-bg:     rgba(250, 204, 21, 0.2);
+  --color-status-neutral-bg:  rgba(255, 255, 255, 0.07);
+
+  --color-timer-ring:   rgba(255, 255, 255, 0.06);
+  --color-timer-glow:   rgba(108, 99, 255, 0.4);
+
+  --color-pulse:        rgba(108, 99, 255, 0.4);
+  --color-pulse-0:      rgba(108, 99, 255, 0);
+
+  --color-done-cta:     #166534;
+  --color-done-cta-text: #bbf7d0;
+
+  --color-fab-shadow:   rgba(108, 99, 255, 0.45);
+}
+
+[data-theme="dark"] body {
+  background-color: #07070b;
+}
+
+@media (min-width: 500px) {
+  [data-theme="dark"] #root {
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.06),
+      0 24px 80px rgba(0, 0, 0, 0.8);
+  }
 }
