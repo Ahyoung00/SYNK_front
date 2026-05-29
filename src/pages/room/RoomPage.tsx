@@ -121,7 +121,10 @@ export default function RoomPage() {
           {room.members.map((m) => (
             <div key={m.userId} className={styles.memberItem}>
               <div className={styles.memberAvatar}>
-                {m.name?.charAt(0) ?? '?'}
+                {m.profileImage
+                  ? <img src={m.profileImage} alt={m.name} className={styles.memberAvatarImg} />
+                  : (m.name?.charAt(0) ?? '?')
+                }
               </div>
               <span className={styles.memberName}>{m.name ?? '알 수 없음'}</span>
             </div>

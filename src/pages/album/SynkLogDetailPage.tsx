@@ -135,45 +135,17 @@ export default function SynkLogDetailPage() {
       <div className={styles.scroll}>
 
         {/* ── 미션별 콜라주 ────────────────────────────────────────────────── */}
-        {collages.map((item) => {
-          const submittedCount = item.participants.filter((p) => p.state === 'done').length
-          const totalCount     = item.participants.length
-
-          return (
-            <div key={item.missionId} className={styles.missionCard}>
-              <p className={styles.missionHeader}>⚡ 수행한 미션</p>
-              <p className={styles.missionText}>{item.missionTitle}</p>
-
-              <p className={styles.missionMeta}>
-                {submittedCount}/{totalCount}명 참여
-              </p>
-
-              <div className={styles.avatarRow}>
-                {item.participants.map((p) => (
-                  <div
-                    key={p.userId}
-                    className={[
-                      styles.avatarItem,
-                      p.state === 'done' ? styles.avatarDone : styles.avatarMissed,
-                    ].join(' ')}
-                  >
-                    {p.profileImage
-                      ? <img src={p.profileImage} alt={p.name} className={styles.avatarImg} />
-                      : <span className={styles.avatarInitial}>{p.name.charAt(0)}</span>
-                    }
-                  </div>
-                ))}
-              </div>
-
-              <button
-                className={styles.synkBtn}
-                onClick={() => handleViewCollage(item)}
-              >
-                콜라주 보기
-              </button>
-            </div>
-          )
-        })}
+        {collages.map((item) => (
+          <div key={item.missionId} className={styles.missionCard}>
+            <p className={styles.missionText}>{item.missionTitle}</p>
+            <button
+              className={styles.synkBtn}
+              onClick={() => handleViewCollage(item)}
+            >
+              콜라주 보기
+            </button>
+          </div>
+        ))}
 
         {/* ── SYNKLOG 합본 영상 ────────────────────────────────────────────── */}
         <div className={styles.missionCard}>
