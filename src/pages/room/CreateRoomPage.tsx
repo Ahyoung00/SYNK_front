@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { roomApi } from '@/services/api/endpoints'
@@ -15,6 +15,20 @@ export default function CreateRoomPage() {
   const [missionEndTime,   setMissionEndTime]   = useState('22:00')
   const [isLoading, setIsLoading]         = useState(false)
   const [error, setError]                 = useState<string | null>(null)
+  const [thumbUrl, setThumbUrl]           = useState<string | null>(null)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  function handleThumbClick() {
+    fileInputRef.current?.click()
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const url = URL.createObjectURL(file)
+    setThumbUrl(url)
+  }
 
   const canCreate = name.trim().length > 0 && !isLoading
 
@@ -59,10 +73,23 @@ export default function CreateRoomPage() {
       <div className={styles.scroll}>
         {/* ── 썸네일 ──────────────────────────────────────────────────────────── */}
         <div className={styles.thumbSection}>
-          <div className={styles.thumbCircle}>
-            <span className={styles.thumbPlus}>+</span>
-          </div>
-          <span className={styles.thumbHint}>사진 추가</span>
+          <button className={styles.thumbCircle} onClick={handleThumbClick}>
+            {thumbUrl ? (
+              <img src={thumbUrl} alt="썸네일" className={styles.thumbImg} />
+            ) : (
+              <span className={styles.thumbPlus}>+</span>
+            )}
+          </button>
+          <span className={styles.thumbHint}>
+            {thumbUrl ? '사진 변경' : '사진 추가'}
+          </span>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
         </div>
 
         {/* ── 방 이름 ─────────────────────────────────────────────────────────── */}
