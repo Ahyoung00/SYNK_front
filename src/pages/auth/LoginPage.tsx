@@ -1,9 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
 import { api } from '@/services/api/client'
-import { userApi } from '@/services/api/endpoints'
+import { authApi, userApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import type { User } from '@/types'
 
@@ -20,8 +20,126 @@ export default function LoginPage() {
   const navigate  = useNavigate()
   const setAuth   = useAuthStore((s) => s.setAuth)
   const isDev     = import.meta.env.DEV
-  const [loading, setLoading] = useState<number | null>(null)
+  const [loading, setLoading]       = useState<number | null>(null)
+  const [oauthLoading, setOauthLoading] = useState<'kakao' | 'google' | null>(null)
+  const [oauthError,   setOauthError]   = useState<string | null>(null)
+  const googleClientRef = useRef<{ requestAccessToken: () => void } | null>(null)
 
+  // ── Google Identity Services 초기화 ──────────────────────────────────────
+  useEffect(() => {
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+    if (googleClientId && window.google?.accounts?.oauth2) {
+      googleClientRef.current = window.google.accounts.oauth2.initTokenClient({
+        client_id: googleClientId,
+        scope: 'email profile openid',
+        callback: async (response) => {
+          if (!response.access_token) {
+            setOauthError('Google 로그인에 실패했어요.')
+            setOauthLoading(null)
+            return
+          }
+          await handleOAuthSuccess('google', response.access_token)
+        },
+      })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── OAuth 공통 처리 ────────────────────────────────────────────────────────
+  async function handleOAuthSuccess(provider: 'kakao' | 'google', accessToken: string) {
+    try {
+      const loginRes = provider === 'kakao'
+        ? await authApi.kakaoLogin(accessToken)
+        : await authApi.googleLogin(accessToken)
+
+      const { token } = loginRes.data
+
+      // 임시 세팅 (Authorization 헤더 활성화)
+      const tempUser: User = {
+        userId: loginRes.data.userId,
+        name: loginRes.data.name,
+        profileImage: loginRes.data.profileImage,
+        missionNotification: true,
+        resultNotification: true,
+        highlightNotification: true,
+      }
+      setAuth(tempUser, token, '')
+
+      // /users/me 로 정확한 프로필로 덮어쓰기
+      try {
+        const meRes = await userApi.getMe()
+        setAuth(meRes.data, token, '')
+      } catch {
+        // /users/me 실패해도 loginRes 데이터로 진행
+      }
+
+      useChatStore.getState().clearAll()
+      navigate(ROUTES.HOME, { replace: true })
+    } catch (e) {
+      console.error(e)
+      setOauthError('로그인에 실패했어요. 다시 시도해주세요.')
+    } finally {
+      setOauthLoading(null)
+    }
+  }
+
+  // ── 카카오 로그인 (OAuth 팝업 + postMessage) ──────────────────────────────
+  function handleKakaoLogin() {
+    if (oauthLoading) return
+    const kakaoKey = import.meta.env.VITE_KAKAO_JS_KEY
+    if (!kakaoKey) {
+      setOauthError('카카오 앱 키가 설정되지 않았어요. (.env.local 확인)')
+      return
+    }
+
+    setOauthLoading('kakao')
+    setOauthError(null)
+
+    const redirectUri = `${window.location.origin}/kakao-callback.html`
+    const url = `https://kauth.kakao.com/oauth/authorize` +
+      `?client_id=${kakaoKey}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=token`
+
+    const popup = window.open(url, 'kakaoLogin', 'width=450,height=600,scrollbars=yes')
+
+    function onMessage(e: MessageEvent) {
+      if (e.origin !== window.location.origin) return
+      if (e.data?.type !== 'kakao_oauth') return
+      window.removeEventListener('message', onMessage)
+
+      if (e.data.error) {
+        setOauthError('카카오 로그인에 실패했어요.')
+        setOauthLoading(null)
+        return
+      }
+      handleOAuthSuccess('kakao', e.data.token)
+    }
+    window.addEventListener('message', onMessage)
+
+    // 팝업을 직접 닫으면 정리
+    const timer = setInterval(() => {
+      if (popup?.closed) {
+        clearInterval(timer)
+        window.removeEventListener('message', onMessage)
+        setOauthLoading((v) => v === 'kakao' ? null : v)
+      }
+    }, 500)
+  }
+
+  // ── 구글 로그인 ────────────────────────────────────────────────────────────
+  function handleGoogleLogin() {
+    if (oauthLoading) return
+    setOauthLoading('google')
+    setOauthError(null)
+
+    if (!googleClientRef.current) {
+      setOauthError('Google SDK가 로드되지 않았어요.')
+      setOauthLoading(null)
+      return
+    }
+
+    googleClientRef.current.requestAccessToken()
+  }
   async function handleDevLogin(userId: number) {
     if (loading !== null) return
     setLoading(userId)
@@ -67,26 +185,42 @@ export default function LoginPage() {
       <h1 style={{ fontSize: 40, fontWeight: 900, letterSpacing: '-1px' }}>SYNK</h1>
       <p style={{ color: 'var(--color-text-sub)', marginBottom: 32 }}>지금 이 순간을 함께</p>
 
-      {/* 실제 OAuth 버튼 — 백엔드 연동 후 활성화 */}
+      {oauthError && (
+        <p style={{ fontSize: 13, color: '#ef4444', textAlign: 'center', maxWidth: 280 }}>
+          {oauthError}
+        </p>
+      )}
+
+      {/* 카카오 로그인 */}
       <button
-        disabled
+        onClick={handleKakaoLogin}
+        disabled={!!oauthLoading}
         style={{
           width: '100%', maxWidth: 320, padding: '14px 24px',
           background: '#FEE500', color: '#191919', borderRadius: 12,
-          fontWeight: 700, fontSize: 15, opacity: 0.4, cursor: 'not-allowed',
+          fontWeight: 700, fontSize: 15,
+          opacity: oauthLoading === 'google' ? 0.4 : 1,
+          cursor: oauthLoading ? 'not-allowed' : 'pointer',
+          transition: 'opacity 0.15s',
         }}
       >
-        카카오 로그인
+        {oauthLoading === 'kakao' ? '로그인 중...' : '카카오 로그인'}
       </button>
+
+      {/* 구글 로그인 */}
       <button
-        disabled
+        onClick={handleGoogleLogin}
+        disabled={!!oauthLoading}
         style={{
           width: '100%', maxWidth: 320, padding: '14px 24px',
           background: '#fff', color: '#191919', borderRadius: 12,
-          fontWeight: 700, fontSize: 15, opacity: 0.4, cursor: 'not-allowed',
+          fontWeight: 700, fontSize: 15,
+          opacity: oauthLoading === 'kakao' ? 0.4 : 1,
+          cursor: oauthLoading ? 'not-allowed' : 'pointer',
+          transition: 'opacity 0.15s',
         }}
       >
-        Google 계정으로 로그인
+        {oauthLoading === 'google' ? '로그인 중...' : 'Google 계정으로 로그인'}
       </button>
 
       {/* DEV 전용 — 유저 선택 로그인 */}
