@@ -943,12 +943,19 @@ app.post('/submissions', (req, res) => {
 
   const submittedAt = new Date().toISOString()
 
-  // 중복 제출 방지: 이미 제출한 경우 기존 submission 반환
+  // 재제출(재촬영) 허용: 이미 제출한 경우 영상 URL만 업데이트
   const myId = getMeId(req)
   const existing = db().get('submissions')
     .find({ mission_id: missionId, user_id: myId }).value()
   if (existing) {
-    return ok(res, { id: existing.id, submittedAt: existing.submitted_at }, '이미 제출됨')
+    db().get('submissions')
+      .find({ id: existing.id })
+      .assign({
+        video_url:    (videoUrl && !videoUrl.startsWith('blob:')) ? videoUrl : MOCK_VIDEO_URL,
+        submitted_at: submittedAt,
+      })
+      .write()
+    return ok(res, { id: existing.id, submittedAt }, '재제출 완료')
   }
 
   const maxId = db().get('submissions').maxBy('id').value()?.id ?? 0

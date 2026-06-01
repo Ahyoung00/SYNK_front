@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
 import { useAuthStore } from '@/store/authStore'
@@ -9,11 +9,14 @@ export default function MissionWaitingPage() {
   const { roomId }          = useParams<{ roomId: string }>()
   const navigate            = useNavigate()
   const active              = useMissionStore((s) => s.active)
+  const previewUrl          = useMissionStore((s) => s.previewUrl)
   const updateParticipation = useMissionStore((s) => s.updateParticipation)
   const myUser              = useAuthStore((s) => s.user)
 
   // 로컬 카운트다운 (active.seconds_left 기준 wall-clock)
   const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
+  const [showVideo, setShowVideo]     = useState(false)
+  const videoRef = useRef<HTMLVideoElement>(null)
 
   // 마운트 시: 내 상태를 즉시 '완료'로 표시
   useEffect(() => {
@@ -96,6 +99,21 @@ export default function MissionWaitingPage() {
         })}
       </div>
 
+      {/* ── 재촬영 / 영상 보기 ───────────────────────────────────────────────── */}
+      <div className={styles.actionRow}>
+        {previewUrl && (
+          <button className={styles.watchBtn} onClick={() => setShowVideo(true)}>
+            🎬 내 영상 보기
+          </button>
+        )}
+        <button
+          className={styles.retakeBtn}
+          onClick={() => navigate(ROUTES.MISSION_CAMERA(Number(roomId) || active?.room.id))}
+        >
+          📷 재촬영
+        </button>
+      </div>
+
       {/* ── 홈으로 돌아가기 ───────────────────────────────────────────────────── */}
       <button
         className={styles.homeBtn}
@@ -103,6 +121,26 @@ export default function MissionWaitingPage() {
       >
         홈으로 돌아가기
       </button>
+
+      {/* ── 영상 미리보기 모달 ────────────────────────────────────────────────── */}
+      {showVideo && previewUrl && (
+        <div className={styles.videoModal} onClick={() => setShowVideo(false)}>
+          <div className={styles.videoModalInner} onClick={(e) => e.stopPropagation()}>
+            <video
+              ref={videoRef}
+              src={previewUrl}
+              className={styles.videoPlayer}
+              autoPlay
+              loop
+              playsInline
+              muted
+            />
+            <button className={styles.videoCloseBtn} onClick={() => setShowVideo(false)}>
+              닫기
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

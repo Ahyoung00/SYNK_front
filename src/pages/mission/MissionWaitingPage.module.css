@@ -100,6 +100,73 @@
 .done    { color: var(--color-status-done); }
 .pending { color: var(--color-accent); }
 
+/* ── 재촬영 / 영상 보기 ─────────────────────────────────────────────────── */
+.actionRow {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.retakeBtn,
+.watchBtn {
+  flex: 1;
+  padding: 14px;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  transition: opacity var(--dur-fast);
+}
+.retakeBtn:active, .watchBtn:active { opacity: 0.75; }
+
+.retakeBtn {
+  background: var(--color-primary);
+  color: #fff;
+}
+
+.watchBtn {
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-sub);
+}
+
+/* ── 영상 미리보기 모달 ──────────────────────────────────────────────────── */
+.videoModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.80);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--sp-5);
+}
+
+.videoModalInner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  width: 100%;
+  max-width: 340px;
+}
+
+.videoPlayer {
+  width: 100%;
+  border-radius: var(--radius-lg);
+  background: #000;
+  max-height: 60dvh;
+  object-fit: cover;
+}
+
+.videoCloseBtn {
+  padding: 12px 40px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-sub);
+}
+
 /* ── 홈으로 돌아가기 버튼 ───────────────────────────────────────────────── */
 .homeBtn {
   margin-top: auto;
