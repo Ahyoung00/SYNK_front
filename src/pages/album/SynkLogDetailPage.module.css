@@ -1,0 +1,165 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: var(--color-bg);
+}
+
+/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
+  flex-shrink: 0;
+}
+
+.backBtn {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+}
+
+.headerTitle {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.headerRight { width: 36px; }
+
+/* ── 스크롤 ───────────────────────────────────────────────────────────────── */
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--sp-4) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  align-items: center;
+}
+
+/* ── 미션 카드 ────────────────────────────────────────────────────────────── */
+.missionCard {
+  width: 100%;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.missionHeader {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 0.04em;
+}
+
+.missionText {
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text);
+  text-align: center;
+}
+
+.synkBtn {
+  margin-top: var(--sp-3);
+  padding: 12px 40px;
+  background: #3b82f6;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 2px;
+  transition: opacity var(--dur-fast);
+}
+
+.synkBtn:active {
+  opacity: 0.82;
+}
+
+/* ── 포토 그리드 ──────────────────────────────────────────────────────────── */
+.photoGrid {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-2);
+}
+
+.photoThumb {
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  transition: opacity var(--dur-fast);
+}
+
+.photoThumb:active {
+  opacity: 0.8;
+}
+
+/* ── 사진 전체 화면 ───────────────────────────────────────────────────────── */
+.photoPage {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: #000;
+}
+
+.photoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
+  flex-shrink: 0;
+}
+
+.photoHeaderTitle {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: #fff;
+}
+
+.photoFull {
+  flex: 1;
+  object-fit: cover;
+}
+
+.photoFooter {
+  display: flex;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
+  flex-shrink: 0;
+}
+
+.photoShareBtn {
+  flex: 1;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: #fff;
+}
+
+.photoSaveBtn {
+  flex: 1;
+  padding: 14px;
+  background: #3b82f6;
+  border-radius: var(--radius-lg);
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: #fff;
+  transition: opacity var(--dur-fast);
+}
+
+.photoSaveBtn:active {
+  opacity: 0.85;
+}

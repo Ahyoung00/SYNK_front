@@ -1,0 +1,66 @@
+.page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100dvh;
+  background: var(--color-bg);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-4);
+  text-align: center;
+  padding: var(--sp-8);
+}
+
+/* ── 이모지 ──────────────────────────────────────────────────────────────── */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+.emojiWrap {
+  animation: float 2s ease-in-out infinite;
+}
+
+.emoji {
+  font-size: 72px;
+}
+
+/* ── 텍스트 ──────────────────────────────────────────────────────────────── */
+.title {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.sub {
+  font-size: var(--text-md);
+  color: var(--color-text-sub);
+  min-width: 180px; /* 점 개수 변할 때 레이아웃 안 흔들리게 */
+}
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── 스피너 ──────────────────────────────────────────────────────────────── */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.spinnerWrap {
+  margin-top: var(--sp-4);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--color-surface-2);
+  border-top-color: var(--color-primary);
+  border-radius: var(--radius-full);
+  animation: spin 0.8s linear infinite;
+}
