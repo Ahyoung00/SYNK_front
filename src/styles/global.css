@@ -5,13 +5,13 @@
 /* ── Design tokens ────────────────────────────────────────────────────────── */
 :root {
   /* Brand colors */
-  --color-bg:          #FEFCF5;
-  --color-surface:     #F4EDE0;
-  --color-surface-2:   #EAE4D2;
-  --color-border:      rgba(100, 140, 60, 0.15);
+  --color-bg:          #fffdf5;
+  --color-surface:     #fcf6e8;
+  --color-surface-2:   #daec93;
+  --color-border:      rgba(100, 150, 50, 0.28);
 
-  --color-primary:     #7AB567;
-  --color-primary-dim: rgba(122, 181, 103, 0.15);
+  --color-primary:     #95c96d;
+  --color-primary-dim: rgba(149, 201, 109, 0.18);
 
   --color-accent:      #E5704A;
 
@@ -30,22 +30,22 @@
   --color-status-done-border: rgba(45, 138, 69, 0.3);
   --color-status-warn:        #B87A0A;
   --color-status-warn-bg:     rgba(184, 122, 10, 0.12);
-  --color-status-neutral-bg:  rgba(100, 140, 60, 0.10);
+  --color-status-neutral-bg:  rgba(149, 201, 109, 0.12);
 
   /* Timer ring / glow */
-  --color-timer-ring:   rgba(100, 140, 60, 0.15);
+  --color-timer-ring:   rgba(149, 201, 109, 0.20);
   --color-timer-glow:   rgba(45, 138, 69, 0.4);
 
   /* Pulse animation */
-  --color-pulse:        rgba(122, 181, 103, 0.4);
-  --color-pulse-0:      rgba(122, 181, 103, 0);
+  --color-pulse:        rgba(149, 201, 109, 0.4);
+  --color-pulse-0:      rgba(149, 201, 109, 0);
 
   /* Done CTA button */
   --color-done-cta:     #3D7A50;
   --color-done-cta-text: #fff;
 
   /* FAB shadow */
-  --color-fab-shadow:   rgba(122, 181, 103, 0.45);
+  --color-fab-shadow:   rgba(149, 201, 109, 0.45);
 
   /* Spacing (4px grid) */
   --sp-1: 4px;
@@ -120,7 +120,7 @@ body {
   line-height: 1.5;
   color: var(--color-text);
   /* 데스크톱에서 앱 바깥 배경 */
-  background-color: #E8E2D0;
+  background-color: #daec93;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;         /* Feels native */
