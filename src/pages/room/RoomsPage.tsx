@@ -152,18 +152,21 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
       </div>
       <div className={styles.avatarStack}>
         {room.memberProfiles.slice(0, 5).map((m, i) => (
-          <span
+          <div
             key={m.userId}
             className={styles.avatarBubble}
             style={{ zIndex: room.memberProfiles.length - i }}
           >
-            👤
-          </span>
+            {m.profileImage
+              ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
+              : <span className={styles.avatarBubbleInitial}>👤</span>
+            }
+          </div>
         ))}
         {room.memberProfiles.length > 5 && (
-          <span className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
+          <div className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
             +{room.memberProfiles.length - 5}
-          </span>
+          </div>
         )}
       </div>
     </button>
@@ -181,13 +184,16 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
       </div>
       <div className={styles.avatarStack}>
         {room.memberProfiles.slice(0, 5).map((m, i) => (
-          <span
+          <div
             key={m.userId}
             className={styles.avatarBubble}
             style={{ zIndex: room.memberProfiles.length - i }}
           >
-            👤
-          </span>
+            {m.profileImage
+              ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
+              : <span className={styles.avatarBubbleInitial}>👤</span>
+            }
+          </div>
         ))}
       </div>
     </button>

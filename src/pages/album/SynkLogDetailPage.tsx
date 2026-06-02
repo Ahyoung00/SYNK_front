@@ -15,17 +15,16 @@ export default function SynkLogDetailPage() {
   const myUser      = useAuthStore((s) => s.user)
   const numRoomId   = Number(roomId)
 
-  const [collages, setCollages]       = useState<CollageItem[]>([])
-  const [synklog, setSynklog]         = useState<SynklogDetailResponse | null>(null)
+  const [collages, setCollages]             = useState<CollageItem[]>([])
+  const [synklog, setSynklog]               = useState<SynklogDetailResponse | null>(null)
   const [synklogMissing, setSynklogMissing] = useState(false)
-  const [isLoading, setIsLoading]     = useState(true)
-  const [error, setError]             = useState(false)
-  const [creatingLog, setCreatingLog] = useState(false)
+  const [isLoading, setIsLoading]           = useState(true)
+  const [error, setError]                   = useState(false)
+  const [creatingLog, setCreatingLog]       = useState(false)
 
   useEffect(() => {
     if (!date) return
 
-    // collages는 필수 / synklog는 없을 수 있음 (404 허용)
     albumApi.getCollages(numRoomId, date)
       .then((res) => setCollages(res.data))
       .catch(() => setError(true))
@@ -33,7 +32,7 @@ export default function SynkLogDetailPage() {
 
     albumApi.getSynklog(numRoomId, date)
       .then((res) => setSynklog(res.data))
-      .catch(() => setSynklogMissing(true))  // 404 = 아직 생성 전
+      .catch(() => setSynklogMissing(true))
   }, [numRoomId, date])
 
   async function handleCreateSynklog() {
@@ -41,7 +40,6 @@ export default function SynkLogDetailPage() {
     setCreatingLog(true)
     try {
       await albumApi.createSynklog(numRoomId, date!)
-      // 생성 후 재조회
       const res = await albumApi.getSynklog(numRoomId, date!)
       setSynklog(res.data)
       setSynklogMissing(false)
@@ -52,7 +50,6 @@ export default function SynkLogDetailPage() {
     }
   }
 
-  // 과거 미션 콜라주 보기 — participants 데이터로 MissionResultPage 세팅
   function handleViewCollage(item: CollageItem) {
     setActive({
       mission: {
@@ -61,9 +58,9 @@ export default function SynkLogDetailPage() {
         mission_template_id: 0,
         type:                'VIDEO',
         status:              'ACTIVE',
-        targeted_at:         date ?? '',
-        deadline:            date ?? '',
-        created_at:          date ?? '',
+        targeted_at:         item.missionStartAt ?? date ?? '',
+        deadline:            item.missionStartAt ?? date ?? '',
+        created_at:          item.missionStartAt ?? date ?? '',
         template: { id: 0, title: item.missionTitle },
       },
       room: {
@@ -82,7 +79,6 @@ export default function SynkLogDetailPage() {
       seconds_left: 0,
       participations: item.participants.map((p) => {
         const isMe = myUser && p.userId === myUser.userId
-        // 내가 제출한 미션이고 이번 세션에서 녹화한 영상이 있으면 실제 영상 사용
         const effectiveVideoUrl = (isMe && p.state === 'done' && previewUrl)
           ? previewUrl
           : p.videoUrl
@@ -128,22 +124,22 @@ export default function SynkLogDetailPage() {
 
   return (
     <div className={styles.page}>
-      {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <SynkHeader date={collages[0] ? date ?? '' : ''} onBack={() => navigate(-1)} />
 
-      {/* ── 콘텐츠 ──────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
 
         {/* ── 미션별 콜라주 ────────────────────────────────────────────────── */}
         {collages.map((item) => (
           <div key={item.missionId} className={styles.missionCard}>
-            <p className={styles.missionText}>{item.missionTitle}</p>
-            <button
-              className={styles.synkBtn}
-              onClick={() => handleViewCollage(item)}
-            >
-              콜라주 보기
-            </button>
+            <div className={styles.missionRow}>
+              <p className={styles.missionText}>{item.missionTitle}</p>
+              <button
+                className={styles.collageBtn}
+                onClick={() => handleViewCollage(item)}
+              >
+                콜라주
+              </button>
+            </div>
           </div>
         ))}
 

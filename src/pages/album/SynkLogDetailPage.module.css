@@ -63,11 +63,34 @@
   letter-spacing: 0.04em;
 }
 
+.missionRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
 .missionText {
   font-size: var(--text-base);
   font-weight: 600;
   color: var(--color-text);
-  text-align: center;
+  flex: 1;
+}
+
+.collageBtn {
+  flex-shrink: 0;
+  padding: 5px 12px;
+  background: #3b82f6;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: #fff;
+  transition: opacity var(--dur-fast);
+}
+
+.collageBtn:active {
+  opacity: 0.8;
 }
 
 .missionMeta {

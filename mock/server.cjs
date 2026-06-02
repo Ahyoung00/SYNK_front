@@ -932,6 +932,15 @@ app.post('/submissions', (req, res) => {
   const { missionId, videoUrl, roomId } = req.body
   if (!missionId) return fail(res, 400, 'missionId는 필수입니다')
 
+  // 마감 시간 체크
+  const missionForCheck = db().get('missions').find({ id: missionId }).value()
+  if (missionForCheck) {
+    const checkTimes = getMissionTimes(missionForCheck)
+    if (checkTimes && Date.now() > checkTimes.deadline.getTime()) {
+      return fail(res, 400, '제출 시간이 종료되었습니다')
+    }
+  }
+
   const submittedAt = new Date().toISOString()
 
   // 중복 제출 방지: 이미 제출한 경우 기존 submission 반환
@@ -1063,8 +1072,9 @@ app.get('/rooms/:id/albums/:date/collages', (req, res) => {
   const members = db().get('room_members').filter({ room_id: roomId }).value()
 
   const data = dayMissions.map((m) => {
-    const tmpl = db().get('mission_templates').find({ id: m.mission_template_id }).value()
-    const subs = db().get('submissions').filter({ mission_id: m.id }).value()
+    const tmpl  = db().get('mission_templates').find({ id: m.mission_template_id }).value()
+    const subs  = db().get('submissions').filter({ mission_id: m.id }).value()
+    const times = getMissionTimes(m)
 
     const participants = members.map((mbr) => {
       const u   = db().get('users').find({ id: mbr.user_id }).value()
@@ -1082,6 +1092,7 @@ app.get('/rooms/:id/albums/:date/collages', (req, res) => {
     return {
       missionId:       m.id,
       missionTitle:    tmpl?.title ?? '',
+      missionStartAt:  times?.targeted_at.toISOString() ?? null,  // 미션 시작 시각
       status:          'COMPLETED',
       collageVideoUrl: null,   // mock: 실제 영상 생성 불가 → null
       participants,
