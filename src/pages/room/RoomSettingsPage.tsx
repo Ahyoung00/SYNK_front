@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { roomApi } from '@/services/api/endpoints'
@@ -18,9 +18,24 @@ export default function RoomSettingsPage() {
   const [missionEndTime,   setMissionEndTime]   = useState('22:00')
   const [memberCount, setMemberCount]         = useState(0)
   const [isOwner, setIsOwner]                 = useState(false)
+  const [thumbUrl, setThumbUrl]               = useState<string | null>(null)
   const [dirty, setDirty]                     = useState(false)
   const [saving, setSaving]                   = useState(false)
   const [isLoading, setIsLoading]             = useState(true)
+
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  function handleThumbClick() {
+    if (!isOwner) return
+    fileInputRef.current?.click()
+  }
+
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setThumbUrl(URL.createObjectURL(file))
+    setDirty(true)
+  }
 
   useEffect(() => {
     if (!id) return
@@ -29,11 +44,11 @@ export default function RoomSettingsPage() {
         const room = roomRes.data
         setRoomName(room.name)
         setMissionCount(room.dailyMissionCount)
-        // "HH:mm:ss" → "HH:mm" 변환
         setMissionStartTime(room.missionStartTime?.slice(0, 5) ?? '10:00')
         setMissionEndTime(room.missionEndTime?.slice(0, 5)     ?? '22:00')
         setMemberCount(room.currentMembers)
         setIsOwner(room.ownerId === myUser?.userId)
+        setThumbUrl(room.thumbnail ?? null)
       })
       .catch(console.error)
       .finally(() => setIsLoading(false))
@@ -48,6 +63,7 @@ export default function RoomSettingsPage() {
         dailyMissionCount: missionCount,
         missionStartTime,
         missionEndTime,
+        ...(thumbUrl ? { thumbnail: thumbUrl } : {}),
       })
       setDirty(false)
       navigate(-1)
@@ -98,9 +114,29 @@ export default function RoomSettingsPage() {
       <div className={styles.scroll}>
         {/* ── 방 썸네일 + 이름 ────────────────────────────────────────────────── */}
         <div className={styles.roomHeader}>
-          <div className={styles.roomThumb}>
-            <span className={styles.roomThumbEmoji}>🌅</span>
-          </div>
+          <button
+            className={styles.roomThumb}
+            onClick={handleThumbClick}
+            disabled={!isOwner}
+            style={{ cursor: isOwner ? 'pointer' : 'default' }}
+          >
+            {thumbUrl
+              ? <img src={thumbUrl} alt="방 이미지" className={styles.roomThumbImg} />
+              : <span className={styles.roomThumbEmoji}>🌅</span>
+            }
+            {isOwner && (
+              <div className={styles.roomThumbOverlay}>
+                <span className={styles.roomThumbCamera}>📷</span>
+              </div>
+            )}
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleFileChange}
+          />
           {isOwner ? (
             <input
               className={styles.roomNameInput}
