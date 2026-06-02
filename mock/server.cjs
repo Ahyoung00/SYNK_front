@@ -45,6 +45,8 @@ const MISSION_WINDOW_MS       = 300_000  // 미션 제출 창: 5분
 const SCHEDULER_INTERVAL_MS   = 30_000   // 스케줄러 체크 주기: 30초
 const MOCK_AUTO_SUBMIT_MIN_MS = 60_000   // 다른 멤버 자동 제출 최소 딜레이: 1분
 const MOCK_AUTO_SUBMIT_MAX_MS = 240_000  // 다른 멤버 자동 제출 최대 딜레이: 4분
+// mock 환경에서 영상 URL로 사용할 공용 테스트 영상 (실제 영상 업로드 불가 시 대체)
+const MOCK_VIDEO_URL = 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4'
 
 // "HH:MM" → 분 단위 정수 (예: "07:30" → 450)
 function getTimeMinutes(timeStr) {
@@ -152,6 +154,16 @@ function initializeCollectionRecords() {
 // ── 미션 발동 알림 생성 (방 멤버 전원) ───────────────────────────────────────
 function createMissionNotifications(missionId, roomId, missionTitle) {
   const memberIds = db().get('room_members').filter({ room_id: roomId }).map('user_id').value()
+
+  // 방 이름 + 발동 시각 조합
+  const room    = db().get('rooms').find({ id: roomId }).value()
+  const mission = db().get('missions').find({ id: missionId }).value()
+  const times   = mission ? getMissionTimes(mission) : null
+  const timeStr = times
+    ? times.targeted_at.toTimeString().slice(0, 5)   // "HH:MM"
+    : new Date().toTimeString().slice(0, 5)
+  const content = `${missionTitle} · ${room?.name ?? ''} · ${timeStr}`
+
   const now = new Date().toISOString()
   for (const userId of memberIds) {
     const maxId = db().get('notifications').maxBy('id').value()?.id ?? 0
@@ -160,7 +172,7 @@ function createMissionNotifications(missionId, roomId, missionTitle) {
       user_id:    userId,
       type:       'MISSION_START',
       title:      '미션이 울렸어요! ⚡',
-      content:    missionTitle,
+      content,
       related_id: missionId,
       is_read:    false,
       created_at: now,
@@ -190,7 +202,7 @@ function scheduleAutoSubmits(missionId, roomId, memberIds) {
         room_id:      roomId,
         mission_id:   missionId,
         status:       'SUBMITTED',
-        video_url:    null,
+        video_url:    MOCK_VIDEO_URL,
         submitted_at: new Date().toISOString(),
       }).write()
 
@@ -323,10 +335,13 @@ app.delete('/users/me', (req, res) => ok(res, null, '회원 탈퇴 완료'))
 // DELETE /rooms/{roomId}/leave   — 방 나가기
 // =============================================================================
 
-// 내 방 목록 — ui_status + members_detail 포함
+// 내 방 목록 — API 명세서 기준: { active[], waiting[] }
+// active: 인원이 다 찬 방 (totalMissions, completedMissions, isAllCompleted, memberProfiles)
+// waiting: 인원 미달 방 (currentMembers, maxMembers, waitingCount, memberProfiles)
 app.get('/rooms/my', (req, res) => {
+  const meId = getMeId(req)
   const memberRoomIds = db().get('room_members')
-    .filter({ user_id: getMeId(req) })
+    .filter({ user_id: meId })
     .map('room_id')
     .value()
 
@@ -334,38 +349,50 @@ app.get('/rooms/my', (req, res) => {
     .filter((r) => memberRoomIds.includes(r.id))
     .value()
 
-  const enriched = rooms.map((room) => {
-    const allMembers = db().get('room_members').filter({ room_id: room.id }).value()
-    const memberCount = allMembers.length
+  const todayStr = new Date().toISOString().slice(0, 10) // "YYYY-MM-DD"
+  const active  = []
+  const waiting = []
 
-    const members_detail = allMembers.map((m) => pickUser(m.user_id)).filter(Boolean)
+  for (const room of rooms) {
+    const memberCount = db().get('room_members').filter({ room_id: room.id }).size().value()
+    const memberProfiles = db().get('room_members').filter({ room_id: room.id }).value()
+      .map((m) => {
+        const u = db().get('users').find({ id: m.user_id }).value()
+        return { userId: m.user_id, profileImage: u?.profile_image ?? null }
+      })
 
-    // 오늘 이 방에서 예약/진행된 미션 수 (PENDING + ACTIVE + COMPLETED + EXPIRED)
-    const todayStr          = new Date().toISOString().slice(0, 10) // "2026-05-25"
-    const todayMissionCount = db().get('missions')
-      .filter((m) => m.room_id === room.id && m.date === todayStr)
-      .size().value()
-    const dailyTotal = room.daily_mission_count ?? 1
-
-    let ui_status, ui_status_text
     if (memberCount < room.max_members) {
       // 대기중 — 인원 미달
-      ui_status      = 'waiting'
-      ui_status_text = `${room.max_members - memberCount}명 더 기다리는 중..`
-    } else if (todayMissionCount >= dailyTotal) {
-      // 오늘 미션 모두 소진
-      ui_status      = 'done'
-      ui_status_text = `오늘 미션 ${todayMissionCount}/${dailyTotal} 🔥`
+      waiting.push({
+        id:             room.id,
+        name:           room.name,
+        currentMembers: memberCount,
+        maxMembers:     room.max_members,
+        waitingCount:   room.max_members - memberCount,
+        roomThumbnail:  room.thumbnail ?? null,
+        memberProfiles,
+      })
     } else {
-      // 진행 중 또는 대기
-      ui_status      = 'active'
-      ui_status_text = `오늘 미션 ${todayMissionCount}/${dailyTotal}`
+      // 참여중 — 인원 충족
+      const todayMissions = db().get('missions')
+        .filter((m) => m.room_id === room.id && m.date === todayStr)
+        .value()
+      const completedMissions = todayMissions.filter((m) => m.status === 'COMPLETED').length
+      const totalMissions     = room.daily_mission_count ?? 1
+
+      active.push({
+        id:                 room.id,
+        name:               room.name,
+        totalMissions,
+        completedMissions,
+        isAllCompleted:     completedMissions >= totalMissions,
+        roomThumbnail:      room.thumbnail ?? null,
+        memberProfiles,
+      })
     }
+  }
 
-    return { ...room, ui_status, ui_status_text, members_detail, member_count: memberCount }
-  })
-
-  ok(res, enriched)
+  ok(res, { active, waiting })
 })
 
 // 방 생성 — Request camelCase, Response: { roomId, code, name, createdAt, thumbnail }
@@ -391,7 +418,6 @@ app.post('/rooms', (req, res) => {
     thumbnail: null,
     owner_id: getMeId(req),
     max_members: maxMembers ?? 5,
-    current_members: 1,
     daily_mission_count: dailyMissionCount ?? 1,
     mission_start_time: missionStartTime,
     mission_end_time: missionEndTime,
@@ -443,8 +469,6 @@ app.post('/rooms/join', (req, res) => {
       is_owner: false,
       joined_at: new Date().toISOString(),
     }).write()
-    db().get('rooms').find({ id: room.id })
-      .assign({ current_members: (room.current_members ?? 0) + 1 }).write()
   }
 
   // 최신 상태의 방 정보
@@ -460,11 +484,45 @@ app.post('/rooms/join', (req, res) => {
   }, '방 참가 완료')
 })
 
-// 방 상세 조회
+// 방 상세 조회 — API 명세서 기준 camelCase + members[] + recentAlbums[]
+// Response: { id, name, code, thumbnail, ownerId, currentMembers, maxMembers,
+//             dailyMissionCount, missionStartTime, missionEndTime, members[], recentAlbums[] }
 app.get('/rooms/:id', (req, res) => {
   const room = db().get('rooms').find({ id: Number(req.params.id) }).value()
   if (!room) return fail(res, 404, '방을 찾을 수 없어요')
-  ok(res, room)
+
+  const memberCount = db().get('room_members').filter({ room_id: room.id }).size().value()
+  const members = db().get('room_members').filter({ room_id: room.id }).value()
+    .map((m) => {
+      const u = db().get('users').find({ id: m.user_id }).value()
+      return { userId: m.user_id, name: u?.name ?? '', profileImage: u?.profile_image ?? null }
+    })
+
+  // 최근 앨범 (COMPLETED 미션 날짜별, 최대 4개)
+  const closedDates = [...new Set(
+    db().get('missions')
+      .filter((m) => m.room_id === room.id && m.status === 'COMPLETED')
+      .sortBy('date').reverse().map('date').value(),
+  )].slice(0, 4)
+  const recentAlbums = closedDates.map((date) => ({
+    date:      date.replace(/-/g, '.'),
+    thumbnail: null,
+  }))
+
+  ok(res, {
+    id:                 room.id,
+    name:               room.name,
+    code:               room.code,
+    thumbnail:          room.thumbnail ?? null,
+    ownerId:            room.owner_id,
+    currentMembers:     memberCount,
+    maxMembers:         room.max_members,
+    dailyMissionCount:  room.daily_mission_count,
+    missionStartTime:   room.mission_start_time,
+    missionEndTime:     room.mission_end_time,
+    members,
+    recentAlbums,
+  })
 })
 
 // 방 설정 수정 — camelCase body → snake_case DB
@@ -495,31 +553,30 @@ app.delete('/rooms/:id', (req, res) => {
   db().get('submissions').remove((s) => missionIds.includes(s.mission_id)).write()
   db().get('missions').remove({ room_id: roomId }).write()
   db().get('synklogs').remove({ room_id: roomId }).write()
-  db().get('chats').remove({ room_id: roomId }).write()
+  db().get('room_chats').remove({ room_id: roomId }).write()
   db().get('room_members').remove({ room_id: roomId }).write()
   db().get('rooms').remove({ id: roomId }).write()
   ok(res, null, '방 삭제 완료')
 })
 
-// 초대 정보 조회
+// 초대 정보 조회 — API 명세서 기준
+// Response: { roomId, roomName, code, inviteUrl, thumbnail }
 app.get('/rooms/:id/invite', (req, res) => {
   const room = db().get('rooms').find({ id: Number(req.params.id) }).value()
   if (!room) return fail(res, 404, '방을 찾을 수 없어요')
   ok(res, {
-    code: room.code,
-    url: `https://synk.app/invite/${room.code}`,
-  })
+    roomId:    room.id,
+    roomName:  room.name,
+    code:      room.code,
+    inviteUrl: `synk.app/r/${room.code}`,
+    thumbnail: room.thumbnail ?? null,
+  }, '초대 정보 조회 성공')
 })
 
 // 방 나가기
 app.delete('/rooms/:id/leave', (req, res) => {
   const roomId = Number(req.params.id)
   db().get('room_members').remove({ user_id: getMeId(req), room_id: roomId }).write()
-  const room = db().get('rooms').find({ id: roomId }).value()
-  if (room) {
-    db().get('rooms').find({ id: roomId })
-      .assign({ current_members: Math.max(0, room.current_members - 1) }).write()
-  }
   ok(res, null)
 })
 
@@ -598,6 +655,8 @@ app.get('/missions/active', (req, res) => {
       }
     })
 
+    const slot = db().get('mission_time_slots').find({ id: m.time_slot_id }).value()
+
     return {
       id:               m.id,
       roomId:           m.room_id,
@@ -605,6 +664,9 @@ app.get('/missions/active', (req, res) => {
       roomThumbnail:    room?.thumbnail ?? null,
       title:            tmpl?.title ?? '',
       description:      tmpl?.description ?? '',
+      missionDate:      m.date ?? null,
+      slotTime:         slot?.slot_time ?? null,
+      deadline:         getMissionTimes(m)?.deadline.toISOString() ?? null,
       remainingSeconds,
       totalMembers:     members.length,
       submittedCount,
@@ -613,6 +675,55 @@ app.get('/missions/active', (req, res) => {
   })
 
   ok(res, items, '진행 중인 미션 조회 성공')
+})
+
+// =============================================================================
+// 미션 참여 현황 (실시간 폴링용)
+// GET /missions/{missionId}/participants
+// Response: { missionId, title, missionDate, slotTime, deadline, remainingSeconds,
+//             status, totalMembers, submittedCount, participants[] }
+// =============================================================================
+
+app.get('/missions/:missionId/participants', (req, res) => {
+  const missionId = Number(req.params.missionId)
+  const mission   = db().get('missions').find({ id: missionId }).value()
+  if (!mission) return fail(res, 404, '미션을 찾을 수 없어요')
+
+  const tmpl    = db().get('mission_templates').find({ id: mission.mission_template_id }).value()
+  const mTimes  = getMissionTimes(mission)
+  const slot    = db().get('mission_time_slots').find({ id: mission.time_slot_id }).value()
+
+  const remainingSeconds = mTimes
+    ? Math.max(0, Math.floor((mTimes.deadline.getTime() - Date.now()) / 1000))
+    : 0
+
+  const members     = db().get('room_members').filter({ room_id: mission.room_id }).value()
+  const submissions = db().get('submissions').filter({ mission_id: missionId }).value()
+
+  const participants = members.map((m) => {
+    const u   = db().get('users').find({ id: m.user_id }).value()
+    const sub = submissions.find((s) => s.user_id === m.user_id)
+    return {
+      userId:       m.user_id,
+      name:         u?.name ?? '',
+      profileImage: u?.profile_image ?? null,
+      status:       sub?.status ?? 'PENDING',
+      submittedAt:  sub?.submitted_at ?? null,
+    }
+  })
+
+  ok(res, {
+    missionId,
+    title:            tmpl?.title ?? '',
+    missionDate:      mission.date,
+    slotTime:         slot?.slot_time ?? null,
+    deadline:         mTimes?.deadline.toISOString() ?? null,
+    remainingSeconds,
+    status:           mission.status,
+    totalMembers:     members.length,
+    submittedCount:   submissions.filter((s) => s.status === 'SUBMITTED').length,
+    participants,
+  }, '참여 현황 조회 성공')
 })
 
 // =============================================================================
@@ -629,9 +740,9 @@ function scheduleDailyMissions() {
     const dateStr  = target.toISOString().slice(0, 10)
 
     for (const room of db().get('rooms').value()) {
-      // 멤버 2명 이상인 방만
+      // 정원이 다 찬 방만 미션 예약
       const memberCount = db().get('room_members').filter({ room_id: room.id }).size().value()
-      if (memberCount < 2) continue
+      if (memberCount < room.max_members) continue
 
       // 이미 예약/진행된 미션 수 확인
       const existing = db().get('missions').filter({ room_id: room.id, date: dateStr }).value()
@@ -717,6 +828,11 @@ function scheduleMissions() {
     const times = getMissionTimes(m)
     if (!times) continue
     if (nowMs < times.targeted_at.getTime()) continue  // 아직 시간 안 됨
+
+    // 정원 미달 방은 발동 안 함
+    const roomForMission = db().get('rooms').find({ id: m.room_id }).value()
+    const memberCountForMission = db().get('room_members').filter({ room_id: m.room_id }).size().value()
+    if (!roomForMission || memberCountForMission < roomForMission.max_members) continue
 
     db().get('missions').find({ id: m.id }).assign({ status: 'ACTIVE' }).write()
     const room = db().get('rooms').find({ id: m.room_id }).value()
@@ -833,7 +949,8 @@ app.post('/submissions', (req, res) => {
     room_id: roomId ?? 1,
     mission_id: missionId,
     status: 'SUBMITTED',
-    video_url: videoUrl ?? null,
+    // blob URL은 세션 만료 후 재생 불가 → mock 영상 URL로 대체
+    video_url: (videoUrl && !videoUrl.startsWith('blob:')) ? videoUrl : MOCK_VIDEO_URL,
     submitted_at: submittedAt,
   }
   db().get('submissions').push(sub).write()
@@ -854,10 +971,25 @@ app.post('/submissions', (req, res) => {
   }, '제출 완료')
 })
 
+// GET /submissions/:id — 개별 영상 조회 (camelCase 변환)
+// API.md: { id, userId, userName, profileImage, missionTitle, submittedAt, videoUrl }
 app.get('/submissions/:id', (req, res) => {
   const sub = db().get('submissions').find({ id: Number(req.params.id) }).value()
   if (!sub) return fail(res, 404, '제출물 없음')
-  ok(res, sub)
+  const u    = db().get('users').find({ id: sub.user_id }).value()
+  const tmpl = db().get('missions').find({ id: sub.mission_id }).value()
+  const title = tmpl
+    ? (db().get('mission_templates').find({ id: tmpl.mission_template_id }).value()?.title ?? '')
+    : ''
+  ok(res, {
+    id:           sub.id,
+    userId:       sub.user_id,
+    userName:     u?.name ?? '',
+    profileImage: u?.profile_image ?? null,
+    missionTitle: title,
+    submittedAt:  sub.submitted_at,
+    videoUrl:     sub.video_url ?? null,
+  }, '영상 조회 성공')
 })
 
 // =============================================================================
@@ -914,26 +1046,23 @@ app.get('/rooms/:id/albums', (req, res) => {
   ok(res, data, '앨범 목록 조회 성공')
 })
 
-// 특정 날짜 SYNKLOG 조회 — COMPLETED 미션 + 제출 내역 기반 (synklog 레코드 불필요)
-// Response: { synklogId, date("YYYY.MM.DD"), synklogVideoUrl, thumbnail, missions[] }
+// =============================================================================
+// GET /rooms/:id/albums/:date/collages — 날짜별 미션 콜라주 + 참여자 영상 조회 (신규)
+// Response: [{ missionId, missionTitle, status, collageVideoUrl, participants[] }]
+// =============================================================================
 app.get('/rooms/:id/albums/:date/collages', (req, res) => {
   const roomId = Number(req.params.id)
-  const date   = req.params.date   // "YYYY-MM-DD" (URL param)
+  const date   = req.params.date  // "YYYY-MM-DD"
 
-  // 해당 날짜 COMPLETED 미션 조회
   const dayMissions = db().get('missions')
-    .filter((m) =>
-      m.room_id === roomId &&
-      m.status === 'COMPLETED' &&
-      m.date === date,
-    )
+    .filter((m) => m.room_id === roomId && m.status === 'COMPLETED' && m.date === date)
     .value()
 
   if (dayMissions.length === 0) return fail(res, 404, '해당 날짜 미션 없음')
 
   const members = db().get('room_members').filter({ room_id: roomId }).value()
 
-  const missions = dayMissions.map((m) => {
+  const data = dayMissions.map((m) => {
     const tmpl = db().get('mission_templates').find({ id: m.mission_template_id }).value()
     const subs = db().get('submissions').filter({ mission_id: m.id }).value()
 
@@ -951,36 +1080,76 @@ app.get('/rooms/:id/albums/:date/collages', (req, res) => {
     })
 
     return {
-      missionId:    m.id,
-      missionTitle: tmpl?.title ?? '',
-      createdAt:    getMissionTimes(m)?.targeted_at.toISOString() ?? m.date,
+      missionId:       m.id,
+      missionTitle:    tmpl?.title ?? '',
+      status:          'COMPLETED',
+      collageVideoUrl: null,   // mock: 실제 영상 생성 불가 → null
       participants,
     }
   })
 
-  ok(res, {
-    synklogId:       null,
+  ok(res, data, '콜라주 목록 조회 성공')
+})
+
+// GET /rooms/:id/albums/:date/synklog — SYNKLOG 조회 (API.md 명세서 기준)
+// PROCESSING: { synklogId, date, status, synklogVideoUrl: null }
+// COMPLETED:  { synklogId, date, status, synklogVideoUrl, thumbnail, missions:[{missionTitle}] }
+// 없으면 404
+app.get('/rooms/:id/albums/:date/synklog', (req, res) => {
+  const roomId = Number(req.params.id)
+  const date   = req.params.date  // "YYYY-MM-DD"
+
+  const log = db().get('synklogs')
+    .find((s) => s.room_id === roomId && s.date === date)
+    .value()
+
+  if (!log) return fail(res, 404, 'SYNKLOG 없음')
+
+  const base = {
+    synklogId:       log.id,
     date:            date.replace(/-/g, '.'),
-    synklogVideoUrl: null,
-    thumbnail:       null,
+    status:          log.status,
+    synklogVideoUrl: log.synklog_video_url ?? null,
+  }
+
+  if (log.status !== 'COMPLETED') {
+    return ok(res, base, 'SYNKLOG 생성 중')
+  }
+
+  // COMPLETED: missions 제목 목록 추가
+  const dayMissions = db().get('missions')
+    .filter((m) => m.room_id === roomId && m.status === 'COMPLETED' && m.date === date)
+    .value()
+  const missions = dayMissions.map((m) => {
+    const tmpl = db().get('mission_templates').find({ id: m.mission_template_id }).value()
+    return { missionTitle: tmpl?.title ?? '' }
+  })
+
+  ok(res, {
+    ...base,
+    thumbnail: log.thumbnail ?? null,
     missions,
   }, 'SYNKLOG 조회 성공')
 })
 
-// SYNKLOG 생성 요청
-// Request body: { roomId, date }
-// Response: { synklogId, status: "PROCESSING" | "COMPLETED" }
+// SYNKLOG 생성 요청 — Request: 없음 (API.md 기준)
+// mock: 즉시 COMPLETED 처리 (실제 영상 생성 시뮬레이션 불가)
 app.post('/rooms/:id/albums/:date/synklog', (req, res) => {
   const roomId = Number(req.params.id)
   const date   = req.params.date
-  const maxId  = db().get('synklogs').maxBy('id').value()?.id ?? 0
+
+  // 이미 있으면 400
+  const existing = db().get('synklogs').find((s) => s.room_id === roomId && s.date === date).value()
+  if (existing) return fail(res, 400, '이미 생성된 SYNKLOG 존재')
+
+  const maxId = db().get('synklogs').maxBy('id').value()?.id ?? 0
   const log = {
-    id: maxId + 1,
-    room_id: roomId,
+    id:                maxId + 1,
+    room_id:           roomId,
     date,
     synklog_video_url: null,
-    thumbnail: null,
-    status: 'PROCESSING',
+    thumbnail:         null,
+    status:            'COMPLETED',  // mock: 즉시 완료
   }
   db().get('synklogs').push(log).write()
   ok(res, {
@@ -1013,19 +1182,20 @@ app.get('/rooms/:id/chats', (req, res) => {
   const todayMissionCompleted = todayMissions.some((m) => m.status === 'COMPLETED')
   const todayMissionDate      = todayMissions.length > 0 ? today : null
 
-  const chats = db().get('chats').filter({ room_id: roomId }).sortBy('id').value()
+  const chats = db().get('room_chats').filter({ room_id: roomId }).sortBy('id').value()
 
   const messages = chats.map((c) => {
     const u = db().get('users').find({ id: c.user_id }).value()
     return {
-      messageId:   c.id,
-      userId:      c.user_id,
-      userName:    u?.name ?? '',
+      messageId:    c.id,
+      userId:       c.user_id,
+      userName:     u?.name ?? '',
       profileImage: u?.profile_image ?? null,
-      content:     c.content,
-      createdAt:   c.created_at,
-      isMyMessage: c.user_id === getMeId(req),
-      reactions:   [],          // reactions 테이블 미구현 — 빈 배열
+      messageType:  c.message_type ?? 'TEXT',
+      content:      c.content,
+      createdAt:    c.created_at,
+      isMyMessage:  c.user_id === getMeId(req),
+      reactions:    [],
     }
   })
 
@@ -1038,8 +1208,28 @@ app.get('/rooms/:id/chats', (req, res) => {
   }, '채팅 조회 성공')
 })
 
-// 리액션 추가 — Response: data 없음 — { success, message: "리액션 추가 완료" }
+// 리액션 추가 — chat_reactions 테이블에 저장 (ERD 기준)
+// Request: { emoji }
+// Response: data 없음 — { success, message: "리액션 추가 완료" }
 app.post('/rooms/:id/chats/:messageId/reactions', (req, res) => {
+  const chatId = Number(req.params.messageId)
+  const userId = getMeId(req)
+  const { emoji } = req.body
+  if (!emoji) return fail(res, 400, 'emoji는 필수입니다')
+
+  // 중복 체크 (chat_id + user_id + emoji 유니크)
+  const existing = db().get('chat_reactions')
+    .find({ chat_id: chatId, user_id: userId, emoji }).value()
+  if (!existing) {
+    const maxId = db().get('chat_reactions').maxBy('id').value()?.id ?? 0
+    db().get('chat_reactions').push({
+      id:         maxId + 1,
+      chat_id:    chatId,
+      user_id:    userId,
+      emoji,
+      created_at: new Date().toISOString(),
+    }).write()
+  }
   ok(res, null, '리액션 추가 완료')
 })
 
@@ -1049,7 +1239,7 @@ app.post('/rooms/:id/chats/:messageId/reactions', (req, res) => {
 app.post('/rooms/:id/chats', (req, res) => {
   const roomId    = Number(req.params.id)
   const { content } = req.body
-  const maxId     = db().get('chats').maxBy('id').value()?.id ?? 0
+  const maxId     = db().get('room_chats').maxBy('id').value()?.id ?? 0
   const createdAt = new Date().toISOString()
   const chat = {
     id: maxId + 1,
@@ -1059,7 +1249,7 @@ app.post('/rooms/:id/chats', (req, res) => {
     content,
     created_at: createdAt,
   }
-  db().get('chats').push(chat).write()
+  db().get('room_chats').push(chat).write()
   ok(res, {
     messageId: chat.id,
     createdAt: chat.created_at,
@@ -1227,7 +1417,7 @@ app.listen(PORT, () => {
   console.log('    GET  /rooms/:id/invite')
   console.log('    DELETE /rooms/:id/leave')
   console.log('    GET  /rooms/:id/albums')
-  console.log('    GET  /rooms/:id/albums/:date/collages')
+  console.log('    GET  /rooms/:id/albums/:date/synklog')
   console.log('    POST /rooms/:id/albums/:date/synklog')
   console.log('    GET|POST /rooms/:id/chats')
   console.log('    POST /rooms/:id/chats/:messageId/reactions')
