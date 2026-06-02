@@ -1,0 +1,44 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: calc(var(--safe-top) + var(--sp-5)) var(--sp-5) var(--sp-4);
+  flex-shrink: 0;
+}
+
+.brand {
+  font-size: var(--text-2xl);
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+.bellBtn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text);
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+
+.bellDot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  background: var(--color-primary);
+  border-radius: 50%;
+  border: 2px solid var(--color-bg);
+}

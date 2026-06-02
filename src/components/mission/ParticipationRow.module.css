@@ -1,0 +1,137 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.header {
+  font-size: var(--text-sm);
+  color: var(--color-text-sub);
+  font-weight: 500;
+}
+
+.count {
+  color: var(--color-text);
+  font-weight: 700;
+}
+
+/* ── 가로 스크롤 ─────────────────────────────────────────────────────────── */
+.row {
+  display: flex;
+  gap: var(--sp-4);
+  overflow-x: auto;
+  padding-bottom: var(--sp-1);
+  scrollbar-width: none;
+}
+.row::-webkit-scrollbar { display: none; }
+
+/* ── 2열 그리드 (대기 화면) ──────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--sp-3);
+}
+
+/* ── 아이템 ──────────────────────────────────────────────────────────────── */
+.chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* ── 아바타 원형 ──────────────────────────────────────────────────────────── */
+.avatar {
+  position: relative;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  background: var(--color-surface-2);
+  transition: border-color 0.3s ease, background 0.3s ease;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.initial {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text-sub);
+}
+
+/* ── 상태별 스타일 ────────────────────────────────────────────────────────── */
+.done {
+  border-color: var(--color-primary);
+  background: var(--color-primary-dim);
+}
+
+.done .initial {
+  color: var(--color-primary);
+}
+
+@keyframes recordingPulse {
+  0%, 100% { border-color: var(--color-accent); box-shadow: 0 0 0 0 rgba(255, 107, 107, 0.4); }
+  50%       { border-color: var(--color-accent); box-shadow: 0 0 0 6px rgba(255, 107, 107, 0); }
+}
+
+.recording {
+  border-color: var(--color-accent);
+  animation: recordingPulse 1.2s ease-in-out infinite;
+}
+
+.me {
+  border-color: var(--color-primary);
+}
+
+/* ── 상태 뱃지 ───────────────────────────────────────────────────────────── */
+.badge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-bg);
+}
+
+@keyframes dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+.badgeRecording {
+  background: var(--color-accent);
+  animation: dot 0.8s ease-in-out infinite;
+}
+
+/* ── 이름 / 상태 텍스트 ──────────────────────────────────────────────────── */
+.name {
+  font-size: 11px;
+  color: var(--color-text-sub);
+  max-width: 52px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stateLabel {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
