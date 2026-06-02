@@ -71,7 +71,7 @@ export default function MissionDetailPage() {
       <div className={styles.participationSection}>
         <ParticipationRow
           participations={participations}
-          myUserId={myUser?.id}
+          myUserId={myUser?.userId}
           layout="row"
         />
       </div>

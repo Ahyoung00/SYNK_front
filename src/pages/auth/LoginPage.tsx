@@ -55,44 +55,6 @@ export default function LoginPage() {
     }
   }
 
-  // ── OAuth 공통 처리 ────────────────────────────────────────────────────────
-  async function handleOAuthSuccess(provider: 'kakao' | 'google', accessToken: string) {
-    try {
-      const loginRes = provider === 'kakao'
-        ? await authApi.kakaoLogin(accessToken)
-        : await authApi.googleLogin(accessToken)
-
-      const { token } = loginRes.data
-
-      // 임시 세팅 (Authorization 헤더 활성화)
-      const tempUser: User = {
-        userId: loginRes.data.userId,
-        name: loginRes.data.name,
-        profileImage: loginRes.data.profileImage,
-        missionNotification: true,
-        resultNotification: true,
-        highlightNotification: true,
-      }
-      setAuth(tempUser, token, '')
-
-      // /users/me 로 정확한 프로필로 덮어쓰기
-      try {
-        const meRes = await userApi.getMe()
-        setAuth(meRes.data, token, '')
-      } catch {
-        // /users/me 실패해도 loginRes 데이터로 진행
-      }
-
-      useChatStore.getState().clearAll()
-      navigate(ROUTES.HOME, { replace: true })
-    } catch (e) {
-      console.error(e)
-      setOauthError('로그인에 실패했어요. 다시 시도해주세요.')
-    } finally {
-      setOauthLoading(null)
-    }
-  }
-
   // ── 카카오 로그인 (OAuth 팝업 + postMessage) ──────────────────────────────
   function handleKakaoLogin() {
     if (oauthLoading) return

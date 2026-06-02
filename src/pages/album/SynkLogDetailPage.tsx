@@ -90,7 +90,7 @@ export default function SynkLogDetailPage() {
             user_id:      p.userId,
             room_id:      numRoomId,
             mission_id:   item.missionId,
-            video_url:    effectiveVideoUrl,
+            video_url:    effectiveVideoUrl ?? '',
             status:       'SUBMITTED' as const,
             submitted_at: p.submittedAt,
           } : undefined,

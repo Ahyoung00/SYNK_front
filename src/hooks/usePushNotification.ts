@@ -75,13 +75,12 @@ export function usePushNotification() {
     if (!data.type) return null
     return {
       id: Number(data.id ?? Date.now()),
-      user_id: 0,
       type: data.type as NotificationType,
       title: data.title ?? '',
       content: data.content ?? '',
-      related_id: data.related_id ? Number(data.related_id) : undefined,
-      is_read: false,
-      created_at: new Date().toISOString(),
+      relatedId: data.related_id ? Number(data.related_id) : null,
+      isRead: false,
+      createdAt: new Date().toISOString(),
     }
   }
 

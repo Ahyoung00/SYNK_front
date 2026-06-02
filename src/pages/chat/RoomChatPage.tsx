@@ -71,7 +71,6 @@ export default function RoomChatPage() {
   const myReactions    = useChatStore((s) => s.myReactions)
   const reactionTarget = useChatStore((s) => s.reactionTarget)
   const setMessages       = useChatStore((s) => s.setMessages)
-  const prependMessages   = useChatStore((s) => s.prependMessages)
   const appendMessage     = useChatStore((s) => s.appendMessage)
   const addReaction       = useChatStore((s) => s.addReaction)
   const removeReaction    = useChatStore((s) => s.removeReaction)

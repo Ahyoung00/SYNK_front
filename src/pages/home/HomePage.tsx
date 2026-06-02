@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useNavigationType } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useMissionStore } from '@/store/missionStore'
 import { useSettingsStore } from '@/store/settingsStore'
@@ -89,7 +89,6 @@ function HomeMissionCard({
   onAllDone,
   onViewWaiting,
   onViewResult,
-  onRetake,
 }: {
   mission: ActiveMissionItem
   myUserId: number | undefined
@@ -99,7 +98,6 @@ function HomeMissionCard({
   onAllDone?: () => void
   onViewWaiting?: () => void
   onViewResult?: () => void
-  onRetake?: () => void
 }) {
   const [secondsLeft, setSecondsLeft] = useState(mission.remainingSeconds)
 
@@ -132,7 +130,7 @@ function HomeMissionCard({
     onExpire()
   }, [isExpired]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const cardStateClass = missionCardStateClass(secondsLeft, styles)
+  const cardStateClass = missionCardStateClass(secondsLeft, styles as { missionCardSafe: string; missionCardWarn: string })
 
   return (
     <div className={[styles.missionCard, cardStateClass].filter(Boolean).join(' ')}>
@@ -239,7 +237,6 @@ function ParticipantItem({ participant: p }: { participant: ActiveMissionPartici
 
 export default function HomePage() {
   const navigate  = useNavigate()
-  const navType   = useNavigationType()
   const user         = useAuthStore((s) => s.user)
   const active       = useMissionStore((s) => s.active)
   const setActive    = useMissionStore((s) => s.setActive)
@@ -401,10 +398,6 @@ export default function HomePage() {
               onViewWaiting={() => {
                 setActive(toMissionState(m))
                 navigate(ROUTES.MISSION_WAITING(m.roomId))
-              }}
-              onRetake={() => {
-                setActive(toMissionState(m))
-                navigate(ROUTES.MISSION_CAMERA(m.roomId))
               }}
               onViewResult={() => {
                 // 결과 화면으로 이동 — 더 이상 카드 유지 불필요

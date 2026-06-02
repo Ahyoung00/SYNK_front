@@ -23,7 +23,7 @@ export function buildCollageCells(
   missionStartAt: string,
 ): CollageCellData[] {
   return participations.map((p, i) => ({
-    user: p.user,
+    user: { id: p.user.userId, name: p.user.name, profile_image: p.user.profileImage ?? undefined },
     videoUrl:      p.submission?.video_url ?? undefined,
     missionStartAt,
     // 실제 submitted_at 사용 — mock 오프셋 제거

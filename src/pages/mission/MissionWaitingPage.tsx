@@ -56,7 +56,7 @@ export default function MissionWaitingPage() {
   // 시간 종료 → 처리 중
   useEffect(() => {
     if (secondsLeft === 0) {
-      navigate(ROUTES.MISSION_PROCESSING(Number(roomId) || active?.room.id))
+      navigate(ROUTES.MISSION_PROCESSING((Number(roomId) || active?.room.id) ?? 0))
     }
   }, [secondsLeft, navigate, roomId]) // eslint-disable-line react-hooks/exhaustive-deps
 
