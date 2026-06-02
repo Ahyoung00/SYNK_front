@@ -1,7 +1,7 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore, type Theme } from '@/store/themeStore'
+import { useSettingsStore } from '@/store/settingsStore'
 import { ROUTES } from '@/constants'
 import AppHeader from '@/components/layout/AppHeader'
 import styles from './ProfilePage.module.css'
@@ -13,10 +13,12 @@ export default function ProfilePage() {
   const theme     = useThemeStore((s) => s.theme)
   const setTheme  = useThemeStore((s) => s.setTheme)
 
-  // 알림 설정 토글 (백엔드 연동 전 로컬 상태)
-  const [missionAlert,    setMissionAlert]    = useState(true)
-  const [resultAlert,     setResultAlert]     = useState(true)
-  const [highlightAlert,  setHighlightAlert]  = useState(true)
+  const missionAlert    = useSettingsStore((s) => s.missionAlert)
+  const resultAlert     = useSettingsStore((s) => s.resultAlert)
+  const highlightAlert  = useSettingsStore((s) => s.highlightAlert)
+  const setMissionAlert   = useSettingsStore((s) => s.setMissionAlert)
+  const setResultAlert    = useSettingsStore((s) => s.setResultAlert)
+  const setHighlightAlert = useSettingsStore((s) => s.setHighlightAlert)
 
   function handleLogout() {
     logout()
