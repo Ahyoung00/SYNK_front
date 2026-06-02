@@ -19,6 +19,8 @@ export default function MissionResultPage() {
   const [cells, setCells] = useState<CollageCellData[]>([])
   const [showStats, setShowStats] = useState(false)
 
+  const isAlbumView = (location.state as { returnTo?: string } | null)?.returnTo === 'album'
+
   // 셀 데이터 초기화
   useEffect(() => {
     let built: CollageCellData[]
@@ -28,9 +30,9 @@ export default function MissionResultPage() {
       built = buildCollageCells(active.participations, startAt)
 
       // 현재 세션에서 녹화한 영상(previewUrl)을 내 셀에 주입
-      if (previewUrl && myUser) {
+      // 앨범 뷰에서는 handleViewCollage에서 미션별로 정확하게 이미 처리했으므로 여기서는 주입 안 함
+      if (previewUrl && myUser && !isAlbumView) {
         built = built.map((c) => {
-          // CollageCellData.user is MemberParticipation['user'] at runtime: { userId, name, profileImage }
           const uid = (c.user as unknown as { userId: number }).userId
           return uid === myUser.userId ? { ...c, videoUrl: previewUrl } : c
         })

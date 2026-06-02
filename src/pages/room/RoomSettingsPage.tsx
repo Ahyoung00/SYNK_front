@@ -24,17 +24,16 @@ export default function RoomSettingsPage() {
 
   useEffect(() => {
     if (!id) return
-    Promise.all([roomApi.getRoom(id), roomApi.getMembers(id)])
-      .then(([roomRes, membersRes]) => {
-        const room    = roomRes.data
-        const members = membersRes.data
+    roomApi.getRoom(id)
+      .then((roomRes) => {
+        const room = roomRes.data
         setRoomName(room.name)
-        setMissionCount(room.daily_mission_count)
+        setMissionCount(room.dailyMissionCount)
         // "HH:mm:ss" → "HH:mm" 변환
-        setMissionStartTime(room.mission_start_time?.slice(0, 5) ?? '10:00')
-        setMissionEndTime(room.mission_end_time?.slice(0, 5)     ?? '22:00')
-        setMemberCount(members.length)
-        setIsOwner(room.owner_id === myUser?.userId)
+        setMissionStartTime(room.missionStartTime?.slice(0, 5) ?? '10:00')
+        setMissionEndTime(room.missionEndTime?.slice(0, 5)     ?? '22:00')
+        setMemberCount(room.currentMembers)
+        setIsOwner(room.ownerId === myUser?.userId)
       })
       .catch(console.error)
       .finally(() => setIsLoading(false))
@@ -139,8 +138,8 @@ export default function RoomSettingsPage() {
                   <span className={styles.stepValue}>{missionCount}회</span>
                   <button
                     className={styles.stepBtn}
-                    onClick={() => { setMissionCount((v) => Math.min(10, v + 1)); setDirty(true) }}
-                    disabled={missionCount >= 10}
+                    onClick={() => { setMissionCount((v) => Math.min(5, v + 1)); setDirty(true) }}
+                    disabled={missionCount >= 5}
                   >+</button>
                 </div>
               ) : (

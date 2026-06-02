@@ -14,7 +14,15 @@ const TYPE_META: Record<string, { icon: string; bg: string }> = {
   ACHIEVEMENT:      { icon: '🔥', bg: 'rgba(249, 115, 22, 0.15)'  },
 }
 
-function NotifGroup({ label, items }: { label: string; items: AppNotification[] }) {
+function NotifGroup({
+  label,
+  items,
+  onRead,
+}: {
+  label: string
+  items: AppNotification[]
+  onRead: (id: number) => void
+}) {
   if (items.length === 0) return null
   return (
     <div className={styles.group}>
@@ -23,7 +31,12 @@ function NotifGroup({ label, items }: { label: string; items: AppNotification[] 
         {items.map((item) => {
           const meta = TYPE_META[item.type] ?? TYPE_META['MEMBER_JOIN']
           return (
-            <div key={item.id} className={styles.notifRow}>
+            <div
+              key={item.id}
+              className={styles.notifRow}
+              onClick={() => !item.isRead && onRead(item.id)}
+              style={{ cursor: item.isRead ? 'default' : 'pointer' }}
+            >
               <div className={styles.iconWrap} style={{ background: meta.bg }}>
                 <span className={styles.notifIcon}>{meta.icon}</span>
               </div>
@@ -41,7 +54,7 @@ function NotifGroup({ label, items }: { label: string; items: AppNotification[] 
 }
 
 export default function NotificationsPage() {
-  const { setNotifications, markAllRead } = useNotificationStore()
+  const { setNotifications, markAllRead: storeMarkAllRead } = useNotificationStore()
   const [data, setData] = useState<NotificationsResponse | null>(null)
 
   useEffect(() => {
@@ -55,6 +68,28 @@ export default function NotificationsPage() {
       .catch(console.error)
   }, [setNotifications])
 
+  /** 단건 읽음 처리 */
+  function handleRead(id: number) {
+    notificationApi.markRead(id).catch(console.error)
+    setData((prev) => {
+      if (!prev) return prev
+      const mark = (list: AppNotification[]) =>
+        list.map((n) => n.id === id ? { ...n, isRead: true } : n)
+      return { ...prev, today: mark(prev.today), thisWeek: mark(prev.thisWeek) }
+    })
+  }
+
+  /** 전체 읽음 처리 */
+  function handleMarkAllRead() {
+    notificationApi.markAllRead().catch(console.error)
+    storeMarkAllRead()
+    setData((prev) => {
+      if (!prev) return prev
+      const markAll = (list: AppNotification[]) => list.map((n) => ({ ...n, isRead: true }))
+      return { ...prev, today: markAll(prev.today), thisWeek: markAll(prev.thisWeek) }
+    })
+  }
+
   const isEmpty = !data || (data.today.length === 0 && data.thisWeek.length === 0)
 
   return (
@@ -65,10 +100,7 @@ export default function NotificationsPage() {
         right={
           <button
             style={{ color: '#3b82f6', fontWeight: 700, fontSize: 'var(--text-sm)' }}
-            onClick={() => {
-              notificationApi.markAllRead().catch(console.error)
-              markAllRead()
-            }}
+            onClick={handleMarkAllRead}
           >
             모두 읽음
           </button>
@@ -83,8 +115,8 @@ export default function NotificationsPage() {
           </p>
         ) : (
           <>
-            <NotifGroup label="오늘"    items={data?.today    ?? []} />
-            <NotifGroup label="이번 주" items={data?.thisWeek ?? []} />
+            <NotifGroup label="오늘"    items={data?.today    ?? []} onRead={handleRead} />
+            <NotifGroup label="이번 주" items={data?.thisWeek ?? []} onRead={handleRead} />
           </>
         )}
       </div>

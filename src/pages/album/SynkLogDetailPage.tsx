@@ -1,79 +1,107 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { albumApi, roomApi } from '@/services/api/endpoints'
+import { albumApi } from '@/services/api/endpoints'
 import { useMissionStore } from '@/store/missionStore'
+import { useAuthStore } from '@/store/authStore'
 import { ROUTES } from '@/constants'
-import type { SynklogDetailResponse, SynklogMission } from '@/types'
+import type { CollageItem, SynklogDetailResponse } from '@/types'
 import styles from './SynkLogDetailPage.module.css'
 
 export default function SynkLogDetailPage() {
   const { roomId, date } = useParams<{ roomId: string; date: string }>()
-  const navigate  = useNavigate()
-  const setActive = useMissionStore((s) => s.setActive)
-  const numRoomId = Number(roomId)
+  const navigate    = useNavigate()
+  const setActive   = useMissionStore((s) => s.setActive)
+  const previewUrl  = useMissionStore((s) => s.previewUrl)
+  const myUser      = useAuthStore((s) => s.user)
+  const numRoomId   = Number(roomId)
 
-  const [data, setData]       = useState<SynklogDetailResponse | null>(null)
-  const [roomName, setRoomName] = useState('')
-  const [isLoading, setIsLoading] = useState(true)
-  const [error, setError]     = useState(false)
+  const [collages, setCollages]       = useState<CollageItem[]>([])
+  const [synklog, setSynklog]         = useState<SynklogDetailResponse | null>(null)
+  const [synklogMissing, setSynklogMissing] = useState(false)
+  const [isLoading, setIsLoading]     = useState(true)
+  const [error, setError]             = useState(false)
+  const [creatingLog, setCreatingLog] = useState(false)
 
   useEffect(() => {
     if (!date) return
-    Promise.all([
-      albumApi.getCollages(numRoomId, date),
-      roomApi.getRoom(numRoomId),
-    ])
-      .then(([collageRes, roomRes]) => {
-        setData(collageRes.data)
-        setRoomName(roomRes.data.name)
-      })
+
+    // collages는 필수 / synklog는 없을 수 있음 (404 허용)
+    albumApi.getCollages(numRoomId, date)
+      .then((res) => setCollages(res.data))
       .catch(() => setError(true))
       .finally(() => setIsLoading(false))
+
+    albumApi.getSynklog(numRoomId, date)
+      .then((res) => setSynklog(res.data))
+      .catch(() => setSynklogMissing(true))  // 404 = 아직 생성 전
   }, [numRoomId, date])
 
-  function handleSynk(mission: SynklogMission) {
-    // active 스토어에 히스토리 미션 데이터 세팅 → MissionResultPage가 콜라주 빌드
+  async function handleCreateSynklog() {
+    if (creatingLog) return
+    setCreatingLog(true)
+    try {
+      await albumApi.createSynklog(numRoomId, date!)
+      // 생성 후 재조회
+      const res = await albumApi.getSynklog(numRoomId, date!)
+      setSynklog(res.data)
+      setSynklogMissing(false)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setCreatingLog(false)
+    }
+  }
+
+  // 과거 미션 콜라주 보기 — participants 데이터로 MissionResultPage 세팅
+  function handleViewCollage(item: CollageItem) {
     setActive({
       mission: {
-        id:                  mission.missionId,
+        id:                  item.missionId,
         room_id:             numRoomId,
         mission_template_id: 0,
         type:                'VIDEO',
         status:              'ACTIVE',
-        targeted_at:         mission.createdAt,
-        deadline:            mission.createdAt,
-        created_at:          mission.createdAt,
-        template: { id: 0, title: mission.missionTitle },
+        targeted_at:         date ?? '',
+        deadline:            date ?? '',
+        created_at:          date ?? '',
+        template: { id: 0, title: item.missionTitle },
       },
       room: {
         id:                  numRoomId,
-        name:                roomName,
+        name:                '',
         code:                '',
         thumbnail:           null,
         owner_id:            0,
-        max_members:         mission.participants.length,
-        current_members:     mission.participants.length,
+        max_members:         item.participants.length,
+        current_members:     item.participants.length,
         daily_mission_count: 1,
         mission_start_time:  '',
         mission_end_time:    '',
         created_at:          null,
       },
       seconds_left: 0,
-      participations: mission.participants.map((p) => ({
-        user: { userId: p.userId, name: p.name, profileImage: p.profileImage },
-        state: p.state,
-        submission: p.videoUrl ? {
-          id:           0,
-          user_id:      p.userId,
-          room_id:      numRoomId,
-          mission_id:   mission.missionId,
-          video_url:    p.videoUrl,
-          status:       'SUBMITTED' as const,
-          submitted_at: p.submittedAt,
-        } : undefined,
-      })),
+      participations: item.participants.map((p) => {
+        const isMe = myUser && p.userId === myUser.userId
+        // 내가 제출한 미션이고 이번 세션에서 녹화한 영상이 있으면 실제 영상 사용
+        const effectiveVideoUrl = (isMe && p.state === 'done' && previewUrl)
+          ? previewUrl
+          : p.videoUrl
+        return {
+          user: { userId: p.userId, name: p.name, profileImage: p.profileImage },
+          state: p.state,
+          submission: p.state === 'done' ? {
+            id:           0,
+            user_id:      p.userId,
+            room_id:      numRoomId,
+            mission_id:   item.missionId,
+            video_url:    effectiveVideoUrl,
+            status:       'SUBMITTED' as const,
+            submitted_at: p.submittedAt,
+          } : undefined,
+        }
+      }),
     })
-    navigate(ROUTES.MISSION_RESULT(mission.missionId), { state: { returnTo: 'album' } })
+    navigate(ROUTES.MISSION_RESULT(item.missionId), { state: { returnTo: 'album' } })
   }
 
   if (isLoading) {
@@ -87,7 +115,7 @@ export default function SynkLogDetailPage() {
     )
   }
 
-  if (error || !data) {
+  if (error || collages.length === 0) {
     return (
       <div className={styles.page}>
         <SynkHeader date={date ?? ''} onBack={() => navigate(-1)} />
@@ -101,27 +129,27 @@ export default function SynkLogDetailPage() {
   return (
     <div className={styles.page}>
       {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
-      <SynkHeader date={data.date} onBack={() => navigate(-1)} />
+      <SynkHeader date={collages[0] ? date ?? '' : ''} onBack={() => navigate(-1)} />
 
       {/* ── 콘텐츠 ──────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
-        {data.missions.map((m) => {
-          const submittedCount = m.participants.filter((p) => p.state === 'done').length
-          const totalCount     = m.participants.length
+
+        {/* ── 미션별 콜라주 ────────────────────────────────────────────────── */}
+        {collages.map((item) => {
+          const submittedCount = item.participants.filter((p) => p.state === 'done').length
+          const totalCount     = item.participants.length
 
           return (
-            <div key={m.missionId} className={styles.missionCard}>
+            <div key={item.missionId} className={styles.missionCard}>
               <p className={styles.missionHeader}>⚡ 수행한 미션</p>
-              <p className={styles.missionText}>{m.missionTitle}</p>
+              <p className={styles.missionText}>{item.missionTitle}</p>
 
-              {/* 참여율 */}
               <p className={styles.missionMeta}>
                 {submittedCount}/{totalCount}명 참여
               </p>
 
-              {/* 참여자 아바타 행 */}
               <div className={styles.avatarRow}>
-                {m.participants.map((p) => (
+                {item.participants.map((p) => (
                   <div
                     key={p.userId}
                     className={[
@@ -137,16 +165,57 @@ export default function SynkLogDetailPage() {
                 ))}
               </div>
 
-              {/* SYNK 버튼 → 콜라주 결과 */}
               <button
                 className={styles.synkBtn}
-                onClick={() => handleSynk(m)}
+                onClick={() => handleViewCollage(item)}
               >
-                SYNK 보기
+                콜라주 보기
               </button>
             </div>
           )
         })}
+
+        {/* ── SYNKLOG 합본 영상 ────────────────────────────────────────────── */}
+        <div className={styles.missionCard}>
+          <p className={styles.missionHeader}>🎬 오늘의 SYNKLOG</p>
+
+          {synklogMissing && (
+            <>
+              <p className={styles.missionMeta}>아직 SYNKLOG가 생성되지 않았어요</p>
+              <button
+                className={styles.synkBtn}
+                onClick={handleCreateSynklog}
+                disabled={creatingLog}
+              >
+                {creatingLog ? '생성 중...' : 'SYNKLOG 생성하기'}
+              </button>
+            </>
+          )}
+
+          {synklog?.status === 'PROCESSING' && (
+            <p className={styles.missionMeta}>⏳ SYNKLOG 생성 중...</p>
+          )}
+
+          {synklog?.status === 'COMPLETED' && (
+            <>
+              {synklog.missions?.map((m, i) => (
+                <p key={i} className={styles.missionText}>· {m.missionTitle}</p>
+              ))}
+              <button
+                className={styles.synkBtn}
+                onClick={() => {
+                  if (synklog.synklogVideoUrl) {
+                    window.open(synklog.synklogVideoUrl, '_blank')
+                  }
+                }}
+                disabled={!synklog.synklogVideoUrl}
+              >
+                SYNKLOG 보기
+              </button>
+            </>
+          )}
+        </div>
+
       </div>
     </div>
   )

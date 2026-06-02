@@ -3,34 +3,29 @@ import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { roomApi } from '@/services/api/endpoints'
-import type { Room } from '@/types'
+import type { ActiveRoom, WaitingRoom } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
 import styles from './RoomsPage.module.css'
 
-// 서버에서 내려오는 enriched Room (mock 서버 /rooms 전용 필드 포함)
-interface RoomWithUI extends Room {
-  ui_status: 'active' | 'done' | 'waiting'
-  ui_status_text: string
-  members_detail: Array<{ userId: number; name: string; profileImage: string | null }>
-  member_count: number
-}
-
 export default function RoomsPage() {
   const navigate = useNavigate()
-  const [rooms, setRooms] = useState<RoomWithUI[]>([])
+  const [activeRooms, setActiveRooms]   = useState<ActiveRoom[]>([])
+  const [waitingRooms, setWaitingRooms] = useState<WaitingRoom[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [sheet, setSheet] = useState(false)
 
   useEffect(() => {
     roomApi
       .getMyRooms()
-      .then((res) => setRooms(res.data as RoomWithUI[]))
+      .then((res) => {
+        setActiveRooms(res.data.active ?? [])
+        setWaitingRooms(res.data.waiting ?? [])
+      })
       .catch(console.error)
       .finally(() => setIsLoading(false))
   }, [])
 
-  const activeRooms  = rooms.filter((r) => r.ui_status !== 'waiting')
-  const waitingRooms = rooms.filter((r) => r.ui_status === 'waiting')
+  const rooms = [...activeRooms, ...waitingRooms]
 
   return (
     <div className={styles.page}>
@@ -53,7 +48,7 @@ export default function RoomsPage() {
             <span className={styles.sectionLabel}>참여중</span>
             <div className={styles.roomList}>
               {activeRooms.map((room) => (
-                <RoomCard
+                <ActiveRoomCard
                   key={room.id}
                   room={room}
                   onClick={() => navigate(ROUTES.ROOM(room.id))}
@@ -72,7 +67,7 @@ export default function RoomsPage() {
             </span>
             <div className={styles.roomList}>
               {waitingRooms.map((room) => (
-                <RoomCard
+                <WaitingRoomCard
                   key={room.id}
                   room={room}
                   onClick={() => navigate(ROUTES.ROOM(room.id))}
@@ -143,43 +138,57 @@ export default function RoomsPage() {
 
 // ── RoomCard ──────────────────────────────────────────────────────────────────
 
-interface RoomCardProps {
-  room: RoomWithUI
-  onClick: () => void
-}
+function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
+  const statusText = room.isAllCompleted
+    ? `오늘 미션 ${room.completedMissions}/${room.totalMissions} 🔥`
+    : `오늘 미션 ${room.completedMissions}/${room.totalMissions}`
+  const statusClass = room.isAllCompleted ? styles.statusDone : styles.statusActive
 
-function RoomCard({ room, onClick }: RoomCardProps) {
   return (
     <button className={styles.roomCard} onClick={onClick}>
       <div className={styles.cardTop}>
         <span className={styles.roomName}>{room.name}</span>
-        <span
-          className={[
-            styles.statusText,
-            room.ui_status === 'done'    ? styles.statusDone :
-            room.ui_status === 'waiting' ? styles.statusWaiting :
-            styles.statusActive,
-          ].join(' ')}
-        >
-          {room.ui_status_text}
-        </span>
+        <span className={[styles.statusText, statusClass].join(' ')}>{statusText}</span>
       </div>
       <div className={styles.avatarStack}>
-        {room.members_detail.slice(0, 5).map((m, i) => (
+        {room.memberProfiles.slice(0, 5).map((m, i) => (
           <span
             key={m.userId}
             className={styles.avatarBubble}
-            style={{ zIndex: room.members_detail.length - i }}
-            title={m.name}
+            style={{ zIndex: room.memberProfiles.length - i }}
           >
-            {m.name.charAt(0)}
+            👤
           </span>
         ))}
-        {room.members_detail.length > 5 && (
+        {room.memberProfiles.length > 5 && (
           <span className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
-            +{room.members_detail.length - 5}
+            +{room.memberProfiles.length - 5}
           </span>
         )}
+      </div>
+    </button>
+  )
+}
+
+function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => void }) {
+  return (
+    <button className={styles.roomCard} onClick={onClick}>
+      <div className={styles.cardTop}>
+        <span className={styles.roomName}>{room.name}</span>
+        <span className={[styles.statusText, styles.statusWaiting].join(' ')}>
+          {room.waitingCount}명 더 기다리는 중..
+        </span>
+      </div>
+      <div className={styles.avatarStack}>
+        {room.memberProfiles.slice(0, 5).map((m, i) => (
+          <span
+            key={m.userId}
+            className={styles.avatarBubble}
+            style={{ zIndex: room.memberProfiles.length - i }}
+          >
+            👤
+          </span>
+        ))}
       </div>
     </button>
   )

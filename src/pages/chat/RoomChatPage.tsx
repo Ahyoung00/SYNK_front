@@ -208,9 +208,6 @@ export default function RoomChatPage() {
       {missionDone && (
         <MissionResultBanner onPress={() => navigate(ROUTES.MISSION_RESULT(numRoomId))} />
       )}
-      {import.meta.env.DEV && !missionDone && (
-        <MissionResultBanner onPress={() => navigate(ROUTES.MISSION_RESULT(numRoomId))} />
-      )}
 
       {/* ── 메시지 목록 ──────────────────────────────────────────────────── */}
       <div className={styles.msgList} ref={listRef} onScroll={handleScroll}>

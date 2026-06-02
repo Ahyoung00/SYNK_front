@@ -22,20 +22,75 @@ export interface User {
 
 // ── Room ──────────────────────────────────────────────────────────────────────
 
+/**
+ * 내부 스토어용 Room (snake_case, ActiveMissionState 등에서 사용)
+ */
 export interface Room {
   id: number
   name: string
   code: string
-  thumbnail: string | null    // ERD: nullable
+  thumbnail: string | null
   owner_id: number
   max_members: number
-  current_members: number | null  // ERD: nullable
+  current_members?: number | null  // ERD에 없음 — 스토어 호환용
   daily_mission_count: number
   /** "HH:mm:ss" */
   mission_start_time: string
   /** "HH:mm:ss" */
   mission_end_time: string
-  created_at: string | null   // ERD: nullable
+  created_at: string | null
+}
+
+/**
+ * GET /rooms/{roomId} 응답 (camelCase, API 명세서 기준)
+ */
+export interface RoomDetail {
+  id: number
+  name: string
+  code: string
+  thumbnail: string | null
+  ownerId: number
+  currentMembers: number
+  maxMembers: number
+  dailyMissionCount: number
+  missionStartTime: string
+  missionEndTime: string
+  members: Array<{ userId: number; name: string; profileImage: string | null }>
+  recentAlbums: Array<{ date: string; thumbnail: string | null }>
+}
+
+/**
+ * GET /rooms/my — 참여중 방 항목
+ */
+export interface ActiveRoom {
+  id: number
+  name: string
+  totalMissions: number
+  completedMissions: number
+  isAllCompleted: boolean
+  roomThumbnail: string | null
+  memberProfiles: Array<{ userId: number; profileImage: string | null }>
+}
+
+/**
+ * GET /rooms/my — 대기중 방 항목
+ */
+export interface WaitingRoom {
+  id: number
+  name: string
+  currentMembers: number
+  maxMembers: number
+  waitingCount: number
+  roomThumbnail: string | null
+  memberProfiles: Array<{ userId: number; profileImage: string | null }>
+}
+
+/**
+ * GET /rooms/my 응답 (API 명세서 기준)
+ */
+export interface RoomsMyResponse {
+  active: ActiveRoom[]
+  waiting: WaitingRoom[]
 }
 
 export interface RoomMember {
@@ -97,6 +152,12 @@ export interface ActiveMissionItem {
   roomThumbnail: string | null
   title: string
   description: string
+  /** "YYYY-MM-DD" */
+  missionDate: string | null
+  /** "HH:mm" */
+  slotTime: string | null
+  /** ISO8601 */
+  deadline: string | null
   remainingSeconds: number
   totalMembers: number
   submittedCount: number
@@ -175,7 +236,7 @@ export interface SynkLog {
   status: SynkLogStatus | null      // ERD: nullable
 }
 
-/** GET /rooms/{roomId}/albums/{date}/collages — missions 배열 내 참여자 */
+/** @deprecated CollageParticipant 사용 권장 */
 export interface SynklogParticipant {
   userId: number
   name: string
@@ -185,25 +246,45 @@ export interface SynklogParticipant {
   state: 'done' | 'waiting'
 }
 
-/** GET /rooms/{roomId}/albums/{date}/collages — missions 배열 내 항목 */
-export interface SynklogMission {
-  missionId: number
-  missionTitle: string
-  createdAt: string
-  participants: SynklogParticipant[]
+// ── Collage (GET /rooms/{roomId}/albums/{date}/collages) ─────────────────────
+
+/** 날짜별 콜라주 API — 미션 1개 내 참여자 */
+export interface CollageParticipant {
+  userId: number
+  name: string
+  profileImage: string | null
+  videoUrl: string | null
+  submittedAt: string | null
+  state: 'done' | 'waiting'
 }
 
+/** GET /rooms/{roomId}/albums/{date}/collages — 배열 내 항목 */
+export interface CollageItem {
+  missionId: number
+  missionTitle: string
+  /** 콜라주 영상 생성 상태 */
+  status: 'PROCESSING' | 'COMPLETED'
+  /** 생성된 콜라주 영상 URL (생성 전 null) */
+  collageVideoUrl: string | null
+  participants: CollageParticipant[]
+}
+
+// ── SynkLog (GET /rooms/{roomId}/albums/{date}/synklog) ──────────────────────
+
 /**
- * GET /rooms/{roomId}/albums/{date}/collages — 특정 날짜 SYNKLOG 조회 응답
- * ERD 우선: synklogVideoUrl / thumbnail 은 nullable 유지
+ * GET /rooms/{roomId}/albums/{date}/synklog — API.md 기준
+ * PROCESSING: synklogId, date, status, synklogVideoUrl(null)
+ * COMPLETED:  + thumbnail, missions[{missionTitle}]
  */
 export interface SynklogDetailResponse {
   synklogId: number
   /** "YYYY.MM.DD" */
   date: string
-  synklogVideoUrl: string | null   // ERD: nullable
-  thumbnail: string | null         // ERD: nullable
-  missions: SynklogMission[]
+  status: 'PROCESSING' | 'COMPLETED'
+  synklogVideoUrl: string | null
+  thumbnail?: string | null
+  /** COMPLETED일 때만 존재 */
+  missions?: Array<{ missionTitle: string }>
 }
 
 // ── Chat ──────────────────────────────────────────────────────────────────────
