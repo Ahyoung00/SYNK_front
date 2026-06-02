@@ -11,8 +11,8 @@ export default function JoinRoomPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError]         = useState<string | null>(null)
 
-  // 코드는 최대 6자리, 4자 이상이어야 버튼 활성화
-  const canJoin = code.trim().length >= 4 && !isLoading
+  // 코드는 최대 5자리, 5자 이상이어야 버튼 활성화
+  const canJoin = code.trim().length >= 5 && !isLoading
 
   async function handleJoin() {
     if (!canJoin) return
@@ -53,7 +53,7 @@ export default function JoinRoomPage() {
               setError(null)
             }}
             onKeyDown={(e) => { if (e.key === 'Enter') handleJoin() }}
-            maxLength={6}
+            maxLength={5}
             autoCapitalize="characters"
             spellCheck={false}
             autoFocus
