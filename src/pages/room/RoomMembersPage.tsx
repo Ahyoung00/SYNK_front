@@ -46,13 +46,11 @@ export default function RoomMembersPage() {
           <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>불러오는 중...</p>
         )}
         {members.map((m) => {
-          const name   = m.user?.name   ?? '알 수 없음'
-          const handle = `@id${m.user_id}`
+          const name = m.user?.name ?? '알 수 없음'
           return (
             <div key={m.id} className={styles.memberRow}>
               <div className={styles.memberInfo}>
                 <span className={styles.memberName}>{name}</span>
-                <span className={styles.memberHandle}>{handle}</span>
               </div>
               {m.is_owner && <span className={styles.ownerBadge}>방장</span>}
               {isOwner && !m.is_owner && (

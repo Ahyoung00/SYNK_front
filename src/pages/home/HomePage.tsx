@@ -232,10 +232,40 @@ export default function HomePage() {
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null)
 
   // 로컬에서 타이머가 만료된 미션 ID 집합 — 서버 poll이 지워도 카드를 유지하기 위해
-  const expiredIdsRef = useRef<Set<number>>(new Set())
+  const expiredIdsRef     = useRef<Set<number>>(new Set())
+  // 이미 알림을 띄운 미션 ID — 첫 로드 포함 (재알림 방지)
+  const seenMissionIdsRef = useRef<Set<number>>(new Set())
+  // 첫 폴링 완료 여부 — 초기 로드 시엔 알림 안 띄움
+  const initialLoadDoneRef = useRef(false)
+
+  // 브라우저 알림 표시
+  function showBrowserNotification(title: string, body: string) {
+    if (!('Notification' in window)) return
+    if (Notification.permission === 'granted') {
+      new Notification(title, { body, icon: '/favicon.ico' })
+    } else if (Notification.permission === 'default') {
+      Notification.requestPermission().then((perm) => {
+        if (perm === 'granted') new Notification(title, { body, icon: '/favicon.ico' })
+      })
+    }
+  }
 
   // 미션 목록 갱신 헬퍼
   function applyMissions(missions: ActiveMissionItem[]) {
+    // 초기 로드 이후 폴링에서 새 미션 감지 → 브라우저 알림
+    if (initialLoadDoneRef.current) {
+      for (const m of missions) {
+        if (!seenMissionIdsRef.current.has(m.id)) {
+          showBrowserNotification(
+            `⚡ ${m.roomName}에서 미션이 울렸어요!`,
+            m.title,
+          )
+        }
+      }
+    }
+    // 본 미션 ID 등록
+    missions.forEach((m) => seenMissionIdsRef.current.add(m.id))
+
     setActiveMissions((prev) => {
       const serverIds = new Set(missions.map((m) => m.id))
       // 로컬 만료 미션은 서버에서 CLOSED 됐어도 유지 (사용자가 결과 보기 전까지)
@@ -258,10 +288,13 @@ export default function HomePage() {
     }
   }
 
-  // 마운트 시 즉시 조회
+  // 마운트 시 즉시 조회 (첫 로드 — 알림 없이 seen 등록만)
   useEffect(() => {
     missionApi.getActiveMission()
-      .then((res) => { applyMissions(res.data) })
+      .then((res) => {
+        applyMissions(res.data)
+        initialLoadDoneRef.current = true  // 이후 폴링부터 알림 활성화
+      })
       .catch(console.error)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 

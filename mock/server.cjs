@@ -41,37 +41,55 @@ function getMeId(req) {
 }
 
 // ── 미션 세션 타이머 & 스케줄러 상수 ─────────────────────────────────────────
-const MISSION_WINDOW_MS        = 300_000  // 미션 제출 창: 5분
-const SCHEDULER_INTERVAL_MS    = 30_000  // 스케줄러 체크 주기: 30초
-const MISSION_FIRE_PROBABILITY  = 0.30   // 창 안에서 매 30초마다 30% 확률로 발동
-const MOCK_AUTO_SUBMIT_MIN_MS  = 60_000  // 다른 멤버 자동 제출 최소 딜레이: 1분
-const MOCK_AUTO_SUBMIT_MAX_MS  = 240_000 // 다른 멤버 자동 제출 최대 딜레이: 4분
-const missionFiredAt            = new Map() // missionId → server-local fired timestamp
+const MISSION_WINDOW_MS       = 300_000  // 미션 제출 창: 5분
+const SCHEDULER_INTERVAL_MS   = 30_000   // 스케줄러 체크 주기: 30초
+const MOCK_AUTO_SUBMIT_MIN_MS = 60_000   // 다른 멤버 자동 제출 최소 딜레이: 1분
+const MOCK_AUTO_SUBMIT_MAX_MS = 240_000  // 다른 멤버 자동 제출 최대 딜레이: 4분
 
-// "HH:MM:SS" → 분 단위 정수 (예: "07:30:00" → 450)
+// "HH:MM" → 분 단위 정수 (예: "07:30" → 450)
 function getTimeMinutes(timeStr) {
-  const [h, m] = String(timeStr ?? '00:00:00').split(':').map(Number)
+  const [h, m] = String(timeStr ?? '00:00').split(':').map(Number)
   return h * 60 + m
 }
 
-// ── 미션 CLOSED 처리 + 도감(collection_records) 자동 생성 ─────────────────────
-function closeMission(missionId) {
+// mission의 targeted_at(Date) 및 deadline(Date) 계산 — time_slot + date 기반
+// debug 미션(_debug_deadline 보유)은 fallback 처리
+function getMissionTimes(mission) {
+  if (mission._debug_deadline) {
+    const deadline    = new Date(mission._debug_deadline)
+    const targeted_at = new Date(deadline.getTime() - MISSION_WINDOW_MS)
+    return { targeted_at, deadline }
+  }
+  const slot = db().get('mission_time_slots').find({ id: mission.time_slot_id }).value()
+  if (!slot || !mission.date) return null
+  const targeted_at = new Date(`${mission.date}T${slot.slot_time}:00`)
+  const deadline    = new Date(targeted_at.getTime() + MISSION_WINDOW_MS)
+  return { targeted_at, deadline }
+}
+
+// ── 미션 종료 처리 (COMPLETED | EXPIRED) + 도감 자동 생성 ──────────────────────
+function closeMission(missionId, newStatus = 'COMPLETED') {
   const mission = db().get('missions').find({ id: missionId }).value()
   if (!mission || mission.status !== 'ACTIVE') return
 
-  db().get('missions').find({ id: missionId }).assign({ status: 'CLOSED' }).write()
-  missionFiredAt.delete(missionId)
+  db().get('missions').find({ id: missionId }).assign({ status: newStatus }).write()
+
+  // COMPLETED일 때만 도감 기록 생성
+  if (newStatus !== 'COMPLETED') {
+    console.log(`  ⏱️  미션 EXPIRED  방[${mission.room_id}] missionId=${missionId}`)
+    return
+  }
 
   // 제출한 멤버별 collection_records 생성 (user_id 중복 제거)
-  const allSubs  = db().get('submissions').filter({ mission_id: missionId, status: 'SUBMITTED' }).value()
+  const allSubs   = db().get('submissions').filter({ mission_id: missionId, status: 'SUBMITTED' }).value()
   const seenUsers = new Set()
-  const today    = new Date().toISOString().slice(0, 10)
+  const date      = mission.date ?? new Date().toISOString().slice(0, 10)
   for (const sub of allSubs) {
     if (seenUsers.has(sub.user_id)) continue
     seenUsers.add(sub.user_id)
 
     const exists = db().get('collection_records')
-      .find({ user_id: sub.user_id, mission_template_id: mission.mission_template_id, date: today })
+      .find({ user_id: sub.user_id, mission_template_id: mission.mission_template_id, date })
       .value()
     if (exists) continue
 
@@ -82,17 +100,17 @@ function closeMission(missionId) {
       mission_template_id: mission.mission_template_id,
       room_id:             mission.room_id,
       submission_id:       sub.id,
-      date:                today,
+      date,
       thumbnail:           null,
     }).write()
   }
 
-  console.log(`  📚 미션 CLOSED + 도감 기록 생성  방[${mission.room_id}] missionId=${missionId}  제출자=${subs.length}명`)
+  console.log(`  📚 미션 COMPLETED + 도감 기록 생성  방[${mission.room_id}] missionId=${missionId}  제출자=${allSubs.length}명`)
 }
 
-// ── 서버 시작 시 기존 CLOSED 미션 → collection_records backfill ──────────────
+// ── 서버 시작 시 기존 COMPLETED 미션 → collection_records backfill ────────────
 function initializeCollectionRecords() {
-  const closedMissions = db().get('missions').filter({ status: 'CLOSED' }).value()
+  const closedMissions = db().get('missions').filter({ status: 'COMPLETED' }).value()
   let created = 0
 
   for (const m of closedMissions) {
@@ -105,7 +123,7 @@ function initializeCollectionRecords() {
       return true
     })
 
-    const date = String(m.created_at).slice(0, 10)
+    const date = m.date ?? new Date().toISOString().slice(0, 10)
     for (const sub of uniqueSubs) {
       const exists = db().get('collection_records')
         .find({ user_id: sub.user_id, mission_template_id: m.mission_template_id, date })
@@ -128,6 +146,25 @@ function initializeCollectionRecords() {
 
   if (created > 0) {
     console.log(`  📚 도감 backfill: ${created}건 생성`)
+  }
+}
+
+// ── 미션 발동 알림 생성 (방 멤버 전원) ───────────────────────────────────────
+function createMissionNotifications(missionId, roomId, missionTitle) {
+  const memberIds = db().get('room_members').filter({ room_id: roomId }).map('user_id').value()
+  const now = new Date().toISOString()
+  for (const userId of memberIds) {
+    const maxId = db().get('notifications').maxBy('id').value()?.id ?? 0
+    db().get('notifications').push({
+      id:         maxId + 1,
+      user_id:    userId,
+      type:       'MISSION_START',
+      title:      '미션이 울렸어요! ⚡',
+      content:    missionTitle,
+      related_id: missionId,
+      is_read:    false,
+      created_at: now,
+    }).write()
   }
 }
 
@@ -303,10 +340,10 @@ app.get('/rooms/my', (req, res) => {
 
     const members_detail = allMembers.map((m) => pickUser(m.user_id)).filter(Boolean)
 
-    // 오늘 이 방에서 발동된 미션 수 (ACTIVE + CLOSED 모두 포함)
+    // 오늘 이 방에서 예약/진행된 미션 수 (PENDING + ACTIVE + COMPLETED + EXPIRED)
     const todayStr          = new Date().toISOString().slice(0, 10) // "2026-05-25"
     const todayMissionCount = db().get('missions')
-      .filter((m) => m.room_id === room.id && String(m.created_at).startsWith(todayStr))
+      .filter((m) => m.room_id === room.id && m.date === todayStr)
       .size().value()
     const dailyTotal = room.daily_mission_count ?? 1
 
@@ -524,16 +561,11 @@ app.get('/missions/active', (req, res) => {
     .filter((m) => myRoomIds.includes(m.room_id) && m.status === 'ACTIVE')
     .value()
 
-  // 첫 조회 시각 등록 (없으면 지금을 "발동 시각"으로 기록)
+  // deadline 기준으로 아직 유효한 미션만 포함
   const now = Date.now()
-  for (const m of allActive) {
-    if (!missionFiredAt.has(m.id)) missionFiredAt.set(m.id, now)
-  }
-
-  // 세션 기준 5분 창이 남아있는 미션만 포함
   const missions = allActive.filter((m) => {
-    const firedAt = missionFiredAt.get(m.id)
-    return (now - firedAt) < MISSION_WINDOW_MS
+    const times = getMissionTimes(m)
+    return times && now < times.deadline.getTime()
   })
 
   const toStatusKo = (sub) => {
@@ -548,9 +580,11 @@ app.get('/missions/active', (req, res) => {
     const members = db().get('room_members').filter({ room_id: m.room_id }).value()
     const subs    = db().get('submissions').filter({ mission_id: m.id }).value()
 
-    // 세션 기준 남은 시간
-    const firedAt        = missionFiredAt.get(m.id)
-    const remainingSeconds = Math.max(0, Math.floor((firedAt + MISSION_WINDOW_MS - Date.now()) / 1000))
+    // deadline 기준 남은 시간 (time_slot + date 계산)
+    const times = getMissionTimes(m)
+    const remainingSeconds = times
+      ? Math.max(0, Math.floor((times.deadline.getTime() - Date.now()) / 1000))
+      : 0
     const submittedCount   = subs.filter((s) => s.status === 'SUBMITTED').length
 
     const participants = members.map((mbr) => {
@@ -582,89 +616,121 @@ app.get('/missions/active', (req, res) => {
 })
 
 // =============================================================================
+// 일일 미션 사전 예약 (PENDING 생성)
+// 오늘과 내일 날짜에 대해 방별로 daily_mission_count만큼 슬롯 선택 → PENDING INSERT
+// =============================================================================
+function scheduleDailyMissions() {
+  const templates = db().get('mission_templates').value()
+  if (templates.length === 0) return
+
+  for (let dayOffset = 0; dayOffset <= 1; dayOffset++) {
+    const target   = new Date()
+    target.setDate(target.getDate() + dayOffset)
+    const dateStr  = target.toISOString().slice(0, 10)
+
+    for (const room of db().get('rooms').value()) {
+      // 멤버 2명 이상인 방만
+      const memberCount = db().get('room_members').filter({ room_id: room.id }).size().value()
+      if (memberCount < 2) continue
+
+      // 이미 예약/진행된 미션 수 확인
+      const existing = db().get('missions').filter({ room_id: room.id, date: dateStr }).value()
+      if (existing.length >= (room.daily_mission_count ?? 1)) continue
+
+      // 방의 시간 창에 해당하는 슬롯 목록
+      const startMin = getTimeMinutes(room.mission_start_time)
+      const endMin   = getTimeMinutes(room.mission_end_time)
+      const usedSlotIds = existing.map((m) => m.time_slot_id)
+
+      const available = db().get('mission_time_slots')
+        .filter((s) => {
+          const slotMin = getTimeMinutes(s.slot_time)
+          return slotMin >= startMin && slotMin < endMin && !usedSlotIds.includes(s.id)
+        })
+        .value()
+        .sort(() => Math.random() - 0.5) // 셔플
+
+      const needed = (room.daily_mission_count ?? 1) - existing.length
+      const selected = []
+      for (const slot of available) {
+        // 이미 선택된 슬롯과 1시간(2슬롯) 이상 간격 유지
+        const slotMin = getTimeMinutes(slot.slot_time)
+        const tooClose = selected.some((s) => Math.abs(getTimeMinutes(s.slot_time) - slotMin) < 120)
+        if (!tooClose) selected.push(slot)
+        if (selected.length >= needed) break
+      }
+
+      for (const slot of selected) {
+        const tmpl  = templates[Math.floor(Math.random() * templates.length)]
+        const maxId = db().get('missions').maxBy('id').value()?.id ?? 0
+        db().get('missions').push({
+          id:                  maxId + 1,
+          room_id:             room.id,
+          mission_template_id: tmpl.id,
+          time_slot_id:        slot.id,
+          date:                dateStr,
+          status:              'PENDING',
+        }).write()
+        console.log(`  📅 미션 예약  방[${room.id}] "${room.name}"  ${dateStr} ${slot.slot_time}  "${tmpl.title}"`)
+      }
+    }
+  }
+}
+
+// =============================================================================
 // 미션 자동 스케줄러 (서버 내부)
 // =============================================================================
 // 30초마다 실행:
-//   1) 만료된 ACTIVE 미션 → CLOSED 처리
-//   2) 각 방의 미션 창(start~end time)을 체크하여 랜덤 확률로 새 미션 발동
+//   1) ACTIVE 미션 종료 체크 (deadline 만료 → EXPIRED, 전원 제출 → COMPLETED)
+//   2) PENDING 미션 활성화 (slot_time 도달 → ACTIVE)
+//   3) 일일 미션 사전 예약 (scheduleDailyMissions)
 // =============================================================================
 function scheduleMissions() {
-  const now            = new Date()
-  const currentMinutes = now.getHours() * 60 + now.getMinutes()
-  const todayStr       = now.toISOString().slice(0, 10) // "2026-05-25"
+  const nowMs  = Date.now()
 
   // ── 1. ACTIVE 미션 종료 체크 ────────────────────────────────────────────
   const activeMissions = db().get('missions').filter({ status: 'ACTIVE' }).value()
   for (const m of activeMissions) {
-    const firedAt = missionFiredAt.get(m.id)
+    const times = getMissionTimes(m)
+    if (!times) continue
 
-    // 1-a. 5분 타이머 만료
-    if (firedAt && (Date.now() - firedAt) >= MISSION_WINDOW_MS) {
-      closeMission(m.id)
-      console.log(`  ⏱️  미션 만료 → CLOSED  방[${m.room_id}] missionId=${m.id}`)
+    // 1-a. deadline 만료 → EXPIRED
+    if (nowMs >= times.deadline.getTime()) {
+      const memberCount    = db().get('room_members').filter({ room_id: m.room_id }).size().value()
+      const submittedCount = db().get('submissions').filter({ mission_id: m.id, status: 'SUBMITTED' }).size().value()
+      const newStatus      = submittedCount > 0 ? 'COMPLETED' : 'EXPIRED'
+      closeMission(m.id, newStatus)
       continue
     }
 
-    // 1-b. 전원 제출 완료 (시간이 남아도 즉시 종료)
+    // 1-b. 전원 제출 완료 → 즉시 COMPLETED
     const memberCount    = db().get('room_members').filter({ room_id: m.room_id }).size().value()
     const submittedCount = db().get('submissions').filter({ mission_id: m.id, status: 'SUBMITTED' }).size().value()
     if (memberCount > 0 && submittedCount >= memberCount) {
-      closeMission(m.id)
-      continue
+      closeMission(m.id, 'COMPLETED')
     }
   }
 
-  // ── 2. 새 미션 발동 체크 ────────────────────────────────────────────────
-  const rooms = db().get('rooms').value()
-  for (const room of rooms) {
-    // 멤버가 2명 이상이어야 미션 발동
-    const memberCount = db().get('room_members')
-      .filter({ room_id: room.id }).size().value()
-    if (memberCount < 2) continue
+  // ── 2. PENDING 미션 활성화 (slot_time 도달) ──────────────────────────────
+  const pendingMissions = db().get('missions').filter({ status: 'PENDING' }).value()
+  for (const m of pendingMissions) {
+    const times = getMissionTimes(m)
+    if (!times) continue
+    if (nowMs < times.targeted_at.getTime()) continue  // 아직 시간 안 됨
 
-    // 현재 시각이 방의 미션 창 안인지
-    const startMin = getTimeMinutes(room.mission_start_time)
-    const endMin   = getTimeMinutes(room.mission_end_time)
-    if (currentMinutes < startMin || currentMinutes >= endMin) continue
+    db().get('missions').find({ id: m.id }).assign({ status: 'ACTIVE' }).write()
+    const room = db().get('rooms').find({ id: m.room_id }).value()
+    const tmpl = db().get('mission_templates').find({ id: m.mission_template_id }).value()
 
-    // 오늘 이 방의 미션 수 (ACTIVE + CLOSED + 완료 모두 포함)
-    const todayMissions = db().get('missions')
-      .filter((m) => m.room_id === room.id && String(m.created_at).startsWith(todayStr))
-      .value()
+    createMissionNotifications(m.id, m.room_id, tmpl?.title ?? '')
+    const memberIds = db().get('room_members').filter({ room_id: m.room_id }).map('user_id').value()
+    scheduleAutoSubmits(m.id, m.room_id, memberIds)
 
-    // 일일 미션 횟수 초과
-    if (todayMissions.length >= (room.daily_mission_count ?? 1)) continue
-
-    // 현재 ACTIVE 미션이 이미 있으면 skip (진행 중인 미션이 끝나야 다음 발동)
-    const hasActive = todayMissions.some((m) => m.status === 'ACTIVE')
-    if (hasActive) continue
-
-    // 랜덤 확률 (기본 30%) — 통과해야 미션 발동
-    if (Math.random() > MISSION_FIRE_PROBABILITY) continue
-
-    // 랜덤 미션 템플릿 선택
-    const templates = db().get('mission_templates').value()
-    const tmpl      = templates[Math.floor(Math.random() * templates.length)]
-
-    // missions 테이블에 INSERT
-    const maxId     = db().get('missions').maxBy('id').value()?.id ?? 0
-    const newMission = {
-      id:                  maxId + 1,
-      room_id:             room.id,
-      mission_template_id: tmpl.id,
-      status:              'ACTIVE',
-      deadline:            new Date(Date.now() + MISSION_WINDOW_MS).toISOString(),
-      created_at:          new Date().toISOString(),
-    }
-    db().get('missions').push(newMission).write()
-    missionFiredAt.set(newMission.id, Date.now())
-
-    // mock: 다른 멤버들 자동 제출 예약 (혼자 테스트할 때도 앨범/도감 동작)
-    const memberIds = db().get('room_members').filter({ room_id: room.id }).map('user_id').value()
-    scheduleAutoSubmits(newMission.id, room.id, memberIds)
-
-    console.log(`  🎯 미션 발동!  방[${room.id}] "${room.name}"  →  [tmpl ${tmpl.id}] "${tmpl.title}"  (${memberIds.length}명 자동제출 예약)`)
+    console.log(`  🎯 미션 활성화!  방[${m.room_id}] "${room?.name}"  ${m.date} ${times.targeted_at.toTimeString().slice(0, 5)}  "${tmpl?.title}"`)
   }
+
+  // ── 3. 일일 미션 사전 예약 ───────────────────────────────────────────────
+  scheduleDailyMissions()
 }
 
 // =============================================================================
@@ -678,18 +744,23 @@ app.post('/debug/rooms/:id/trigger-mission', (req, res) => {
 
   const templates = db().get('mission_templates').value()
   const tmpl      = templates[Math.floor(Math.random() * templates.length)]
+  const todayStr  = new Date().toISOString().slice(0, 10)
 
-  const maxId     = db().get('missions').maxBy('id').value()?.id ?? 0
+  // 현재 시각으로부터 5분짜리 임시 슬롯 없이, 즉시 ACTIVE 미션 생성
+  // (debug 전용 — time_slot_id=null 허용, getMissionTimes fallback 처리)
+  const nowMs    = Date.now()
+  const maxId    = db().get('missions').maxBy('id').value()?.id ?? 0
   const newMission = {
     id:                  maxId + 1,
     room_id:             roomId,
     mission_template_id: tmpl.id,
+    time_slot_id:        null,  // debug: slot 없이 직접 deadline 저장
+    date:                todayStr,
     status:              'ACTIVE',
-    deadline:            new Date(Date.now() + MISSION_WINDOW_MS).toISOString(),
-    created_at:          new Date().toISOString(),
+    _debug_deadline:     new Date(nowMs + MISSION_WINDOW_MS).toISOString(),
   }
   db().get('missions').push(newMission).write()
-  missionFiredAt.set(newMission.id, Date.now())
+  createMissionNotifications(newMission.id, roomId, tmpl.title)
 
   const memberIds = db().get('room_members').filter({ room_id: roomId }).map('user_id').value()
   scheduleAutoSubmits(newMission.id, roomId, memberIds)
@@ -714,9 +785,11 @@ app.get('/submissions/missions/:missionId', (req, res) => {
   const mission   = db().get('missions').find({ id: missionId }).value()
   if (!mission) return fail(res, 404, '미션을 찾을 수 없어요')
 
-  // 남은 시간(초) — deadline 기준 (마감 지났으면 0)
-  const deadline         = new Date(mission.deadline)
-  const remainingSeconds = Math.max(0, Math.floor((deadline - Date.now()) / 1000))
+  // 남은 시간(초) — time_slot 기반 deadline 계산
+  const mTimes       = getMissionTimes(mission)
+  const remainingSeconds = mTimes
+    ? Math.max(0, Math.floor((mTimes.deadline.getTime() - Date.now()) / 1000))
+    : 0
 
   // 방 멤버 전체
   const members     = db().get('room_members').filter({ room_id: mission.room_id }).value()
@@ -765,13 +838,13 @@ app.post('/submissions', (req, res) => {
   }
   db().get('submissions').push(sub).write()
 
-  // ── 전원 제출 체크 → 미션 즉시 CLOSED + 도감 기록 ─────────────────────
+  // ── 전원 제출 체크 → 미션 즉시 COMPLETED + 도감 기록 ──────────────────
   const mission = db().get('missions').find({ id: missionId }).value()
   if (mission && mission.status === 'ACTIVE') {
     const memberCount    = db().get('room_members').filter({ room_id: mission.room_id }).size().value()
     const submittedCount = db().get('submissions').filter({ mission_id: missionId, status: 'SUBMITTED' }).size().value()
     if (submittedCount >= memberCount) {
-      closeMission(missionId)
+      closeMission(missionId, 'COMPLETED')
     }
   }
 
@@ -794,20 +867,20 @@ app.get('/submissions/:id', (req, res) => {
 // POST /rooms/{roomId}/albums/{date}/synklog         — SYNKLOG 생성 요청
 // =============================================================================
 
-// 방의 날짜별 앨범 목록 — CLOSED 미션 기반 (synklogs 불필요)
+// 방의 날짜별 앨범 목록 — COMPLETED 미션 기반 (synklogs 불필요)
 // Response: { date("YYYY.MM.DD"), thumbnail, memberProfiles[] }[]
 app.get('/rooms/:id/albums', (req, res) => {
   const roomId = Number(req.params.id)
 
-  // CLOSED 미션을 날짜별로 그룹핑
+  // COMPLETED 미션을 날짜별로 그룹핑
   const closedMissions = db().get('missions')
-    .filter((m) => m.room_id === roomId && m.status === 'CLOSED')
+    .filter((m) => m.room_id === roomId && m.status === 'COMPLETED')
     .value()
 
   // date → mission[] 맵
   const byDate = {}
   for (const m of closedMissions) {
-    const date = String(m.created_at).slice(0, 10)   // "YYYY-MM-DD"
+    const date = m.date   // "YYYY-MM-DD"
     if (!byDate[date]) byDate[date] = []
     byDate[date].push(m)
   }
@@ -841,18 +914,18 @@ app.get('/rooms/:id/albums', (req, res) => {
   ok(res, data, '앨범 목록 조회 성공')
 })
 
-// 특정 날짜 SYNKLOG 조회 — CLOSED 미션 + 제출 내역 기반 (synklog 레코드 불필요)
+// 특정 날짜 SYNKLOG 조회 — COMPLETED 미션 + 제출 내역 기반 (synklog 레코드 불필요)
 // Response: { synklogId, date("YYYY.MM.DD"), synklogVideoUrl, thumbnail, missions[] }
 app.get('/rooms/:id/albums/:date/collages', (req, res) => {
   const roomId = Number(req.params.id)
   const date   = req.params.date   // "YYYY-MM-DD" (URL param)
 
-  // 해당 날짜 CLOSED 미션 조회 (created_at 기준)
+  // 해당 날짜 COMPLETED 미션 조회
   const dayMissions = db().get('missions')
     .filter((m) =>
       m.room_id === roomId &&
-      m.status === 'CLOSED' &&
-      String(m.created_at).startsWith(date),
+      m.status === 'COMPLETED' &&
+      m.date === date,
     )
     .value()
 
@@ -880,7 +953,7 @@ app.get('/rooms/:id/albums/:date/collages', (req, res) => {
     return {
       missionId:    m.id,
       missionTitle: tmpl?.title ?? '',
-      createdAt:    m.created_at,
+      createdAt:    getMissionTimes(m)?.targeted_at.toISOString() ?? m.date,
       participants,
     }
   })
@@ -935,7 +1008,7 @@ app.get('/rooms/:id/chats', (req, res) => {
   // 오늘 미션 완료 여부
   const today = new Date().toISOString().slice(0, 10)
   const todayMissions = db().get('missions')
-    .filter((m) => m.room_id === roomId && (m.targeted_at ?? '').slice(0, 10) === today)
+    .filter((m) => m.room_id === roomId && m.date === today)
     .value()
   const todayMissionCompleted = todayMissions.some((m) => m.status === 'COMPLETED')
   const todayMissionDate      = todayMissions.length > 0 ? today : null
@@ -1173,13 +1246,13 @@ app.listen(PORT, () => {
   console.log('    POST /debug/rooms/:id/trigger-mission  ← 즉시 미션 강제 발동')
   console.log('')
 
-  // ── 기존 데이터 backfill: CLOSED 미션 → collection_records 생성 ──────────
+  // ── 기존 데이터 backfill: COMPLETED 미션 → collection_records 생성 ────────
   initializeCollectionRecords()
 
   // ── 자동 미션 스케줄러 시작 ─────────────────────────────────────────────
   scheduleMissions() // 서버 기동 직후 1회 즉시 실행
   setInterval(scheduleMissions, SCHEDULER_INTERVAL_MS)
-  console.log(`  ⏰ 미션 스케줄러 가동 중  (${SCHEDULER_INTERVAL_MS / 1000}초 간격, 발동확률 ${MISSION_FIRE_PROBABILITY * 100}%)`)
+  console.log(`  ⏰ 미션 스케줄러 가동 중  (${SCHEDULER_INTERVAL_MS / 1000}초 간격, 시간 슬롯 방식)`)
   console.log('     → 방의 mission_start_time ~ mission_end_time 창 안에서만 동작')
   console.log('')
 })
