@@ -1,0 +1,77 @@
+# SYNK 프로젝트
+
+## 프로젝트 개요
+Spring Boot 기반 실시간 미션 공유 앱 백엔드
+친구들과 랜덤 시간에 미션을 수행하고 영상을 공유하는 서비스
+
+## 기술 스택
+- Java 17
+- Spring Boot 3.3.x
+- Spring Data JPA
+- Spring Security
+- MySQL 8.0
+- JWT
+
+## 패키지 구조
+com.synk
+├── controller
+├── service
+├── repository
+├── entity
+├── dto
+│   ├── request
+│   └── response
+├── config
+├── util
+└── global
+    ├── exception
+    └── response
+
+## 공통 Response 구조
+{
+  "success": true,
+  "data": {},
+  "message": "응답 메시지"
+}
+
+## 코드 컨벤션
+- 변수명: camelCase
+- 클래스명: PascalCase
+- 상수: UPPER_SNAKE_CASE
+- 들여쓰기: 4칸
+- Entity에 @Setter 금지 → 빌더 패턴 사용
+- @Transactional은 Service에서만 사용
+- 예외처리는 GlobalExceptionHandler에서 통합 처리
+
+## Entity 작성 규칙
+@Entity
+@Table(name = "테이블명")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+public class 클래스명 {
+    ...
+}
+
+## 주요 규칙
+- 모든 API는 JWT 토큰 필요 (로그인/회원가입 제외)
+- deadline = date + slotTime + 5분 (DB 저장 안 함, 계산값)
+- submissions 미제출자는 deadline 종료 시 MISSED로 일괄 INSERT
+- rooms.current_members 컬럼 없음 → COUNT(room_members)로 대체
+- mission_templates는 서비스 출시 전 90개 미리 INSERT 필요
+- mission_time_slots는 서비스 출시 전 36개 미리 INSERT 필요 (00:00~23:59, 30분 간격)
+
+## Entity 작성 순서
+1. MissionTemplate (참조 당하는 테이블이므로 가장 먼저)
+2. MissionTimeSlot
+3. User
+4. Room
+5. RoomMember
+6. Mission
+7. Submission
+8. Collage
+9. Synklog
+10. RoomChat
+11. ChatReaction
+12. Notification
+13. CollectionRecord
