@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { useThemeStore, type Theme } from '@/store/themeStore'
 import { ROUTES } from '@/constants'
 import AppHeader from '@/components/layout/AppHeader'
 import styles from './ProfilePage.module.css'
@@ -9,6 +10,8 @@ export default function ProfilePage() {
   const navigate  = useNavigate()
   const user      = useAuthStore((s) => s.user)
   const logout    = useAuthStore((s) => s.logout)
+  const theme     = useThemeStore((s) => s.theme)
+  const setTheme  = useThemeStore((s) => s.setTheme)
 
   // 알림 설정 토글 (백엔드 연동 전 로컬 상태)
   const [missionAlert,    setMissionAlert]    = useState(true)
@@ -77,6 +80,8 @@ export default function ProfilePage() {
         <div className={styles.section}>
           <h2 className={styles.sectionLabel}>기타</h2>
           <div className={styles.sectionCard}>
+            <ThemeRow theme={theme} onChange={setTheme} />
+            <div className={styles.divider} />
             <LinkRow label="도움말" onPress={() => {}} />
             <div className={styles.divider} />
             <LinkRow label="버전 정보" onPress={() => {}} />
@@ -95,6 +100,28 @@ export default function ProfilePage() {
 }
 
 /* ── 서브 컴포넌트 ──────────────────────────────────────────────────────────── */
+
+function ThemeRow({ theme, onChange }: { theme: Theme; onChange: (t: Theme) => void }) {
+  return (
+    <div className={styles.themeRow}>
+      <span className={styles.rowLabel}>화면 테마</span>
+      <div className={styles.themeToggleGroup}>
+        <button
+          className={[styles.themeBtn, theme === 'light' ? styles.themeBtnActive : ''].join(' ')}
+          onClick={() => onChange('light')}
+        >
+          ☀️ 라이트
+        </button>
+        <button
+          className={[styles.themeBtn, theme === 'dark' ? styles.themeBtnActive : ''].join(' ')}
+          onClick={() => onChange('dark')}
+        >
+          🌙 다크
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function ToggleRow({
   label, desc, value, onChange,

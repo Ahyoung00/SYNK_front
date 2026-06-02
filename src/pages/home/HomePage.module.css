@@ -90,7 +90,7 @@
   flex-direction: column;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid var(--color-border);
 }
 
 /* 다중 미션에서 돌아가기 버튼 */
@@ -123,7 +123,7 @@
 
 .missionCardSub {
   font-size: var(--text-xs);
-  color: rgba(255,255,255,0.55);
+  color: var(--color-text-sub);
 }
 
 .missionCardTimer {
@@ -213,7 +213,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid rgba(255,255,255,0.08);
+  border: 2px solid var(--color-border);
 }
 
 .participantAvatarImg {
@@ -241,17 +241,17 @@
 }
 
 .statusDone {
-  background: rgba(74, 222, 128, 0.2);
-  color: #4ade80;
+  background: var(--color-status-done-bg);
+  color: var(--color-status-done);
 }
 
 .statusRecording {
-  background: rgba(250, 204, 21, 0.2);
-  color: #facc15;
+  background: var(--color-status-warn-bg);
+  color: var(--color-status-warn);
 }
 
 .statusWaiting {
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--color-status-neutral-bg);
   color: var(--color-text-muted);
 }
 
@@ -278,19 +278,19 @@
 .missionCardAllDone {
   margin: var(--sp-1) var(--sp-4) var(--sp-4);
   padding: var(--sp-4);
-  background: rgba(74, 222, 128, 0.12);
-  border: 1px solid rgba(74, 222, 128, 0.3);
+  background: var(--color-status-done-bg);
+  border: 1px solid var(--color-status-done-border);
   border-radius: var(--radius-lg);
   text-align: center;
   font-size: var(--text-base);
   font-weight: 700;
-  color: #4ade80;
+  color: var(--color-status-done);
 }
 
 /* 참여완료 상태 — 초록 계열로 구분 */
 .missionCardCtaDone {
-  background: #166534;
-  color: #bbf7d0;
+  background: var(--color-done-cta);
+  color: var(--color-done-cta-text);
 }
 .missionCardCtaDone:active { opacity: 0.85; }
 
@@ -395,8 +395,8 @@
 
 /* ── 미션 알림 배너 ───────────────────────────────────────────────────────── */
 @keyframes bannerPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(108,99,255,0.4); }
-  50%       { box-shadow: 0 0 0 8px rgba(108,99,255,0); }
+  0%, 100% { box-shadow: 0 0 0 0 var(--color-pulse); }
+  50%       { box-shadow: 0 0 0 8px var(--color-pulse-0); }
 }
 
 .alertBanner {
@@ -406,7 +406,7 @@
   gap: var(--sp-3);
   padding: var(--sp-4) var(--sp-5);
   background: var(--color-primary-dim);
-  border: 1px solid rgba(108, 99, 255, 0.4);
+  border: 1px solid var(--color-pulse);
   border-radius: var(--radius-lg);
   animation: bannerPulse 2s ease-in-out infinite;
   text-align: left;

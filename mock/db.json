@@ -638,7 +638,7 @@
       "mission_template_id": 9,
       "time_slot_id": 24,
       "date": "2026-05-29",
-      "status": "PENDING"
+      "status": "COMPLETED"
     },
     {
       "id": 68,
@@ -785,6 +785,15 @@
       "time_slot_id": 17,
       "date": "2026-05-30",
       "status": "PENDING"
+    },
+    {
+      "id": 86,
+      "room_id": 1,
+      "mission_template_id": 3,
+      "time_slot_id": null,
+      "date": "2026-05-29",
+      "status": "COMPLETED",
+      "_debug_deadline": "2026-05-29T08:58:54.337Z"
     }
   ],
   "submissions": [
@@ -1507,6 +1516,96 @@
       "status": "SUBMITTED",
       "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
       "submitted_at": "2026-05-29T07:34:24.850Z"
+    },
+    {
+      "id": 81,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 67,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:32:14.459Z"
+    },
+    {
+      "id": 82,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 67,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:32:52.032Z"
+    },
+    {
+      "id": 83,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 67,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:33:34.028Z"
+    },
+    {
+      "id": 84,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 67,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:34:08.964Z"
+    },
+    {
+      "id": 85,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 67,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:34:09.493Z"
+    },
+    {
+      "id": 86,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 86,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:54:55.121Z"
+    },
+    {
+      "id": 87,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 86,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:55:19.224Z"
+    },
+    {
+      "id": 88,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 86,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:56:13.750Z"
+    },
+    {
+      "id": 89,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 86,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:57:08.635Z"
+    },
+    {
+      "id": 90,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 86,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-05-29T08:57:45.313Z"
     }
   ],
   "collages": [],
@@ -4260,6 +4359,106 @@
       "related_id": 64,
       "is_read": false,
       "created_at": "2026-05-29T07:30:28.868Z"
+    },
+    {
+      "id": 275,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "오늘의 신발 찍기 · 아침반 · 17:30",
+      "related_id": 67,
+      "is_read": false,
+      "created_at": "2026-05-29T08:30:17.947Z"
+    },
+    {
+      "id": 276,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "오늘의 신발 찍기 · 아침반 · 17:30",
+      "related_id": 67,
+      "is_read": false,
+      "created_at": "2026-05-29T08:30:17.947Z"
+    },
+    {
+      "id": 277,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "오늘의 신발 찍기 · 아침반 · 17:30",
+      "related_id": 67,
+      "is_read": false,
+      "created_at": "2026-05-29T08:30:17.947Z"
+    },
+    {
+      "id": 278,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "오늘의 신발 찍기 · 아침반 · 17:30",
+      "related_id": 67,
+      "is_read": false,
+      "created_at": "2026-05-29T08:30:17.947Z"
+    },
+    {
+      "id": 279,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "오늘의 신발 찍기 · 아침반 · 17:30",
+      "related_id": 67,
+      "is_read": false,
+      "created_at": "2026-05-29T08:30:17.947Z"
+    },
+    {
+      "id": 280,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 아침반 · 17:53",
+      "related_id": 86,
+      "is_read": false,
+      "created_at": "2026-05-29T08:53:54.347Z"
+    },
+    {
+      "id": 281,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 아침반 · 17:53",
+      "related_id": 86,
+      "is_read": false,
+      "created_at": "2026-05-29T08:53:54.347Z"
+    },
+    {
+      "id": 282,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 아침반 · 17:53",
+      "related_id": 86,
+      "is_read": false,
+      "created_at": "2026-05-29T08:53:54.347Z"
+    },
+    {
+      "id": 283,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 아침반 · 17:53",
+      "related_id": 86,
+      "is_read": false,
+      "created_at": "2026-05-29T08:53:54.347Z"
+    },
+    {
+      "id": 284,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 아침반 · 17:53",
+      "related_id": 86,
+      "is_read": false,
+      "created_at": "2026-05-29T08:53:54.347Z"
     }
   ],
   "collection_records": [
@@ -5205,6 +5404,51 @@
       "mission_template_id": 4,
       "room_id": 2,
       "submission_id": 70,
+      "date": "2026-05-29",
+      "thumbnail": null
+    },
+    {
+      "id": 106,
+      "user_id": 1,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 86,
+      "date": "2026-05-29",
+      "thumbnail": null
+    },
+    {
+      "id": 107,
+      "user_id": 4,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 87,
+      "date": "2026-05-29",
+      "thumbnail": null
+    },
+    {
+      "id": 108,
+      "user_id": 3,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 88,
+      "date": "2026-05-29",
+      "thumbnail": null
+    },
+    {
+      "id": 109,
+      "user_id": 2,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 89,
+      "date": "2026-05-29",
+      "thumbnail": null
+    },
+    {
+      "id": 110,
+      "user_id": 5,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 90,
       "date": "2026-05-29",
       "thumbnail": null
     }

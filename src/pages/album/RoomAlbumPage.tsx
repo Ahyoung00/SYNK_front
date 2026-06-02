@@ -41,11 +41,11 @@ export default function RoomAlbumPage() {
 
       {/* ── 목록 ────────────────────────────────────────────────────────────── */}
       {isLoading ? (
-        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
           불러오는 중...
         </p>
       ) : albums.length === 0 ? (
-        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
           아직 앨범이 없어요
         </p>
       ) : (

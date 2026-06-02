@@ -20,17 +20,17 @@
   width: 160px;
   height: 160px;
   border-radius: var(--radius-full);
-  background: #2a1f0e;
+  background: var(--color-surface-2);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 0 8px rgba(180, 120, 30, 0.12);
+  box-shadow: 0 0 0 8px var(--color-timer-ring);
 }
 
 .timerText {
   font-size: 40px;
   font-weight: 900;
-  color: #f59e0b;
+  color: var(--color-timer-warn);
   letter-spacing: -1px;
   font-variant-numeric: tabular-nums;
 }
@@ -97,7 +97,7 @@
   font-weight: 700;
 }
 
-.done    { color: #4ade80; }
+.done    { color: var(--color-status-done); }
 .pending { color: var(--color-accent); }
 
 /* ── 홈으로 돌아가기 버튼 ───────────────────────────────────────────────── */

@@ -64,7 +64,7 @@ export default function RoomPage() {
       <div className={styles.page}>
         <NavHeader title="방" onBack={() => navigate(ROUTES.ROOMS)} />
         <div className={styles.scroll}>
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>불러오는 중...</p>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>불러오는 중...</p>
         </div>
       </div>
     )
@@ -75,7 +75,7 @@ export default function RoomPage() {
       <div className={styles.page}>
         <NavHeader title="방" onBack={() => navigate(ROUTES.ROOMS)} />
         <div className={styles.scroll}>
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>방을 찾을 수 없어요</p>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>방을 찾을 수 없어요</p>
         </div>
       </div>
     )
@@ -147,7 +147,7 @@ export default function RoomPage() {
         </div>
 
         {albums.length === 0 ? (
-          <p style={{ padding: '12px 20px', color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+          <p style={{ padding: '12px 20px', color: 'var(--color-text-muted)', fontSize: 13 }}>
             아직 앨범이 없어요
           </p>
         ) : (

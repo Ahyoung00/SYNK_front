@@ -26,7 +26,7 @@ export default function CollectionDetailPage() {
 
       <div className={styles.scroll}>
         {isLoading && (
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
             불러오는 중...
           </p>
         )}
@@ -61,7 +61,7 @@ export default function CollectionDetailPage() {
             <div>
               <h2 className={styles.sectionTitle}>내 기록</h2>
               {detail.records.length === 0 ? (
-                <p style={{ padding: '16px 20px', color: 'rgba(255,255,255,0.3)', fontSize: 13 }}>
+                <p style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: 13 }}>
                   기록이 없어요
                 </p>
               ) : (
@@ -71,7 +71,7 @@ export default function CollectionDetailPage() {
                       {r.thumbnail ? (
                         <img src={r.thumbnail} alt={r.date} className={styles.photo} />
                       ) : (
-                        <div className={styles.photo} style={{ background: 'rgba(255,255,255,0.05)' }} />
+                        <div className={styles.photo} style={{ background: 'var(--color-surface-2)' }} />
                       )}
                       <span className={styles.photoLabel}>{r.roomName} · {r.date}</span>
                     </div>
@@ -83,7 +83,7 @@ export default function CollectionDetailPage() {
         )}
 
         {!isLoading && !detail && (
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.3)' }}>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
             미션 정보를 찾을 수 없어요
           </p>
         )}

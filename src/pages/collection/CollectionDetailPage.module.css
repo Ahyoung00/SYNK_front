@@ -51,7 +51,7 @@
   gap: var(--sp-4);
   padding: var(--sp-4) var(--sp-5);
   background: var(--color-surface);
-  border: 1px solid rgba(108, 99, 255, 0.35);
+  border: 1px solid rgba(122, 181, 103, 0.35);
   border-radius: var(--radius-lg);
 }
 

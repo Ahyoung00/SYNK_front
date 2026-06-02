@@ -31,7 +31,7 @@
 }
 
 .greetingName {
-  color: #3b82f6;
+  color: var(--color-primary);
   font-weight: 600;
 }
 
@@ -215,7 +215,7 @@
   height: 56px;
   border-radius: 50%;
   background: var(--color-primary);
-  box-shadow: 0 4px 16px rgba(124, 58, 237, 0.45);
+  box-shadow: 0 4px 16px var(--color-fab-shadow);
   display: flex;
   align-items: center;
   justify-content: center;

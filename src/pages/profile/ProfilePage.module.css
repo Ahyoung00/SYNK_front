@@ -223,6 +223,37 @@
   transform: translateX(20px);
 }
 
+/* ── 테마 토글 행 ─────────────────────────────────────────────────────────── */
+.themeRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) var(--sp-5);
+  gap: var(--sp-4);
+}
+
+.themeToggleGroup {
+  display: flex;
+  gap: var(--sp-2);
+}
+
+.themeBtn {
+  padding: 6px 14px;
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-sub);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+}
+
+.themeBtnActive {
+  background: var(--color-primary);
+  color: #fff;
+  border-color: var(--color-primary);
+}
+
 /* ── 링크 행 ──────────────────────────────────────────────────────────────── */
 .linkRow {
   width: 100%;

@@ -62,10 +62,10 @@ export default function LoginPage() {
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       justifyContent: 'center', height: '100dvh',
-      background: '#0f0f14', color: '#fff', gap: 16, padding: '0 24px',
+      background: 'var(--color-bg)', color: 'var(--color-text)', gap: 16, padding: '0 24px',
     }}>
       <h1 style={{ fontSize: 40, fontWeight: 900, letterSpacing: '-1px' }}>SYNK</h1>
-      <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: 32 }}>지금 이 순간을 함께</p>
+      <p style={{ color: 'var(--color-text-sub)', marginBottom: 32 }}>지금 이 순간을 함께</p>
 
       {/* 실제 OAuth 버튼 — 백엔드 연동 후 활성화 */}
       <button
@@ -93,11 +93,11 @@ export default function LoginPage() {
       {isDev && (
         <div style={{ marginTop: 40, width: '100%', maxWidth: 320 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
-            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
-            <span style={{ fontSize: 11, color: 'rgba(255,255,255,0.25)', whiteSpace: 'nowrap' }}>
+            <div style={{ flex: 1, height: 1, background: 'var(--color-border)' }} />
+            <span style={{ fontSize: 11, color: 'var(--color-text-muted)', whiteSpace: 'nowrap' }}>
               DEV — 유저 선택
             </span>
-            <div style={{ flex: 1, height: 1, background: 'rgba(255,255,255,0.1)' }} />
+            <div style={{ flex: 1, height: 1, background: 'var(--color-border)' }} />
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -109,10 +109,10 @@ export default function LoginPage() {
                 style={{
                   width: '100%', padding: '12px 20px',
                   background: loading === u.id
-                    ? 'rgba(108, 99, 255, 0.25)'
-                    : 'rgba(108, 99, 255, 0.1)',
-                  border: '1px dashed rgba(108, 99, 255, 0.4)',
-                  color: '#6c63ff', borderRadius: 12,
+                    ? 'rgba(122, 181, 103, 0.25)'
+                    : 'rgba(122, 181, 103, 0.1)',
+                  border: '1px dashed rgba(122, 181, 103, 0.4)',
+                  color: 'var(--color-primary)', borderRadius: 12,
                   fontWeight: 600, fontSize: 14,
                   display: 'flex', alignItems: 'center', gap: 10,
                   opacity: loading !== null && loading !== u.id ? 0.4 : 1,
@@ -121,9 +121,9 @@ export default function LoginPage() {
               >
                 <span style={{
                   width: 28, height: 28, borderRadius: '50%',
-                  background: 'rgba(108,99,255,0.25)',
+                  background: 'rgba(122,181,103,0.25)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 12, fontWeight: 700, color: '#a59fff', flexShrink: 0,
+                  fontSize: 12, fontWeight: 700, color: 'var(--color-primary)', flexShrink: 0,
                 }}>
                   {u.name.charAt(0)}
                 </span>
@@ -132,7 +132,7 @@ export default function LoginPage() {
             ))}
           </div>
 
-          <p style={{ marginTop: 10, fontSize: 11, color: 'rgba(255,255,255,0.2)', textAlign: 'center' }}>
+          <p style={{ marginTop: 10, fontSize: 11, color: 'var(--color-text-muted)', textAlign: 'center' }}>
             빌드 시 자동으로 사라짐
           </p>
         </div>
