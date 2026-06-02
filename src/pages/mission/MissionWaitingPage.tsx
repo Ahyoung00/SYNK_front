@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
 import { useAuthStore } from '@/store/authStore'
@@ -6,28 +6,37 @@ import { ROUTES } from '@/constants'
 import styles from './MissionWaitingPage.module.css'
 
 export default function MissionWaitingPage() {
-  const { roomId }            = useParams<{ roomId: string }>()
-  const navigate              = useNavigate()
-  const active                = useMissionStore((s) => s.active)
-  const updateParticipation   = useMissionStore((s) => s.updateParticipation)
-  const myUser                = useAuthStore((s) => s.user)
+  const { roomId }          = useParams<{ roomId: string }>()
+  const navigate            = useNavigate()
+  const active              = useMissionStore((s) => s.active)
+  const updateParticipation = useMissionStore((s) => s.updateParticipation)
+  const myUser              = useAuthStore((s) => s.user)
 
-  // 개발용: 내 상태 → done, 나머지 멤버도 단계적으로 완료
+  // 로컬 카운트다운 (active.seconds_left 기준 wall-clock)
+  const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
+
+  // 마운트 시: 내 상태를 즉시 '완료'로 표시
+  useEffect(() => {
+    if (!active || !myUser) return
+    const me = active.participations.find((p) => p.user.userId === myUser.userId)
+    if (me && me.state !== 'done') {
+      updateParticipation({ ...me, state: 'done' })
+    }
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 카운트다운 — wall-clock 기반
   useEffect(() => {
     if (!active) return
+    const startedAt  = Date.now()
+    const initialSec = active.seconds_left
+    setSecondsLeft(initialSec)
 
-    const myId = myUser?.id ?? 1
-    const me = active.participations.find((p) => p.user.id === myId)
-    if (me) updateParticipation({ ...me, state: 'done' })
-
-    const others = active.participations.filter((p) => p.user.id !== myId)
-    const timers: ReturnType<typeof setTimeout>[] = []
-    others.forEach((p, i) => {
-      const t = setTimeout(() => updateParticipation({ ...p, state: 'done' }), (i + 1) * 1800)
-      timers.push(t)
-    })
-    return () => timers.forEach(clearTimeout)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    const id = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startedAt) / 1000)
+      setSecondsLeft(Math.max(0, initialSec - elapsed))
+    }, 1000)
+    return () => clearInterval(id)
+  }, [active?.mission.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 전원 완료 → 처리 중
   useEffect(() => {
@@ -43,16 +52,16 @@ export default function MissionWaitingPage() {
 
   // 시간 종료 → 처리 중
   useEffect(() => {
-    if (active?.seconds_left === 0) {
-      navigate(ROUTES.MISSION_PROCESSING(Number(roomId) || active.room.id))
+    if (secondsLeft === 0) {
+      navigate(ROUTES.MISSION_PROCESSING(Number(roomId) || active?.room.id))
     }
-  }, [active, navigate, roomId])
+  }, [secondsLeft, navigate, roomId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!active) { navigate(ROUTES.HOME, { replace: true }); return null }
 
-  const { participations, seconds_left } = active
-  const mm = String(Math.floor(seconds_left / 60)).padStart(2, '0')
-  const ss = String(seconds_left % 60).padStart(2, '0')
+  const { participations } = active
+  const mm = String(Math.floor(secondsLeft / 60)).padStart(2, '0')
+  const ss = String(secondsLeft % 60).padStart(2, '0')
 
   return (
     <div className={styles.page}>
@@ -71,10 +80,10 @@ export default function MissionWaitingPage() {
         {participations.map((p) => {
           const done = p.state === 'done'
           return (
-            <div key={p.user.id} className={styles.memberRow}>
+            <div key={p.user.userId} className={styles.memberRow}>
               <div className={styles.memberAvatar}>
-                {p.user.profile_image
-                  ? <img src={p.user.profile_image} alt={p.user.name} className={styles.memberImg} />
+                {p.user.profileImage
+                  ? <img src={p.user.profileImage} alt={p.user.name} className={styles.memberImg} />
                   : <span className={styles.memberInitial}>{p.user.name.charAt(0)}</span>
                 }
               </div>
@@ -86,6 +95,14 @@ export default function MissionWaitingPage() {
           )
         })}
       </div>
+
+      {/* ── 홈으로 돌아가기 ───────────────────────────────────────────────────── */}
+      <button
+        className={styles.homeBtn}
+        onClick={() => navigate(ROUTES.HOME, { replace: true })}
+      >
+        홈으로 돌아가기
+      </button>
     </div>
   )
 }

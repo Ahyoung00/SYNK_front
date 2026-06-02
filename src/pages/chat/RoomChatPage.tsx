@@ -2,121 +2,120 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
-import { wsClient } from '@/services/websocket/client'
+import { chatApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import { MOCK_CHAT_MESSAGES, formatDateLabel, formatTime } from '@/utils/mockChat'
-import type { RoomChat, ChatReaction } from '@/types'
+import type { RoomChatMessage, ChatReactionSummary } from '@/types'
 import styles from './RoomChatPage.module.css'
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const EMOJI_OPTIONS = ['😂', '❤️', '😮', '🔥', '👍', '🎉'] as const
-const GROUP_THRESHOLD_MS = 5 * 60_000          // 5 min → same group
+const GROUP_THRESHOLD_MS = 5 * 60_000     // 5분 이내 연속 = 같은 그룹
 const LONG_PRESS_MS = 500
-
-// Mock room info (until backend)
-const MOCK_ROOM = { id: 1, name: '새벽반', memberCount: 5 }
+const EMPTY_MSGS: RoomChatMessage[] = []  // 안정적인 빈 배열 참조 (매 렌더 새 [] 방지)
 
 // ── Display item types ────────────────────────────────────────────────────────
-interface DateItem  { kind: 'date'; label: string; key: string }
-interface MsgItem   {
+interface DateItem { kind: 'date'; label: string; key: string }
+interface MsgItem  {
   kind: 'msg'
-  msg: RoomChat
-  isGroupFirst: boolean   // show sender name above
-  isGroupLast: boolean    // show avatar + time
+  msg: RoomChatMessage
+  isGroupFirst: boolean   // sender 이름 표시
+  isGroupLast: boolean    // 아바타 + 시간 표시
 }
 type DisplayItem = DateItem | MsgItem
 
-function buildDisplayItems(msgs: RoomChat[]): DisplayItem[] {
+function buildDisplayItems(msgs: RoomChatMessage[]): DisplayItem[] {
   const items: DisplayItem[] = []
   let lastDate = ''
 
   for (let i = 0; i < msgs.length; i++) {
     const msg  = msgs[i]
-    const date = msg.created_at.slice(0, 10)
+    const date = msg.createdAt.slice(0, 10)
 
     if (date !== lastDate) {
-      items.push({ kind: 'date', label: formatDateLabel(msg.created_at), key: `d-${date}` })
+      items.push({ kind: 'date', label: formatDateLabel(msg.createdAt), key: `d-${date}` })
       lastDate = date
     }
 
     const prev = msgs[i - 1]
     const next = msgs[i + 1]
-    const ts   = new Date(msg.created_at).getTime()
+    const ts   = new Date(msg.createdAt).getTime()
 
     const samePrev =
       prev &&
-      prev.user_id === msg.user_id &&
-      prev.created_at.slice(0, 10) === date &&
-      ts - new Date(prev.created_at).getTime() < GROUP_THRESHOLD_MS
+      prev.userId === msg.userId &&
+      prev.createdAt.slice(0, 10) === date &&
+      ts - new Date(prev.createdAt).getTime() < GROUP_THRESHOLD_MS
 
     const sameNext =
       next &&
-      next.user_id === msg.user_id &&
-      next.created_at.slice(0, 10) === date &&
-      new Date(next.created_at).getTime() - ts < GROUP_THRESHOLD_MS
+      next.userId === msg.userId &&
+      next.createdAt.slice(0, 10) === date &&
+      new Date(next.createdAt).getTime() - ts < GROUP_THRESHOLD_MS
 
-    items.push({
-      kind: 'msg',
-      msg,
-      isGroupFirst: !samePrev,
-      isGroupLast:  !sameNext,
-    })
+    items.push({ kind: 'msg', msg, isGroupFirst: !samePrev, isGroupLast: !sameNext })
   }
   return items
 }
 
-/** Group reactions by emoji for display */
-function groupReactions(
-  reactions: ChatReaction[],
-  myUserId: number,
-): { emoji: string; count: number; myId?: number }[] {
-  const map = new Map<string, { count: number; myId?: number }>()
-  for (const r of reactions) {
-    const cur = map.get(r.emoji) ?? { count: 0 }
-    if (r.user_id === myUserId) cur.myId = r.id
-    cur.count++
-    map.set(r.emoji, cur)
-  }
-  return Array.from(map.entries()).map(([emoji, v]) => ({ emoji, ...v }))
-}
-
 // ── Main Page ────────────────────────────────────────────────────────────────
 export default function RoomChatPage() {
-  const { roomId }  = useParams()
-  const navigate    = useNavigate()
-  const numRoomId   = Number(roomId ?? MOCK_ROOM.id)
+  const { roomId } = useParams()
+  const navigate   = useNavigate()
+  const numRoomId  = Number(roomId ?? 1)
 
   const myUser   = useAuthStore((s) => s.user)
-  const myUserId = myUser?.id ?? 1
+  const myUserId = myUser?.userId ?? 1
 
-  const messages       = useChatStore((s) => s.messages[String(numRoomId)] ?? [])
+  const messages       = useChatStore((s) => s.messages[String(numRoomId)] ?? EMPTY_MSGS)
+  const myReactions    = useChatStore((s) => s.myReactions)
   const reactionTarget = useChatStore((s) => s.reactionTarget)
+  const setMessages       = useChatStore((s) => s.setMessages)
   const prependMessages   = useChatStore((s) => s.prependMessages)
   const appendMessage     = useChatStore((s) => s.appendMessage)
   const addReaction       = useChatStore((s) => s.addReaction)
   const removeReaction    = useChatStore((s) => s.removeReaction)
   const setReactionTarget = useChatStore((s) => s.setReactionTarget)
 
-  const [text, setText] = useState('')
-  const listRef         = useRef<HTMLDivElement>(null)
-  const inputRef        = useRef<HTMLTextAreaElement>(null)
-  const isAtBottomRef   = useRef(true)
-  const longPressTimer  = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [text, setText]       = useState('')
+  const [roomName, setRoomName]     = useState('')
+  const [memberCount, setMemberCount] = useState(0)
+  const [missionDone, setMissionDone] = useState(false)
 
-  // ── Mock data seed ────────────────────────────────────────────────────────
+  const listRef        = useRef<HTMLDivElement>(null)
+  const inputRef       = useRef<HTMLTextAreaElement>(null)
+  const isAtBottomRef  = useRef(true)
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const loaded         = useRef(false)
+
+  // ── 메시지 목록 API 조회 ──────────────────────────────────────────────────
   useEffect(() => {
-    if (messages.length === 0) {
-      prependMessages(numRoomId, MOCK_CHAT_MESSAGES)
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (loaded.current) return
+    loaded.current = true
 
-  // ── Initial scroll (instant) ──────────────────────────────────────────────
+    chatApi.getMessages(numRoomId)
+      .then((res) => {
+        setRoomName(res.data.roomName)
+        setMemberCount(res.data.memberCount)
+        setMissionDone(res.data.todayMissionCompleted)
+        const msgs = res.data.messages.length > 0
+          ? res.data.messages
+          : MOCK_CHAT_MESSAGES    // API 메시지 없으면 mock 시드
+        // setMessages로 교체 — 유저 전환 후에도 이전 캐시 없이 정확히 덮어씀
+        setMessages(numRoomId, msgs)
+      })
+      .catch(() => {
+        if (messages.length === 0) setMessages(numRoomId, MOCK_CHAT_MESSAGES)
+      })
+  }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── 초기 스크롤 (즉시) ────────────────────────────────────────────────────
   useEffect(() => {
     const el = listRef.current
     if (el) el.scrollTop = el.scrollHeight
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Scroll on new message (smooth if near bottom) ─────────────────────────
+  // ── 새 메시지 오면 스크롤 ─────────────────────────────────────────────────
   useEffect(() => {
     if (isAtBottomRef.current) {
       const el = listRef.current
@@ -124,98 +123,77 @@ export default function RoomChatPage() {
     }
   }, [messages.length])
 
-  // ── WS subscription ───────────────────────────────────────────────────────
-  useEffect(() => {
-    const offMsg = wsClient.on<RoomChat>('CHAT_MESSAGE', (ev) => {
-      if (ev.room_id === numRoomId) appendMessage(ev.room_id, ev.payload)
-    })
-    const offReact = wsClient.on<ChatReaction>('CHAT_REACTION', (ev) => {
-      if (ev.room_id === numRoomId)
-        addReaction(ev.room_id, ev.payload.chat_id, ev.payload)
-    })
-    return () => { offMsg(); offReact() }
-  }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Scroll position tracking ──────────────────────────────────────────────
+  // ── 스크롤 위치 추적 ──────────────────────────────────────────────────────
   function handleScroll() {
     const el = listRef.current
     if (!el) return
     isAtBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 80
   }
 
-  // ── Send ──────────────────────────────────────────────────────────────────
+  // ── 메시지 전송 ───────────────────────────────────────────────────────────
   function handleSend() {
     const content = text.trim()
     if (!content) return
-    const msg: RoomChat = {
-      id: Date.now(),
-      room_id: numRoomId,
-      user_id: myUserId,
-      message_type: 'TEXT',
+
+    const msg: RoomChatMessage = {
+      messageId:   Date.now(),
+      userId:      myUserId,
+      userName:    myUser?.name ?? '나',
+      profileImage: myUser?.profileImage ?? null,
       content,
-      created_at: new Date().toISOString(),
-      user: { id: myUserId, name: myUser?.name ?? '유현' },
-      reactions: [],
+      createdAt:   new Date().toISOString(),
+      isMyMessage: true,
+      reactions:   [],
     }
     appendMessage(numRoomId, msg)
     setText('')
-    // Reset textarea height
     if (inputRef.current) inputRef.current.style.height = 'auto'
     isAtBottomRef.current = true
-    // wsClient.send({ type: 'CHAT_MESSAGE', room_id: numRoomId, payload: msg })
+
+    // 실제 API 전송 (fire-and-forget)
+    chatApi.sendMessage(numRoomId, content).catch(console.error)
   }
 
   function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
   }
 
-  // ── Reaction toggle ────────────────────────────────────────────────────────
-  const handleReactionToggle = useCallback((chatId: number, emoji: string) => {
-    const msg = messages.find((m) => m.id === chatId)
-    if (!msg) return
-    const existing = (msg.reactions ?? []).find(
-      (r) => r.user_id === myUserId && r.emoji === emoji,
-    )
-    if (existing) {
-      removeReaction(numRoomId, chatId, existing.id)
+  // ── 리액션 토글 ───────────────────────────────────────────────────────────
+  const handleReactionToggle = useCallback((msgId: number, emoji: string) => {
+    const rKey = `${numRoomId}:${msgId}`
+    const myEmojis = myReactions[rKey] ?? []
+    if (myEmojis.includes(emoji)) {
+      removeReaction(numRoomId, msgId, emoji)
     } else {
-      addReaction(numRoomId, chatId, {
-        id: Date.now(),
-        chat_id: chatId,
-        user_id: myUserId,
-        emoji,
-        created_at: new Date().toISOString(),
-      })
+      addReaction(numRoomId, msgId, emoji)
+      chatApi.addReaction(numRoomId, msgId, emoji).catch(console.error)
     }
     setReactionTarget(null)
-  }, [messages, myUserId, numRoomId, addReaction, removeReaction, setReactionTarget])
+  }, [myReactions, numRoomId, addReaction, removeReaction, setReactionTarget])
 
-  // ── Long press ────────────────────────────────────────────────────────────
-  function startLongPress(chatId: number) {
-    longPressTimer.current = setTimeout(() => setReactionTarget(chatId), LONG_PRESS_MS)
+  // ── 롱프레스 ─────────────────────────────────────────────────────────────
+  function startLongPress(msgId: number) {
+    longPressTimer.current = setTimeout(() => setReactionTarget(msgId), LONG_PRESS_MS)
   }
   function cancelLongPress() {
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
   }
 
-  // ── Display items (memoized) ──────────────────────────────────────────────
-  const displayItems = useMemo(
-    () => buildDisplayItems(messages),
-    [messages],
-  )
+  // ── 디스플레이 아이템 (메모) ───────────────────────────────────────────────
+  const displayItems = useMemo(() => buildDisplayItems(messages), [messages])
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div className={styles.page}>
 
-      {/* ── 헤더 ───────────────────────────────────────────────────────────── */}
+      {/* ── 헤더 ─────────────────────────────────────────────────────────── */}
       <div className={styles.header}>
         <button className={styles.iconBtn} onClick={() => navigate(-1)} aria-label="뒤로">
           <BackIcon />
         </button>
         <div className={styles.headerCenter}>
-          <span className={styles.headerTitle}>{MOCK_ROOM.name}</span>
-          <span className={styles.headerSub}>{MOCK_ROOM.memberCount}명</span>
+          <span className={styles.headerTitle}>{roomName || '채팅'}</span>
+          {memberCount > 0 && <span className={styles.headerSub}>{memberCount}명</span>}
         </div>
         <button
           className={styles.iconBtn}
@@ -226,36 +204,41 @@ export default function RoomChatPage() {
         </button>
       </div>
 
-      {/* ── 미션 결과 배너 ─────────────────────────────────────────────────── */}
-      <MissionResultBanner onPress={() => navigate(ROUTES.MISSION_RESULT(1))} />
+      {/* ── 오늘 미션 결과 배너 ──────────────────────────────────────────── */}
+      {missionDone && (
+        <MissionResultBanner onPress={() => navigate(ROUTES.MISSION_RESULT(numRoomId))} />
+      )}
+      {import.meta.env.DEV && !missionDone && (
+        <MissionResultBanner onPress={() => navigate(ROUTES.MISSION_RESULT(numRoomId))} />
+      )}
 
-      {/* ── 메시지 목록 ────────────────────────────────────────────────────── */}
+      {/* ── 메시지 목록 ──────────────────────────────────────────────────── */}
       <div className={styles.msgList} ref={listRef} onScroll={handleScroll}>
         {displayItems.map((item) => {
           if (item.kind === 'date') {
             return <DateSep key={item.key} label={item.label} />
           }
           const { msg, isGroupFirst, isGroupLast } = item
-          const isMe = msg.user_id === myUserId
+          const rKey = `${numRoomId}:${msg.messageId}`
           return (
             <MsgBubble
-              key={msg.id}
+              key={msg.messageId}
               msg={msg}
-              isMe={isMe}
+              isMe={msg.isMyMessage}
               isGroupFirst={isGroupFirst}
               isGroupLast={isGroupLast}
-              myUserId={myUserId}
-              onLongPressStart={() => startLongPress(msg.id)}
+              myReactionEmojis={myReactions[rKey] ?? []}
+              onLongPressStart={() => startLongPress(msg.messageId)}
               onLongPressEnd={cancelLongPress}
-              onReactionTap={(emoji) => handleReactionToggle(msg.id, emoji)}
-              onOpenPicker={() => setReactionTarget(msg.id)}
+              onReactionTap={(emoji) => handleReactionToggle(msg.messageId, emoji)}
+              onOpenPicker={() => setReactionTarget(msg.messageId)}
             />
           )
         })}
         <div className={styles.listBottom} />
       </div>
 
-      {/* ── 입력창 ─────────────────────────────────────────────────────────── */}
+      {/* ── 입력창 ───────────────────────────────────────────────────────── */}
       <div className={styles.inputBar}>
         <textarea
           ref={inputRef}
@@ -280,7 +263,7 @@ export default function RoomChatPage() {
         </button>
       </div>
 
-      {/* ── 리액션 피커 바텀시트 ────────────────────────────────────────────── */}
+      {/* ── 리액션 피커 바텀시트 ─────────────────────────────────────────── */}
       {reactionTarget !== null && (
         <div className={styles.pickerOverlay} onClick={() => setReactionTarget(null)}>
           <div className={styles.pickerSheet} onClick={(e) => e.stopPropagation()}>
@@ -317,14 +300,12 @@ function DateSep({ label }: { label: string }) {
 }
 
 function MissionResultBanner({ onPress }: { onPress: () => void }) {
-  // Show when there's a completed mission result (mock: always in dev)
-  if (!import.meta.env.DEV) return null
   return (
     <button className={styles.missionBanner} onClick={onPress}>
       <span className={styles.missionBannerIcon}>✨</span>
       <div className={styles.missionBannerBody}>
         <span className={styles.missionBannerTitle}>오늘의 미션 결과가 나왔어요!</span>
-        <span className={styles.missionBannerSub}>참여율 100% · 5명 모두 완료</span>
+        <span className={styles.missionBannerSub}>콜라주 결과 보러가기</span>
       </div>
       <span className={styles.missionBannerArrow}>›</span>
     </button>
@@ -332,11 +313,11 @@ function MissionResultBanner({ onPress }: { onPress: () => void }) {
 }
 
 interface MsgBubbleProps {
-  msg: RoomChat
+  msg: RoomChatMessage
   isMe: boolean
   isGroupFirst: boolean
   isGroupLast: boolean
-  myUserId: number
+  myReactionEmojis: string[]
   onLongPressStart: () => void
   onLongPressEnd: () => void
   onReactionTap: (emoji: string) => void
@@ -344,11 +325,13 @@ interface MsgBubbleProps {
 }
 
 function MsgBubble({
-  msg, isMe, isGroupFirst, isGroupLast, myUserId,
+  msg, isMe, isGroupFirst, isGroupLast, myReactionEmojis,
   onLongPressStart, onLongPressEnd, onReactionTap, onOpenPicker,
 }: MsgBubbleProps) {
-  const grouped = groupReactions(msg.reactions ?? [], myUserId)
-  const initial = msg.user?.name?.charAt(0) ?? '?'
+  const reactions = msg.reactions.filter((r): r is ChatReactionSummary & { emoji: string } =>
+    r.emoji !== null,
+  )
+  const initial = msg.userName.charAt(0) || '?'
 
   return (
     <div
@@ -358,22 +341,22 @@ function MsgBubble({
         isGroupLast ? styles.msgRowLast : '',
       ].filter(Boolean).join(' ')}
     >
-      {/* Avatar (others only, last in group) */}
+      {/* 아바타 (상대방 메시지, 그룹 마지막) */}
       {!isMe && (
         isGroupLast
           ? <div className={styles.avatar}><span className={styles.avatarText}>{initial}</span></div>
           : <div className={styles.avatarSpacer} />
       )}
 
-      {/* Bubble + meta */}
+      {/* 버블 + 메타 */}
       <div className={[styles.bubbleCol, isMe ? styles.bubbleColMe : ''].filter(Boolean).join(' ')}>
 
-        {/* Sender name (others only, first in group) */}
+        {/* 발신자 이름 (상대방, 그룹 첫 번째) */}
         {!isMe && isGroupFirst && (
-          <span className={styles.senderName}>{msg.user?.name}</span>
+          <span className={styles.senderName}>{msg.userName}</span>
         )}
 
-        {/* Bubble */}
+        {/* 버블 */}
         <div
           className={[
             styles.bubble,
@@ -390,20 +373,23 @@ function MsgBubble({
           <span className={styles.bubbleText}>{msg.content}</span>
         </div>
 
-        {/* Time (last in group only) */}
+        {/* 시간 (그룹 마지막만) */}
         {isGroupLast && (
           <span className={[styles.msgTime, isMe ? styles.msgTimeMe : ''].filter(Boolean).join(' ')}>
-            {formatTime(msg.created_at)}
+            {formatTime(msg.createdAt)}
           </span>
         )}
 
-        {/* Reactions */}
-        {grouped.length > 0 && (
+        {/* 리액션 */}
+        {reactions.length > 0 && (
           <div className={[styles.reactions, isMe ? styles.reactionsMe : ''].filter(Boolean).join(' ')}>
-            {grouped.map(({ emoji, count, myId }) => (
+            {reactions.map(({ emoji, count }) => (
               <button
                 key={emoji}
-                className={[styles.reactionChip, myId ? styles.reactionChipMine : ''].filter(Boolean).join(' ')}
+                className={[
+                  styles.reactionChip,
+                  myReactionEmojis.includes(emoji) ? styles.reactionChipMine : '',
+                ].filter(Boolean).join(' ')}
                 onClick={() => onReactionTap(emoji)}
               >
                 <span>{emoji}</span>

@@ -84,6 +84,315 @@
   gap: var(--sp-4);
 }
 
+/* ── 02_홈 인라인 미션 카드 ───────────────────────────────────────────────── */
+.missionCard {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* 다중 미션에서 돌아가기 버튼 */
+.missionCardBack {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: color var(--dur-fast);
+}
+.missionCardBack:active { color: var(--color-text); }
+
+.missionCardHeader {
+  padding: var(--sp-5) var(--sp-5) var(--sp-4);
+  background: rgba(220, 38, 38, 0.18);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.missionCardRoomBadge {
+  font-size: var(--text-base);
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.missionCardSub {
+  font-size: var(--text-xs);
+  color: rgba(255,255,255,0.55);
+}
+
+.missionCardTimer {
+  background: rgba(220, 38, 38, 0.12);
+  display: flex;
+  justify-content: center;
+  padding: var(--sp-4) 0 var(--sp-5);
+}
+
+.missionCardInfo {
+  margin: var(--sp-3) var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.missionCardLabel {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-sub);
+  letter-spacing: 0.5px;
+}
+
+.missionCardTitle {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  color: var(--color-text);
+  line-height: 1.35;
+}
+
+.missionCardDesc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+/* ── 참여 현황 ───────────────────────────────────────────────────────────── */
+.missionCardParticipants {
+  padding: var(--sp-1) var(--sp-4) var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.missionCardParticipantsRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.missionCardParticipantsLabel {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text-sub);
+}
+
+.missionCardParticipantsCount {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-muted);
+}
+
+.missionCardAvatarRow {
+  display: flex;
+  gap: var(--sp-3);
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ── 참여자 아이템 ─────────────────────────────────────────────────────────── */
+.participantItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 48px;
+}
+
+.participantAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-2);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(255,255,255,0.08);
+}
+
+.participantAvatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.participantAvatarInitial {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.participantName {
+  font-size: 11px;
+  color: var(--color-text-sub);
+}
+
+.participantStatus {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: var(--radius-full);
+}
+
+.statusDone {
+  background: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+}
+
+.statusRecording {
+  background: rgba(250, 204, 21, 0.2);
+  color: #facc15;
+}
+
+.statusWaiting {
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--color-text-muted);
+}
+
+/* ── 참여하기 CTA ─────────────────────────────────────────────────────────── */
+.missionCardCta {
+  margin: var(--sp-1) var(--sp-4) var(--sp-4);
+  padding: var(--sp-4);
+  background: var(--color-primary);
+  border-radius: var(--radius-lg);
+  color: #fff;
+  font-size: var(--text-base);
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  transition: opacity var(--dur-fast);
+}
+
+.missionCardCta:active { opacity: 0.8; }
+.missionCardCta:disabled {
+  background: var(--color-surface-2);
+  color: var(--color-text-muted);
+}
+
+/* 전원 완료 메시지 (카드가 곧 사라짐) */
+.missionCardAllDone {
+  margin: var(--sp-1) var(--sp-4) var(--sp-4);
+  padding: var(--sp-4);
+  background: rgba(74, 222, 128, 0.12);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: #4ade80;
+}
+
+/* 참여완료 상태 — 초록 계열로 구분 */
+.missionCardCtaDone {
+  background: #166534;
+  color: #bbf7d0;
+}
+.missionCardCtaDone:active { opacity: 0.85; }
+
+/* 만료 후 결과 보기 — 보라 계열 */
+.missionCardCtaResult {
+  background: var(--color-primary);
+  color: #fff;
+}
+.missionCardCtaResult:active { opacity: 0.85; }
+
+/* ── 03_방 선택 화면 ──────────────────────────────────────────────────────── */
+.missionSelectSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.missionSelectTitle {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-sub);
+  padding: 0 var(--sp-1);
+}
+
+.missionSelectCard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  text-align: left;
+  transition: background var(--dur-fast);
+}
+
+.missionSelectCard:active {
+  background: var(--color-surface-2);
+}
+
+.missionSelectThumb {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface-2);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.missionSelectThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.missionSelectThumbFallback {
+  font-size: 22px;
+}
+
+.missionSelectInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.missionSelectRoom {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.missionSelectTitle2 {
+  font-size: var(--text-xs);
+  color: var(--color-text-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.missionSelectMeta {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.missionSelectTimer {
+  font-size: var(--text-lg);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+  flex-shrink: 0;
+}
+
 /* ── 미션 알림 배너 ───────────────────────────────────────────────────────── */
 @keyframes bannerPulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(108,99,255,0.4); }
@@ -202,40 +511,3 @@
   padding-left: var(--sp-4);
 }
 
-/* ── DEV 섹션 ─────────────────────────────────────────────────────────────── */
-.devSection {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-2);
-  padding: var(--sp-4);
-  background: rgba(108, 99, 255, 0.04);
-  border: 1px dashed rgba(108, 99, 255, 0.25);
-  border-radius: var(--radius-lg);
-}
-
-.devLabel {
-  font-size: var(--text-xs);
-  font-weight: 700;
-  color: rgba(108, 99, 255, 0.5);
-  letter-spacing: 1px;
-}
-
-.devBtn {
-  width: 100%;
-  padding: var(--sp-4);
-  background: rgba(108, 99, 255, 0.12);
-  border: 1px solid rgba(108, 99, 255, 0.3);
-  border-radius: var(--radius-md);
-  color: var(--color-primary);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  transition: background var(--dur-fast);
-}
-
-.devBtn:active { background: rgba(108, 99, 255, 0.2); }
-
-.devHint {
-  font-size: var(--text-xs);
-  color: rgba(255,255,255,0.2);
-  line-height: 1.5;
-}

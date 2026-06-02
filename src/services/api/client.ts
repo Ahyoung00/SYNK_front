@@ -2,10 +2,11 @@ import { API_BASE_URL, STORAGE_KEYS } from '@/constants'
 import type { ApiResponse } from '@/types'
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Lightweight fetch wrapper for Spring Boot REST API
+// Lightweight fetch wrapper
+// 실제 API 응답 형식: { success: boolean, data: T, message: string }
 // ─────────────────────────────────────────────────────────────────────────────
 
-class ApiError extends Error {
+export class ApiError extends Error {
   constructor(
     public status: number,
     message: string,
@@ -15,11 +16,27 @@ class ApiError extends Error {
   }
 }
 
+/**
+ * localStorage에서 실제 JWT 토큰만 추출
+ * zustand persist가 전체 상태 JSON을 같은 키로 저장하므로
+ * raw string이 아닌 state.token 필드를 파싱해서 꺼낸다
+ */
+function getAuthToken(): string | null {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { state?: { token?: string | null } }
+    return parsed?.state?.token ?? null
+  } catch {
+    return null
+  }
+}
+
 async function request<T>(
   path: string,
   options: RequestInit = {},
 ): Promise<ApiResponse<T>> {
-  const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+  const token = getAuthToken()
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
@@ -29,20 +46,33 @@ async function request<T>(
 
   const res = await fetch(`${API_BASE_URL}${path}`, { ...options, headers })
 
-  // Auto-refresh on 401 — placeholder; wire up real refresh logic here
+  // HTTP 레벨 에러 처리
   if (res.status === 401) {
-    // TODO: call refreshToken endpoint, update store, retry
     localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN)
     window.location.replace('/login')
     throw new ApiError(401, 'Unauthorized')
   }
 
   if (!res.ok) {
-    const body = await res.text()
-    throw new ApiError(res.status, body || res.statusText)
+    // 백엔드가 에러 응답도 { success, data, message } 형식으로 내려줄 수 있음
+    let message = res.statusText
+    try {
+      const body = await res.json() as Partial<ApiResponse<unknown>>
+      message = body.message ?? message
+    } catch {
+      // 파싱 실패 시 statusText 사용
+    }
+    throw new ApiError(res.status, message)
   }
 
-  return res.json() as Promise<ApiResponse<T>>
+  const json = await res.json() as ApiResponse<T>
+
+  // 애플리케이션 레벨 에러 처리 (HTTP 200이지만 success: false인 경우)
+  if (json.success === false) {
+    throw new ApiError(res.status, json.message || 'Request failed')
+  }
+
+  return json
 }
 
 export const api = {
@@ -68,7 +98,7 @@ export const api = {
 
   delete: <T>(path: string) => request<T>(path, { method: 'DELETE' }),
 
-  /** Upload binary (video/image) via multipart */
+  /** 비디오/이미지 multipart 업로드 */
   upload: async <T>(path: string, file: Blob, fieldName = 'file'): Promise<ApiResponse<T>> => {
     const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
     const form = new FormData()
@@ -81,6 +111,9 @@ export const api = {
     })
 
     if (!res.ok) throw new ApiError(res.status, res.statusText)
-    return res.json() as Promise<ApiResponse<T>>
+
+    const json = await res.json() as ApiResponse<T>
+    if (json.success === false) throw new ApiError(res.status, json.message)
+    return json
   },
 }

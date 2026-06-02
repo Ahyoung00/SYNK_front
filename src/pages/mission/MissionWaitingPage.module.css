@@ -99,3 +99,21 @@
 
 .done    { color: #4ade80; }
 .pending { color: var(--color-accent); }
+
+/* ── 홈으로 돌아가기 버튼 ───────────────────────────────────────────────── */
+.homeBtn {
+  margin-top: auto;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  font-size: var(--text-base);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  transition: background var(--dur-fast);
+}
+
+.homeBtn:active {
+  background: var(--color-border);
+}

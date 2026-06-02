@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import { wsClient } from '@/services/websocket/client'
 import { useMissionStore } from '@/store/missionStore'
-import type { WsEvent, Submission, RoomChat } from '@/types'
+import type { WsEvent, Submission, RoomChatMessage } from '@/types'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // useWebSocket — connect to a room's WS channel and react to events
@@ -19,7 +19,7 @@ export function useRoomWebSocket(roomId: number | undefined) {
     const offSubmit = wsClient.on<Submission>('MEMBER_SUBMITTED', (e: WsEvent<Submission>) => {
       // Update the member's participation badge in the waiting screen
       updateParticipation({
-        user: { id: e.payload.user_id, name: '', profile_image: undefined },
+        user: { userId: e.payload.user_id, name: '', profileImage: null },
         submission: e.payload,
         state: 'done',
       })
@@ -52,7 +52,7 @@ export function useChatSocket(roomId: number | undefined) {
     sendReaction: (chatId: number, emoji: string) =>
       wsClient.send({ type: 'CHAT_REACTION', room_id: roomId, payload: { chat_id: chatId, emoji } }),
 
-    onMessage: (handler: (e: WsEvent<RoomChat>) => void) =>
-      wsClient.on<RoomChat>('CHAT_MESSAGE', handler),
+    onMessage: (handler: (e: WsEvent<RoomChatMessage>) => void) =>
+      wsClient.on<RoomChatMessage>('CHAT_MESSAGE', handler),
   }
 }

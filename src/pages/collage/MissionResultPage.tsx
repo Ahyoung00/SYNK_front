@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
+import { useAuthStore } from '@/store/authStore'
 import { CollageGrid } from '@/components/collage/CollageGrid'
 import { buildCollageCells, createMockCells } from '@/utils/mockCollage'
 import type { CollageCellData } from '@/utils/mockCollage'
@@ -8,22 +9,36 @@ import { ROUTES } from '@/constants'
 import styles from './MissionResultPage.module.css'
 
 export default function MissionResultPage() {
-  const navigate = useNavigate()
-  const active = useMissionStore((s) => s.active)
+  const navigate     = useNavigate()
+  const active       = useMissionStore((s) => s.active)
   const clearMission = useMissionStore((s) => s.clearMission)
+  const previewUrl   = useMissionStore((s) => s.previewUrl)
+  const myUser       = useAuthStore((s) => s.user)
 
   const [cells, setCells] = useState<CollageCellData[]>([])
   const [showStats, setShowStats] = useState(false)
 
   // 셀 데이터 초기화
   useEffect(() => {
+    let built: CollageCellData[]
+
     if (active) {
       const startAt = active.mission.targeted_at
-      setCells(buildCollageCells(active.participations, startAt))
+      built = buildCollageCells(active.participations, startAt)
+
+      // 현재 세션에서 녹화한 영상(previewUrl)을 내 셀에 주입
+      if (previewUrl && myUser) {
+        built = built.map((c) => {
+          // CollageCellData.user is MemberParticipation['user'] at runtime: { userId, name, profileImage }
+          const uid = (c.user as unknown as { userId: number }).userId
+          return uid === myUser.userId ? { ...c, videoUrl: previewUrl } : c
+        })
+      }
     } else {
-      // 직접 URL 접근 시 mock 데이터
-      setCells(createMockCells())
+      built = createMockCells()
     }
+
+    setCells(built)
 
     // 통계 영역은 0.4초 후 fade-in
     const t = setTimeout(() => setShowStats(true), 400)
@@ -41,6 +56,18 @@ export default function MissionResultPage() {
       v.currentTime = 0
       v.play().catch(() => {})
     })
+  }
+
+  function handleSave() {
+    // 웹 환경: 녹화한 영상 blob이 있으면 다운로드, 없으면 안내
+    if (previewUrl) {
+      const a = document.createElement('a')
+      a.href = previewUrl
+      a.download = `synk_${new Date().toISOString().slice(0, 10)}.webm`
+      a.click()
+    } else {
+      alert('실제 기기에서는 갤러리에 저장됩니다.\n(웹 환경에서는 이번 세션의 영상만 저장할 수 있어요)')
+    }
   }
 
   // ── 통계 계산 ──────────────────────────────────────────────────────────────
@@ -131,7 +158,7 @@ export default function MissionResultPage() {
           <button className={styles.replayBtn} onClick={handleReplay}>
             다시보기
           </button>
-          <button className={styles.saveBtn} onClick={() => alert('저장 기능은 Capacitor Filesystem 연동 후 구현 예정입니다.')}>
+          <button className={styles.saveBtn} onClick={handleSave}>
             저장하기
           </button>
         </div>

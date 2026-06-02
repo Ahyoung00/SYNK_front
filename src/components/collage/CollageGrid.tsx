@@ -49,7 +49,7 @@ export function CollageGrid({ cells }: Props) {
 
         return (
           <div
-            key={cell.user.id}
+            key={cell.user.userId}
             className={styles.cellWrap}
             style={colSpan > 1 ? { gridColumn: `span ${colSpan}` } : undefined}
           >

@@ -33,7 +33,6 @@ export default function ProfilePage() {
           </div>
           <div className={styles.profileInfo}>
             <span className={styles.profileName}>{user?.name ?? '내 프로필'}</span>
-            <span className={styles.profileId}>@iam.synk</span>
           </div>
           <button
             className={styles.editBtn}

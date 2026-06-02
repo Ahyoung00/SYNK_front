@@ -1,0 +1,793 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "auth_provider": "KAKAO",
+      "auth_provider_id": "kakao_11111",
+      "name": "아영",
+      "profile_image": null,
+      "fcm_token": null,
+      "status": "active",
+      "mission_alert": true,
+      "result_alert": true,
+      "highlight_alert": true,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-05-25T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "auth_provider": "KAKAO",
+      "auth_provider_id": "kakao_22222",
+      "name": "유현",
+      "profile_image": null,
+      "fcm_token": null,
+      "status": "active",
+      "mission_alert": true,
+      "result_alert": true,
+      "highlight_alert": false,
+      "created_at": "2026-01-01T00:00:00Z",
+      "updated_at": "2026-05-25T00:00:00Z"
+    },
+    {
+      "id": 3,
+      "auth_provider": "KAKAO",
+      "auth_provider_id": "kakao_33333",
+      "name": "지민",
+      "profile_image": null,
+      "fcm_token": null,
+      "status": "active",
+      "mission_alert": true,
+      "result_alert": true,
+      "highlight_alert": true,
+      "created_at": "2026-01-15T00:00:00Z",
+      "updated_at": "2026-05-20T00:00:00Z"
+    },
+    {
+      "id": 4,
+      "auth_provider": "GOOGLE",
+      "auth_provider_id": "google_44444",
+      "name": "수현",
+      "profile_image": null,
+      "fcm_token": null,
+      "status": "active",
+      "mission_alert": false,
+      "result_alert": true,
+      "highlight_alert": true,
+      "created_at": "2026-02-01T00:00:00Z",
+      "updated_at": "2026-05-22T00:00:00Z"
+    },
+    {
+      "id": 5,
+      "auth_provider": "KAKAO",
+      "auth_provider_id": "kakao_55555",
+      "name": "대주",
+      "profile_image": null,
+      "fcm_token": null,
+      "status": "active",
+      "mission_alert": true,
+      "result_alert": false,
+      "highlight_alert": true,
+      "created_at": "2026-02-15T00:00:00Z",
+      "updated_at": "2026-05-25T00:00:00Z"
+    }
+  ],
+  "rooms": [
+    {
+      "id": 1,
+      "name": "아침반",
+      "code": "MORN1",
+      "thumbnail": null,
+      "owner_id": 2,
+      "max_members": 5,
+      "current_members": 5,
+      "daily_mission_count": 8,
+      "mission_start_time": "20:00",
+      "mission_end_time": "23:34",
+      "created_at": "2026-03-01T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "name": "zz반",
+      "code": "ZZZ22",
+      "thumbnail": null,
+      "owner_id": 1,
+      "max_members": 5,
+      "current_members": 5,
+      "daily_mission_count": 6,
+      "mission_start_time": "20:00",
+      "mission_end_time": "23:00",
+      "created_at": "2026-03-15T00:00:00Z"
+    },
+    {
+      "id": 3,
+      "name": "축구부",
+      "code": "KICK3",
+      "thumbnail": null,
+      "owner_id": 3,
+      "max_members": 6,
+      "current_members": 4,
+      "daily_mission_count": 1,
+      "mission_start_time": "20:00:00",
+      "mission_end_time": "23:00:00",
+      "created_at": "2026-04-01T00:00:00Z"
+    }
+  ],
+  "room_members": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "room_id": 1,
+      "is_owner": false,
+      "joined_at": "2026-03-01T00:00:00Z"
+    },
+    {
+      "id": 2,
+      "user_id": 2,
+      "room_id": 1,
+      "is_owner": true,
+      "joined_at": "2026-03-01T00:00:00Z"
+    },
+    {
+      "id": 3,
+      "user_id": 3,
+      "room_id": 1,
+      "is_owner": false,
+      "joined_at": "2026-03-02T00:00:00Z"
+    },
+    {
+      "id": 4,
+      "user_id": 4,
+      "room_id": 1,
+      "is_owner": false,
+      "joined_at": "2026-03-05T00:00:00Z"
+    },
+    {
+      "id": 5,
+      "user_id": 5,
+      "room_id": 1,
+      "is_owner": false,
+      "joined_at": "2026-03-10T00:00:00Z"
+    },
+    {
+      "id": 6,
+      "user_id": 1,
+      "room_id": 2,
+      "is_owner": true,
+      "joined_at": "2026-03-15T00:00:00Z"
+    },
+    {
+      "id": 7,
+      "user_id": 2,
+      "room_id": 2,
+      "is_owner": false,
+      "joined_at": "2026-03-15T00:00:00Z"
+    },
+    {
+      "id": 8,
+      "user_id": 3,
+      "room_id": 2,
+      "is_owner": false,
+      "joined_at": "2026-03-16T00:00:00Z"
+    },
+    {
+      "id": 9,
+      "user_id": 4,
+      "room_id": 2,
+      "is_owner": false,
+      "joined_at": "2026-03-20T00:00:00Z"
+    },
+    {
+      "id": 10,
+      "user_id": 5,
+      "room_id": 2,
+      "is_owner": false,
+      "joined_at": "2026-03-22T00:00:00Z"
+    },
+    {
+      "id": 11,
+      "user_id": 1,
+      "room_id": 3,
+      "is_owner": false,
+      "joined_at": "2026-04-01T00:00:00Z"
+    },
+    {
+      "id": 12,
+      "user_id": 3,
+      "room_id": 3,
+      "is_owner": true,
+      "joined_at": "2026-04-01T00:00:00Z"
+    },
+    {
+      "id": 13,
+      "user_id": 5,
+      "room_id": 3,
+      "is_owner": false,
+      "joined_at": "2026-04-05T00:00:00Z"
+    },
+    {
+      "id": 14,
+      "user_id": 2,
+      "room_id": 3,
+      "is_owner": false,
+      "joined_at": "2026-05-25T09:08:24.410Z"
+    }
+  ],
+  "mission_templates": [
+    {
+      "id": 1,
+      "title": "지금 네 표정 그대로 찍기",
+      "description": "카메라 앞, 있는 그대로"
+    },
+    {
+      "id": 2,
+      "title": "지금 손에 있는 것 찍기",
+      "description": "손에 뭐든 들고 찍어요"
+    },
+    {
+      "id": 3,
+      "title": "발밑 찍기",
+      "description": "지금 발 아래를 찍어요"
+    },
+    {
+      "id": 4,
+      "title": "하늘 찍기",
+      "description": "지금 이 순간의 하늘"
+    },
+    {
+      "id": 5,
+      "title": "아침 식사 찍기",
+      "description": "오늘 아침 뭐 먹었나요?"
+    },
+    {
+      "id": 6,
+      "title": "창문 밖 풍경 찍기",
+      "description": "창밖을 바라보세요"
+    },
+    {
+      "id": 7,
+      "title": "지금 앉아 있는 곳 찍기",
+      "description": "지금 어디 있나요?"
+    },
+    {
+      "id": 8,
+      "title": "가장 가까운 식물 찍기",
+      "description": "주변의 초록을 찾아요"
+    },
+    {
+      "id": 9,
+      "title": "오늘의 신발 찍기",
+      "description": "오늘 어떤 신발 신었어요?"
+    },
+    {
+      "id": 10,
+      "title": "지금 마시는 것 찍기",
+      "description": "커피? 물? 뭐든 ok"
+    }
+  ],
+  "missions": [
+    {
+      "id": 1,
+      "room_id": 2,
+      "mission_template_id": 8,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T12:01:15.890Z",
+      "created_at": "2026-05-25T11:56:15.890Z"
+    },
+    {
+      "id": 2,
+      "room_id": 3,
+      "mission_template_id": 4,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T12:01:15.892Z",
+      "created_at": "2026-05-25T11:56:15.892Z"
+    },
+    {
+      "id": 3,
+      "room_id": 1,
+      "mission_template_id": 4,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T12:01:45.910Z",
+      "created_at": "2026-05-25T11:56:45.910Z"
+    },
+    {
+      "id": 4,
+      "room_id": 1,
+      "mission_template_id": 7,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T12:10:24.042Z",
+      "created_at": "2026-05-25T12:05:24.042Z"
+    },
+    {
+      "id": 5,
+      "room_id": 2,
+      "mission_template_id": 1,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T12:10:24.075Z",
+      "created_at": "2026-05-25T12:05:24.075Z"
+    },
+    {
+      "id": 6,
+      "room_id": 2,
+      "mission_template_id": 1,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T12:17:23.188Z",
+      "created_at": "2026-05-25T12:12:23.188Z"
+    },
+    {
+      "id": 7,
+      "room_id": 1,
+      "mission_template_id": 1,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T12:40:02.853Z",
+      "created_at": "2026-05-25T12:35:02.853Z"
+    },
+    {
+      "id": 8,
+      "room_id": 1,
+      "mission_template_id": 3,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T12:45:03.358Z",
+      "created_at": "2026-05-25T12:40:03.358Z"
+    },
+    {
+      "id": 9,
+      "room_id": 2,
+      "mission_template_id": 6,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T13:07:44.066Z",
+      "created_at": "2026-05-25T13:02:44.066Z"
+    },
+    {
+      "id": 10,
+      "room_id": 2,
+      "mission_template_id": 1,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T13:13:22.308Z",
+      "created_at": "2026-05-25T13:08:22.308Z"
+    },
+    {
+      "id": 11,
+      "room_id": 2,
+      "mission_template_id": 5,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T13:19:52.398Z",
+      "created_at": "2026-05-25T13:14:52.398Z"
+    },
+    {
+      "id": 12,
+      "room_id": 1,
+      "mission_template_id": 4,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T13:53:53.051Z",
+      "created_at": "2026-05-25T13:48:53.051Z"
+    },
+    {
+      "id": 13,
+      "room_id": 1,
+      "mission_template_id": 8,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T13:58:53.122Z",
+      "created_at": "2026-05-25T13:53:53.122Z"
+    },
+    {
+      "id": 14,
+      "room_id": 1,
+      "mission_template_id": 4,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T14:15:53.470Z",
+      "created_at": "2026-05-25T14:10:53.470Z"
+    },
+    {
+      "id": 15,
+      "room_id": 1,
+      "mission_template_id": 1,
+      "status": "CLOSED",
+      "deadline": "2026-05-25T14:31:53.690Z",
+      "created_at": "2026-05-25T14:26:53.690Z"
+    }
+  ],
+  "submissions": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 8,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T12:47:31.314Z"
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "room_id": 2,
+      "mission_id": 10,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:08:48.494Z"
+    },
+    {
+      "id": 3,
+      "user_id": 2,
+      "room_id": 2,
+      "mission_id": 10,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:10:47.344Z"
+    },
+    {
+      "id": 4,
+      "user_id": 4,
+      "room_id": 2,
+      "mission_id": 10,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:11:17.082Z"
+    },
+    {
+      "id": 5,
+      "user_id": 5,
+      "room_id": 2,
+      "mission_id": 10,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:12:38.673Z"
+    },
+    {
+      "id": 6,
+      "user_id": 5,
+      "room_id": 2,
+      "mission_id": 10,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:14:01.408Z"
+    },
+    {
+      "id": 7,
+      "user_id": 5,
+      "room_id": 2,
+      "mission_id": 10,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:14:24.805Z"
+    },
+    {
+      "id": 8,
+      "user_id": 5,
+      "room_id": 2,
+      "mission_id": 10,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:14:52.068Z"
+    },
+    {
+      "id": 9,
+      "user_id": 5,
+      "room_id": 2,
+      "mission_id": 11,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:15:39.907Z"
+    },
+    {
+      "id": 10,
+      "user_id": 1,
+      "room_id": 2,
+      "mission_id": 11,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:16:02.983Z"
+    },
+    {
+      "id": 11,
+      "user_id": 2,
+      "room_id": 2,
+      "mission_id": 11,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:17:06.867Z"
+    },
+    {
+      "id": 12,
+      "user_id": 4,
+      "room_id": 2,
+      "mission_id": 11,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:18:23.392Z"
+    },
+    {
+      "id": 13,
+      "user_id": 4,
+      "room_id": 2,
+      "mission_id": 11,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:20:34.685Z"
+    },
+    {
+      "id": 14,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 12,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:49:14.139Z"
+    },
+    {
+      "id": 15,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 12,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:49:42.126Z"
+    },
+    {
+      "id": 16,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 12,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:50:29.352Z"
+    },
+    {
+      "id": 17,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 12,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:51:12.435Z"
+    },
+    {
+      "id": 18,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 12,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T13:51:31.654Z"
+    },
+    {
+      "id": 19,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 14,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:13:00.827Z"
+    },
+    {
+      "id": 20,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 14,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:13:18.570Z"
+    },
+    {
+      "id": 21,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 14,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:13:33.276Z"
+    },
+    {
+      "id": 22,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 14,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:13:47.255Z"
+    },
+    {
+      "id": 23,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 14,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:14:01.508Z"
+    },
+    {
+      "id": 24,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 15,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:27:17.991Z"
+    },
+    {
+      "id": 25,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 15,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:27:38.578Z"
+    },
+    {
+      "id": 26,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 15,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:27:58.789Z"
+    },
+    {
+      "id": 27,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 15,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:28:12.515Z"
+    },
+    {
+      "id": 28,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 15,
+      "status": "SUBMITTED",
+      "video_url": "mock://recorded-video",
+      "submitted_at": "2026-05-25T14:28:25.846Z"
+    }
+  ],
+  "collages": [],
+  "synklogs": [],
+  "chats": [
+    {
+      "id": 1,
+      "room_id": 1,
+      "user_id": 1,
+      "message_type": "TEXT",
+      "content": "test_아영",
+      "created_at": "2026-05-25T08:45:52.304Z"
+    }
+  ],
+  "notifications": [],
+  "collection_records": [
+    {
+      "id": 1,
+      "user_id": 1,
+      "mission_template_id": 3,
+      "room_id": 1,
+      "submission_id": 1,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 2,
+      "user_id": 1,
+      "mission_template_id": 1,
+      "room_id": 2,
+      "submission_id": 2,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 3,
+      "user_id": 2,
+      "mission_template_id": 1,
+      "room_id": 2,
+      "submission_id": 3,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 4,
+      "user_id": 4,
+      "mission_template_id": 1,
+      "room_id": 2,
+      "submission_id": 4,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 5,
+      "user_id": 5,
+      "mission_template_id": 1,
+      "room_id": 2,
+      "submission_id": 5,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 6,
+      "user_id": 5,
+      "mission_template_id": 5,
+      "room_id": 2,
+      "submission_id": 9,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 7,
+      "user_id": 1,
+      "mission_template_id": 5,
+      "room_id": 2,
+      "submission_id": 10,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 8,
+      "user_id": 2,
+      "mission_template_id": 5,
+      "room_id": 2,
+      "submission_id": 11,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 9,
+      "user_id": 4,
+      "mission_template_id": 5,
+      "room_id": 2,
+      "submission_id": 12,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 10,
+      "user_id": 2,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 14,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 11,
+      "user_id": 1,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 15,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 12,
+      "user_id": 5,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 16,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 13,
+      "user_id": 3,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 17,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 14,
+      "user_id": 4,
+      "mission_template_id": 4,
+      "room_id": 1,
+      "submission_id": 18,
+      "date": "2026-05-25",
+      "thumbnail": null
+    },
+    {
+      "id": 15,
+      "user_id": 3,
+      "mission_template_id": 1,
+      "room_id": 1,
+      "submission_id": 26,
+      "date": "2026-05-25",
+      "thumbnail": null
+    }
+  ]
+}

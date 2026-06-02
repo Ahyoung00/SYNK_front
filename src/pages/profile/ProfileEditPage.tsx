@@ -1,17 +1,29 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
+import { userApi } from '@/services/api/endpoints'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './ProfileEditPage.module.css'
 
 export default function ProfileEditPage() {
-  const navigate = useNavigate()
-  const user = useAuthStore((s) => s.user)
-  const [name, setName] = useState(user?.name ?? '유현')
+  const navigate  = useNavigate()
+  const user      = useAuthStore((s) => s.user)
+  const setUser   = useAuthStore((s) => s.setUser)
+  const [name, setName]       = useState(user?.name ?? '')
+  const [saving, setSaving]   = useState(false)
 
-  function handleSave() {
-    // TODO: API 호출 후 authStore 업데이트
-    navigate(-1)
+  async function handleSave() {
+    if (!name.trim() || saving) return
+    setSaving(true)
+    try {
+      await userApi.updateProfile({ name: name.trim() })
+      if (user) setUser({ ...user, name: name.trim() })
+      navigate(-1)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -19,7 +31,7 @@ export default function ProfileEditPage() {
       {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <NavHeader
         title="프로필 수정"
-        right={<button className={styles.saveBtn} onClick={handleSave}>저장</button>}
+        right={<button className={styles.saveBtn} onClick={handleSave} disabled={saving}>{saving ? '저장 중...' : '저장'}</button>}
       />
 
       <div className={styles.scroll}>
@@ -42,14 +54,6 @@ export default function ProfileEditPage() {
           />
         </div>
 
-        {/* ── 아이디 필드 (읽기 전용) ────────────────────────────────────────── */}
-        <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>아이디</label>
-          <div className={styles.fieldReadonly}>
-            <span className={styles.fieldPrefix}>@</span>
-            <span className={styles.fieldValue}>iam.synk</span>
-          </div>
-        </div>
       </div>
     </div>
   )

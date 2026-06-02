@@ -1,34 +1,83 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useAuthStore } from '@/store/authStore'
+import { roomApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './RoomSettingsPage.module.css'
 
-// 개발용 — 방장 여부 토글 (실제 구현 시 서버 데이터로 대체)
-const IS_OWNER = true
-
 export default function RoomSettingsPage() {
-  const { roomId }   = useParams<{ roomId: string }>()
-  const navigate     = useNavigate()
-  const [roomName, setRoomName]       = useState('새벽반')
-  const [missionCount, setMissionCount] = useState(5)
-  const [dirty, setDirty]             = useState(false)
+  const { roomId }    = useParams<{ roomId: string }>()
+  const navigate      = useNavigate()
+  const myUser        = useAuthStore((s) => s.user)
+  const id            = Number(roomId)
 
-  function handleNameChange(v: string) {
-    setRoomName(v)
-    setDirty(true)
+  const [roomName, setRoomName]               = useState('')
+  const [missionCount, setMissionCount]       = useState(1)
+  const [missionStartTime, setMissionStartTime] = useState('10:00')
+  const [missionEndTime,   setMissionEndTime]   = useState('22:00')
+  const [memberCount, setMemberCount]         = useState(0)
+  const [isOwner, setIsOwner]                 = useState(false)
+  const [dirty, setDirty]                     = useState(false)
+  const [saving, setSaving]                   = useState(false)
+  const [isLoading, setIsLoading]             = useState(true)
+
+  useEffect(() => {
+    if (!id) return
+    Promise.all([roomApi.getRoom(id), roomApi.getMembers(id)])
+      .then(([roomRes, membersRes]) => {
+        const room    = roomRes.data
+        const members = membersRes.data
+        setRoomName(room.name)
+        setMissionCount(room.daily_mission_count)
+        // "HH:mm:ss" → "HH:mm" 변환
+        setMissionStartTime(room.mission_start_time?.slice(0, 5) ?? '10:00')
+        setMissionEndTime(room.mission_end_time?.slice(0, 5)     ?? '22:00')
+        setMemberCount(members.length)
+        setIsOwner(room.owner_id === myUser?.userId)
+      })
+      .catch(console.error)
+      .finally(() => setIsLoading(false))
+  }, [id]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleSave() {
+    if (!dirty || saving) return
+    setSaving(true)
+    try {
+      await roomApi.updateRoom(id, {
+        name:              roomName,
+        dailyMissionCount: missionCount,
+        missionStartTime,
+        missionEndTime,
+      })
+      setDirty(false)
+      navigate(-1)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSaving(false)
+    }
   }
 
-  function handleSave() {
-    // TODO: API call
-    setDirty(false)
-    navigate(-1)
-  }
-
-  function handleDeleteRoom() {
+  async function handleDeleteRoom() {
     if (!window.confirm('정말로 방을 삭제할까요? 이 작업은 되돌릴 수 없어요.')) return
-    // TODO: API call
-    navigate(ROUTES.ROOMS, { replace: true })
+    try {
+      await roomApi.deleteRoom(id)
+      navigate(ROUTES.ROOMS, { replace: true })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className={styles.page}>
+        <NavHeader title="방 설정" />
+        <div className={styles.scroll}>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'rgba(255,255,255,0.4)' }}>불러오는 중...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -36,13 +85,13 @@ export default function RoomSettingsPage() {
       {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <NavHeader
         title="방 설정"
-        right={IS_OWNER ? (
+        right={isOwner ? (
           <button
             className={[styles.saveBtn, dirty ? styles.saveBtnActive : ''].join(' ')}
             onClick={handleSave}
-            disabled={!dirty}
+            disabled={!dirty || saving}
           >
-            저장
+            {saving ? '저장 중...' : '저장'}
           </button>
         ) : undefined}
       />
@@ -53,11 +102,11 @@ export default function RoomSettingsPage() {
           <div className={styles.roomThumb}>
             <span className={styles.roomThumbEmoji}>🌅</span>
           </div>
-          {IS_OWNER ? (
+          {isOwner ? (
             <input
               className={styles.roomNameInput}
               value={roomName}
-              onChange={(e) => handleNameChange(e.target.value)}
+              onChange={(e) => { setRoomName(e.target.value); setDirty(true) }}
               maxLength={20}
               placeholder="방 이름"
             />
@@ -72,7 +121,7 @@ export default function RoomSettingsPage() {
         <div className={styles.sectionGroup}>
           <div className={styles.sectionHeader}>
             <span className={styles.sectionTitle}>방 설정</span>
-            <span className={styles.sectionMeta}>현재 5명 참여 중</span>
+            <span className={styles.sectionMeta}>{memberCount}명 참여 중</span>
           </div>
 
           <div className={styles.settingCard}>
@@ -80,7 +129,7 @@ export default function RoomSettingsPage() {
             <div className={styles.settingRow}>
               <div className={styles.settingIcon}><span>⚡</span></div>
               <span className={styles.settingLabel}>일일 미션 횟수</span>
-              {IS_OWNER ? (
+              {isOwner ? (
                 <div className={styles.stepper}>
                   <button
                     className={styles.stepBtn}
@@ -102,10 +151,27 @@ export default function RoomSettingsPage() {
             <div className={styles.rowDivider} />
 
             {/* 미션 알림 시간대 */}
-            <div className={styles.settingRow}>
-              <div className={styles.settingIconGray}><span>●</span></div>
+            <div className={styles.settingRowTime}>
               <span className={styles.settingLabel}>미션 알림 시간대</span>
-              <span className={styles.settingValue}>10:00–22:00</span>
+              {isOwner ? (
+                <div className={styles.timeInputRow}>
+                  <input
+                    type="time"
+                    className={styles.timeInput}
+                    value={missionStartTime}
+                    onChange={(e) => { setMissionStartTime(e.target.value); setDirty(true) }}
+                  />
+                  <span className={styles.timeDash}>–</span>
+                  <input
+                    type="time"
+                    className={styles.timeInput}
+                    value={missionEndTime}
+                    onChange={(e) => { setMissionEndTime(e.target.value); setDirty(true) }}
+                  />
+                </div>
+              ) : (
+                <span className={styles.settingValue}>{missionStartTime}–{missionEndTime}</span>
+              )}
             </div>
           </div>
         </div>
@@ -113,7 +179,7 @@ export default function RoomSettingsPage() {
         {/* ── 멤버 관리 ────────────────────────────────────────────────────────── */}
         <button
           className={styles.memberBtn}
-          onClick={() => navigate(ROUTES.ROOM_MEMBERS(Number(roomId)))}
+          onClick={() => navigate(ROUTES.ROOM_MEMBERS(id))}
         >
           <span className={styles.memberBtnIcon}>🪬</span>
           <span className={styles.memberBtnLabel}>멤버 관리</span>
@@ -121,7 +187,7 @@ export default function RoomSettingsPage() {
         </button>
 
         {/* ── 방 삭제 (방장 전용) ──────────────────────────────────────────────── */}
-        {IS_OWNER && (
+        {isOwner && (
           <button className={styles.deleteRoomBtn} onClick={handleDeleteRoom}>
             🗑️ 방 삭제하기
           </button>
@@ -130,4 +196,3 @@ export default function RoomSettingsPage() {
     </div>
   )
 }
-

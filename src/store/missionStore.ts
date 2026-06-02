@@ -45,7 +45,7 @@ export const useMissionStore = create<MissionStore>()((set, get) => ({
         active: {
           ...s.active,
           participations: s.active.participations.map((p) =>
-            p.user.id === updated.user.id ? updated : p,
+            p.user.userId === updated.user.userId ? updated : p,
           ),
         },
       }

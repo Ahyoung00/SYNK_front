@@ -22,7 +22,7 @@ export function ParticipationRow({ participations, myUserId, layout = 'row' }: P
 
       <div className={layout === 'grid' ? styles.grid : styles.row}>
         {participations.map((p) => (
-          <MemberChip key={p.user.id} p={p} isMe={p.user.id === myUserId} />
+          <MemberChip key={p.user.userId} p={p} isMe={p.user.userId === myUserId} />
         ))}
       </div>
     </div>
@@ -35,8 +35,8 @@ function MemberChip({ p, isMe }: { p: MemberParticipation; isMe: boolean }) {
   return (
     <div className={styles.chip}>
       <div className={[styles.avatar, styles[p.state], isMe ? styles.me : ''].join(' ')}>
-        {p.user.profile_image ? (
-          <img src={p.user.profile_image} alt={p.user.name} className={styles.avatarImg} />
+        {p.user.profileImage ? (
+          <img src={p.user.profileImage} alt={p.user.name} className={styles.avatarImg} />
         ) : (
           <span className={styles.initial}>{initial}</span>
         )}
@@ -51,7 +51,7 @@ function MemberChip({ p, isMe }: { p: MemberParticipation; isMe: boolean }) {
       </div>
 
       <span className={styles.name} title={p.user.name}>
-        {isMe ? `${p.user.name}(나)` : p.user.name}
+        {p.user.name}
       </span>
       <span className={styles.stateLabel}>
         {p.state === 'done' ? '완료' : p.state === 'recording' ? '찍는 중' : '대기'}
