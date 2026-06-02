@@ -90,7 +90,33 @@
   flex-direction: column;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(220, 38, 38, 0.5);
+  background: #dc2626;   /* danger: < 1분 */
+  transition: background 0.6s ease, border-color 0.6s ease;
+}
+
+/* 3분 이상: 파란색 */
+.missionCardSafe {
+  background: #1e3a6b;
+  border-color: rgba(59, 130, 246, 0.5);
+}
+.missionCardSafe .missionCardHeader {
+  background: rgba(30, 100, 220, 0.2);
+}
+.missionCardSafe .missionCardTimer {
+  background: rgba(30, 100, 220, 0.1);
+}
+
+/* 1~3분: 초록색 */
+.missionCardWarn {
+  background: #1a3d20;
+  border-color: rgba(34, 197, 94, 0.5);
+}
+.missionCardWarn .missionCardHeader {
+  background: rgba(30, 130, 60, 0.2);
+}
+.missionCardWarn .missionCardTimer {
+  background: rgba(30, 130, 60, 0.1);
 }
 
 /* 다중 미션에서 돌아가기 버튼 */
@@ -108,7 +134,7 @@
 
 .missionCardHeader {
   padding: var(--sp-5) var(--sp-5) var(--sp-4);
-  background: rgba(220, 38, 38, 0.18);
+  background: rgba(0, 0, 0, 0.06);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -118,16 +144,16 @@
 .missionCardRoomBadge {
   font-size: var(--text-base);
   font-weight: 800;
-  color: var(--color-text);
+  color: #fff;
 }
 
 .missionCardSub {
   font-size: var(--text-xs);
-  color: var(--color-text-sub);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .missionCardTimer {
-  background: rgba(220, 38, 38, 0.12);
+  background: rgba(0, 0, 0, 0.04);
   display: flex;
   justify-content: center;
   padding: var(--sp-4) 0 var(--sp-5);
@@ -136,7 +162,7 @@
 .missionCardInfo {
   margin: var(--sp-3) var(--sp-4);
   padding: var(--sp-4) var(--sp-5);
-  background: var(--color-surface);
+  background: rgba(0, 0, 0, 0.35);
   border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
@@ -146,20 +172,20 @@
 .missionCardLabel {
   font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--color-text-sub);
+  color: var(--color-primary);
   letter-spacing: 0.5px;
 }
 
 .missionCardTitle {
   font-size: var(--text-lg);
   font-weight: 800;
-  color: var(--color-text);
+  color: #fff;
   line-height: 1.35;
 }
 
 .missionCardDesc {
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* ── 참여 현황 ───────────────────────────────────────────────────────────── */
@@ -179,13 +205,13 @@
 .missionCardParticipantsLabel {
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--color-text-sub);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .missionCardParticipantsCount {
   font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .missionCardAvatarRow {
@@ -230,7 +256,7 @@
 
 .participantName {
   font-size: 11px;
-  color: var(--color-text-sub);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .participantStatus {
@@ -253,6 +279,22 @@
 .statusWaiting {
   background: var(--color-status-neutral-bg);
   color: var(--color-text-muted);
+}
+
+/* 어두운 미션 카드 위에서는 밝은 색으로 */
+.missionCard .statusDone {
+  background: rgba(74, 222, 128, 0.2);
+  color: #4ade80;
+}
+
+.missionCard .statusRecording {
+  background: rgba(250, 204, 21, 0.2);
+  color: #facc15;
+}
+
+.missionCard .statusWaiting {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
 }
 
 /* ── 참여하기 CTA ─────────────────────────────────────────────────────────── */
@@ -294,6 +336,28 @@
 }
 .missionCardCtaDone:active { opacity: 0.85; }
 
+/* 참여완료 + 재촬영 래퍼 */
+.missionCardDoneWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding: var(--sp-1) var(--sp-4) var(--sp-4);
+}
+
+/* 재촬영 버튼 (카드 다크 배경 위의 보조 버튼) */
+.missionCardRetake {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-lg);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  transition: background var(--dur-fast);
+}
+.missionCardRetake:active { background: rgba(255, 255, 255, 0.20); }
+
 /* 만료 후 결과 보기 — 보라 계열 */
 .missionCardCtaResult {
   background: var(--color-primary);
@@ -321,16 +385,19 @@
   align-items: center;
   gap: var(--sp-3);
   padding: var(--sp-4);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   text-align: left;
-  transition: background var(--dur-fast);
+  transition: opacity var(--dur-fast);
 }
 
 .missionSelectCard:active {
-  background: var(--color-surface-2);
+  opacity: 0.8;
 }
+
+/* 다중 선택 카드 위 텍스트는 항상 흰색 계열 */
+.missionSelectRoom  { color: #fff !important; }
+.missionSelectTitle2 { color: rgba(255,255,255,0.65) !important; }
+.missionSelectMeta  { color: rgba(255,255,255,0.5) !important; }
 
 .missionSelectThumb {
   width: 52px;
@@ -510,4 +577,10 @@
   color: var(--color-text-muted);
   padding-left: var(--sp-4);
 }
+
+/* 다크 모드: 미션 정보 박스만 원래 남색으로 복원 */
+:global([data-theme="dark"]) .missionCardInfo {
+  background: #1a1a2e;
+}
+
 

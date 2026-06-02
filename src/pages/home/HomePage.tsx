@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useNavigationType } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useMissionStore } from '@/store/missionStore'
+import { useSettingsStore } from '@/store/settingsStore'
 import { missionApi } from '@/services/api/endpoints'
 import type { ActiveMissionItem, ActiveMissionParticipant, ActiveMissionState } from '@/types'
 import { ROUTES } from '@/constants'
@@ -63,9 +64,18 @@ function formatTimer(seconds: number): string {
 }
 
 function timerColor(seconds: number): string {
-  if (seconds > 180) return '#4ade80'
-  if (seconds > 60)  return '#facc15'
-  return '#f87171'
+  if (seconds > 180) return '#60a5fa'  // 파랑
+  if (seconds > 60)  return '#4ade80'  // 초록
+  return '#f87171'                      // 빨강
+}
+
+function missionCardStateClass(
+  seconds: number,
+  s: { missionCardSafe: string; missionCardWarn: string },
+): string {
+  if (seconds > 180) return s.missionCardSafe
+  if (seconds > 60)  return s.missionCardWarn
+  return ''
 }
 
 // ── 홈 인라인 미션 카드 ────────────────────────────────────────────────────────
@@ -79,15 +89,17 @@ function HomeMissionCard({
   onAllDone,
   onViewWaiting,
   onViewResult,
+  onRetake,
 }: {
   mission: ActiveMissionItem
   myUserId: number | undefined
   onParticipate: () => void
   onBack?: () => void
-  onExpire?: () => void      // 타이머 0이 됐을 때 → "미션 완료 보기" 표시
-  onAllDone?: () => void     // 전원 제출 완료 → 카드 즉시 사라짐
-  onViewWaiting?: () => void // 참여완료 버튼 클릭 → 대기 화면
-  onViewResult?: () => void  // 미션 완료 보기 버튼 클릭 → 결과 화면
+  onExpire?: () => void
+  onAllDone?: () => void
+  onViewWaiting?: () => void
+  onViewResult?: () => void
+  onRetake?: () => void
 }) {
   const [secondsLeft, setSecondsLeft] = useState(mission.remainingSeconds)
 
@@ -120,8 +132,10 @@ function HomeMissionCard({
     onExpire()
   }, [isExpired]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  const cardStateClass = missionCardStateClass(secondsLeft, styles)
+
   return (
-    <div className={styles.missionCard}>
+    <div className={[styles.missionCard, cardStateClass].filter(Boolean).join(' ')}>
 
       {/* ── 뒤로가기 (다중 미션 선택에서 온 경우) ──────────────────────── */}
       {onBack && (
@@ -179,12 +193,14 @@ function HomeMissionCard({
           미션 완료 보기 →
         </button>
       ) : iDone ? (
-        <button
-          className={[styles.missionCardCta, styles.missionCardCtaDone].join(' ')}
-          onClick={onViewWaiting}
-        >
-          ✓ 참여완료
-        </button>
+        <div className={styles.missionCardDoneWrap}>
+          <button
+            className={[styles.missionCardCta, styles.missionCardCtaDone].join(' ')}
+            onClick={onViewWaiting}
+          >
+            ✓ 참여완료
+          </button>
+        </div>
       ) : (
         <button
           className={styles.missionCardCta}
@@ -224,12 +240,44 @@ function ParticipantItem({ participant: p }: { participant: ActiveMissionPartici
 export default function HomePage() {
   const navigate  = useNavigate()
   const navType   = useNavigationType()
-  const user      = useAuthStore((s) => s.user)
-  const active    = useMissionStore((s) => s.active)
-  const setActive = useMissionStore((s) => s.setActive)
+  const user         = useAuthStore((s) => s.user)
+  const active       = useMissionStore((s) => s.active)
+  const setActive    = useMissionStore((s) => s.setActive)
+  const missionAlert = useSettingsStore((s) => s.missionAlert)
 
   const [activeMissions, setActiveMissions]       = useState<ActiveMissionItem[]>([])
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null)
+
+  // 다중 미션 선택 화면용 실시간 카운트다운 (id → 남은 초)
+  const [localSeconds, setLocalSeconds] = useState<Record<number, number>>({})
+
+  // activeMissions 변경 시 localSeconds 동기화
+  useEffect(() => {
+    setLocalSeconds((prev) => {
+      const next: Record<number, number> = {}
+      activeMissions.forEach((m) => {
+        // 서버 값이 더 정확하면 덮어쓰고, 아니면 기존 로컬 값 유지
+        next[m.id] = prev[m.id] !== undefined
+          ? Math.min(prev[m.id], m.remainingSeconds)
+          : m.remainingSeconds
+      })
+      return next
+    })
+  }, [activeMissions])
+
+  // 1초마다 모든 미션 카운트다운
+  useEffect(() => {
+    const id = setInterval(() => {
+      setLocalSeconds((prev) => {
+        const next: Record<number, number> = {}
+        Object.entries(prev).forEach(([k, v]) => {
+          next[Number(k)] = Math.max(0, v - 1)
+        })
+        return next
+      })
+    }, 1000)
+    return () => clearInterval(id)
+  }, [])
 
   // 로컬에서 타이머가 만료된 미션 ID 집합 — 서버 poll이 지워도 카드를 유지하기 위해
   const expiredIdsRef     = useRef<Set<number>>(new Set())
@@ -238,8 +286,9 @@ export default function HomePage() {
   // 첫 폴링 완료 여부 — 초기 로드 시엔 알림 안 띄움
   const initialLoadDoneRef = useRef(false)
 
-  // 브라우저 알림 표시
+  // 브라우저 알림 표시 (미션 알림 OFF면 건너뜀)
   function showBrowserNotification(title: string, body: string) {
+    if (!missionAlert) return
     if (!('Notification' in window)) return
     if (Notification.permission === 'granted') {
       new Notification(title, { body, icon: '/favicon.ico' })
@@ -353,6 +402,10 @@ export default function HomePage() {
                 setActive(toMissionState(m))
                 navigate(ROUTES.MISSION_WAITING(m.roomId))
               }}
+              onRetake={() => {
+                setActive(toMissionState(m))
+                navigate(ROUTES.MISSION_CAMERA(m.roomId))
+              }}
               onViewResult={() => {
                 // 결과 화면으로 이동 — 더 이상 카드 유지 불필요
                 expiredIdsRef.current.delete(m.id)
@@ -369,34 +422,46 @@ export default function HomePage() {
         {activeMissions.length > 1 && selectedMissionId === null && (
           <div className={styles.missionSelectSection}>
             <p className={styles.missionSelectTitle}>⚡ 참여할 방을 선택하세요</p>
-            {activeMissions.map((m) => (
-              <button
-                key={m.id}
-                className={styles.missionSelectCard}
-                onClick={() => setSelectedMissionId(m.id)}
-              >
-                <div className={styles.missionSelectThumb}>
-                  {m.roomThumbnail
-                    ? <img src={m.roomThumbnail} alt={m.roomName} className={styles.missionSelectThumbImg} />
-                    : <span className={styles.missionSelectThumbFallback}>🏠</span>
-                  }
-                </div>
-                <div className={styles.missionSelectInfo}>
-                  <span className={styles.missionSelectRoom}>{m.roomName}</span>
-                  <span className={styles.missionSelectTitle2}>{m.title}</span>
-                  <span className={styles.missionSelectMeta}>
-                    {m.submittedCount}/{m.totalMembers}명 완료
-                  </span>
-                </div>
-                <span
-                  className={styles.missionSelectTimer}
-                  style={{ color: timerColor(m.remainingSeconds) }}
+            {activeMissions.map((m) => {
+              const secs = localSeconds[m.id] ?? m.remainingSeconds
+              const cardBg =
+                secs > 180 ? '#1e3a6b'
+                : secs > 60 ? '#1a3d20'
+                : '#7a1a1a'
+              const cardBorder =
+                secs > 180 ? 'rgba(59,130,246,0.5)'
+                : secs > 60 ? 'rgba(34,197,94,0.5)'
+                : 'rgba(220,38,38,0.5)'
+              return (
+                <button
+                  key={m.id}
+                  className={styles.missionSelectCard}
+                  style={{ background: cardBg, border: `1px solid ${cardBorder}` }}
+                  onClick={() => setSelectedMissionId(m.id)}
                 >
-                  {formatTimer(m.remainingSeconds)}
-                </span>
-                <span className={styles.alertArrow}>›</span>
-              </button>
-            ))}
+                  <div className={styles.missionSelectThumb}>
+                    {m.roomThumbnail
+                      ? <img src={m.roomThumbnail} alt={m.roomName} className={styles.missionSelectThumbImg} />
+                      : <span className={styles.missionSelectThumbFallback}>🏠</span>
+                    }
+                  </div>
+                  <div className={styles.missionSelectInfo}>
+                    <span className={styles.missionSelectRoom}>{m.roomName}</span>
+                    <span className={styles.missionSelectTitle2}>{m.title}</span>
+                    <span className={styles.missionSelectMeta}>
+                      {m.submittedCount}/{m.totalMembers}명 완료
+                    </span>
+                  </div>
+                  <span
+                    className={styles.missionSelectTimer}
+                    style={{ color: timerColor(secs) }}
+                  >
+                    {formatTimer(secs)}
+                  </span>
+                  <span className={styles.alertArrow}>›</span>
+                </button>
+              )
+            })}
           </div>
         )}
 
