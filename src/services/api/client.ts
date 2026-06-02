@@ -40,6 +40,7 @@ async function request<T>(
 
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers ?? {}),
   }
@@ -106,7 +107,10 @@ export const api = {
 
     const res = await fetch(`${API_BASE_URL}${path}`, {
       method: 'POST',
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      headers: {
+        'ngrok-skip-browser-warning': 'true',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
       body: form,
     })
 

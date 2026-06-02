@@ -48,7 +48,6 @@ export default defineConfig({
   },
 
   server: {
-    host: '127.0.0.1',
     // Proxy Spring Boot REST / WebSocket during local dev
     proxy: {
       '/api': {

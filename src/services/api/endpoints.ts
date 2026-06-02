@@ -36,13 +36,13 @@ import type {
 // Response data: { token, isNewUser, userId, name, profileImage }
 
 export const authApi = {
-  /** 카카오 OAuth 액세스 토큰으로 로그인/회원가입 */
-  kakaoLogin: (accessToken: string) =>
-    api.post<LoginResponse>('/auth/kakao', { accessToken }),
+  /** 카카오 OAuth authorization code로 로그인/회원가입 */
+  kakaoLogin: (code: string, redirectUri: string) =>
+    api.post<LoginResponse>('/auth/kakao', { code, redirectUri }),
 
-  /** Google OAuth 액세스 토큰으로 로그인/회원가입 */
-  googleLogin: (accessToken: string) =>
-    api.post<LoginResponse>('/auth/google', { accessToken }),
+  /** Google OAuth authorization code로 로그인/회원가입 */
+  googleLogin: (code: string, redirectUri: string) =>
+    api.post<LoginResponse>('/auth/google', { code, redirectUri }),
 
   logout: () => api.post<void>('/auth/logout'),
 }
