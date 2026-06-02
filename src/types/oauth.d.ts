@@ -8,6 +8,12 @@ interface Window {
           scope:     string
           callback:  (response: { access_token?: string; error?: string }) => void
         }) => { requestAccessToken: () => void }
+        initCodeClient: (config: {
+          client_id:    string
+          scope:        string
+          redirect_uri: string
+          callback:     (response: { code?: string; error?: string }) => void
+        }) => { requestCode: () => void }
       }
     }
   }

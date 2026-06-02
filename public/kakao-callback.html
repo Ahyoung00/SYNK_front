@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+  <head><meta charset="UTF-8" /></head>
+  <body>
+    <script>
+      // 카카오 OAuth authorization code → query string에서 code 추출
+      const params = new URLSearchParams(window.location.search)
+      const code   = params.get('code')
+      const error  = params.get('error')
+
+      if (code) {
+        window.opener?.postMessage(
+          { type: 'kakao_oauth', code },
+          window.location.origin,
+        )
+      } else {
+        window.opener?.postMessage(
+          { type: 'kakao_oauth', error: error ?? 'unknown' },
+          window.location.origin,
+        )
+      }
+      window.close()
+    </script>
+  </body>
+</html>

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
@@ -23,26 +23,37 @@ export default function LoginPage() {
   const [loading, setLoading]       = useState<number | null>(null)
   const [oauthLoading, setOauthLoading] = useState<'kakao' | 'google' | null>(null)
   const [oauthError,   setOauthError]   = useState<string | null>(null)
-  const googleClientRef = useRef<{ requestAccessToken: () => void } | null>(null)
 
-  // ── Google Identity Services 초기화 ──────────────────────────────────────
-  useEffect(() => {
-    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
-    if (googleClientId && window.google?.accounts?.oauth2) {
-      googleClientRef.current = window.google.accounts.oauth2.initTokenClient({
-        client_id: googleClientId,
-        scope: 'email profile openid',
-        callback: async (response) => {
-          if (!response.access_token) {
-            setOauthError('Google 로그인에 실패했어요.')
-            setOauthLoading(null)
-            return
-          }
-          await handleOAuthSuccess('google', response.access_token)
-        },
-      })
+  // ── 카카오 code 처리 ──────────────────────────────────────────────────────
+  async function handleKakaoCodeSuccess(code: string, redirectUri: string) {
+    try {
+      const loginRes = await authApi.kakaoLogin(code, redirectUri)
+      const { token } = loginRes.data
+
+      const tempUser: User = {
+        userId: loginRes.data.userId,
+        name: loginRes.data.name,
+        profileImage: loginRes.data.profileImage,
+        missionNotification: true,
+        resultNotification: true,
+        highlightNotification: true,
+      }
+      setAuth(tempUser, token, '')
+
+      try {
+        const meRes = await userApi.getMe()
+        setAuth(meRes.data, token, '')
+      } catch { /* loginRes 데이터로 진행 */ }
+
+      useChatStore.getState().clearAll()
+      navigate(ROUTES.HOME, { replace: true })
+    } catch (e) {
+      console.error(e)
+      setOauthError('카카오 로그인에 실패했어요. 다시 시도해주세요.')
+    } finally {
+      setOauthLoading(null)
     }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }
 
   // ── OAuth 공통 처리 ────────────────────────────────────────────────────────
   async function handleOAuthSuccess(provider: 'kakao' | 'google', accessToken: string) {
@@ -98,7 +109,7 @@ export default function LoginPage() {
     const url = `https://kauth.kakao.com/oauth/authorize` +
       `?client_id=${kakaoKey}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&response_type=token`
+      `&response_type=code`
 
     const popup = window.open(url, 'kakaoLogin', 'width=450,height=600,scrollbars=yes')
 
@@ -112,7 +123,7 @@ export default function LoginPage() {
         setOauthLoading(null)
         return
       }
-      handleOAuthSuccess('kakao', e.data.token)
+      handleKakaoCodeSuccess(e.data.code, redirectUri)
     }
     window.addEventListener('message', onMessage)
 
@@ -126,19 +137,76 @@ export default function LoginPage() {
     }, 500)
   }
 
-  // ── 구글 로그인 ────────────────────────────────────────────────────────────
+  // ── 구글 로그인 (OAuth 팝업 + postMessage) ────────────────────────────────
   function handleGoogleLogin() {
     if (oauthLoading) return
-    setOauthLoading('google')
-    setOauthError(null)
-
-    if (!googleClientRef.current) {
-      setOauthError('Google SDK가 로드되지 않았어요.')
-      setOauthLoading(null)
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+    if (!googleClientId) {
+      setOauthError('Google 클라이언트 ID가 설정되지 않았어요. (.env 확인)')
       return
     }
 
-    googleClientRef.current.requestAccessToken()
+    setOauthLoading('google')
+    setOauthError(null)
+
+    const redirectUri = `${window.location.origin}/google-callback.html`
+    const url = `https://accounts.google.com/o/oauth2/v2/auth` +
+      `?client_id=${googleClientId}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code` +
+      `&scope=${encodeURIComponent('email profile openid')}`
+
+    const popup = window.open(url, 'googleLogin', 'width=450,height=600,scrollbars=yes')
+
+    function onMessage(e: MessageEvent) {
+      if (e.origin !== window.location.origin) return
+      if (e.data?.type !== 'google_oauth') return
+      window.removeEventListener('message', onMessage)
+
+      if (e.data.error) {
+        setOauthError('Google 로그인에 실패했어요.')
+        setOauthLoading(null)
+        return
+      }
+      handleGoogleCodeSuccess(e.data.code, redirectUri)
+    }
+    window.addEventListener('message', onMessage)
+
+    const timer = setInterval(() => {
+      if (popup?.closed) {
+        clearInterval(timer)
+        window.removeEventListener('message', onMessage)
+        setOauthLoading((v) => v === 'google' ? null : v)
+      }
+    }, 500)
+  }
+
+  // ── 구글 code 처리 ──────────────────────────────────────────────────────
+  async function handleGoogleCodeSuccess(code: string, redirectUri: string) {
+    try {
+      const loginRes = await authApi.googleLogin(code, redirectUri)
+      const { token } = loginRes.data
+      const tempUser: User = {
+        userId: loginRes.data.userId,
+        name: loginRes.data.name,
+        profileImage: loginRes.data.profileImage,
+        missionNotification: true,
+        resultNotification: true,
+        highlightNotification: true,
+      }
+      setAuth(tempUser, token, '')
+      try {
+        const meRes = await userApi.getMe()
+        setAuth(meRes.data, token, '')
+      } catch { /* loginRes 데이터로 진행 */ }
+      useChatStore.getState().clearAll()
+      navigate(ROUTES.HOME, { replace: true })
+    } catch (e) {
+      console.error(e)
+      setOauthError('Google 로그인에 실패했어요. 다시 시도해주세요.')
+    } finally {
+      setOauthLoading(null)
+    }
   }
   async function handleDevLogin(userId: number) {
     if (loading !== null) return
