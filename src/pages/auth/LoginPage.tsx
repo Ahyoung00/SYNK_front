@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
@@ -23,6 +23,10 @@ export default function LoginPage() {
   const [loading, setLoading]       = useState<number | null>(null)
   const [oauthLoading, setOauthLoading] = useState<'kakao' | 'google' | null>(null)
   const [oauthError,   setOauthError]   = useState<string | null>(null)
+  const cleanupRef = useRef<(() => void) | null>(null)
+
+  // 언마운트 시 남은 리스너/타이머 정리
+  useEffect(() => () => { cleanupRef.current?.() }, [])
 
   // ── 카카오 code 처리 ──────────────────────────────────────────────────────
   async function handleKakaoCodeSuccess(code: string, redirectUri: string) {
@@ -116,7 +120,8 @@ export default function LoginPage() {
       `?client_id=${googleClientId}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code` +
-      `&scope=${encodeURIComponent('email profile openid')}`
+      `&scope=${encodeURIComponent('email profile openid')}` +
+      `&prompt=select_account`
 
     const popup = window.open(url, 'googleLogin', 'width=450,height=600,scrollbars=yes')
 
@@ -138,9 +143,15 @@ export default function LoginPage() {
       if (popup?.closed) {
         clearInterval(timer)
         window.removeEventListener('message', onMessage)
+        cleanupRef.current = null
         setOauthLoading((v) => v === 'google' ? null : v)
       }
     }, 500)
+
+    cleanupRef.current = () => {
+      clearInterval(timer)
+      window.removeEventListener('message', onMessage)
+    }
   }
 
   // ── 구글 code 처리 ──────────────────────────────────────────────────────
@@ -210,7 +221,7 @@ export default function LoginPage() {
     <div style={{
       display: 'flex', flexDirection: 'column', alignItems: 'center',
       justifyContent: 'center', height: '100dvh',
-      background: 'var(--color-bg)', color: 'var(--color-text)', gap: 16, padding: '0 24px',
+      background: 'var(--color-login-bg, #e8e8e8)', color: 'var(--color-text)', gap: 16, padding: '0 24px',
     }}>
       <h1 style={{ fontSize: 40, fontWeight: 900, letterSpacing: '-1px' }}>SYNK</h1>
       <p style={{ color: 'var(--color-text-sub)', marginBottom: 32 }}>지금 이 순간을 함께</p>

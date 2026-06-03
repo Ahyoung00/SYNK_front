@@ -48,7 +48,7 @@ function toMissionState(item: ActiveMissionItem): ActiveMissionState {
       created_at:          null,
     },
     seconds_left:   item.remainingSeconds,
-    participations: item.participants.map((p) => ({
+    participations: (item.participants ?? []).map((p) => ({
       user:  { userId: p.userId, name: p.name, profileImage: p.profileImage },
       state: toState(p.status),
     })),
@@ -113,10 +113,11 @@ function HomeMissionCard({
     return () => clearInterval(id)
   }, [mission.id, mission.remainingSeconds])
 
-  const doneCount = mission.participants.filter((p) => p.status === '완료').length
+  const participants = mission.participants ?? []
+  const doneCount = participants.filter((p) => p.status === '완료').length
   const allDone   = doneCount >= mission.totalMembers  // 전원 제출 완료
   const isExpired = secondsLeft <= 0                   // 타이머 만료 (전원 완료 별도 처리)
-  const iDone     = mission.participants.some((p) => p.userId === myUserId && p.status === '완료')
+  const iDone     = participants.some((p) => p.userId === myUserId && p.status === '완료')
 
   // 전원 제출 완료 → 카드 즉시 사라짐 (앨범에 자동 저장됨)
   useEffect(() => {
@@ -171,7 +172,7 @@ function HomeMissionCard({
           </span>
         </div>
         <div className={styles.missionCardAvatarRow}>
-          {mission.participants.map((p) => (
+          {participants.map((p) => (
             <ParticipantItem key={p.userId} participant={p} />
           ))}
         </div>
