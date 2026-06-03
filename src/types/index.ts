@@ -103,6 +103,15 @@ export interface RoomMember {
   user?: Pick<User, 'userId' | 'name' | 'profileImage'>
 }
 
+/** GET /rooms/{roomId}/members 응답 내 개별 멤버 */
+export interface RoomMemberItem {
+  userId: number
+  name: string
+  profileImage: string | null
+  isOwner: boolean
+  joinedAt: string | null
+}
+
 // ── Mission ───────────────────────────────────────────────────────────────────
 
 export interface MissionTemplate {

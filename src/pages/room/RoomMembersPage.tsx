@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { roomApi } from '@/services/api/endpoints'
-import type { RoomMember } from '@/types'
+import type { RoomMemberItem } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './RoomMembersPage.module.css'
 
@@ -11,7 +11,7 @@ export default function RoomMembersPage() {
   const id = Number(roomId)
   const me = useAuthStore((s) => s.user)
 
-  const [members, setMembers] = useState<RoomMember[]>([])
+  const [members, setMembers] = useState<RoomMemberItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -23,15 +23,13 @@ export default function RoomMembersPage() {
       .finally(() => setIsLoading(false))
   }, [id])
 
-  // 내가 방장인지 확인
-  const myMember = members.find((m) => m.user_id === me?.userId)
-  const isOwner  = myMember?.is_owner ?? false
+  const isOwner = members.find((m) => m.userId === me?.userId)?.isOwner ?? false
 
-  function handleKick(memberId: number, name: string) {
+  function handleKick(userId: number, name: string) {
     if (!window.confirm(`${name}님을 강퇴하시겠어요?`)) return
     roomApi
-      .kickMember(id, memberId)
-      .then(() => setMembers((prev) => prev.filter((m) => m.user_id !== memberId)))
+      .kickMember(id, userId)
+      .then(() => setMembers((prev) => prev.filter((m) => m.userId !== userId)))
       .catch(console.error)
   }
 
@@ -45,31 +43,28 @@ export default function RoomMembersPage() {
         {isLoading && (
           <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>불러오는 중...</p>
         )}
-        {members.map((m) => {
-          const name = m.user?.name ?? '알 수 없음'
-          return (
-            <div key={m.id} className={styles.memberRow}>
-              <div className={styles.memberInfo}>
-                <div className={styles.memberAvatar}>
-                  {m.user?.profileImage
-                    ? <img src={m.user.profileImage} alt={name} className={styles.memberAvatarImg} />
-                    : <span className={styles.memberAvatarInitial}>👤</span>
-                  }
-                </div>
-                <span className={styles.memberName}>{name}</span>
+        {members.map((m) => (
+          <div key={m.userId} className={styles.memberRow}>
+            <div className={styles.memberInfo}>
+              <div className={styles.memberAvatar}>
+                {m.profileImage
+                  ? <img src={m.profileImage} alt={m.name} className={styles.memberAvatarImg} />
+                  : <span className={styles.memberAvatarInitial}>👤</span>
+                }
               </div>
-              {m.is_owner && <span className={styles.ownerBadge}>방장</span>}
-              {isOwner && !m.is_owner && (
-                <button
-                  className={styles.kickBtn}
-                  onClick={() => handleKick(m.user_id, name)}
-                >
-                  강퇴
-                </button>
-              )}
+              <span className={styles.memberName}>{m.name}</span>
             </div>
-          )
-        })}
+            {m.isOwner && <span className={styles.ownerBadge}>방장</span>}
+            {isOwner && !m.isOwner && (
+              <button
+                className={styles.kickBtn}
+                onClick={() => handleKick(m.userId, m.name)}
+              >
+                강퇴
+              </button>
+            )}
+          </div>
+        ))}
       </div>
     </div>
   )

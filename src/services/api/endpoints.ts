@@ -4,6 +4,7 @@ import type {
   RoomDetail,
   RoomsMyResponse,
   RoomMember,
+  RoomMemberItem,
   Submission,
   AlbumItem,
   SynklogDetailResponse,
@@ -133,8 +134,7 @@ export const roomApi = {
   getInvite: (roomId: number) =>
     api.get<{ roomId: number; roomName: string; code: string; inviteUrl: string; thumbnail: string | null }>(`/rooms/${roomId}/invite`),
 
-  /** 스펙 미확정 */
-  getMembers: (roomId: number) => api.get<RoomMember[]>(`/rooms/${roomId}/members`),
+  getMembers: (roomId: number) => api.get<RoomMemberItem[]>(`/rooms/${roomId}/members`),
 
   /** 스펙 미확정 */
   kickMember: (roomId: number, userId: number) =>
