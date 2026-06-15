@@ -3,7 +3,6 @@ import type {
   User,
   RoomDetail,
   RoomsMyResponse,
-  RoomMember,
   RoomMemberItem,
   Submission,
   AlbumItem,
