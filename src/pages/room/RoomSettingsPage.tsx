@@ -18,6 +18,7 @@ export default function RoomSettingsPage() {
   const [missionStartTime, setMissionStartTime] = useState('10:00')
   const [missionEndTime,   setMissionEndTime]   = useState('22:00')
   const [memberCount, setMemberCount]         = useState(0)
+  const [maxMembers, setMaxMembers]           = useState(10)
   const [isOwner, setIsOwner]                 = useState(false)
   const [thumbUrl, setThumbUrl]               = useState<string | null>(null)
   const [dirty, setDirty]                     = useState(false)
@@ -48,6 +49,7 @@ export default function RoomSettingsPage() {
         setMissionStartTime(room.missionStartTime?.slice(0, 5) ?? '10:00')
         setMissionEndTime(room.missionEndTime?.slice(0, 5)     ?? '22:00')
         setMemberCount(room.currentMembers)
+        setMaxMembers(room.maxMembers)
         setIsOwner(room.ownerId === myUser?.userId)
         setThumbUrl(room.thumbnail ?? null)
       })
@@ -64,6 +66,7 @@ export default function RoomSettingsPage() {
         dailyMissionCount: missionCount,
         missionStartTime,
         missionEndTime,
+        maxMembers,
         ...(thumbUrl ? { thumbnail: thumbUrl } : {}),
       })
       setDirty(false)
