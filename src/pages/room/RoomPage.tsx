@@ -28,10 +28,8 @@ export default function RoomPage() {
         setRoom(roomRes.data)
         setAlbums(albumsRes.data)
       })
-      .catch((e: { response?: { status?: number } }) => {
-        if (e?.response?.status === 403 || e?.response?.status === 401) {
-          setNotMember(true)
-        }
+      .catch(() => {
+        setNotMember(true)
       })
       .finally(() => setIsLoading(false))
   }, [id])
