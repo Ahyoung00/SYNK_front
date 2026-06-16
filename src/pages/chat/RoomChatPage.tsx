@@ -3,7 +3,9 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
 import { chatApi } from '@/services/api/endpoints'
+import { wsClient } from '@/services/websocket/client'
 import { ROUTES } from '@/constants'
+import type { WsEvent } from '@/types'
 import { MOCK_CHAT_MESSAGES, formatDateLabel, formatTime } from '@/utils/mockChat'
 import type { RoomChatMessage, ChatReactionSummary } from '@/types'
 import styles from './RoomChatPage.module.css'
@@ -87,7 +89,7 @@ export default function RoomChatPage() {
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const loaded         = useRef(false)
 
-  // ── 메시지 목록 API 조회 ──────────────────────────────────────────────────
+  // ── 메시지 목록 API 조회 + WebSocket 연결 ────────────────────────────────
   useEffect(() => {
     if (loaded.current) return
     loaded.current = true
@@ -99,13 +101,29 @@ export default function RoomChatPage() {
         setMissionDone(res.data.todayMissionCompleted)
         const msgs = res.data.messages.length > 0
           ? res.data.messages
-          : MOCK_CHAT_MESSAGES    // API 메시지 없으면 mock 시드
-        // setMessages로 교체 — 유저 전환 후에도 이전 캐시 없이 정확히 덮어씀
+          : MOCK_CHAT_MESSAGES
         setMessages(numRoomId, msgs)
       })
       .catch(() => {
         if (messages.length === 0) setMessages(numRoomId, MOCK_CHAT_MESSAGES)
       })
+
+    // WebSocket 연결
+    wsClient.connect(numRoomId)
+
+    // 다른 사용자의 메시지 수신
+    const unsubChat = wsClient.on<RoomChatMessage>('CHAT_MESSAGE', (event: WsEvent<RoomChatMessage>) => {
+      const incoming = event.payload
+      // 내가 보낸 메시지는 optimistic update로 이미 추가됐으므로 중복 방지
+      if (incoming.myMessage || incoming.isMyMessage) return
+      appendMessage(numRoomId, incoming)
+    })
+
+    return () => {
+      unsubChat()
+      wsClient.disconnect()
+      loaded.current = false
+    }
   }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 초기 스크롤 (즉시) ────────────────────────────────────────────────────
