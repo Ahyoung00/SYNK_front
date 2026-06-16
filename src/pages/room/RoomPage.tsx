@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { roomApi, albumApi, debugApi } from '@/services/api/endpoints'
 import type { RoomDetail, AlbumItem } from '@/types'
@@ -7,29 +7,49 @@ import NavHeader from '@/components/layout/NavHeader'
 import styles from './RoomPage.module.css'
 
 export default function RoomPage() {
-  const { roomId } = useParams<{ roomId: string }>()
-  const navigate   = useNavigate()
-  const id = Number(roomId)
+  const { roomId }       = useParams<{ roomId: string }>()
+  const navigate         = useNavigate()
+  const [searchParams]   = useSearchParams()
+  const id               = Number(roomId)
+  const inviteCode       = searchParams.get('code')
 
   const [room, setRoom]               = useState<RoomDetail | null>(null)
   const [albums, setAlbums]           = useState<AlbumItem[]>([])
   const [codeCopied, setCodeCopied]   = useState(false)
   const [isLoading, setIsLoading]     = useState(true)
   const [triggering, setTriggering]   = useState(false)
+  const [notMember, setNotMember]     = useState(false)
+  const [joining, setJoining]         = useState(false)
 
   useEffect(() => {
     if (!id) return
     Promise.all([
-      roomApi.getRoom(id),   // members 포함
+      roomApi.getRoom(id),
       albumApi.getAlbums(id),
     ])
       .then(([roomRes, albumsRes]) => {
         setRoom(roomRes.data)
         setAlbums(albumsRes.data)
       })
-      .catch(console.error)
+      .catch((e: { response?: { status?: number } }) => {
+        if (e?.response?.status === 403 || e?.response?.status === 401) {
+          setNotMember(true)
+        }
+      })
       .finally(() => setIsLoading(false))
   }, [id])
+
+  async function handleJoinFromRoom() {
+    const code = inviteCode
+    if (!code) return
+    setJoining(true)
+    try {
+      await roomApi.joinRoom(code)
+      window.location.href = `/room/${id}`
+    } catch {
+      setJoining(false)
+    }
+  }
 
   function copyCode() {
     if (!room) return
@@ -65,6 +85,36 @@ export default function RoomPage() {
         <NavHeader title="방" onBack={() => navigate(ROUTES.ROOMS)} />
         <div className={styles.scroll}>
           <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>불러오는 중...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (notMember) {
+    return (
+      <div className={styles.page}>
+        <NavHeader title="방 참여" onBack={() => navigate(ROUTES.ROOMS)} />
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 20, padding: '40px 24px' }}>
+          <span style={{ fontSize: 56 }}>🔗</span>
+          <p style={{ fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-text)', textAlign: 'center' }}>초대받은 방이에요</p>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', textAlign: 'center' }}>아직 이 방의 멤버가 아니에요.<br/>참여하시겠어요?</p>
+          {inviteCode ? (
+            <button
+              onClick={handleJoinFromRoom}
+              disabled={joining}
+              style={{ width: '100%', maxWidth: 320, padding: '14px', background: 'var(--color-primary)', borderRadius: 'var(--radius-lg)', fontSize: 'var(--text-base)', fontWeight: 700, color: '#fff', opacity: joining ? 0.6 : 1 }}
+            >
+              {joining ? '참여 중...' : '참여하기'}
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate(ROUTES.ROOM_JOIN)}
+              style={{ width: '100%', maxWidth: 320, padding: '14px', background: 'var(--color-primary)', borderRadius: 'var(--radius-lg)', fontSize: 'var(--text-base)', fontWeight: 700, color: '#fff' }}
+            >
+              코드로 참여하기
+            </button>
+          )}
+          <button onClick={() => navigate(ROUTES.ROOMS)} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>취소</button>
         </div>
       </div>
     )
