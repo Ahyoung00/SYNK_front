@@ -505,6 +505,7 @@ export interface RoomUpdateRequest {
   missionStartTime?: string
   /** HH:mm e.g. "22:00" */
   missionEndTime?: string
+  maxMembers?: number
 }
 
 /**
