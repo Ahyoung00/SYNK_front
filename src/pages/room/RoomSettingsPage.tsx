@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
-import { roomApi } from '@/services/api/endpoints'
+import { roomApi, uploadApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import NavHeader from '@/components/layout/NavHeader'
 import TimePicker from '@/components/ui/TimePicker'
@@ -21,6 +21,7 @@ export default function RoomSettingsPage() {
   const [maxMembers, setMaxMembers]           = useState(10)
   const [isOwner, setIsOwner]                 = useState(false)
   const [thumbUrl, setThumbUrl]               = useState<string | null>(null)
+  const [newThumbFile, setNewThumbFile]       = useState<File | null>(null)
   const [dirty, setDirty]                     = useState(false)
   const [saving, setSaving]                   = useState(false)
   const [isLoading, setIsLoading]             = useState(true)
@@ -35,6 +36,7 @@ export default function RoomSettingsPage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+    setNewThumbFile(file)
     setThumbUrl(URL.createObjectURL(file))
     setDirty(true)
   }
@@ -61,13 +63,24 @@ export default function RoomSettingsPage() {
     if (!dirty || saving) return
     setSaving(true)
     try {
+      let thumbnailUrl: string | undefined
+      if (newThumbFile) {
+        const { presignedUrl, fileUrl } = await uploadApi.getPresignedUrl(newThumbFile.name, 'room')
+        await fetch(presignedUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': newThumbFile.type || 'image/jpeg' },
+          body: newThumbFile,
+        })
+        thumbnailUrl = fileUrl
+        setThumbUrl(fileUrl)
+      }
       await roomApi.updateRoom(id, {
         name:              roomName,
         dailyMissionCount: missionCount,
         missionStartTime,
         missionEndTime,
         maxMembers,
-        ...(thumbUrl ? { thumbnail: thumbUrl } : {}),
+        ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
       })
       setDirty(false)
       navigate(-1)

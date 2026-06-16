@@ -307,7 +307,7 @@ export const notificationApi = {
 // GET /upload/presigned-url?filename=&type= — S3 Presigned URL 발급
 
 export const uploadApi = {
-  getPresignedUrl: async (filename: string, type: 'profile' | 'video' = 'profile') => {
+  getPresignedUrl: async (filename: string, type: 'profile' | 'room' | 'video' = 'profile') => {
     const res = await api.get<{ presignedUrl: string; fileUrl: string }>(
       `/upload/presigned-url?filename=${encodeURIComponent(filename)}&type=${type}`,
     )

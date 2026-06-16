@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
-import { roomApi } from '@/services/api/endpoints'
+import { roomApi, uploadApi } from '@/services/api/endpoints'
 import NavHeader from '@/components/layout/NavHeader'
 import TimePicker from '@/components/ui/TimePicker'
 import styles from './CreateRoomPage.module.css'
@@ -17,6 +17,7 @@ export default function CreateRoomPage() {
   const [isLoading, setIsLoading]         = useState(false)
   const [error, setError]                 = useState<string | null>(null)
   const [thumbUrl, setThumbUrl]           = useState<string | null>(null)
+  const [thumbFile, setThumbFile]         = useState<File | null>(null)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -27,8 +28,8 @@ export default function CreateRoomPage() {
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
-    const url = URL.createObjectURL(file)
-    setThumbUrl(url)
+    setThumbFile(file)
+    setThumbUrl(URL.createObjectURL(file))
   }
 
   const canCreate = name.trim().length > 0 && !isLoading
@@ -45,8 +46,20 @@ export default function CreateRoomPage() {
         missionStartTime,
         missionEndTime,
       })
-      // res.data.roomId 로 생성된 방 페이지 이동
-      navigate(ROUTES.ROOM_CREATED(res.data.roomId), { replace: true })
+      const roomId = res.data.roomId
+
+      // 썸네일 선택한 경우 S3 업로드 후 방 썸네일 설정
+      if (thumbFile) {
+        const { presignedUrl, fileUrl } = await uploadApi.getPresignedUrl(thumbFile.name, 'room')
+        await fetch(presignedUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': thumbFile.type || 'image/jpeg' },
+          body: thumbFile,
+        })
+        await roomApi.updateRoom(roomId, { thumbnail: fileUrl })
+      }
+
+      navigate(ROUTES.ROOM_CREATED(roomId), { replace: true })
     } catch (err) {
       console.error(err)
       setError('방 생성에 실패했어요. 다시 시도해주세요.')
