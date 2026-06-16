@@ -108,20 +108,38 @@ export default function RoomChatPage() {
         if (messages.length === 0) setMessages(numRoomId, MOCK_CHAT_MESSAGES)
       })
 
-    // WebSocket 연결
+    // WebSocket 연결 (실시간 수신 시도)
     wsClient.connect(numRoomId)
-
-    // 다른 사용자의 메시지 수신
     const unsubChat = wsClient.on<RoomChatMessage>('CHAT_MESSAGE', (event: WsEvent<RoomChatMessage>) => {
       const incoming = event.payload
-      // 내가 보낸 메시지는 optimistic update로 이미 추가됐으므로 중복 방지
       if (incoming.myMessage || incoming.isMyMessage) return
       appendMessage(numRoomId, incoming)
     })
 
+    // 폴링 폴백 — 3초마다 최신 메시지 확인
+    let lastMaxId = -1
+    const pollInterval = setInterval(() => {
+      chatApi.getMessages(numRoomId).then((res) => {
+        const msgs = res.data.messages
+        if (!msgs.length) return
+        const newMaxId = msgs[msgs.length - 1].messageId
+        if (lastMaxId === -1) { lastMaxId = newMaxId; return }
+        if (newMaxId > lastMaxId) {
+          // 이미 store에 있는 messageId는 제외 (optimistic 중복 방지)
+          const existingIds = new Set(
+            useChatStore.getState().messages[String(numRoomId)]?.map((m) => m.messageId) ?? []
+          )
+          const newMsgs = msgs.filter((m) => m.messageId > lastMaxId && !existingIds.has(m.messageId))
+          newMsgs.forEach((m) => appendMessage(numRoomId, m))
+          lastMaxId = newMaxId
+        }
+      }).catch(() => {})
+    }, 3000)
+
     return () => {
       unsubChat()
       wsClient.disconnect()
+      clearInterval(pollInterval)
       loaded.current = false
     }
   }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
