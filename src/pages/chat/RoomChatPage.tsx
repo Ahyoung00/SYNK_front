@@ -152,18 +152,6 @@ export default function RoomChatPage() {
     const content = text.trim()
     if (!content) return
 
-    const msg: RoomChatMessage = {
-      messageId:   Date.now(),
-      userId:      myUserId,
-      userName:    myUser?.name ?? '나',
-      profileImage: myUser?.profileImage ?? null,
-      content,
-      createdAt:   new Date().toISOString(),
-      isMyMessage: true,
-      myMessage:   true,
-      reactions:   [],
-    }
-    appendMessage(numRoomId, msg)
     setText('')
     if (inputRef.current) inputRef.current.style.height = 'auto'
     isAtBottomRef.current = true
