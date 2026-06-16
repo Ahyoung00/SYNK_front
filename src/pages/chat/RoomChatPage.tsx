@@ -155,7 +155,7 @@ export default function RoomChatPage() {
   }
 
   function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend() }
+    if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); handleSend() }
   }
 
   // ── 리액션 토글 ───────────────────────────────────────────────────────────
