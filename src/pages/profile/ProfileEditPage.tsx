@@ -10,9 +10,10 @@ export default function ProfileEditPage() {
   const user      = useAuthStore((s) => s.user)
   const setUser   = useAuthStore((s) => s.setUser)
 
-  const [name, setName]         = useState(user?.name ?? '')
-  const [photoUrl, setPhotoUrl] = useState<string | null>(user?.profileImage ?? null)
-  const [saving, setSaving]     = useState(false)
+  const [name, setName]           = useState(user?.name ?? '')
+  const [photoUrl, setPhotoUrl]   = useState<string | null>(user?.profileImage ?? null)
+  const [newPhotoFile, setNewPhotoFile] = useState<File | null>(null)
+  const [saving, setSaving]       = useState(false)
 
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -24,13 +25,13 @@ export default function ProfileEditPage() {
     const file = e.target.files?.[0]
     if (!file) return
 
+    setNewPhotoFile(file)
     const reader = new FileReader()
     reader.onload = (ev) => {
       const result = ev.target?.result
       if (typeof result === 'string') setPhotoUrl(result)
     }
     reader.readAsDataURL(file)
-    // 같은 파일 다시 선택 가능하도록 초기화
     e.target.value = ''
   }
 
@@ -39,12 +40,12 @@ export default function ProfileEditPage() {
     setSaving(true)
     try {
       const payload: { name?: string; profileImage?: string } = { name: name.trim() }
-      // 사진이 변경된 경우에만 포함
-      if (photoUrl !== (user?.profileImage ?? null)) {
-        payload.profileImage = photoUrl ?? undefined
+      // 새 파일을 선택한 경우에만 profileImage 포함 (카카오 CDN URL은 절대 전송 안 함)
+      if (newPhotoFile && photoUrl?.startsWith('data:')) {
+        payload.profileImage = photoUrl
       }
       await userApi.updateProfile(payload)
-      if (user) setUser({ ...user, name: name.trim(), profileImage: photoUrl })
+      if (user) setUser({ ...user, name: name.trim(), profileImage: newPhotoFile ? photoUrl : user.profileImage })
       navigate(-1)
     } catch (e) {
       console.error(e)

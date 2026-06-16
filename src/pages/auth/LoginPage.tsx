@@ -7,6 +7,11 @@ import { authApi, userApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import type { User } from '@/types'
 
+function toHttps(url: string | null | undefined): string | undefined {
+  if (!url) return undefined
+  return url.replace(/^http:\/\//, 'https://')
+}
+
 // DEV 전용 — db.json users 목록
 const DEV_USERS = [
   { id: 1, name: '아영' },
@@ -39,7 +44,7 @@ export default function LoginPage() {
       const tempUser: User = {
         userId: loginRes.data.userId,
         name: loginRes.data.name,
-        profileImage: loginRes.data.profileImage,
+        profileImage: toHttps(loginRes.data.profileImage),
         missionNotification: true,
         resultNotification: true,
         highlightNotification: true,
@@ -164,7 +169,7 @@ export default function LoginPage() {
       const tempUser: User = {
         userId: loginRes.data.userId,
         name: loginRes.data.name,
-        profileImage: loginRes.data.profileImage,
+        profileImage: toHttps(loginRes.data.profileImage),
         missionNotification: true,
         resultNotification: true,
         highlightNotification: true,
