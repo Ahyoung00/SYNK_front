@@ -21,6 +21,7 @@
     "@capacitor/haptics": "^6.0.1",
     "@capacitor/push-notifications": "^6.0.2",
     "@capacitor/status-bar": "^6.0.1",
+    "@stomp/stompjs": "^7.3.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^6.27.0",

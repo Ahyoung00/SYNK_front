@@ -1,91 +1,70 @@
-import { WS_BASE_URL, STORAGE_KEYS } from '@/constants'
-import type { WsEvent, WsEventType } from '@/types'
+import { Client } from '@stomp/stompjs'
+import { STORAGE_KEYS } from '@/constants'
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Lightweight WebSocket client with auto-reconnect
-// Spring Boot back-end uses STOMP over WebSocket; swap in a STOMP lib if needed
-// ─────────────────────────────────────────────────────────────────────────────
+let stompClient: Client | null = null
 
-type Handler<T = unknown> = (event: WsEvent<T>) => void
-
-class SynkWebSocket {
-  private ws: WebSocket | null = null
-  private handlers = new Map<WsEventType, Set<Handler>>()
-  private reconnectDelay = 1000
-  private roomId: number | null = null
-  private shouldReconnect = false
-
-  connect(roomId: number) {
-    this.roomId = roomId
-    this.shouldReconnect = true
-    this._open()
-  }
-
-  private _open() {
-    let token: string | null = null
-    try {
-      const raw = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
-      token = raw ? (JSON.parse(raw) as { state?: { token?: string } }).state?.token ?? null : null
-    } catch {
-      token = null
-    }
-    if (!token) { this.shouldReconnect = false; return }
-    const url = `${WS_BASE_URL}/rooms/${this.roomId}?token=${token}`
-    this.ws = new WebSocket(url)
-
-    this.ws.onopen = () => {
-      console.info('[WS] connected to room', this.roomId)
-      this.reconnectDelay = 1000
-    }
-
-    this.ws.onmessage = (ev) => {
-      try {
-        const event = JSON.parse(ev.data as string) as WsEvent
-        const set = this.handlers.get(event.type)
-        set?.forEach((h) => h(event))
-      } catch {
-        console.warn('[WS] failed to parse message', ev.data)
-      }
-    }
-
-    this.ws.onclose = () => {
-      console.info('[WS] disconnected')
-      if (this.shouldReconnect) {
-        setTimeout(() => this._open(), this.reconnectDelay)
-        this.reconnectDelay = Math.min(this.reconnectDelay * 2, 30_000)
-      }
-    }
-
-    this.ws.onerror = (err) => {
-      console.error('[WS] error', err)
-    }
-  }
-
-  disconnect() {
-    this.shouldReconnect = false
-    this.ws?.close()
-    this.ws = null
-    this.roomId = null
-  }
-
-  send(data: unknown) {
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify(data))
-    }
-  }
-
-  on<T>(type: WsEventType, handler: Handler<T>) {
-    if (!this.handlers.has(type)) {
-      this.handlers.set(type, new Set())
-    }
-    this.handlers.get(type)!.add(handler as Handler)
-    return () => this.off(type, handler as Handler)
-  }
-
-  off(type: WsEventType, handler: Handler) {
-    this.handlers.get(type)?.delete(handler)
+function getToken(): string {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+    return raw
+      ? (JSON.parse(raw) as { state?: { token?: string } }).state?.token ?? ''
+      : ''
+  } catch {
+    return ''
   }
 }
 
-// Singleton instance — shared across the app
-export const wsClient = new SynkWebSocket()
+export function connectStomp(
+  roomId: number,
+  onMessage: (msg: unknown) => void,
+): () => void {
+  if (stompClient?.active) {
+    stompClient.deactivate()
+  }
+
+  const client = new Client({
+    brokerURL: 'wss://api.synkapp.co.kr/ws',
+    connectHeaders: {
+      Authorization: `Bearer ${getToken()}`,
+    },
+    reconnectDelay: 5000,
+    onConnect: () => {
+      console.info('[STOMP] connected to room', roomId)
+      client.subscribe(`/topic/rooms/${roomId}`, (frame) => {
+        try {
+          onMessage(JSON.parse(frame.body))
+        } catch {
+          console.warn('[STOMP] parse error', frame.body)
+        }
+      })
+    },
+    onStompError: (frame) => {
+      console.error('[STOMP] error', frame)
+    },
+  })
+
+  client.activate()
+  stompClient = client
+
+  return () => {
+    client.deactivate()
+    stompClient = null
+  }
+}
+
+export function publishChat(roomId: number, content: string) {
+  if (!stompClient?.active) return
+  stompClient.publish({
+    destination: `/app/rooms/${roomId}/chat`,
+    body: JSON.stringify({ content, messageType: 'TEXT' }),
+  })
+}
+
+// 레거시 호환용 (wsClient 참조하는 곳이 있을 경우 대비)
+export const wsClient = {
+  connect: () => {},
+  disconnect: () => {},
+  on: () => () => {},
+  off: () => {},
+  send: () => {},
+}
