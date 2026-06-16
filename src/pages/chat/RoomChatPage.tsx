@@ -359,7 +359,14 @@ function MsgBubble({
       {/* 아바타 (상대방 메시지, 그룹 마지막) */}
       {!isMe && (
         isGroupLast
-          ? <div className={styles.avatar}><span className={styles.avatarText}>{initial}</span></div>
+          ? (
+            <div className={styles.avatar}>
+              {msg.profileImage
+                ? <img src={msg.profileImage} alt={msg.userName} className={styles.avatarImg} />
+                : <span className={styles.avatarText}>{initial}</span>
+              }
+            </div>
+          )
           : <div className={styles.avatarSpacer} />
       )}
 
