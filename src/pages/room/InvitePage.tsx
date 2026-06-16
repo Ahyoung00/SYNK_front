@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useState } from 'react'
+import { useNavigate, useParams, Navigate } from 'react-router-dom'
 import { roomApi } from '@/services/api/endpoints'
 import { useAuthStore } from '@/store/authStore'
 import { ROUTES } from '@/constants'
@@ -13,11 +13,9 @@ export default function InvitePage() {
   const [joining, setJoining] = useState(false)
   const [error, setError]     = useState<string | null>(null)
 
-  useEffect(() => {
-    if (!isLoggedIn) {
-      navigate(ROUTES.LOGIN, { state: { redirectTo: `/invite/${code}` }, replace: true })
-    }
-  }, [isLoggedIn]) // eslint-disable-line react-hooks/exhaustive-deps
+  if (!isLoggedIn) {
+    return <Navigate to={ROUTES.LOGIN} state={{ redirectTo: `/invite/${code}` }} replace />
+  }
 
   async function handleJoin() {
     if (!code || joining) return
@@ -32,8 +30,6 @@ export default function InvitePage() {
       setJoining(false)
     }
   }
-
-  if (!isLoggedIn) return null
 
   return (
     <div className={styles.page}>
