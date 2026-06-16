@@ -15,7 +15,9 @@ export function formatDateLabel(isoStr: string): string {
 
 /** ISO → "오전/오후 H:MM" */
 export function formatTime(isoStr: string): string {
-  const d = new Date(isoStr)
+  // 백엔드가 Z 없이 UTC 시간을 보내므로 강제로 UTC로 파싱
+  const normalized = isoStr.endsWith('Z') ? isoStr : isoStr + 'Z'
+  const d = new Date(normalized)
   const h = d.getHours()
   const m = d.getMinutes()
   const ampm = h < 12 ? '오전' : '오후'
