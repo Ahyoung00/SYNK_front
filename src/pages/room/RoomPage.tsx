@@ -134,6 +134,14 @@ export default function RoomPage() {
       <NavHeader
         title={room.name}
         onBack={() => navigate(ROUTES.ROOMS)}
+        titleLeft={
+          <div className={styles.roomThumb}>
+            {room.thumbnail
+              ? <img src={room.thumbnail} alt={room.name} className={styles.roomThumbImg} />
+              : <span className={styles.roomThumbEmoji}>🌅</span>
+            }
+          </div>
+        }
         titleExtra={
           <button
             className={styles.chatBtn}

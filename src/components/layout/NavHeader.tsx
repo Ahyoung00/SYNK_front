@@ -5,6 +5,8 @@ import styles from './NavHeader.module.css'
 interface NavHeaderProps {
   /** 중앙 타이틀 */
   title: string
+  /** 타이틀 왼쪽에 붙는 요소 (예: 방 썸네일) */
+  titleLeft?: ReactNode
   /** 타이틀 오른쪽에 붙는 추가 요소 (예: 채팅 아이콘) */
   titleExtra?: ReactNode
   /** 우측 액션 요소 (예: "저장" 버튼). 없으면 빈 공간으로 균형 유지 */
@@ -17,7 +19,7 @@ interface NavHeaderProps {
  * 서브페이지 공통 헤더
  * 좌: ← 뒤로 / 중앙: 타이틀 / 우: 액션 or 빈 영역
  */
-export default function NavHeader({ title, titleExtra, right, onBack }: NavHeaderProps) {
+export default function NavHeader({ title, titleLeft, titleExtra, right, onBack }: NavHeaderProps) {
   const navigate = useNavigate()
 
   return (
@@ -31,6 +33,7 @@ export default function NavHeader({ title, titleExtra, right, onBack }: NavHeade
       </button>
 
       <div className={styles.center}>
+        {titleLeft}
         <span className={styles.title}>{title}</span>
         {titleExtra}
       </div>
