@@ -110,7 +110,8 @@ export default function RoomChatPage() {
     // STOMP WebSocket 실시간 수신
     const disconnectStomp = connectStomp(numRoomId, (incoming) => {
       const msg = incoming as RoomChatMessage
-      if (msg.myMessage || msg.isMyMessage) return
+      // 내가 보낸 메시지는 optimistic update로 이미 표시됨 → 서버 echo 무시
+      if (msg.userId === myUserId) return
       const existingIds = new Set(
         useChatStore.getState().messages[String(numRoomId)]?.map((m) => m.messageId) ?? []
       )
