@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { roomApi } from '@/services/api/endpoints'
 import NavHeader from '@/components/layout/NavHeader'
+import TimePicker from '@/components/ui/TimePicker'
 import styles from './CreateRoomPage.module.css'
 
 export default function CreateRoomPage() {
@@ -155,18 +156,14 @@ export default function CreateRoomPage() {
             <div className={styles.settingRowTime}>
               <span className={styles.settingLabel}>미션 알림 시간대</span>
               <div className={styles.timeInputRow}>
-                <input
-                  type="time"
-                  className={styles.timeInput}
+                <TimePicker
                   value={missionStartTime}
-                  onChange={(e) => setMissionStartTime(e.target.value)}
+                  onChange={setMissionStartTime}
                 />
                 <span className={styles.timeDash}>–</span>
-                <input
-                  type="time"
-                  className={styles.timeInput}
+                <TimePicker
                   value={missionEndTime}
-                  onChange={(e) => setMissionEndTime(e.target.value)}
+                  onChange={setMissionEndTime}
                 />
               </div>
             </div>
