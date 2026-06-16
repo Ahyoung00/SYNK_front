@@ -22,7 +22,14 @@ class SynkWebSocket {
   }
 
   private _open() {
-    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+    let token: string | null = null
+    try {
+      const raw = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+      token = raw ? (JSON.parse(raw) as { state?: { token?: string } }).state?.token ?? null : null
+    } catch {
+      token = null
+    }
+    if (!token) { this.shouldReconnect = false; return }
     const url = `${WS_BASE_URL}/rooms/${this.roomId}?token=${token}`
     this.ws = new WebSocket(url)
 
