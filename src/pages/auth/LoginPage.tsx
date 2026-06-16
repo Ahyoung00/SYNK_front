@@ -7,8 +7,8 @@ import { authApi, userApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import type { User } from '@/types'
 
-function toHttps(url: string | null | undefined): string | undefined {
-  if (!url) return undefined
+function toHttps(url: string | null | undefined): string | null {
+  if (!url) return null
   return url.replace(/^http:\/\//, 'https://')
 }
 
