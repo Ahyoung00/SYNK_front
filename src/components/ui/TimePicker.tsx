@@ -25,7 +25,9 @@ const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5)
 export default function TimePicker({ value, onChange }: Props) {
   const { ampm, hour, minute } = to12h(value)
   const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState({ top: 0, left: 0 })
   const ref = useRef<HTMLDivElement>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -35,13 +37,21 @@ export default function TimePicker({ value, onChange }: Props) {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [open])
 
+  function handleOpen() {
+    if (btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect()
+      setPos({ top: rect.bottom + 6, left: rect.left })
+    }
+    setOpen((v) => !v)
+  }
+
   function select(newAmpm: string, newHour: number, newMinute: number) {
     onChange(to24h(newAmpm, newHour, newMinute))
   }
 
   return (
     <div className={styles.wrap} ref={ref}>
-      <button className={styles.display} onClick={() => setOpen((v) => !v)}>
+      <button ref={btnRef} className={styles.display} onClick={handleOpen}>
         <span className={styles.ampm}>{ampm}</span>
         <span className={styles.time}>
           {String(hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}
@@ -49,7 +59,7 @@ export default function TimePicker({ value, onChange }: Props) {
       </button>
 
       {open && (
-        <div className={styles.dropdown}>
+        <div className={styles.dropdown} style={{ top: pos.top, left: pos.left }}>
           {/* 오전/오후 */}
           <div className={styles.col}>
             {['오전', '오후'].map((ap) => (
