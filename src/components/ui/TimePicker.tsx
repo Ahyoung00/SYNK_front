@@ -71,8 +71,7 @@ export default function TimePicker({ value, onChange }: Props) {
                 className={[styles.item, hour === h ? styles.active : ''].join(' ')}
                 onClick={() => selectHour(h)}
               >
-                <span className={styles.itemAmpm}>{ampmLabel(h)}</span>
-                {String(h % 12 === 0 ? 12 : h % 12).padStart(2, '0')}
+                {String(h).padStart(2, '0')}
               </button>
             ))}
           </div>
