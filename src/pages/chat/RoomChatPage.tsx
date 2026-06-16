@@ -168,12 +168,7 @@ export default function RoomChatPage() {
     if (inputRef.current) inputRef.current.style.height = 'auto'
     isAtBottomRef.current = true
 
-    // STOMP로 전송, 실패 시 REST 폴백
-    try {
-      publishChat(numRoomId, content)
-    } catch {
-      chatApi.sendMessage(numRoomId, content).catch(console.error)
-    }
+    publishChat(numRoomId, content)
   }
 
   function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
