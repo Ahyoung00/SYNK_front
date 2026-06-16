@@ -2,12 +2,17 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
-import { chatApi } from '@/services/api/endpoints'
+import { chatApi, roomApi } from '@/services/api/endpoints'
 import { connectStomp, publishChat } from '@/services/websocket/client'
 import { ROUTES } from '@/constants'
 import { MOCK_CHAT_MESSAGES, formatDateLabel, formatTime } from '@/utils/mockChat'
 import type { RoomChatMessage, ChatReactionSummary } from '@/types'
 import styles from './RoomChatPage.module.css'
+
+function toHttps(url: string | null | undefined): string | null {
+  if (!url) return null
+  return url.replace(/^http:\/\//, 'https://')
+}
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const EMOJI_OPTIONS = ['😂', '❤️', '😮', '🔥', '👍', '🎉'] as const
@@ -81,6 +86,8 @@ export default function RoomChatPage() {
   const [roomName, setRoomName]     = useState('')
   const [memberCount, setMemberCount] = useState(0)
   const [missionDone, setMissionDone] = useState(false)
+  // userId → profileImage 맵 (STOMP 메시지에 profileImage 없을 때 보완용)
+  const memberProfileMap = useRef<Map<number, string | null>>(new Map())
 
   const listRef        = useRef<HTMLDivElement>(null)
   const inputRef       = useRef<HTMLTextAreaElement>(null)
@@ -93,13 +100,25 @@ export default function RoomChatPage() {
     if (loaded.current) return
     loaded.current = true
 
+    // 멤버 프로필 맵 구축
+    roomApi.getRoom(numRoomId)
+      .then((res) => {
+        res.data.members.forEach((m) => {
+          memberProfileMap.current.set(m.userId, toHttps(m.profileImage))
+        })
+      })
+      .catch(() => {})
+
     chatApi.getMessages(numRoomId)
       .then((res) => {
         setRoomName(res.data.roomName)
         setMemberCount(res.data.memberCount)
         setMissionDone(res.data.todayMissionCompleted)
         const msgs = res.data.messages.length > 0
-          ? res.data.messages
+          ? res.data.messages.map((m) => ({
+              ...m,
+              profileImage: toHttps(m.profileImage) ?? memberProfileMap.current.get(Number(m.userId)) ?? null,
+            }))
           : MOCK_CHAT_MESSAGES
         setMessages(numRoomId, msgs)
       })
@@ -109,9 +128,13 @@ export default function RoomChatPage() {
 
     // STOMP WebSocket 실시간 수신
     const disconnectStomp = connectStomp(numRoomId, (incoming) => {
-      const msg = incoming as RoomChatMessage
+      const raw = incoming as RoomChatMessage
       // 내 userId면 optimistic update로 이미 표시됨 → echo 무시
-      if (Number(msg.userId) === myUserId) return
+      if (Number(raw.userId) === myUserId) return
+      const msg: RoomChatMessage = {
+        ...raw,
+        profileImage: toHttps(raw.profileImage) ?? memberProfileMap.current.get(Number(raw.userId)) ?? null,
+      }
       const existingIds = new Set(
         useChatStore.getState().messages[String(numRoomId)]?.map((m) => m.messageId) ?? []
       )
