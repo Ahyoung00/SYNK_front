@@ -257,6 +257,11 @@
   color-scheme: dark;
   outline: none;
   transition: border-color var(--dur-fast);
+  cursor: pointer;
+}
+
+.timeInput::-webkit-calendar-picker-indicator {
+  display: none;
 }
 
 .timeInput:focus {
