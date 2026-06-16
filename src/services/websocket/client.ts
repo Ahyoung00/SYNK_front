@@ -54,7 +54,13 @@ export function connectStomp(
       pendingMessages.length = 0
     },
     onStompError: (frame) => {
-      console.error('[STOMP] error', frame)
+      console.error('[STOMP] broker error', frame.headers, frame.body)
+    },
+    onWebSocketError: (event) => {
+      console.error('[STOMP] WebSocket error event', event)
+    },
+    onWebSocketClose: (event) => {
+      console.error('[STOMP] WebSocket closed — code:', event.code, 'reason:', event.reason, 'wasClean:', event.wasClean)
     },
     onDisconnect: () => {
       console.info('[STOMP] disconnected')
