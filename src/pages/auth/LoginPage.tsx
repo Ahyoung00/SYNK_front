@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
 import { api } from '@/services/api/client'
@@ -18,6 +18,8 @@ const DEV_USERS = [
 
 export default function LoginPage() {
   const navigate  = useNavigate()
+  const location  = useLocation()
+  const redirectTo = (location.state as { redirectTo?: string } | null)?.redirectTo ?? ROUTES.HOME
   const setAuth   = useAuthStore((s) => s.setAuth)
   const isDev     = import.meta.env.DEV
   const [loading, setLoading]       = useState<number | null>(null)
@@ -50,7 +52,7 @@ export default function LoginPage() {
       } catch { /* loginRes 데이터로 진행 */ }
 
       useChatStore.getState().clearAll()
-      navigate(ROUTES.HOME, { replace: true })
+      navigate(redirectTo, { replace: true })
     } catch (e) {
       console.error(e)
       setOauthError('카카오 로그인에 실패했어요. 다시 시도해주세요.')
@@ -173,7 +175,7 @@ export default function LoginPage() {
         setAuth(meRes.data, token, '')
       } catch { /* loginRes 데이터로 진행 */ }
       useChatStore.getState().clearAll()
-      navigate(ROUTES.HOME, { replace: true })
+      navigate(redirectTo, { replace: true })
     } catch (e) {
       console.error(e)
       setOauthError('Google 로그인에 실패했어요. 다시 시도해주세요.')
@@ -209,7 +211,7 @@ export default function LoginPage() {
       const meRes = await userApi.getMe()
       setAuth(meRes.data, token, `mock-refresh-${userId}`)
 
-      navigate(ROUTES.HOME, { replace: true })
+      navigate(redirectTo, { replace: true })
     } catch (e) {
       console.error(e)
     } finally {
