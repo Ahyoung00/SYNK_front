@@ -30,7 +30,7 @@ export function connectStomp(
     connectHeaders: {
       Authorization: `Bearer ${token}`,
     },
-    reconnectDelay: 5000,
+    reconnectDelay: 0,
     onConnect: () => {
       console.info('[STOMP] connected to room', roomId)
 

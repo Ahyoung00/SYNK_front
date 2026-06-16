@@ -1,27 +1,7 @@
-import { useEffect } from 'react'
-import { connectStomp } from '@/services/websocket/client'
-import { useMissionStore } from '@/store/missionStore'
-import type { Submission } from '@/types'
+// STOMP WebSocket은 RoomChatPage에서만 직접 연결 관리
 
-export function useRoomWebSocket(roomId: number | undefined) {
-  const updateParticipation = useMissionStore((s) => s.updateParticipation)
-
-  useEffect(() => {
-    if (!roomId) return
-
-    const disconnect = connectStomp(roomId, (incoming) => {
-      const msg = incoming as { type?: string; payload?: Submission }
-      if (msg.type === 'MEMBER_SUBMITTED' && msg.payload) {
-        updateParticipation({
-          user: { userId: msg.payload.user_id, name: '', profileImage: null },
-          submission: msg.payload,
-          state: 'done',
-        })
-      }
-    })
-
-    return disconnect
-  }, [roomId, updateParticipation])
+export function useRoomWebSocket(_roomId: number | undefined) {
+  // 채팅 페이지(RoomChatPage)에서 connectStomp()로 직접 관리
 }
 
 export function useChatSocket(_roomId: number | undefined) {
