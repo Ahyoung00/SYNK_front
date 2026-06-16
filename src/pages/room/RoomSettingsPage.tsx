@@ -24,6 +24,7 @@ export default function RoomSettingsPage() {
   const [newThumbFile, setNewThumbFile]       = useState<File | null>(null)
   const [dirty, setDirty]                     = useState(false)
   const [saving, setSaving]                   = useState(false)
+  const [saveError, setSaveError]             = useState<string | null>(null)
   const [isLoading, setIsLoading]             = useState(true)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -62,12 +63,13 @@ export default function RoomSettingsPage() {
   async function handleSave() {
     if (!dirty || saving) return
     setSaving(true)
+    setSaveError(null)
     try {
       let thumbnailUrl: string | undefined
       if (newThumbFile) {
         const { presignedUrl, fileUrl } = await uploadApi.getPresignedUrl(newThumbFile.name, 'room')
         const s3Res = await fetch(presignedUrl, { method: 'PUT', body: newThumbFile })
-        if (!s3Res.ok) throw new Error(`S3 upload failed: ${s3Res.status}`)
+        if (!s3Res.ok) throw new Error(`이미지 업로드 실패 (${s3Res.status})`)
         thumbnailUrl = fileUrl
         setThumbUrl(fileUrl)
       }
@@ -82,6 +84,7 @@ export default function RoomSettingsPage() {
       setDirty(false)
       navigate(-1)
     } catch (e) {
+      setSaveError(e instanceof Error ? e.message : '저장에 실패했어요')
       console.error(e)
     } finally {
       setSaving(false)
@@ -220,6 +223,13 @@ export default function RoomSettingsPage() {
             </div>
           </div>
         </div>
+
+        {/* ── 저장 에러 ────────────────────────────────────────────────────────── */}
+        {saveError && (
+          <p style={{ padding: '0 20px 8px', color: '#ef4444', fontSize: 13, textAlign: 'center' }}>
+            {saveError}
+          </p>
+        )}
 
         {/* ── 멤버 관리 ────────────────────────────────────────────────────────── */}
         <button
