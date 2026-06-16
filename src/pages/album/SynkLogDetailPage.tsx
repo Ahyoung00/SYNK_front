@@ -111,12 +111,23 @@ export default function SynkLogDetailPage() {
     )
   }
 
-  if (error || collages.length === 0) {
+  if (error) {
     return (
       <div className={styles.page}>
         <SynkHeader date={date ?? ''} onBack={() => navigate(-1)} />
         <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
           데이터를 불러올 수 없어요
+        </p>
+      </div>
+    )
+  }
+
+  if (!isLoading && collages.length === 0) {
+    return (
+      <div className={styles.page}>
+        <SynkHeader date={date ?? ''} onBack={() => navigate(-1)} />
+        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+          아직 완료된 미션이 없어요 🌱
         </p>
       </div>
     )
