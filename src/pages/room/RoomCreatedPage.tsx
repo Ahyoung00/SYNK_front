@@ -9,9 +9,10 @@ export default function RoomCreatedPage() {
   const navigate   = useNavigate()
   const id         = Number(roomId)
 
-  const [roomName, setRoomName] = useState('')
-  const [roomCode, setRoomCode] = useState('')
-  const [copied, setCopied]     = useState(false)
+  const [roomName, setRoomName]       = useState('')
+  const [roomCode, setRoomCode]       = useState('')
+  const [thumbnail, setThumbnail]     = useState<string | null>(null)
+  const [copied, setCopied]           = useState(false)
   const [inviteSheet, setInviteSheet] = useState(false)
 
   useEffect(() => {
@@ -20,6 +21,7 @@ export default function RoomCreatedPage() {
       .then((res) => {
         setRoomName(res.data.name)
         setRoomCode(res.data.code)
+        setThumbnail(res.data.thumbnail ?? null)
       })
       .catch(console.error)
   }, [id])
@@ -71,9 +73,12 @@ export default function RoomCreatedPage() {
 
       {/* ── 콘텐츠 ──────────────────────────────────────────────────────────── */}
       <div className={styles.content}>
-        {/* 이모지 썸네일 */}
+        {/* 방 썸네일 */}
         <div className={styles.thumb}>
-          <span className={styles.thumbEmoji}>🌅</span>
+          {thumbnail
+            ? <img src={thumbnail} alt={roomName} className={styles.thumbImg} />
+            : <span className={styles.thumbEmoji}>🌅</span>
+          }
         </div>
 
         {/* 완료 메시지 */}
