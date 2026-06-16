@@ -142,6 +142,7 @@ export default function RoomChatPage() {
       content,
       createdAt:   new Date().toISOString(),
       isMyMessage: true,
+      myMessage:   true,
       reactions:   [],
     }
     appendMessage(numRoomId, msg)
