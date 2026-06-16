@@ -48,15 +48,16 @@ export default function CreateRoomPage() {
       })
       const roomId = res.data.roomId
 
-      // 썸네일 선택한 경우 S3 업로드 후 방 썸네일 설정
+      let thumbnailFileUrl: string | undefined
       if (thumbFile) {
         const { presignedUrl, fileUrl } = await uploadApi.getPresignedUrl(thumbFile.name, 'room')
         const s3Res = await fetch(presignedUrl, { method: 'PUT', body: thumbFile })
         if (!s3Res.ok) throw new Error(`S3 upload failed: ${s3Res.status}`)
         await roomApi.updateRoom(roomId, { thumbnail: fileUrl })
+        thumbnailFileUrl = fileUrl
       }
 
-      navigate(ROUTES.ROOM_CREATED(roomId), { replace: true })
+      navigate(ROUTES.ROOM_CREATED(roomId), { replace: true, state: { thumbnail: thumbnailFileUrl } })
     } catch (err) {
       console.error(err)
       setError('방 생성에 실패했어요. 다시 시도해주세요.')

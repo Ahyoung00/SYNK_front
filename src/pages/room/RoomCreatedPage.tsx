@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { roomApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import styles from './RoomCreatedPage.module.css'
@@ -7,11 +7,14 @@ import styles from './RoomCreatedPage.module.css'
 export default function RoomCreatedPage() {
   const { roomId } = useParams<{ roomId: string }>()
   const navigate   = useNavigate()
+  const location   = useLocation()
   const id         = Number(roomId)
 
   const [roomName, setRoomName]       = useState('')
   const [roomCode, setRoomCode]       = useState('')
-  const [thumbnail, setThumbnail]     = useState<string | null>(null)
+  const [thumbnail, setThumbnail]     = useState<string | null>(
+    (location.state as { thumbnail?: string } | null)?.thumbnail ?? null
+  )
   const [copied, setCopied]           = useState(false)
   const [inviteSheet, setInviteSheet] = useState(false)
 
@@ -21,7 +24,7 @@ export default function RoomCreatedPage() {
       .then((res) => {
         setRoomName(res.data.name)
         setRoomCode(res.data.code)
-        setThumbnail(res.data.thumbnail ?? null)
+        if (res.data.thumbnail) setThumbnail(res.data.thumbnail)
       })
       .catch(console.error)
   }, [id])
