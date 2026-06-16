@@ -3,9 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
 import { chatApi } from '@/services/api/endpoints'
-import { wsClient } from '@/services/websocket/client'
 import { ROUTES } from '@/constants'
-import type { WsEvent } from '@/types'
 import { MOCK_CHAT_MESSAGES, formatDateLabel, formatTime } from '@/utils/mockChat'
 import type { RoomChatMessage, ChatReactionSummary } from '@/types'
 import styles from './RoomChatPage.module.css'
@@ -108,15 +106,7 @@ export default function RoomChatPage() {
         if (messages.length === 0) setMessages(numRoomId, MOCK_CHAT_MESSAGES)
       })
 
-    // WebSocket 연결 (실시간 수신 시도)
-    wsClient.connect(numRoomId)
-    const unsubChat = wsClient.on<RoomChatMessage>('CHAT_MESSAGE', (event: WsEvent<RoomChatMessage>) => {
-      const incoming = event.payload
-      if (incoming.myMessage || incoming.isMyMessage) return
-      appendMessage(numRoomId, incoming)
-    })
-
-    // 폴링 폴백 — 3초마다 최신 메시지 확인
+    // 3초마다 최신 메시지 폴링
     let lastMaxId = -1
     const pollInterval = setInterval(() => {
       chatApi.getMessages(numRoomId).then((res) => {
@@ -137,8 +127,6 @@ export default function RoomChatPage() {
     }, 3000)
 
     return () => {
-      unsubChat()
-      wsClient.disconnect()
       clearInterval(pollInterval)
       loaded.current = false
     }
