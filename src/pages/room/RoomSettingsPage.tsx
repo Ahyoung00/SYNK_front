@@ -47,6 +47,7 @@ export default function RoomSettingsPage() {
     roomApi.getRoom(id)
       .then((roomRes) => {
         const room = roomRes.data
+        console.log('[RoomSettings] GET room.thumbnail:', room.thumbnail)
         setRoomName(room.name)
         setMissionCount(room.dailyMissionCount)
         setMissionStartTime(room.missionStartTime?.slice(0, 5) ?? '10:00')
@@ -73,14 +74,17 @@ export default function RoomSettingsPage() {
         thumbnailUrl = fileUrl
         setThumbUrl(fileUrl)
       }
-      await roomApi.updateRoom(id, {
+      const updatePayload = {
         name:              roomName,
         dailyMissionCount: missionCount,
         missionStartTime,
         missionEndTime,
         maxMembers,
         ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
-      })
+      }
+      console.log('[RoomSettings] PATCH payload:', updatePayload)
+      const updateRes = await roomApi.updateRoom(id, updatePayload)
+      console.log('[RoomSettings] PATCH response:', updateRes.data)
       setDirty(false)
       navigate(-1)
     } catch (e) {
