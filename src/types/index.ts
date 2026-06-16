@@ -331,6 +331,7 @@ export interface RoomChatMessage {
   content: string
   /** ISO 8601 */
   createdAt: string
+  myMessage: boolean
   isMyMessage: boolean
   reactions: ChatReactionSummary[]
 }
