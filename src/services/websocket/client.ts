@@ -1,7 +1,9 @@
 import { Client } from '@stomp/stompjs'
+import SockJS from 'sockjs-client'
 import { STORAGE_KEYS } from '@/constants'
 
 let stompClient: Client | null = null
+const pendingMessages: Array<{ roomId: number; content: string }> = []
 
 function getToken(): string {
   try {
@@ -22,14 +24,17 @@ export function connectStomp(
     stompClient.deactivate()
   }
 
+  const token = getToken()
+
   const client = new Client({
-    brokerURL: 'wss://api.synkapp.co.kr/ws',
+    webSocketFactory: () => new SockJS('https://api.synkapp.co.kr/ws'),
     connectHeaders: {
-      Authorization: `Bearer ${getToken()}`,
+      Authorization: `Bearer ${token}`,
     },
     reconnectDelay: 5000,
     onConnect: () => {
       console.info('[STOMP] connected to room', roomId)
+
       client.subscribe(`/topic/rooms/${roomId}`, (frame) => {
         try {
           onMessage(JSON.parse(frame.body))
@@ -37,9 +42,23 @@ export function connectStomp(
           console.warn('[STOMP] parse error', frame.body)
         }
       })
+
+      // 연결 전 쌓인 메시지 전송
+      pendingMessages
+        .filter((m) => m.roomId === roomId)
+        .forEach((m) => {
+          client.publish({
+            destination: `/app/rooms/${m.roomId}/chat`,
+            body: JSON.stringify({ content: m.content, messageType: 'TEXT' }),
+          })
+        })
+      pendingMessages.length = 0
     },
     onStompError: (frame) => {
       console.error('[STOMP] error', frame)
+    },
+    onDisconnect: () => {
+      console.info('[STOMP] disconnected')
     },
   })
 
@@ -53,14 +72,17 @@ export function connectStomp(
 }
 
 export function publishChat(roomId: number, content: string) {
-  if (!stompClient?.active) return
-  stompClient.publish({
-    destination: `/app/rooms/${roomId}/chat`,
-    body: JSON.stringify({ content, messageType: 'TEXT' }),
-  })
+  if (stompClient?.active && stompClient.connected) {
+    stompClient.publish({
+      destination: `/app/rooms/${roomId}/chat`,
+      body: JSON.stringify({ content, messageType: 'TEXT' }),
+    })
+  } else {
+    // 아직 연결 중이면 큐에 쌓아두기
+    pendingMessages.push({ roomId, content })
+  }
 }
 
-// 레거시 호환용 (wsClient 참조하는 곳이 있을 경우 대비)
 export const wsClient = {
   connect: () => {},
   disconnect: () => {},
