@@ -75,3 +75,9 @@
   font-weight: 700;
   background: var(--color-primary-dim);
 }
+
+.itemAmpm {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-right: 4px;
+}

@@ -6,27 +6,23 @@ interface Props {
   onChange: (value: string) => void
 }
 
-function to12h(time24: string) {
+function parse(time24: string) {
   const [h, m] = time24.split(':').map(Number)
-  const ampm = h < 12 ? '오전' : '오후'
-  const hour = h % 12 === 0 ? 12 : h % 12
-  return { ampm, hour, minute: m }
+  return { hour: h, minute: m }
 }
 
-function to24h(ampm: string, hour: number, minute: number) {
-  let h = hour % 12
-  if (ampm === '오후') h += 12
-  return `${String(h).padStart(2, '0')}:${String(minute).padStart(2, '0')}`
+function ampmLabel(hour: number) {
+  return hour < 12 ? '오전' : '오후'
 }
 
-const HOURS   = Array.from({ length: 12 }, (_, i) => i + 1)
-const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5)
+const HOURS   = Array.from({ length: 24 }, (_, i) => i)       // 0~23
+const MINUTES = Array.from({ length: 12 }, (_, i) => i * 5)   // 0,5,...,55
 
 export default function TimePicker({ value, onChange }: Props) {
-  const { ampm, hour, minute } = to12h(value)
+  const { hour, minute } = parse(value)
   const [open, setOpen] = useState(false)
-  const [pos, setPos] = useState({ top: 0, left: 0 })
-  const ref = useRef<HTMLDivElement>(null)
+  const [pos, setPos]   = useState({ top: 0, left: 0 })
+  const ref    = useRef<HTMLDivElement>(null)
   const btnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
@@ -45,45 +41,38 @@ export default function TimePicker({ value, onChange }: Props) {
     setOpen((v) => !v)
   }
 
-  function select(newAmpm: string, newHour: number, newMinute: number) {
-    onChange(to24h(newAmpm, newHour, newMinute))
+  function selectHour(h: number) {
+    onChange(`${String(h).padStart(2, '0')}:${String(minute).padStart(2, '0')}`)
   }
+
+  function selectMinute(m: number) {
+    onChange(`${String(hour).padStart(2, '0')}:${String(m).padStart(2, '0')}`)
+    setOpen(false)
+  }
+
+  const displayHour = hour % 12 === 0 ? 12 : hour % 12
 
   return (
     <div className={styles.wrap} ref={ref}>
       <button ref={btnRef} className={styles.display} onClick={handleOpen}>
-        <span className={styles.ampm}>{ampm}</span>
+        <span className={styles.ampm}>{ampmLabel(hour)}</span>
         <span className={styles.time}>
-          {String(hour).padStart(2, '0')}:{String(minute).padStart(2, '0')}
+          {String(displayHour).padStart(2, '0')}:{String(minute).padStart(2, '0')}
         </span>
       </button>
 
       {open && (
         <div className={styles.dropdown} style={{ top: pos.top, left: pos.left }}>
-          {/* 오전/오후 */}
-          <div className={styles.col}>
-            {['오전', '오후'].map((ap) => (
-              <button
-                key={ap}
-                className={[styles.item, ampm === ap ? styles.active : ''].join(' ')}
-                onClick={() => select(ap, hour, minute)}
-              >
-                {ap}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.divider} />
-
-          {/* 시 */}
+          {/* 시 (0~23) */}
           <div className={styles.col}>
             {HOURS.map((h) => (
               <button
                 key={h}
                 className={[styles.item, hour === h ? styles.active : ''].join(' ')}
-                onClick={() => select(ampm, h, minute)}
+                onClick={() => selectHour(h)}
               >
-                {String(h).padStart(2, '0')}
+                <span className={styles.itemAmpm}>{ampmLabel(h)}</span>
+                {String(h % 12 === 0 ? 12 : h % 12).padStart(2, '0')}
               </button>
             ))}
           </div>
@@ -96,7 +85,7 @@ export default function TimePicker({ value, onChange }: Props) {
               <button
                 key={m}
                 className={[styles.item, minute === m ? styles.active : ''].join(' ')}
-                onClick={() => { select(ampm, hour, m); setOpen(false) }}
+                onClick={() => selectMinute(m)}
               >
                 {String(m).padStart(2, '0')}
               </button>
