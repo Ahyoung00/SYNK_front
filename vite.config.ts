@@ -21,9 +21,7 @@ export default defineConfig({
     },
   },
 
-  // Capacitor requires a relative base path so assets load
-  // correctly when bundled in the native webview
-  base: './',
+  base: '/',
 
   build: {
     // Capacitor reads from /dist by default (see capacitor.config.ts)
