@@ -42,14 +42,9 @@ export default function ProfileEditPage() {
       const payload: { name?: string; profileImage?: string } = { name: name.trim() }
 
       if (newPhotoFile) {
-        // 1) presigned URL 발급
         const { presignedUrl, fileUrl } = await uploadApi.getPresignedUrl(newPhotoFile.name, 'profile')
-        // 2) S3에 직접 업로드
-        await fetch(presignedUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': newPhotoFile.type || 'image/jpeg' },
-          body: newPhotoFile,
-        })
+        const s3Res = await fetch(presignedUrl, { method: 'PUT', body: newPhotoFile })
+        if (!s3Res.ok) throw new Error(`S3 upload failed: ${s3Res.status}`)
         // 3) 짧은 fileUrl만 profileImage로 전달
         payload.profileImage = fileUrl
         setPhotoUrl(fileUrl)

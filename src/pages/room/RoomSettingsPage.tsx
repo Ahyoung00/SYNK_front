@@ -66,11 +66,8 @@ export default function RoomSettingsPage() {
       let thumbnailUrl: string | undefined
       if (newThumbFile) {
         const { presignedUrl, fileUrl } = await uploadApi.getPresignedUrl(newThumbFile.name, 'room')
-        await fetch(presignedUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': newThumbFile.type || 'image/jpeg' },
-          body: newThumbFile,
-        })
+        const s3Res = await fetch(presignedUrl, { method: 'PUT', body: newThumbFile })
+        if (!s3Res.ok) throw new Error(`S3 upload failed: ${s3Res.status}`)
         thumbnailUrl = fileUrl
         setThumbUrl(fileUrl)
       }

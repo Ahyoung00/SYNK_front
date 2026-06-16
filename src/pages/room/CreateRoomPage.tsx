@@ -51,11 +51,8 @@ export default function CreateRoomPage() {
       // 썸네일 선택한 경우 S3 업로드 후 방 썸네일 설정
       if (thumbFile) {
         const { presignedUrl, fileUrl } = await uploadApi.getPresignedUrl(thumbFile.name, 'room')
-        await fetch(presignedUrl, {
-          method: 'PUT',
-          headers: { 'Content-Type': thumbFile.type || 'image/jpeg' },
-          body: thumbFile,
-        })
+        const s3Res = await fetch(presignedUrl, { method: 'PUT', body: thumbFile })
+        if (!s3Res.ok) throw new Error(`S3 upload failed: ${s3Res.status}`)
         await roomApi.updateRoom(roomId, { thumbnail: fileUrl })
       }
 
