@@ -27,7 +27,7 @@ export function connectStomp(
   const token = getToken()
 
   const client = new Client({
-    webSocketFactory: () => new SockJS('https://api.synkapp.co.kr/ws'),
+    webSocketFactory: () => new SockJS('https://api.synk.ai.kr/ws'),
     connectHeaders: {
       Authorization: `Bearer ${token}`,
     },
