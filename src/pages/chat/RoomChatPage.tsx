@@ -220,7 +220,7 @@ export default function RoomChatPage() {
             <MsgBubble
               key={msg.messageId}
               msg={msg}
-              isMe={msg.isMyMessage}
+              isMe={msg.isMyMessage || msg.myMessage}
               isGroupFirst={isGroupFirst}
               isGroupLast={isGroupLast}
               myReactionEmojis={myReactions[rKey] ?? []}
