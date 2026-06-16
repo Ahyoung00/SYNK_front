@@ -1,5 +1,4 @@
 import { Client } from '@stomp/stompjs'
-import SockJS from 'sockjs-client'
 import { STORAGE_KEYS } from '@/constants'
 
 let stompClient: Client | null = null
@@ -27,7 +26,7 @@ export function connectStomp(
   const token = getToken()
 
   const client = new Client({
-    webSocketFactory: () => new SockJS('https://api.synk.ai.kr/ws'),
+    brokerURL: 'wss://api.synk.ai.kr/ws',
     connectHeaders: {
       Authorization: `Bearer ${token}`,
     },
