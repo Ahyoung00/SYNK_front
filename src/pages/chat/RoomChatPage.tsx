@@ -324,7 +324,7 @@ function MsgBubble({
   msg, isMe, isGroupFirst, isGroupLast, myReactionEmojis,
   onLongPressStart, onLongPressEnd, onReactionTap, onOpenPicker,
 }: MsgBubbleProps) {
-  const reactions = msg.reactions.filter((r): r is ChatReactionSummary & { emoji: string } =>
+  const reactions = (msg.reactions ?? []).filter((r): r is ChatReactionSummary & { emoji: string } =>
     r.emoji !== null,
   )
   const initial = msg.userName.charAt(0) || '?'
