@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { roomApi, albumApi, debugApi } from '@/services/api/endpoints'
 import type { RoomDetail, AlbumItem } from '@/types'
@@ -9,9 +9,7 @@ import styles from './RoomPage.module.css'
 export default function RoomPage() {
   const { roomId }       = useParams<{ roomId: string }>()
   const navigate         = useNavigate()
-  const [searchParams]   = useSearchParams()
   const id               = Number(roomId)
-  const inviteCode       = searchParams.get('code')
 
   const [room, setRoom]               = useState<RoomDetail | null>(null)
   const [albums, setAlbums]           = useState<AlbumItem[]>([])
@@ -19,7 +17,6 @@ export default function RoomPage() {
   const [isLoading, setIsLoading]     = useState(true)
   const [triggering, setTriggering]   = useState(false)
   const [notMember, setNotMember]     = useState(false)
-  const [joining, setJoining]         = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -38,18 +35,6 @@ export default function RoomPage() {
       })
       .finally(() => setIsLoading(false))
   }, [id])
-
-  async function handleJoinFromRoom() {
-    const code = inviteCode
-    if (!code) return
-    setJoining(true)
-    try {
-      await roomApi.joinRoom(code)
-      window.location.href = `/room/${id}`
-    } catch {
-      setJoining(false)
-    }
-  }
 
   function copyCode() {
     if (!room) return
@@ -97,23 +82,8 @@ export default function RoomPage() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, gap: 20, padding: '40px 24px' }}>
           <span style={{ fontSize: 56 }}>🔗</span>
           <p style={{ fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-text)', textAlign: 'center' }}>초대받은 방이에요</p>
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', textAlign: 'center' }}>아직 이 방의 멤버가 아니에요.<br/>참여하시겠어요?</p>
-          {inviteCode ? (
-            <button
-              onClick={handleJoinFromRoom}
-              disabled={joining}
-              style={{ width: '100%', maxWidth: 320, padding: '14px', background: 'var(--color-primary)', borderRadius: 'var(--radius-lg)', fontSize: 'var(--text-base)', fontWeight: 700, color: '#fff', opacity: joining ? 0.6 : 1 }}
-            >
-              {joining ? '참여 중...' : '참여하기'}
-            </button>
-          ) : (
-            <button
-              onClick={() => navigate(ROUTES.ROOM_JOIN)}
-              style={{ width: '100%', maxWidth: 320, padding: '14px', background: 'var(--color-primary)', borderRadius: 'var(--radius-lg)', fontSize: 'var(--text-base)', fontWeight: 700, color: '#fff' }}
-            >
-              코드로 참여하기
-            </button>
-          )}
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', textAlign: 'center' }}>초대 코드를 입력하고 참여하세요</p>
+          <JoinWithCode roomId={id} onJoined={() => { window.location.href = `/room/${id}` }} />
           <button onClick={() => navigate(ROUTES.ROOMS)} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>취소</button>
         </div>
       </div>
@@ -285,5 +255,44 @@ function LeaveIcon() {
       <polyline points="16 17 21 12 16 7" />
       <line x1="21" y1="12" x2="9" y2="12" />
     </svg>
+  )
+}
+
+function JoinWithCode({ roomId, onJoined }: { roomId: number; onJoined: () => void }) {
+  const [code, setCode] = useState('')
+  const [joining, setJoining] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  async function handleJoin() {
+    if (!code.trim() || joining) return
+    setJoining(true)
+    setError(null)
+    try {
+      await roomApi.joinRoom(code.trim().toUpperCase())
+      onJoined()
+    } catch {
+      setError('코드가 올바르지 않아요.')
+      setJoining(false)
+    }
+  }
+
+  return (
+    <div style={{ width: '100%', maxWidth: 320, display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <input
+        value={code}
+        onChange={(e) => setCode(e.target.value.toUpperCase())}
+        placeholder="초대 코드 입력"
+        maxLength={10}
+        style={{ width: '100%', padding: '12px 14px', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border)', background: 'var(--color-surface-2)', color: 'var(--color-text)', fontSize: 'var(--text-base)', letterSpacing: 3, textAlign: 'center' }}
+      />
+      {error && <p style={{ fontSize: 'var(--text-sm)', color: '#ff6b6b', textAlign: 'center' }}>{error}</p>}
+      <button
+        onClick={handleJoin}
+        disabled={!code.trim() || joining}
+        style={{ width: '100%', padding: '14px', background: 'var(--color-primary)', borderRadius: 'var(--radius-lg)', fontSize: 'var(--text-base)', fontWeight: 700, color: '#fff', opacity: (!code.trim() || joining) ? 0.5 : 1 }}
+      >
+        {joining ? '참여 중...' : '참여하기'}
+      </button>
+    </div>
   )
 }

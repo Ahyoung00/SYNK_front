@@ -30,7 +30,7 @@ export default function RoomCreatedPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const inviteLink = `https://synk-front.vercel.app/invite/${roomCode}`
+  const inviteLink = `https://synk-front.vercel.app/room/${id}`
   const shareText  = `SYNK 방에 초대합니다! 코드: ${roomCode}\n${inviteLink}`
 
   function handleKakao() {
