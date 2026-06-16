@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
-import { userApi } from '@/services/api/endpoints'
+import { userApi, uploadApi } from '@/services/api/endpoints'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './ProfileEditPage.module.css'
 
@@ -40,12 +40,23 @@ export default function ProfileEditPage() {
     setSaving(true)
     try {
       const payload: { name?: string; profileImage?: string } = { name: name.trim() }
-      // 새 파일을 선택한 경우에만 profileImage 포함 (카카오 CDN URL은 절대 전송 안 함)
-      if (newPhotoFile && photoUrl?.startsWith('data:')) {
-        payload.profileImage = photoUrl
+
+      if (newPhotoFile) {
+        // 1) presigned URL 발급
+        const { presignedUrl, fileUrl } = await uploadApi.getPresignedUrl(newPhotoFile.name, 'profile')
+        // 2) S3에 직접 업로드
+        await fetch(presignedUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': newPhotoFile.type || 'image/jpeg' },
+          body: newPhotoFile,
+        })
+        // 3) 짧은 fileUrl만 profileImage로 전달
+        payload.profileImage = fileUrl
+        setPhotoUrl(fileUrl)
       }
+
       await userApi.updateProfile(payload)
-      if (user) setUser({ ...user, name: name.trim(), profileImage: newPhotoFile ? photoUrl : user.profileImage })
+      if (user) setUser({ ...user, name: name.trim(), profileImage: payload.profileImage ?? user.profileImage })
       navigate(-1)
     } catch (e) {
       console.error(e)

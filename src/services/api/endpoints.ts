@@ -302,3 +302,15 @@ export const notificationApi = {
   /** 스펙 미확정 */
   markAllRead: () => api.patch<void>('/notifications/read-all'),
 }
+
+// ── Upload ────────────────────────────────────────────────────────────────────
+// GET /upload/presigned-url?filename=&type= — S3 Presigned URL 발급
+
+export const uploadApi = {
+  getPresignedUrl: async (filename: string, type: 'profile' | 'video' = 'profile') => {
+    const res = await api.get<{ presignedUrl: string; fileUrl: string }>(
+      `/upload/presigned-url?filename=${encodeURIComponent(filename)}&type=${type}`,
+    )
+    return res.data
+  },
+}
