@@ -30,6 +30,40 @@ export default function RoomCreatedPage() {
     setTimeout(() => setCopied(false), 2000)
   }
 
+  const inviteLink = `https://synk-front.vercel.app/invite/${roomCode}`
+  const shareText  = `SYNK 방에 초대합니다! 코드: ${roomCode}\n${inviteLink}`
+
+  function handleKakao() {
+    const kakaoKey = import.meta.env.VITE_KAKAO_JS_KEY
+    if (!kakaoKey) return
+    const w = window as unknown as { Kakao?: { isInitialized: () => boolean; init: (k: string) => void; Share: { sendDefault: (o: object) => void } } }
+    if (!w.Kakao) return
+    if (!w.Kakao.isInitialized()) w.Kakao.init(kakaoKey)
+    w.Kakao.Share.sendDefault({
+      objectType: 'text',
+      text: shareText,
+      link: { mobileWebUrl: inviteLink, webUrl: inviteLink },
+    })
+  }
+
+  function handleSMS() {
+    window.open(`sms:?body=${encodeURIComponent(shareText)}`)
+  }
+
+  function handleInsta() {
+    navigator.clipboard?.writeText(shareText).catch(() => {})
+    window.open('https://www.instagram.com/', '_blank')
+  }
+
+  function handleMore() {
+    if (navigator.share) {
+      navigator.share({ title: 'SYNK 초대', text: shareText, url: inviteLink }).catch(() => {})
+    } else {
+      navigator.clipboard?.writeText(inviteLink).catch(() => {})
+      alert('링크가 복사됐어요!')
+    }
+  }
+
   return (
     <div className={styles.page}>
       {/* ── 배경 그라디언트 ──────────────────────────────────────────────────── */}
@@ -97,12 +131,12 @@ export default function RoomCreatedPage() {
             {/* 공유 아이콘 */}
             <div className={styles.shareRow}>
               {[
-                { emoji: '💬', label: '카카오톡', bg: '#FEE500', color: '#391B1B' },
-                { emoji: '📸', label: '인스타',   bg: '#E1306C', color: '#fff' },
-                { emoji: '✉️', label: '메시지',   bg: '#34C759', color: '#fff' },
-                { emoji: '•••', label: '더보기',  bg: 'var(--color-surface-2)', color: 'var(--color-text)' },
+                { emoji: '💬', label: '카카오톡', bg: '#FEE500', color: '#391B1B', onClick: handleKakao },
+                { emoji: '📸', label: '인스타',   bg: '#E1306C', color: '#fff',    onClick: handleInsta },
+                { emoji: '✉️', label: '메시지',   bg: '#34C759', color: '#fff',    onClick: handleSMS },
+                { emoji: '•••', label: '더보기',  bg: 'var(--color-surface-2)', color: 'var(--color-text)', onClick: handleMore },
               ].map((s) => (
-                <div key={s.label} className={styles.shareItem}>
+                <div key={s.label} className={styles.shareItem} onClick={s.onClick} style={{ cursor: 'pointer' }}>
                   <span
                     className={styles.shareIcon}
                     style={{ background: s.bg, color: s.color }}
