@@ -83,7 +83,7 @@ export default function RoomPage() {
           <span style={{ fontSize: 56 }}>🔗</span>
           <p style={{ fontSize: 'var(--text-lg)', fontWeight: 800, color: 'var(--color-text)', textAlign: 'center' }}>초대받은 방이에요</p>
           <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)', textAlign: 'center' }}>초대 코드를 입력하고 참여하세요</p>
-          <JoinWithCode roomId={id} onJoined={() => { window.location.href = `/room/${id}` }} />
+          <JoinWithCode onJoined={() => { window.location.href = `/room/${id}` }} />
           <button onClick={() => navigate(ROUTES.ROOMS)} style={{ fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>취소</button>
         </div>
       </div>
@@ -258,7 +258,7 @@ function LeaveIcon() {
   )
 }
 
-function JoinWithCode({ roomId, onJoined }: { roomId: number; onJoined: () => void }) {
+function JoinWithCode({ onJoined }: { onJoined: () => void }) {
   const [code, setCode] = useState('')
   const [joining, setJoining] = useState(false)
   const [error, setError] = useState<string | null>(null)
