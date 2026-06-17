@@ -11,7 +11,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       // firebase-messaging-sw.js 는 Firebase SDK가 직접 등록하므로 제외
       filename: 'sw.js',
-      includeAssets: ['SYNK_2.png'],
+      includeAssets: ['SYNK_2.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'SYNK',
         short_name: 'SYNK',
@@ -24,14 +24,20 @@ export default defineConfig({
         start_url: '/',
         icons: [
           {
-            src: 'SYNK_2.png',
-            sizes: '400x390',
+            src: 'icon-192.png',
+            sizes: '192x192',
             type: 'image/png',
             purpose: 'any',
           },
           {
-            src: 'SYNK_2.png',
-            sizes: '400x390',
+            src: 'icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any',
+          },
+          {
+            src: 'icon-512.png',
+            sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable',
           },
