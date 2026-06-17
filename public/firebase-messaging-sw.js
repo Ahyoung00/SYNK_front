@@ -20,25 +20,23 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging()
 
-// 백그라운드(앱이 닫혔거나 탭이 백그라운드) 알림 수신
-messaging.onBackgroundMessage((payload) => {
-  const { title = '알림', body = '' } = payload.notification ?? {}
-  self.registration.showNotification(title, {
-    body,
+self.addEventListener('push', function (e) {
+  if (!e.data.json()) return
+
+  const resultData = e.data.json().notification
+  const notificationTitle = resultData.title
+
+  const notificationOptions = {
+    body: resultData.body,
     icon: '/icon-192.png',
-    data: payload.data,
-  })
+  }
+
+  console.log(resultData.title, { body: resultData.body })
+
+  e.waitUntil(self.registration.showNotification(notificationTitle, notificationOptions))
 })
 
-// 알림 클릭 시 앱으로 포커스 이동
-self.addEventListener('notificationclick', (event) => {
+self.addEventListener('notificationclick', function (event) {
   event.notification.close()
-  event.waitUntil(
-    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      if (clientList.length > 0) {
-        return clientList[0].focus()
-      }
-      return clients.openWindow('/')
-    }),
-  )
+  event.waitUntil(clients.openWindow('/'))
 })
