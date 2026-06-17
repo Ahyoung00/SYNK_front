@@ -13,10 +13,13 @@ export function useFcm() {
   const token = useAuthStore((s) => s.token)
 
   useEffect(() => {
+    console.log('[FCM] useEffect 실행, token:', !!token)
     if (!token) return
+    console.log('[FCM] Notification 지원:', 'Notification' in window, '/ SW 지원:', 'serviceWorker' in navigator)
     if (!('Notification' in window) || !('serviceWorker' in navigator)) return
 
     Notification.requestPermission().then((permission) => {
+      console.log('[FCM] 알림 권한:', permission)
       if (permission !== 'granted') return
       registerAndSendToken()
     })
