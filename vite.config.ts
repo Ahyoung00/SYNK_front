@@ -1,10 +1,64 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { VitePWA } from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      // firebase-messaging-sw.js 는 Firebase SDK가 직접 등록하므로 제외
+      filename: 'sw.js',
+      includeAssets: ['icon.svg'],
+      manifest: {
+        name: 'SYNK',
+        short_name: 'SYNK',
+        description: '친구들과 함께하는 미션 챌린지',
+        theme_color: '#0f0f14',
+        background_color: '#0f0f14',
+        display: 'standalone',
+        orientation: 'portrait',
+        scope: '/',
+        start_url: '/',
+        icons: [
+          {
+            src: 'icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'any',
+          },
+          {
+            src: 'icon.svg',
+            sizes: 'any',
+            type: 'image/svg+xml',
+            purpose: 'maskable',
+          },
+        ],
+      },
+      workbox: {
+        // firebase-messaging-sw.js 는 PWA SW 캐싱 대상에서 제외
+        navigateFallbackDenylist: [/^\/firebase-messaging-sw\.js$/],
+        runtimeCaching: [
+          {
+            // API 응답은 캐시하지 않음 (항상 최신 데이터)
+            urlPattern: /^https:\/\/api\.synk\.ai\.kr\/.*/i,
+            handler: 'NetworkOnly',
+          },
+          {
+            // Google/Firebase 스크립트는 캐시
+            urlPattern: /^https:\/\/www\.gstatic\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'firebase-scripts',
+              expiration: { maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+        ],
+      },
+    }),
+  ],
 
   resolve: {
     alias: {
