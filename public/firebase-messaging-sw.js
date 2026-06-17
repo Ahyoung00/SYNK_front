@@ -1,3 +1,11 @@
+self.addEventListener('install', function (e) {
+  self.skipWaiting()
+})
+
+self.addEventListener('activate', function (e) {
+  console.log('fcm sw activate..')
+})
+
 importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js')
 importScripts('https://www.gstatic.com/firebasejs/10.14.1/firebase-messaging-compat.js')
 
