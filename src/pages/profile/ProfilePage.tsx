@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore, type Theme } from '@/store/themeStore'
 import { useSettingsStore } from '@/store/settingsStore'
+import { userApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import AppHeader from '@/components/layout/AppHeader'
 import styles from './ProfilePage.module.css'
@@ -19,6 +20,10 @@ export default function ProfilePage() {
   const setMissionAlert   = useSettingsStore((s) => s.setMissionAlert)
   const setResultAlert    = useSettingsStore((s) => s.setResultAlert)
   const setHighlightAlert = useSettingsStore((s) => s.setHighlightAlert)
+
+  async function updateNotification(patch: { missionNotification?: boolean; resultNotification?: boolean; highlightNotification?: boolean }) {
+    try { await userApi.updateNotificationSettings(patch) } catch {}
+  }
 
   function handleLogout() {
     logout()
@@ -59,21 +64,21 @@ export default function ProfilePage() {
               label="미션 알림"
               desc="매고 없이 오는 알림을 받아요"
               value={missionAlert}
-              onChange={setMissionAlert}
+              onChange={(v) => { setMissionAlert(v); updateNotification({ missionNotification: v }) }}
             />
             <div className={styles.divider} />
             <ToggleRow
               label="결과 알림"
               desc="결과가 생성되면 알려줘요"
               value={resultAlert}
-              onChange={setResultAlert}
+              onChange={(v) => { setResultAlert(v); updateNotification({ resultNotification: v }) }}
             />
             <div className={styles.divider} />
             <ToggleRow
               label="하이라이트 알림"
               desc="새 영상이 만들어지면 알려줘요"
               value={highlightAlert}
-              onChange={setHighlightAlert}
+              onChange={(v) => { setHighlightAlert(v); updateNotification({ highlightNotification: v }) }}
             />
           </div>
         </div>
