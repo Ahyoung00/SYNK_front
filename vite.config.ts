@@ -8,9 +8,10 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
       registerType: 'autoUpdate',
-      // firebase-messaging-sw.js 는 Firebase SDK가 직접 등록하므로 제외
-      filename: 'sw.js',
       includeAssets: ['SYNK_2.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
         name: 'SYNK',
@@ -43,29 +44,8 @@ export default defineConfig({
           },
         ],
       },
-      workbox: {
-        // firebase-messaging-sw.js 는 PWA SW 캐싱 대상에서 제외
-        navigateFallbackDenylist: [
-          /^\/firebase-messaging-sw\.js$/,
-          /^\/kakao-callback\.html$/,
-          /^\/google-callback\.html$/,
-        ],
-        runtimeCaching: [
-          {
-            // API 응답은 캐시하지 않음 (항상 최신 데이터)
-            urlPattern: /^https:\/\/api\.synk\.ai\.kr\/.*/i,
-            handler: 'NetworkOnly',
-          },
-          {
-            // Google/Firebase 스크립트는 캐시
-            urlPattern: /^https:\/\/www\.gstatic\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'firebase-scripts',
-              expiration: { maxAgeSeconds: 60 * 60 * 24 * 30 },
-            },
-          },
-        ],
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
       },
     }),
   ],
