@@ -24,10 +24,15 @@ export async function requestNotificationPermission(): Promise<boolean> {
       serviceWorkerRegistration: registration,
     })
     if (token) {
+      console.log('[FCM] 토큰:', token)
       await userApi.updateFcmToken(token)
+      console.log('[FCM] 서버 등록 완료')
+    } else {
+      console.warn('[FCM] 토큰 발급 실패')
     }
     return true
-  } catch {
+  } catch (err) {
+    console.error('[FCM] 오류:', err)
     return false
   }
 }
