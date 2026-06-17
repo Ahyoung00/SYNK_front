@@ -110,9 +110,12 @@ export default function NotificationsPage() {
       {/* ── 알림 목록 ─────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
         {isEmpty ? (
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-            알림이 없어요
-          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '60px 20px' }}>
+            <img src="/icon-notifications-off.svg" alt="" style={{ width: 48, height: 48 }} />
+            <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' }}>
+              알림이 없어요
+            </p>
+          </div>
         ) : (
           <>
             <NotifGroup label="오늘"    items={data?.today    ?? []} onRead={handleRead} />
