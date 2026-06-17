@@ -40,13 +40,18 @@ export function useFcm() {
 
 async function registerAndSendToken() {
   try {
-    const registration = await navigator.serviceWorker.ready
+    // Firebase 백그라운드 알림은 firebase-messaging-sw.js로 발급한 토큰이어야 함
+    // navigator.serviceWorker.ready는 PWA의 sw.js를 반환하므로 명시적으로 등록
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      scope: '/',
+    })
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration: registration,
     })
     if (token) {
       await userApi.updateFcmToken(token)
+      console.log('[FCM] 토큰 등록 완료')
     }
   } catch (err) {
     console.error('[FCM] 토큰 등록 실패:', err)
