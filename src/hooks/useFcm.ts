@@ -44,7 +44,11 @@ export function useFcm() {
   useEffect(() => {
     if (!token) return
     if (!('Notification' in window) || !('serviceWorker' in navigator)) return
-    if (Notification.permission !== 'granted') return
+
+    // 이미 권한이 허용된 경우 자동으로 토큰 등록
+    if (Notification.permission === 'granted') {
+      requestNotificationPermission()
+    }
 
     const unsubscribe = onMessage(messaging, (payload) => {
       const data = payload.data ?? {}
