@@ -7,8 +7,7 @@
   align-items: stretch;
   background: var(--color-surface-2);
   border-top: 1px solid var(--color-border);
-  padding-bottom: var(--safe-bottom);
-  height: calc(var(--bottom-nav-height) + var(--safe-bottom));
+  height: var(--bottom-nav-height);
   z-index: 100;
 }
 
