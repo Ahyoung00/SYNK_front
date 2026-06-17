@@ -141,10 +141,11 @@ export default function RoomsPage() {
 function RoomThumbnail({ src }: { src: string | null }) {
   return (
     <div className={styles.thumbnail}>
-      {src
-        ? <img src={src} alt="" className={styles.thumbnailImg} />
-        : <span className={styles.thumbnailPlaceholder}>🏠</span>
-      }
+      <img
+        src={src ?? '/SYNK.jpeg'}
+        alt=""
+        className={styles.thumbnailImg}
+      />
     </div>
   )
 }
