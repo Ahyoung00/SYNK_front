@@ -121,7 +121,7 @@ body {
   line-height: 1.5;
   color: var(--color-text);
   /* 데스크톱에서 앱 바깥 배경 */
-  background-color: #daec93;
+  background-color: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;         /* Feels native */

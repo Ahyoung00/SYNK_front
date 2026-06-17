@@ -10,7 +10,8 @@
   /* safe area 부분은 페이지 배경색 */
   background: var(--color-surface-2);
   border-top: 1px solid var(--color-border);
-  height: var(--bottom-nav-height);
+  height: calc(var(--bottom-nav-height) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
   z-index: 100;
 }
 
