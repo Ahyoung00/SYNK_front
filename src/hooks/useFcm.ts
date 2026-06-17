@@ -13,7 +13,7 @@ export function useFcm() {
   const token = useAuthStore((s) => s.token)
 
   useEffect(() => {
-    if (!token) return  // JWT 없으면 스킵
+    if (!token) return
     if (!('Notification' in window) || !('serviceWorker' in navigator)) return
 
     Notification.requestPermission().then((permission) => {
@@ -21,23 +21,21 @@ export function useFcm() {
       registerAndSendToken()
     })
 
-    // 포그라운드 메시지 수신
     const unsubscribe = onMessage(messaging, (payload) => {
       const data = payload.data ?? {}
       const appNotif = mapToAppNotification(data)
       if (appNotif) prependNotification(appNotif)
 
-      // 브라우저 Notification API로 배너 표시
       if (payload.notification) {
         new Notification(payload.notification.title ?? '', {
           body: payload.notification.body,
-          icon: '/icons/icon-192.png',
+          icon: '/icon-192.png',
         })
       }
     })
 
     return unsubscribe
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [token]) // token이 생기면 (로그인 직후) FCM 등록 실행
 }
 
 async function registerAndSendToken() {

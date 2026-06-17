@@ -3,6 +3,11 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import type { User } from '@/types'
 import { STORAGE_KEYS } from '@/constants'
 
+function toHttps(url: string | null | undefined): string | null {
+  if (!url) return null
+  return url.replace(/^http:\/\//, 'https://')
+}
+
 interface AuthState {
   user: User | null
   token: string | null
@@ -26,9 +31,9 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
 
       setAuth: (user, token, refreshToken) =>
-        set({ user, token, refreshToken, isAuthenticated: true }),
+        set({ user: { ...user, profileImage: toHttps(user.profileImage) }, token, refreshToken, isAuthenticated: true }),
 
-      setUser: (user) => set({ user }),
+      setUser: (user) => set({ user: { ...user, profileImage: toHttps(user.profileImage) } }),
 
       setToken: (token) => set({ token }),
 

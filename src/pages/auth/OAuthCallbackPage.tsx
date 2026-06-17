@@ -54,7 +54,9 @@ export default function OAuthCallbackPage({ provider }: Props) {
         setAuth(user, token, '')
         useChatStore.getState().clearAll()
         navigate(ROUTES.HOME, { replace: true })
-        userApi.getMe().then((r) => setAuth(r.data, token, '')).catch(() => {})
+        userApi.getMe().then((r) => {
+          setAuth({ ...r.data, profileImage: toHttps(r.data.profileImage) }, token, '')
+        }).catch(() => {})
       } catch {
         navigate('/login', { replace: true })
       }
