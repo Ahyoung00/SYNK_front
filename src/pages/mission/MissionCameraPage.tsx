@@ -22,9 +22,7 @@ export default function MissionCameraPage() {
 
   // 페이지 진입 시 카메라 켜기
   useEffect(() => {
-    if (!camera.isNative) {
-      camera.startPreview('front')
-    }
+    camera.startPreview('front')
     return () => {
       camera.stopPreview()
     }

@@ -15,9 +15,6 @@ export const ROOM_MAX_MEMBERS = 10
 /** Total number of mission templates in 도감 */
 export const COLLECTION_TOTAL = 90
 
-/** Capacitor plugin IDs */
-export const CAMERA_PLUGIN = '@capacitor/camera'
-
 // ── API ───────────────────────────────────────────────────────────────────────
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? '/api'

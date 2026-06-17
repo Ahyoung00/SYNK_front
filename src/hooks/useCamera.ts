@@ -1,6 +1,4 @@
 import { useCallback, useRef, useState } from 'react'
-import { Capacitor } from '@capacitor/core'
-import { Camera, CameraResultType, CameraSource } from '@capacitor/camera'
 import { VIDEO_MIN_S, VIDEO_MAX_S } from '@/constants'
 
 export type CameraFacing = 'front' | 'back'
@@ -16,19 +14,15 @@ interface UseCameraReturn {
   /** 최소 녹화 시간(3s) 충족 여부 */
   canStop: boolean
   error: string | null
-  isNative: boolean
 
   startPreview: (facing?: CameraFacing) => Promise<void>
   stopPreview: () => void
   startRecording: () => void
   stopRecording: () => void
-  captureNative: () => Promise<void>
   clearRecording: () => void
 }
 
 export function useCamera(): UseCameraReturn {
-  const isNative = Capacitor.isNativePlatform()
-
   const [state, setState] = useState<RecordingState>('idle')
   const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null)
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null)
@@ -45,8 +39,6 @@ export function useCamera(): UseCameraReturn {
   // ── Web: camera preview ───────────────────────────────────────────────────
 
   const startPreview = useCallback(async (facing: CameraFacing = 'front') => {
-    if (isNative) return
-
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: facing === 'front' ? 'user' : 'environment' },
@@ -67,7 +59,7 @@ export function useCamera(): UseCameraReturn {
       setError(msg)
       setState('error')
     }
-  }, [isNative])
+  }, [])
 
   const stopPreview = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop())
@@ -129,29 +121,6 @@ export function useCamera(): UseCameraReturn {
     }
   }, [])
 
-  // ── Native: Capacitor Camera ──────────────────────────────────────────────
-
-  const captureNative = useCallback(async () => {
-    try {
-      setState('recording')
-      const photo = await Camera.getPhoto({
-        resultType: CameraResultType.Uri,
-        source: CameraSource.Camera,
-        quality: 90,
-      })
-      if (photo.webPath) {
-        const res = await fetch(photo.webPath)
-        const blob = await res.blob()
-        setRecordedBlob(blob)
-        setRecordedUrl(URL.createObjectURL(blob))
-        setState('done')
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Capture failed')
-      setState('error')
-    }
-  }, [])
-
   // ── Clear ─────────────────────────────────────────────────────────────────
 
   const clearRecording = useCallback(() => {
@@ -173,12 +142,10 @@ export function useCamera(): UseCameraReturn {
     recordingElapsed: elapsed,
     canStop,
     error,
-    isNative,
     startPreview,
     stopPreview,
     startRecording,
     stopRecording,
-    captureNative,
     clearRecording,
   }
 }
