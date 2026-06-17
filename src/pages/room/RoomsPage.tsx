@@ -138,6 +138,17 @@ export default function RoomsPage() {
 
 // ── RoomCard ──────────────────────────────────────────────────────────────────
 
+function RoomThumbnail({ src }: { src: string | null }) {
+  return (
+    <div className={styles.thumbnail}>
+      {src
+        ? <img src={src} alt="" className={styles.thumbnailImg} />
+        : <span className={styles.thumbnailPlaceholder}>🏠</span>
+      }
+    </div>
+  )
+}
+
 function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
   const statusText = room.isAllCompleted
     ? `오늘 미션 ${room.completedMissions}/${room.totalMissions} 🔥`
@@ -146,28 +157,33 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
 
   return (
     <button className={styles.roomCard} onClick={onClick}>
-      <div className={styles.cardTop}>
-        <span className={styles.roomName}>{room.name}</span>
-        <span className={[styles.statusText, statusClass].join(' ')}>{statusText}</span>
-      </div>
-      <div className={styles.avatarStack}>
-        {room.memberProfiles.slice(0, 5).map((m, i) => (
-          <div
-            key={m.userId}
-            className={styles.avatarBubble}
-            style={{ zIndex: room.memberProfiles.length - i }}
-          >
-            {m.profileImage
-              ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-              : <span className={styles.avatarBubbleInitial}>👤</span>
-            }
+      <div className={styles.cardInner}>
+        <RoomThumbnail src={room.roomThumbnail} />
+        <div className={styles.cardBody}>
+          <div className={styles.cardTop}>
+            <span className={styles.roomName}>{room.name}</span>
+            <span className={[styles.statusText, statusClass].join(' ')}>{statusText}</span>
           </div>
-        ))}
-        {room.memberProfiles.length > 5 && (
-          <div className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
-            +{room.memberProfiles.length - 5}
+          <div className={styles.avatarStack}>
+            {room.memberProfiles.slice(0, 5).map((m, i) => (
+              <div
+                key={m.userId}
+                className={styles.avatarBubble}
+                style={{ zIndex: room.memberProfiles.length - i }}
+              >
+                {m.profileImage
+                  ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
+                  : <span className={styles.avatarBubbleInitial}>👤</span>
+                }
+              </div>
+            ))}
+            {room.memberProfiles.length > 5 && (
+              <div className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
+                +{room.memberProfiles.length - 5}
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </div>
     </button>
   )
@@ -176,25 +192,30 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
 function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => void }) {
   return (
     <button className={styles.roomCard} onClick={onClick}>
-      <div className={styles.cardTop}>
-        <span className={styles.roomName}>{room.name}</span>
-        <span className={[styles.statusText, styles.statusWaiting].join(' ')}>
-          {room.waitingCount}명 더 기다리는 중..
-        </span>
-      </div>
-      <div className={styles.avatarStack}>
-        {room.memberProfiles.slice(0, 5).map((m, i) => (
-          <div
-            key={m.userId}
-            className={styles.avatarBubble}
-            style={{ zIndex: room.memberProfiles.length - i }}
-          >
-            {m.profileImage
-              ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-              : <span className={styles.avatarBubbleInitial}>👤</span>
-            }
+      <div className={styles.cardInner}>
+        <RoomThumbnail src={room.roomThumbnail} />
+        <div className={styles.cardBody}>
+          <div className={styles.cardTop}>
+            <span className={styles.roomName}>{room.name}</span>
+            <span className={[styles.statusText, styles.statusWaiting].join(' ')}>
+              {room.waitingCount}명 더 기다리는 중..
+            </span>
           </div>
-        ))}
+          <div className={styles.avatarStack}>
+            {room.memberProfiles.slice(0, 5).map((m, i) => (
+              <div
+                key={m.userId}
+                className={styles.avatarBubble}
+                style={{ zIndex: room.memberProfiles.length - i }}
+              >
+                {m.profileImage
+                  ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
+                  : <span className={styles.avatarBubbleInitial}>👤</span>
+                }
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     </button>
   )
