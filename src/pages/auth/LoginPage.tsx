@@ -66,9 +66,12 @@ export default function LoginPage() {
     }
   }
 
-  // ── 카카오 로그인 (OAuth 팝업 + localStorage storage event) ─────────────
-  // Kakao's auth page sets COOP: same-origin, which nulls window.opener in the
-  // popup. postMessage doesn't work; localStorage + storage event does.
+  // ── 카카오 로그인 ─────────────────────────────────────────────────────────
+  // Kakao sets COOP: same-origin on their auth page, nulling window.opener.
+  // postMessage fails silently. We write the auth code to localStorage in the
+  // callback page, then detect it via both 'storage' event (works when popup is
+  // a real separate window) and 'focus' event (works on mobile where window.open
+  // may reuse the same tab or popup.closed is not detectable).
   function handleKakaoLogin() {
     if (oauthLoading) return
     const kakaoKey = import.meta.env.VITE_KAKAO_JS_KEY
@@ -87,15 +90,17 @@ export default function LoginPage() {
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code`
 
-    const popup = window.open(url, 'kakaoLogin', 'width=450,height=600,scrollbars=yes')
+    window.open(url, 'kakaoLogin', 'width=450,height=600,scrollbars=yes')
 
-    function onStorage(e: StorageEvent) {
-      if (e.key !== 'kakao_oauth_result' || !e.newValue) return
-      window.removeEventListener('storage', onStorage)
-      clearInterval(timer)
+    let handled = false
+    function consumeResult() {
+      const raw = localStorage.getItem('kakao_oauth_result')
+      if (!raw) return
+      if (handled) return
+      handled = true
+      cleanup()
       localStorage.removeItem('kakao_oauth_result')
-
-      const result = JSON.parse(e.newValue)
+      const result = JSON.parse(raw)
       if (result.error) {
         setOauthError('카카오 로그인에 실패했어요.')
         setOauthLoading(null)
@@ -103,26 +108,37 @@ export default function LoginPage() {
       }
       handleKakaoCodeSuccess(result.code, redirectUri)
     }
-    window.addEventListener('storage', onStorage)
 
-    // 팝업을 직접 닫으면 정리 (storage event가 오지 않은 경우)
-    const timer = setInterval(() => {
-      try {
-        if (popup?.closed) {
-          clearInterval(timer)
-          window.removeEventListener('storage', onStorage)
-          setOauthLoading((v) => v === 'kakao' ? null : v)
-        }
-      } catch { /* COOP may block popup.closed — ignore */ }
-    }, 500)
-
-    cleanupRef.current = () => {
-      clearInterval(timer)
-      window.removeEventListener('storage', onStorage)
+    function onStorage(e: StorageEvent) {
+      if (e.key === 'kakao_oauth_result') consumeResult()
     }
+    function onFocus() { consumeResult() }
+
+    window.addEventListener('storage', onStorage)
+    window.addEventListener('focus', onFocus)
+
+    function cleanup() {
+      window.removeEventListener('storage', onStorage)
+      window.removeEventListener('focus', onFocus)
+      clearInterval(timer)
+      cleanupRef.current = null
+    }
+
+    // 팝업을 그냥 닫으면 정리
+    const timer = setInterval(() => {
+      consumeResult()
+      const raw = localStorage.getItem('kakao_oauth_result')
+      if (raw) return // 아직 결과 대기 중
+      // 아무것도 없고 handled도 false면 유저가 팝업 닫은 것
+      if (!handled) {
+        // 팝업 닫힘 감지는 COOP 때문에 불가 — focus로 커버
+      }
+    }, 800)
+
+    cleanupRef.current = cleanup
   }
 
-  // ── 구글 로그인 (OAuth 팝업 + localStorage storage event) ───────────────
+  // ── 구글 로그인 ───────────────────────────────────────────────────────────
   function handleGoogleLogin() {
     if (oauthLoading) return
     const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
@@ -143,15 +159,16 @@ export default function LoginPage() {
       `&scope=${encodeURIComponent('email profile openid')}` +
       `&prompt=select_account`
 
-    const popup = window.open(url, 'googleLogin', 'width=450,height=600,scrollbars=yes')
+    window.open(url, 'googleLogin', 'width=450,height=600,scrollbars=yes')
 
-    function onStorage(e: StorageEvent) {
-      if (e.key !== 'google_oauth_result' || !e.newValue) return
-      window.removeEventListener('storage', onStorage)
-      clearInterval(timer)
+    let handled = false
+    function consumeResult() {
+      const raw = localStorage.getItem('google_oauth_result')
+      if (!raw || handled) return
+      handled = true
+      cleanup()
       localStorage.removeItem('google_oauth_result')
-
-      const result = JSON.parse(e.newValue)
+      const result = JSON.parse(raw)
       if (result.error) {
         setOauthError('Google 로그인에 실패했어요.')
         setOauthLoading(null)
@@ -159,23 +176,25 @@ export default function LoginPage() {
       }
       handleGoogleCodeSuccess(result.code, redirectUri)
     }
-    window.addEventListener('storage', onStorage)
 
-    const timer = setInterval(() => {
-      try {
-        if (popup?.closed) {
-          clearInterval(timer)
-          window.removeEventListener('storage', onStorage)
-          cleanupRef.current = null
-          setOauthLoading((v) => v === 'google' ? null : v)
-        }
-      } catch { /* COOP may block popup.closed — ignore */ }
-    }, 500)
-
-    cleanupRef.current = () => {
-      clearInterval(timer)
-      window.removeEventListener('storage', onStorage)
+    function onStorage(e: StorageEvent) {
+      if (e.key === 'google_oauth_result') consumeResult()
     }
+    function onFocus() { consumeResult() }
+
+    window.addEventListener('storage', onStorage)
+    window.addEventListener('focus', onFocus)
+
+    function cleanup() {
+      window.removeEventListener('storage', onStorage)
+      window.removeEventListener('focus', onFocus)
+      clearInterval(timer)
+      cleanupRef.current = null
+    }
+
+    const timer = setInterval(() => { consumeResult() }, 800)
+
+    cleanupRef.current = cleanup
   }
 
   // ── 구글 code 처리 ──────────────────────────────────────────────────────
