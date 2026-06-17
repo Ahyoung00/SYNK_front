@@ -1,7 +1,5 @@
 /// <reference lib="webworker" />
 import { cleanupOutdatedCaches, precacheAndRoute } from 'workbox-precaching'
-import { initializeApp } from 'firebase/app'
-import { getMessaging, onBackgroundMessage } from 'firebase/messaging/sw'
 
 declare const self: ServiceWorkerGlobalScope & { __WB_MANIFEST: Array<{ url: string; revision: string | null }> }
 
@@ -13,24 +11,26 @@ self.addEventListener('activate', (e: ExtendableEvent) => {
   e.waitUntil(self.clients.claim())
 })
 
-const firebaseApp = initializeApp({
-  apiKey: 'AIzaSyB7pgYMC37wqEm4wm0q6CIr9oveMUk0pY0',
-  authDomain: 'synk-fea96.firebaseapp.com',
-  projectId: 'synk-fea96',
-  storageBucket: 'synk-fea96.firebasestorage.app',
-  messagingSenderId: '228681249941',
-  appId: '1:228681249941:web:dcc883bf734d7da648579c',
-})
+self.addEventListener('push', (e: PushEvent) => {
+  if (!e.data) return
 
-const messaging = getMessaging(firebaseApp)
+  let title = 'SYNK'
+  let body = ''
 
-onBackgroundMessage(messaging, (payload) => {
-  const title = payload.notification?.title ?? '미션 시작!'
-  const body = payload.notification?.body ?? ''
-  self.registration.showNotification(title, {
-    body,
-    icon: '/icon-192.png',
-  })
+  try {
+    const data = e.data.json()
+    title = data.notification?.title ?? data.title ?? title
+    body = data.notification?.body ?? data.body ?? body
+  } catch {
+    body = e.data.text()
+  }
+
+  e.waitUntil(
+    self.registration.showNotification(title, {
+      body,
+      icon: '/icon-192.png',
+    })
+  )
 })
 
 self.addEventListener('notificationclick', (e: NotificationEvent) => {
