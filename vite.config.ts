@@ -24,22 +24,13 @@ export default defineConfig({
   base: '/',
 
   build: {
-    // Capacitor reads from /dist by default (see capacitor.config.ts)
     outDir: 'dist',
-    // Avoid inline assets that break Capacitor's CSP
-    assetsInlineLimit: 0,
     rollupOptions: {
       output: {
-        // Code-split by feature area for better caching
         manualChunks: {
           vendor: ['react', 'react-dom', 'react-router-dom'],
           state: ['zustand'],
-          capacitor: [
-            '@capacitor/core',
-            '@capacitor/camera',
-            '@capacitor/push-notifications',
-            '@capacitor/app',
-          ],
+          firebase: ['firebase/app', 'firebase/messaging'],
         },
       },
     },
