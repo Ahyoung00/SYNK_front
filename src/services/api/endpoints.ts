@@ -141,6 +141,10 @@ export const roomApi = {
   /** 스펙 미확정 */
   kickMember: (roomId: number, userId: number) =>
     api.delete<void>(`/rooms/${roomId}/members/${userId}`),
+
+  /** [테스트용] POST /rooms/{roomId}/test-notification — 방 멤버 전원 FCM 알림 발송 */
+  testNotification: (roomId: number) =>
+    api.post<void>(`/rooms/${roomId}/test-notification`),
 }
 
 // ── Mission ───────────────────────────────────────────────────────────────────

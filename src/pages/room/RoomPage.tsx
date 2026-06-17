@@ -62,6 +62,15 @@ export default function RoomPage() {
       .catch(console.error)
   }
 
+  async function handleTestNotification() {
+    try {
+      await roomApi.testNotification(id)
+      alert('✅ FCM 알림 발송 완료!\n방 멤버 전원에게 알림이 전송됐어요.')
+    } catch (e) {
+      alert('❌ 알림 발송 실패')
+    }
+  }
+
   async function handleTriggerMission() {
     if (triggering) return
     setTriggering(true)
@@ -256,6 +265,16 @@ export default function RoomPage() {
             {triggering ? '발동 중...' : '🧪 미션 강제 발동 (개발용)'}
           </button>
         )}
+        <button
+          onClick={handleTestNotification}
+          style={{
+            width: '100%', padding: '10px', marginBottom: 8,
+            background: 'rgba(99,102,241,0.15)', border: '1px dashed #6366f1',
+            borderRadius: 10, color: '#6366f1', fontSize: 13, cursor: 'pointer',
+          }}
+        >
+          🔔 FCM 알림 테스트 (전체 발송)
+        </button>
         <button className={styles.leaveBtn} onClick={handleLeave}>
           <LeaveIcon />
           방 나가기
