@@ -6,6 +6,7 @@ import AppLayout from '@/components/layout/AppLayout'
 // Auth
 import LoginPage from '@/pages/auth/LoginPage'
 import OnboardingPage from '@/pages/auth/OnboardingPage'
+import OAuthCallbackPage from '@/pages/auth/OAuthCallbackPage'
 
 // Home
 import HomePage from '@/pages/home/HomePage'
@@ -45,9 +46,11 @@ import { AuthGuard } from './AuthGuard'
 
 export const router = createBrowserRouter([
   // ── Public ─────────────────────────────────────────────────────────────────
-  { path: '/onboarding', element: <OnboardingPage /> },
-  { path: '/login',      element: <LoginPage /> },
-  { path: '/invite/:code', element: <InvitePage /> },
+  { path: '/onboarding',          element: <OnboardingPage /> },
+  { path: '/login',               element: <LoginPage /> },
+  { path: '/kakao-callback.html', element: <OAuthCallbackPage provider="kakao" /> },
+  { path: '/google-callback.html', element: <OAuthCallbackPage provider="google" /> },
+  { path: '/invite/:code',        element: <InvitePage /> },
 
   // ── Protected ──────────────────────────────────────────────────────────────
   {
