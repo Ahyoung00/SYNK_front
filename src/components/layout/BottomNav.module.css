@@ -3,8 +3,7 @@
   bottom: 0 !important;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 390px;
+  width: min(100vw, 390px);
   display: flex;
   align-items: stretch;
   background: var(--color-surface-2);

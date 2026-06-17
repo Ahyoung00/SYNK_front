@@ -138,7 +138,6 @@ body {
   display: flex;
   flex-direction: column;
   background-color: var(--color-bg);
-  position: relative;
 }
 
 /* 데스크톱: 폰 너비로 제한 + 그림자로 기기 느낌 */
