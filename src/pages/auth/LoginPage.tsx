@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
 import { api } from '@/services/api/client'
@@ -22,36 +22,39 @@ const DEV_USERS = [
 ]
 
 export default function LoginPage() {
-  const navigate   = useNavigate()
-  const location   = useLocation()
-  const redirectTo = (location.state as { redirectTo?: string } | null)?.redirectTo ?? ROUTES.HOME
-  const setAuth    = useAuthStore((s) => s.setAuth)
-  const isDev      = import.meta.env.DEV
+  const navigate      = useNavigate()
+  const location      = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const redirectTo    = (location.state as { redirectTo?: string } | null)?.redirectTo ?? ROUTES.HOME
+  const setAuth       = useAuthStore((s) => s.setAuth)
+  const isDev         = import.meta.env.DEV
   const [loading,      setLoading]      = useState<number | null>(null)
   const [oauthLoading, setOauthLoading] = useState<'kakao' | 'google' | null>(null)
   const [oauthError,   setOauthError]   = useState<string | null>(null)
 
-  // ── 리다이렉트 후 돌아왔을 때 sessionStorage에서 OAuth 코드 처리 ──────────
+  // ── 리다이렉트 후 돌아왔을 때 URL 파라미터에서 OAuth 코드 처리 ─────────────
   useEffect(() => {
-    const raw = sessionStorage.getItem('oauth_pending')
-    if (!raw) return
-    sessionStorage.removeItem('oauth_pending')
+    const kakaoCode  = searchParams.get('kakao_code')
+    const kakaoError = searchParams.get('kakao_error')
+    const googleCode  = searchParams.get('google_code')
+    const googleError = searchParams.get('google_error')
 
-    let pending: { provider: string; code?: string; error?: string }
-    try { pending = JSON.parse(raw) } catch { return }
+    if (!kakaoCode && !kakaoError && !googleCode && !googleError) return
 
-    if (pending.error || !pending.code) {
-      setOauthError('로그인에 실패했어요. 다시 시도해주세요.')
-      return
-    }
+    // URL에서 파라미터 제거 (코드 재사용 방지)
+    setSearchParams({}, { replace: true })
 
     const origin = window.location.origin
-    if (pending.provider === 'kakao') {
+    if (kakaoCode) {
       setOauthLoading('kakao')
-      handleKakaoCodeSuccess(pending.code, `${origin}/kakao-callback.html`)
-    } else if (pending.provider === 'google') {
+      handleKakaoCodeSuccess(kakaoCode, `${origin}/kakao-callback.html`)
+    } else if (kakaoError) {
+      setOauthError('카카오 로그인에 실패했어요. 다시 시도해주세요.')
+    } else if (googleCode) {
       setOauthLoading('google')
-      handleGoogleCodeSuccess(pending.code, `${origin}/google-callback.html`)
+      handleGoogleCodeSuccess(googleCode, `${origin}/google-callback.html`)
+    } else if (googleError) {
+      setOauthError('Google 로그인에 실패했어요. 다시 시도해주세요.')
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

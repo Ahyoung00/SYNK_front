@@ -8,11 +8,10 @@
       const error = params.get('error')
 
       if (code) {
-        sessionStorage.setItem('oauth_pending', JSON.stringify({ provider: 'google', code }))
+        window.location.replace('/login?google_code=' + encodeURIComponent(code))
       } else {
-        sessionStorage.setItem('oauth_pending', JSON.stringify({ provider: 'google', error: error ?? 'unknown' }))
+        window.location.replace('/login?google_error=' + encodeURIComponent(error ?? 'unknown'))
       }
-      window.location.replace('/')
     </script>
   </body>
 </html>

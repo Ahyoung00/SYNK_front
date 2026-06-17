@@ -8,12 +8,10 @@
       const error = params.get('error')
 
       if (code) {
-        sessionStorage.setItem('oauth_pending', JSON.stringify({ provider: 'kakao', code }))
+        window.location.replace('/login?kakao_code=' + encodeURIComponent(code))
       } else {
-        sessionStorage.setItem('oauth_pending', JSON.stringify({ provider: 'kakao', error: error ?? 'unknown' }))
+        window.location.replace('/login?kakao_error=' + encodeURIComponent(error ?? 'unknown'))
       }
-      // 앱 루트로 돌아가기
-      window.location.replace('/')
     </script>
   </body>
 </html>
