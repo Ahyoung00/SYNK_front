@@ -7,14 +7,18 @@
   max-width: 390px;
   display: flex;
   align-items: stretch;
-  background: var(--color-surface-2);
+  /* safe area 부분은 페이지 배경색 */
+  background: var(--color-bg);
   border-top: 1px solid var(--color-border);
-  height: var(--bottom-nav-height);
+  height: calc(var(--bottom-nav-height) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
   z-index: 100;
 }
 
 .tab {
   flex: 1;
+  /* stretch + padding-bottom으로 탭은 정확히 --bottom-nav-height만 채움 */
+  background: var(--color-surface-2);
   display: flex;
   flex-direction: column;
   align-items: center;
