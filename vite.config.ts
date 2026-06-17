@@ -45,7 +45,11 @@ export default defineConfig({
       },
       workbox: {
         // firebase-messaging-sw.js 는 PWA SW 캐싱 대상에서 제외
-        navigateFallbackDenylist: [/^\/firebase-messaging-sw\.js$/],
+        navigateFallbackDenylist: [
+          /^\/firebase-messaging-sw\.js$/,
+          /^\/kakao-callback\.html$/,
+          /^\/google-callback\.html$/,
+        ],
         runtimeCaching: [
           {
             // API 응답은 캐시하지 않음 (항상 최신 데이터)
