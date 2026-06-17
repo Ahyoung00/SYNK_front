@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { getToken, onMessage } from 'firebase/messaging'
 import { messaging } from '@/lib/firebase'
 import { useNotificationStore } from '@/store/notificationStore'
+import { useAuthStore } from '@/store/authStore'
 import { userApi } from '@/services/api/endpoints'
 import type { AppNotification, NotificationType } from '@/types'
 
@@ -9,8 +10,10 @@ const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY as string
 
 export function useFcm() {
   const prependNotification = useNotificationStore((s) => s.prependNotification)
+  const token = useAuthStore((s) => s.token)
 
   useEffect(() => {
+    if (!token) return  // JWT 없으면 스킵
     if (!('Notification' in window) || !('serviceWorker' in navigator)) return
 
     Notification.requestPermission().then((permission) => {
