@@ -463,7 +463,7 @@ export default function HomePage() {
         {activeMissions.length === 0 && !active && (
           <>
             <div className={styles.waitingCard}>
-              <img src="/icon-notifications-off.svg" alt="" className={styles.waitingIcon} />
+              <span className={styles.waitingIcon}>🔕</span>
               <p className={styles.waitingTitle}>아직 아무런 미션이<br />울리지 않았습니다</p>
               <p className={styles.waitingDesc}>미션이 울리면 홈 화면에 바로 알려드릴게요</p>
               <div className={styles.waitingBadge}>랜덤 알림을 기다리는 중</div>

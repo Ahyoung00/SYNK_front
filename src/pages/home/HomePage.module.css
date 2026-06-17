@@ -519,7 +519,7 @@
   text-align: center;
 }
 
-.waitingIcon { width: 48px; height: 48px; }
+.waitingIcon { font-size: 40px; }
 
 .waitingTitle {
   font-size: var(--text-md);
