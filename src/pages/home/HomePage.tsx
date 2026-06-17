@@ -8,6 +8,7 @@ import type { ActiveMissionItem, ActiveMissionParticipant, ActiveMissionState } 
 import { ROUTES } from '@/constants'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import AppHeader from '@/components/layout/AppHeader'
+import NotificationPrompt from '@/components/ui/NotificationPrompt'
 import styles from './HomePage.module.css'
 
 // ActiveMissionItem(API) → ActiveMissionState(store) 변환
@@ -365,6 +366,7 @@ export default function HomePage() {
 
   return (
     <div className={styles.page}>
+      <NotificationPrompt />
 
       {/* ── 헤더 ──────────────────────────────────────────────────────────── */}
       <AppHeader subtitle={`안녕하세요, ${firstName}님 👋`} />

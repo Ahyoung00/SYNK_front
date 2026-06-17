@@ -8,21 +8,38 @@ import type { AppNotification, NotificationType } from '@/types'
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY as string
 
+// 사용자 제스처(버튼 클릭)에서 호출 — iOS PWA는 자동 호출 무시
+export async function requestNotificationPermission(): Promise<boolean> {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) return false
+
+  const permission = await Notification.requestPermission()
+  if (permission !== 'granted') return false
+
+  try {
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      scope: '/',
+    })
+    const token = await getToken(messaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: registration,
+    })
+    if (token) {
+      await userApi.updateFcmToken(token)
+    }
+    return true
+  } catch {
+    return false
+  }
+}
+
 export function useFcm() {
   const prependNotification = useNotificationStore((s) => s.prependNotification)
   const token = useAuthStore((s) => s.token)
 
   useEffect(() => {
-    console.log('[FCM] useEffect 실행, token:', !!token)
     if (!token) return
-    console.log('[FCM] Notification 지원:', 'Notification' in window, '/ SW 지원:', 'serviceWorker' in navigator)
     if (!('Notification' in window) || !('serviceWorker' in navigator)) return
-
-    Notification.requestPermission().then((permission) => {
-      console.log('[FCM] 알림 권한:', permission)
-      if (permission !== 'granted') return
-      registerAndSendToken()
-    })
+    if (Notification.permission !== 'granted') return
 
     const unsubscribe = onMessage(messaging, (payload) => {
       const data = payload.data ?? {}
@@ -38,27 +55,7 @@ export function useFcm() {
     })
 
     return unsubscribe
-  }, [token]) // token이 생기면 (로그인 직후) FCM 등록 실행
-}
-
-async function registerAndSendToken() {
-  try {
-    // Firebase 백그라운드 알림은 firebase-messaging-sw.js로 발급한 토큰이어야 함
-    // navigator.serviceWorker.ready는 PWA의 sw.js를 반환하므로 명시적으로 등록
-    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
-      scope: '/',
-    })
-    const token = await getToken(messaging, {
-      vapidKey: VAPID_KEY,
-      serviceWorkerRegistration: registration,
-    })
-    if (token) {
-      await userApi.updateFcmToken(token)
-      console.log('[FCM] 토큰 등록 완료')
-    }
-  } catch (err) {
-    console.error('[FCM] 토큰 등록 실패:', err)
-  }
+  }, [token])
 }
 
 function mapToAppNotification(data: Record<string, string>): AppNotification | null {
