@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
@@ -22,26 +22,46 @@ const DEV_USERS = [
 ]
 
 export default function LoginPage() {
-  const navigate  = useNavigate()
-  const location  = useLocation()
+  const navigate   = useNavigate()
+  const location   = useLocation()
   const redirectTo = (location.state as { redirectTo?: string } | null)?.redirectTo ?? ROUTES.HOME
-  const setAuth   = useAuthStore((s) => s.setAuth)
-  const isDev     = import.meta.env.DEV
-  const [loading, setLoading]       = useState<number | null>(null)
+  const setAuth    = useAuthStore((s) => s.setAuth)
+  const isDev      = import.meta.env.DEV
+  const [loading,      setLoading]      = useState<number | null>(null)
   const [oauthLoading, setOauthLoading] = useState<'kakao' | 'google' | null>(null)
   const [oauthError,   setOauthError]   = useState<string | null>(null)
-  const cleanupRef = useRef<(() => void) | null>(null)
 
-  // 언마운트 시 남은 리스너/타이머 정리
-  useEffect(() => () => { cleanupRef.current?.() }, [])
+  // ── 리다이렉트 후 돌아왔을 때 sessionStorage에서 OAuth 코드 처리 ──────────
+  useEffect(() => {
+    const raw = sessionStorage.getItem('oauth_pending')
+    if (!raw) return
+    sessionStorage.removeItem('oauth_pending')
 
-  // ── 카카오 code 처리 ──────────────────────────────────────────────────────
+    let pending: { provider: string; code?: string; error?: string }
+    try { pending = JSON.parse(raw) } catch { return }
+
+    if (pending.error || !pending.code) {
+      setOauthError('로그인에 실패했어요. 다시 시도해주세요.')
+      return
+    }
+
+    const origin = window.location.origin
+    if (pending.provider === 'kakao') {
+      setOauthLoading('kakao')
+      handleKakaoCodeSuccess(pending.code, `${origin}/kakao-callback.html`)
+    } else if (pending.provider === 'google') {
+      setOauthLoading('google')
+      handleGoogleCodeSuccess(pending.code, `${origin}/google-callback.html`)
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // ── 카카오 code → 로그인 ─────────────────────────────────────────────────
   async function handleKakaoCodeSuccess(code: string, redirectUri: string) {
     try {
       const loginRes = await authApi.kakaoLogin(code, redirectUri)
       const { token } = loginRes.data
-
-      const tempUser: User = {
+      const user: User = {
         userId: loginRes.data.userId,
         name: loginRes.data.name,
         profileImage: toHttps(loginRes.data.profileImage),
@@ -49,12 +69,9 @@ export default function LoginPage() {
         resultNotification: true,
         highlightNotification: true,
       }
-      setAuth(tempUser, token, '')
+      setAuth(user, token, '')
       useChatStore.getState().clearAll()
-      // setAuth 직후 바로 이동 — getMe()를 기다리면 401 핸들러가
-      // window.location.replace('/login')을 호출해 navigate를 덮어쓸 수 있음
       navigate(redirectTo, { replace: true })
-      // 프로필 전체 로드는 이동 후 백그라운드에서 실행
       userApi.getMe().then((r) => setAuth(r.data, token, '')).catch(() => {})
     } catch (e) {
       console.error(e)
@@ -64,12 +81,7 @@ export default function LoginPage() {
     }
   }
 
-  // ── 카카오 로그인 ─────────────────────────────────────────────────────────
-  // Kakao sets COOP: same-origin on their auth page, nulling window.opener.
-  // postMessage fails silently. We write the auth code to localStorage in the
-  // callback page, then detect it via both 'storage' event (works when popup is
-  // a real separate window) and 'focus' event (works on mobile where window.open
-  // may reuse the same tab or popup.closed is not detectable).
+  // ── 카카오 로그인 버튼 → 리다이렉트 ─────────────────────────────────────
   function handleKakaoLogin() {
     if (oauthLoading) return
     const kakaoKey = import.meta.env.VITE_KAKAO_JS_KEY
@@ -77,130 +89,22 @@ export default function LoginPage() {
       setOauthError('카카오 앱 키가 설정되지 않았어요. (.env.local 확인)')
       return
     }
-
     setOauthLoading('kakao')
     setOauthError(null)
-    localStorage.removeItem('kakao_oauth_result')
-
     const redirectUri = `${window.location.origin}/kakao-callback.html`
-    const url = `https://kauth.kakao.com/oauth/authorize` +
+    window.location.href =
+      `https://kauth.kakao.com/oauth/authorize` +
       `?client_id=${kakaoKey}` +
       `&redirect_uri=${encodeURIComponent(redirectUri)}` +
       `&response_type=code`
-
-    window.open(url, 'kakaoLogin', 'width=450,height=600,scrollbars=yes')
-
-    let handled = false
-    function consumeResult() {
-      const raw = localStorage.getItem('kakao_oauth_result')
-      if (!raw) return
-      if (handled) return
-      handled = true
-      cleanup()
-      localStorage.removeItem('kakao_oauth_result')
-      const result = JSON.parse(raw)
-      if (result.error) {
-        setOauthError('카카오 로그인에 실패했어요.')
-        setOauthLoading(null)
-        return
-      }
-      handleKakaoCodeSuccess(result.code, redirectUri)
-    }
-
-    function onStorage(e: StorageEvent) {
-      if (e.key === 'kakao_oauth_result') consumeResult()
-    }
-    function onFocus() { consumeResult() }
-
-    window.addEventListener('storage', onStorage)
-    window.addEventListener('focus', onFocus)
-
-    function cleanup() {
-      window.removeEventListener('storage', onStorage)
-      window.removeEventListener('focus', onFocus)
-      clearInterval(timer)
-      cleanupRef.current = null
-    }
-
-    // 팝업을 그냥 닫으면 정리
-    const timer = setInterval(() => {
-      consumeResult()
-      const raw = localStorage.getItem('kakao_oauth_result')
-      if (raw) return // 아직 결과 대기 중
-      // 아무것도 없고 handled도 false면 유저가 팝업 닫은 것
-      if (!handled) {
-        // 팝업 닫힘 감지는 COOP 때문에 불가 — focus로 커버
-      }
-    }, 800)
-
-    cleanupRef.current = cleanup
   }
 
-  // ── 구글 로그인 ───────────────────────────────────────────────────────────
-  function handleGoogleLogin() {
-    if (oauthLoading) return
-    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
-    if (!googleClientId) {
-      setOauthError('Google 클라이언트 ID가 설정되지 않았어요. (.env 확인)')
-      return
-    }
-
-    setOauthLoading('google')
-    setOauthError(null)
-    localStorage.removeItem('google_oauth_result')
-
-    const redirectUri = `${window.location.origin}/google-callback.html`
-    const url = `https://accounts.google.com/o/oauth2/v2/auth` +
-      `?client_id=${googleClientId}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&response_type=code` +
-      `&scope=${encodeURIComponent('email profile openid')}` +
-      `&prompt=select_account`
-
-    window.open(url, 'googleLogin', 'width=450,height=600,scrollbars=yes')
-
-    let handled = false
-    function consumeResult() {
-      const raw = localStorage.getItem('google_oauth_result')
-      if (!raw || handled) return
-      handled = true
-      cleanup()
-      localStorage.removeItem('google_oauth_result')
-      const result = JSON.parse(raw)
-      if (result.error) {
-        setOauthError('Google 로그인에 실패했어요.')
-        setOauthLoading(null)
-        return
-      }
-      handleGoogleCodeSuccess(result.code, redirectUri)
-    }
-
-    function onStorage(e: StorageEvent) {
-      if (e.key === 'google_oauth_result') consumeResult()
-    }
-    function onFocus() { consumeResult() }
-
-    window.addEventListener('storage', onStorage)
-    window.addEventListener('focus', onFocus)
-
-    function cleanup() {
-      window.removeEventListener('storage', onStorage)
-      window.removeEventListener('focus', onFocus)
-      clearInterval(timer)
-      cleanupRef.current = null
-    }
-
-    const timer = setInterval(() => { consumeResult() }, 800)
-
-    cleanupRef.current = cleanup
-  }
-
-  // ── 구글 code 처리 ──────────────────────────────────────────────────────
+  // ── 구글 code → 로그인 ───────────────────────────────────────────────────
   async function handleGoogleCodeSuccess(code: string, redirectUri: string) {
     try {
       const loginRes = await authApi.googleLogin(code, redirectUri)
       const { token } = loginRes.data
-      const tempUser: User = {
+      const user: User = {
         userId: loginRes.data.userId,
         name: loginRes.data.name,
         profileImage: toHttps(loginRes.data.profileImage),
@@ -208,7 +112,7 @@ export default function LoginPage() {
         resultNotification: true,
         highlightNotification: true,
       }
-      setAuth(tempUser, token, '')
+      setAuth(user, token, '')
       useChatStore.getState().clearAll()
       navigate(redirectTo, { replace: true })
       userApi.getMe().then((r) => setAuth(r.data, token, '')).catch(() => {})
@@ -219,34 +123,48 @@ export default function LoginPage() {
       setOauthLoading(null)
     }
   }
+
+  // ── 구글 로그인 버튼 → 리다이렉트 ───────────────────────────────────────
+  function handleGoogleLogin() {
+    if (oauthLoading) return
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+    if (!googleClientId) {
+      setOauthError('Google 클라이언트 ID가 설정되지 않았어요. (.env 확인)')
+      return
+    }
+    setOauthLoading('google')
+    setOauthError(null)
+    const redirectUri = `${window.location.origin}/google-callback.html`
+    window.location.href =
+      `https://accounts.google.com/o/oauth2/v2/auth` +
+      `?client_id=${googleClientId}` +
+      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
+      `&response_type=code` +
+      `&scope=${encodeURIComponent('email profile openid')}` +
+      `&prompt=select_account`
+  }
+
+  // ── DEV 전용 로그인 ───────────────────────────────────────────────────────
   async function handleDevLogin(userId: number) {
     if (loading !== null) return
     setLoading(userId)
-    // 유저 전환 시 이전 유저의 채팅 캐시 초기화
     useChatStore.getState().clearAll()
     try {
-      // 1) 유저 선택 로그인 → 토큰 발급
       const loginRes = await api.post<{
         token: string; userId: number; name: string; profileImage: string | null
       }>('/auth/dev-login', { userId })
       const { token } = loginRes.data
-
-      // 2) 토큰을 임시 저장 후 /users/me 로 전체 프로필 로드
-      //    (setAuth를 먼저 호출해야 이후 API 요청에 Authorization 헤더가 붙음)
       const tempUser: User = {
         userId,
-        name:                  loginRes.data.name,
-        profileImage:          loginRes.data.profileImage,
-        missionNotification:   true,
-        resultNotification:    true,
+        name: loginRes.data.name,
+        profileImage: loginRes.data.profileImage,
+        missionNotification: true,
+        resultNotification: true,
         highlightNotification: true,
       }
       setAuth(tempUser, token, `mock-refresh-${userId}`)
-
-      // 3) /users/me 로 정확한 프로필로 덮어쓰기
       const meRes = await userApi.getMe()
       setAuth(meRes.data, token, `mock-refresh-${userId}`)
-
       navigate(redirectTo, { replace: true })
     } catch (e) {
       console.error(e)
@@ -312,7 +230,6 @@ export default function LoginPage() {
             </span>
             <div style={{ flex: 1, height: 1, background: 'var(--color-border)' }} />
           </div>
-
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {DEV_USERS.map((u) => (
               <button
@@ -321,10 +238,8 @@ export default function LoginPage() {
                 disabled={loading !== null}
                 style={{
                   width: '100%', padding: '12px 20px',
-                  background: loading === u.id
-                    ? 'rgba(122, 181, 103, 0.25)'
-                    : 'rgba(122, 181, 103, 0.1)',
-                  border: '1px dashed rgba(122, 181, 103, 0.4)',
+                  background: loading === u.id ? 'rgba(122,181,103,0.25)' : 'rgba(122,181,103,0.1)',
+                  border: '1px dashed rgba(122,181,103,0.4)',
                   color: 'var(--color-primary)', borderRadius: 12,
                   fontWeight: 600, fontSize: 14,
                   display: 'flex', alignItems: 'center', gap: 10,
@@ -344,7 +259,6 @@ export default function LoginPage() {
               </button>
             ))}
           </div>
-
           <p style={{ marginTop: 10, fontSize: 11, color: 'var(--color-text-muted)', textAlign: 'center' }}>
             빌드 시 자동으로 사라짐
           </p>

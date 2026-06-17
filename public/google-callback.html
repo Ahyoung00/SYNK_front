@@ -4,15 +4,15 @@
   <body>
     <script>
       const params = new URLSearchParams(window.location.search)
-      const code   = params.get('code')
-      const error  = params.get('error')
+      const code  = params.get('code')
+      const error = params.get('error')
 
-      localStorage.setItem('google_oauth_result', JSON.stringify({
-        code: code ?? null,
-        error: error ?? (code ? null : 'unknown'),
-        ts: Date.now(),
-      }))
-      window.close()
+      if (code) {
+        sessionStorage.setItem('oauth_pending', JSON.stringify({ provider: 'google', code }))
+      } else {
+        sessionStorage.setItem('oauth_pending', JSON.stringify({ provider: 'google', error: error ?? 'unknown' }))
+      }
+      window.location.replace('/')
     </script>
   </body>
 </html>

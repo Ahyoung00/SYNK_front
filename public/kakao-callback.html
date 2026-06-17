@@ -4,17 +4,16 @@
   <body>
     <script>
       const params = new URLSearchParams(window.location.search)
-      const code   = params.get('code')
-      const error  = params.get('error')
+      const code  = params.get('code')
+      const error = params.get('error')
 
-      // window.opener is nulled by Kakao's COOP: same-origin header.
-      // Use localStorage + storage event as a reliable alternative.
-      localStorage.setItem('kakao_oauth_result', JSON.stringify({
-        code: code ?? null,
-        error: error ?? (code ? null : 'unknown'),
-        ts: Date.now(),
-      }))
-      window.close()
+      if (code) {
+        sessionStorage.setItem('oauth_pending', JSON.stringify({ provider: 'kakao', code }))
+      } else {
+        sessionStorage.setItem('oauth_pending', JSON.stringify({ provider: 'kakao', error: error ?? 'unknown' }))
+      }
+      // 앱 루트로 돌아가기
+      window.location.replace('/')
     </script>
   </body>
 </html>
