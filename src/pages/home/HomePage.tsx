@@ -461,21 +461,12 @@ export default function HomePage() {
 
         {/* ── 01_대기 화면 ──────────────────────────────────────────────────── */}
         {activeMissions.length === 0 && !active && (
-          <>
-            <div className={styles.waitingCard}>
-              <span className={styles.waitingIcon}>🔕</span>
-              <p className={styles.waitingTitle}>아직 아무런 미션이<br />울리지 않았습니다</p>
-              <p className={styles.waitingDesc}>미션이 울리면 홈 화면에 바로 알려드릴게요</p>
-              <div className={styles.waitingBadge}>랜덤 알림을 기다리는 중</div>
-            </div>
-            <div className={styles.statusCard}>
-              <div className={styles.statusRow}>
-                <span className={styles.statusDot} />
-                <span className={styles.statusText}>참여 가능한 미션 없음</span>
-              </div>
-              <p className={styles.statusDesc}>방 탭에서 방을 확인하거나 만들어보세요</p>
-            </div>
-          </>
+          <div className={styles.waitingCard}>
+            <span className={styles.waitingIcon}>🔕</span>
+            <p className={styles.waitingTitle}>아직 아무런 미션이<br />울리지 않았습니다</p>
+            <p className={styles.waitingDesc}>미션이 울리면 홈 화면에 바로 알려드릴게요</p>
+            <div className={styles.waitingBadge}>랜덤 알림을 기다리는 중</div>
+          </div>
         )}
 
         {/* WS active 배너 (API 목록에 없을 때 fallback) */}
