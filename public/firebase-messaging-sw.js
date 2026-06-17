@@ -17,7 +17,7 @@ messaging.onBackgroundMessage((payload) => {
   const { title = '알림', body = '' } = payload.notification ?? {}
   self.registration.showNotification(title, {
     body,
-    icon: '/icons/icon-192.png',
+    icon: '/icon-192.png',
     data: payload.data,
   })
 })
