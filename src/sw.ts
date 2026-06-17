@@ -15,15 +15,24 @@ self.addEventListener('activate', (e: ExtendableEvent) => {
 
 self.addEventListener('push', (e: PushEvent) => {
   if (!e.data) return
-  const data = e.data.json()
-  const notification = data.notification ?? {}
-  if (!notification.title) return
 
-  console.log('미션 시작!', { body: notification.body })
+  let title = 'SYNK'
+  let body = ''
+
+  try {
+    const data = e.data.json()
+    const notification = data.notification ?? {}
+    title = notification.title ?? title
+    body = notification.body ?? body
+  } catch {
+    body = e.data.text()
+  }
+
+  console.log('push 수신:', { title, body })
 
   e.waitUntil(
-    self.registration.showNotification(notification.title, {
-      body: notification.body,
+    self.registration.showNotification(title, {
+      body,
       icon: '/icon-192.png',
     })
   )
