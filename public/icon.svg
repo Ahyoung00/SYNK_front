@@ -1,4 +1,40 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#6c63ff"/>
-  <text x="256" y="340" font-family="Arial Black, sans-serif" font-size="260" font-weight="900" fill="#ffffff" text-anchor="middle" letter-spacing="-8">S</text>
+  <defs>
+    <!-- 배경 모양으로 클리핑 -->
+    <clipPath id="bg-clip">
+      <rect width="512" height="512" rx="88"/>
+    </clipPath>
+    <linearGradient id="boltGrad" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#FFE033"/>
+      <stop offset="100%" stop-color="#FFAA00"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 배경 -->
+  <rect width="512" height="512" rx="88" fill="#1b2040"/>
+
+  <!-- 클립 영역 안에 모든 콘텐츠 -->
+  <g clip-path="url(#bg-clip)">
+    <!-- 흰색 원호 (중심 256,230 반지름 130) 10~11시 방향에 갭 -->
+    <path d="M 143,165 A 130,130 0 1 1 191,117"
+          fill="none" stroke="white" stroke-width="17" stroke-linecap="round"/>
+
+    <!-- 주황색 스파크 3개 (갭 근처, 바깥쪽으로 펼쳐짐) -->
+    <line x1="154" y1="152" x2="133" y2="144" stroke="#FF8C1A" stroke-width="12" stroke-linecap="round"/>
+    <line x1="157" y1="143" x2="140" y2="123" stroke="#FF8C1A" stroke-width="12" stroke-linecap="round"/>
+    <line x1="163" y1="135" x2="156" y2="113" stroke="#FF8C1A" stroke-width="12" stroke-linecap="round"/>
+
+    <!-- 번개 볼트 -->
+    <polygon points="248,128 215,250 244,250 198,365 275,258 247,258 278,128"
+             fill="url(#boltGrad)"/>
+
+    <!-- SYNK 텍스트 -->
+    <text x="256" y="440"
+          font-family="'Arial Black', Arial, sans-serif"
+          font-size="68"
+          font-weight="900"
+          fill="white"
+          text-anchor="middle"
+          letter-spacing="8">SYNK</text>
+  </g>
 </svg>
