@@ -2,12 +2,12 @@ import { NavLink } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import styles from './BottomNav.module.css'
 
-// 탭 순서: 홈 / 도감 / 방 / 마이
+// 탭 순서: 홈 / 방 / 도감 / 마이
 // 알림은 홈 헤더 우상단 벨 아이콘으로 진입
 const tabs = [
   { to: ROUTES.HOME,       label: '홈',   icon: IconHome },
-  { to: ROUTES.COLLECTION, label: '도감', icon: IconBook },
   { to: ROUTES.ROOMS,      label: '방',   icon: IconDoor },
+  { to: ROUTES.COLLECTION, label: '도감', icon: IconBook },
   { to: ROUTES.PROFILE,    label: '마이', icon: IconUser },
 ] as const
 
