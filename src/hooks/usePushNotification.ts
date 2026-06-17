@@ -1,19 +1,12 @@
 import { useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { PushNotifications } from '@capacitor/push-notifications'
+import { LocalNotifications } from '@capacitor/local-notifications'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { useNotificationStore } from '@/store/notificationStore'
+import { userApi } from '@/services/api/endpoints'
 import type { AppNotification, NotificationType } from '@/types'
-
-// ─────────────────────────────────────────────────────────────────────────────
-// usePushNotification
-//
-// Call once at the top of the app (e.g. inside <App>).
-// On native: registers Capacitor PushNotifications, requests permission,
-//            and handles incoming / tap events.
-// On web:    falls back to the Notification API.
-// ─────────────────────────────────────────────────────────────────────────────
 
 export function usePushNotification() {
   const navigate = useNavigate()
@@ -25,10 +18,7 @@ export function usePushNotification() {
     } else {
       setupWeb()
     }
-    // No cleanup needed; listeners live for the app lifetime
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── Native (Capacitor) ────────────────────────────────────────────────────
 
   function setupNative() {
     PushNotifications.requestPermissions().then(({ receive }) => {
@@ -38,27 +28,37 @@ export function usePushNotification() {
     })
 
     PushNotifications.addListener('registration', ({ value: token }) => {
-      // Send FCM token to Spring Boot backend
-      fetch('/api/auth/fcm-token', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ fcm_token: token }),
-      }).catch(console.error)
+      userApi.updateFcmToken(token).catch(console.error)
     })
 
-    // Notification received while app is open
+    // 앱이 포그라운드 상태일 때 알림 수신 → 로컬 알림으로 표시
     PushNotifications.addListener('pushNotificationReceived', (notification) => {
       const appNotif = mapPushToAppNotification(notification.data)
       if (appNotif) prependNotification(appNotif)
+
+      // 포그라운드에서도 배너 표시
+      LocalNotifications.schedule({
+        notifications: [
+          {
+            id: Date.now(),
+            title: notification.title ?? appNotif?.title ?? '',
+            body: notification.body ?? appNotif?.content ?? '',
+            extra: notification.data,
+          },
+        ],
+      }).catch(console.error)
     })
 
-    // User tapped a notification
+    // 알림 탭 처리 (백그라운드/종료 상태에서 탭)
     PushNotifications.addListener('pushNotificationActionPerformed', ({ notification }) => {
       handleNotificationTap(notification.data)
     })
-  }
 
-  // ── Web fallback ──────────────────────────────────────────────────────────
+    // 포그라운드 로컬 알림 탭 처리
+    LocalNotifications.addListener('localNotificationActionPerformed', ({ notification }) => {
+      handleNotificationTap(notification.extra as Record<string, string>)
+    })
+  }
 
   function setupWeb() {
     if (!('Notification' in window)) return
@@ -66,8 +66,6 @@ export function usePushNotification() {
       Notification.requestPermission()
     }
   }
-
-  // ── Helpers ───────────────────────────────────────────────────────────────
 
   function mapPushToAppNotification(
     data: Record<string, string>,
@@ -96,7 +94,6 @@ export function usePushNotification() {
         if (relatedId) navigate(ROUTES.MISSION_RESULT(relatedId))
         break
       case 'SYNKLOG_CREATED':
-        // related_id is room_id
         if (relatedId) navigate(ROUTES.ROOM_ALBUM(relatedId))
         break
       default:

@@ -72,6 +72,9 @@ export const userApi = {
   }) => api.patch<void>('/users/me/notifications', data),
 
   withdraw: () => api.delete<void>('/users/me'),
+
+  /** FCM 토큰 등록/갱신 — PUT /users/fcm-token */
+  updateFcmToken: (fcmToken: string) => api.put<void>('/users/fcm-token', { fcmToken }),
 }
 
 // ── Room ──────────────────────────────────────────────────────────────────────
