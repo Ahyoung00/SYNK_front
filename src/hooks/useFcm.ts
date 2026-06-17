@@ -54,9 +54,11 @@ export function useFcm() {
       if (appNotif) prependNotification(appNotif)
 
       if (payload.notification) {
-        new Notification(payload.notification.title ?? '', {
-          body: payload.notification.body,
-          icon: '/icon-192.png',
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.showNotification(payload.notification!.title ?? '', {
+            body: payload.notification!.body,
+            icon: '/icon-192.png',
+          })
         })
       }
     })
