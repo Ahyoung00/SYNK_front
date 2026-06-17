@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { Capacitor } from '@capacitor/core'
 import { PushNotifications } from '@capacitor/push-notifications'
-import { LocalNotifications } from '@capacitor/local-notifications'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { useNotificationStore } from '@/store/notificationStore'
@@ -31,32 +30,13 @@ export function usePushNotification() {
       userApi.updateFcmToken(token).catch(console.error)
     })
 
-    // 앱이 포그라운드 상태일 때 알림 수신 → 로컬 알림으로 표시
     PushNotifications.addListener('pushNotificationReceived', (notification) => {
       const appNotif = mapPushToAppNotification(notification.data)
       if (appNotif) prependNotification(appNotif)
-
-      // 포그라운드에서도 배너 표시
-      LocalNotifications.schedule({
-        notifications: [
-          {
-            id: Date.now(),
-            title: notification.title ?? appNotif?.title ?? '',
-            body: notification.body ?? appNotif?.content ?? '',
-            extra: notification.data,
-          },
-        ],
-      }).catch(console.error)
     })
 
-    // 알림 탭 처리 (백그라운드/종료 상태에서 탭)
     PushNotifications.addListener('pushNotificationActionPerformed', ({ notification }) => {
       handleNotificationTap(notification.data)
-    })
-
-    // 포그라운드 로컬 알림 탭 처리
-    LocalNotifications.addListener('localNotificationActionPerformed', ({ notification }) => {
-      handleNotificationTap(notification.extra as Record<string, string>)
     })
   }
 
