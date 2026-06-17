@@ -50,14 +50,12 @@ export default function LoginPage() {
         highlightNotification: true,
       }
       setAuth(tempUser, token, '')
-
-      try {
-        const meRes = await userApi.getMe()
-        setAuth(meRes.data, token, '')
-      } catch { /* loginRes 데이터로 진행 */ }
-
       useChatStore.getState().clearAll()
+      // setAuth 직후 바로 이동 — getMe()를 기다리면 401 핸들러가
+      // window.location.replace('/login')을 호출해 navigate를 덮어쓸 수 있음
       navigate(redirectTo, { replace: true })
+      // 프로필 전체 로드는 이동 후 백그라운드에서 실행
+      userApi.getMe().then((r) => setAuth(r.data, token, '')).catch(() => {})
     } catch (e) {
       console.error(e)
       setOauthError('카카오 로그인에 실패했어요. 다시 시도해주세요.')
@@ -211,12 +209,9 @@ export default function LoginPage() {
         highlightNotification: true,
       }
       setAuth(tempUser, token, '')
-      try {
-        const meRes = await userApi.getMe()
-        setAuth(meRes.data, token, '')
-      } catch { /* loginRes 데이터로 진행 */ }
       useChatStore.getState().clearAll()
       navigate(redirectTo, { replace: true })
+      userApi.getMe().then((r) => setAuth(r.data, token, '')).catch(() => {})
     } catch (e) {
       console.error(e)
       setOauthError('Google 로그인에 실패했어요. 다시 시도해주세요.')
