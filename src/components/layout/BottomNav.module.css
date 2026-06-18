@@ -1,9 +1,6 @@
 .nav {
-  position: fixed;
-  bottom: 0 !important;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(100vw, 390px);
+  flex-shrink: 0;
+  width: 100%;
   display: flex;
   align-items: stretch;
   background: var(--color-surface-2);
