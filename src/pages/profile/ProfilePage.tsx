@@ -39,11 +39,7 @@ export default function ProfilePage() {
         {/* ── 프로필 카드 ─────────────────────────────────────────────────────── */}
         <div className={styles.profileCard}>
           <div className={styles.avatarWrap}>
-            {user?.profileImage ? (
-              <img src={user.profileImage} alt="프로필" className={styles.avatarImg} />
-            ) : (
-              <span className={styles.avatarEmoji}>👤</span>
-            )}
+            <img src={user?.profileImage ?? '/SYNK.jpeg'} alt="프로필" className={styles.avatarImg} />
           </div>
           <div className={styles.profileInfo}>
             <span className={styles.profileName}>{user?.name ?? '내 프로필'}</span>

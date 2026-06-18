@@ -36,7 +36,7 @@ export default function CollectionDetailPage() {
             {/* ── 미션 설명 카드 ──────────────────────────────────────────────── */}
             <div className={styles.missionCard}>
               <div className={styles.missionAvatar}>
-                <span className={styles.missionAvatarText}>🎯</span>
+                <img src="/SYNK.jpeg" alt="" className={styles.missionAvatarImg} />
               </div>
               <div className={styles.missionText}>
                 <span className={styles.missionTitle}>{detail.title}</span>

@@ -146,10 +146,7 @@ export default function RoomPage() {
         onBack={() => navigate(ROUTES.ROOMS)}
         titleLeft={
           <div className={styles.roomThumb}>
-            {room.thumbnail
-              ? <img src={room.thumbnail} alt={room.name} className={styles.roomThumbImg} />
-              : <span className={styles.roomThumbEmoji}>🌅</span>
-            }
+            <img src={room.thumbnail ?? '/SYNK.jpeg'} alt={room.name} className={styles.roomThumbImg} />
           </div>
         }
         titleExtra={

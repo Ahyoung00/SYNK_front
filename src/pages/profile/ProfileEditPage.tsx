@@ -76,11 +76,7 @@ export default function ProfileEditPage() {
         {/* ── 아바타 ──────────────────────────────────────────────────────────── */}
         <div className={styles.avatarSection}>
           <div className={styles.avatar} onClick={handlePhotoClick} style={{ cursor: 'pointer' }}>
-            {photoUrl ? (
-              <img src={photoUrl} alt="프로필" className={styles.avatarImg} />
-            ) : (
-              <span className={styles.avatarEmoji}>😊</span>
-            )}
+            <img src={photoUrl ?? '/SYNK.jpeg'} alt="프로필" className={styles.avatarImg} />
           </div>
           <button className={styles.changePhotoBtn} onClick={handlePhotoClick}>
             프로필 사진 변경

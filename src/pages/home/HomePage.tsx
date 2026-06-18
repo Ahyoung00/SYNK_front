@@ -433,10 +433,7 @@ export default function HomePage() {
                   onClick={() => setSelectedMissionId(m.id)}
                 >
                   <div className={styles.missionSelectThumb}>
-                    {m.roomThumbnail
-                      ? <img src={m.roomThumbnail} alt={m.roomName} className={styles.missionSelectThumbImg} />
-                      : <span className={styles.missionSelectThumbFallback}>🏠</span>
-                    }
+                    <img src={m.roomThumbnail ?? '/SYNK.jpeg'} alt={m.roomName} className={styles.missionSelectThumbImg} />
                   </div>
                   <div className={styles.missionSelectInfo}>
                     <span className={styles.missionSelectRoom}>{m.roomName}</span>
