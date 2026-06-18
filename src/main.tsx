@@ -4,11 +4,16 @@ import { RouterProvider } from 'react-router-dom'
 import { router } from './router'
 import '@/styles/global.css'
 
-function setVh() {
-  document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`)
+// iOS PWA: CSS 뷰포트 단위(dvh/vh/%)가 실제 화면과 어긋나는 문제 →
+// JS로 실제 보이는 높이(window.innerHeight)를 --app-height에 직접 주입
+function setAppHeight() {
+  document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`)
 }
-setVh()
-window.addEventListener('resize', setVh)
+setAppHeight()
+window.addEventListener('resize', setAppHeight)
+window.addEventListener('orientationchange', setAppHeight)
+window.addEventListener('pageshow', setAppHeight)
+window.visualViewport?.addEventListener('resize', setAppHeight)
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
