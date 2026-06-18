@@ -7,8 +7,8 @@
 
 /* ── Sizes ───────────────────────────────────────────────────────────────── */
 .lg {
-  width: 160px;
-  height: 160px;
+  width: 120px;
+  height: 120px;
 }
 
 .sm {
@@ -35,7 +35,7 @@
 }
 
 .time {
-  font-size: 36px;
+  font-size: 28px;
   font-weight: 800;
   letter-spacing: -1px;
   font-variant-numeric: tabular-nums;
