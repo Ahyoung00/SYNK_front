@@ -4,6 +4,7 @@ import { ROUTES } from '@/constants'
 import { collectionApi } from '@/services/api/endpoints'
 import type { CollectionListResponse, CollectionMissionItem } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
+import Loading from '@/components/ui/Loading'
 import styles from './CollectionPage.module.css'
 
 // thumbnail 없을 때 미션 ID 기반 그라디언트 폴백
@@ -54,9 +55,7 @@ export default function CollectionPage() {
         {/* ── 미션 목록 ──────────────────────────────────────────────────────── */}
         <div className={styles.missionList}>
           {isLoading ? (
-            <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-              불러오는 중...
-            </p>
+            <Loading />
           ) : !data || data.missions.length === 0 ? (
             <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
               아직 완료한 미션이 없어요

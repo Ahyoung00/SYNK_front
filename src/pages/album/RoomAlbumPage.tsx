@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { albumApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import type { AlbumItem } from '@/types'
+import Loading from '@/components/ui/Loading'
 import styles from './RoomAlbumPage.module.css'
 
 /** "YYYY.MM.DD" → "YYYY-MM-DD" (URL 파라미터용) */
@@ -41,9 +42,7 @@ export default function RoomAlbumPage() {
 
       {/* ── 목록 ────────────────────────────────────────────────────────────── */}
       {isLoading ? (
-        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-          불러오는 중...
-        </p>
+        <Loading />
       ) : albums.length === 0 ? (
         <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
           아직 앨범이 없어요

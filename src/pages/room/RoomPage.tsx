@@ -4,6 +4,7 @@ import { ROUTES } from '@/constants'
 import { roomApi, albumApi, debugApi } from '@/services/api/endpoints'
 import type { RoomDetail, AlbumItem } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
+import Loading from '@/components/ui/Loading'
 import styles from './RoomPage.module.css'
 
 export default function RoomPage() {
@@ -90,7 +91,7 @@ export default function RoomPage() {
       <div className={styles.page}>
         <NavHeader title="방" onBack={() => navigate(ROUTES.ROOMS)} />
         <div className={styles.scroll}>
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>불러오는 중...</p>
+          <Loading />
         </div>
       </div>
     )

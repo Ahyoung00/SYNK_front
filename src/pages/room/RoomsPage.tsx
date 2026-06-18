@@ -5,6 +5,7 @@ import { ROUTES } from '@/constants'
 import { roomApi } from '@/services/api/endpoints'
 import type { ActiveRoom, WaitingRoom } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
+import Loading from '@/components/ui/Loading'
 import styles from './RoomsPage.module.css'
 
 export default function RoomsPage() {
@@ -35,12 +36,7 @@ export default function RoomsPage() {
       {/* ── 스크롤 ──────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
 
-        {isLoading && (
-          <div className={styles.empty}>
-            <span className={styles.emptyIcon}>⏳</span>
-            <p className={styles.emptyTitle}>불러오는 중...</p>
-          </div>
-        )}
+        {isLoading && <Loading />}
 
         {/* 참여중 */}
         {!isLoading && activeRooms.length > 0 && (
