@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCamera, VIDEO_MIN_S, VIDEO_MAX_S } from '@/hooks/useCamera'
 import { useMissionStore } from '@/store/missionStore'
-import { missionApi } from '@/services/api/endpoints'
+import { missionApi, uploadApi } from '@/services/api/endpoints'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import { ROUTES } from '@/constants'
 import { formatTime } from '@/hooks/useTimer'
@@ -47,20 +47,28 @@ export default function MissionCameraPage() {
   const secondsLeft = active.seconds_left
 
   async function handleSubmit() {
-    if (isSubmitting) return
+    if (isSubmitting || !camera.recordedBlob) return
     setIsSubmitting(true)
-    if (camera.recordedBlob) {
-      setRecordedBlob(camera.recordedBlob)
-    }
+    setRecordedBlob(camera.recordedBlob)
     try {
-      // mock에서는 실제 파일 업로드 대신 placeholder URL 사용
+      const filename = `mission_${mission.id}_${Date.now()}.mp4`
+      const { presignedUrl, fileUrl } = await uploadApi.getPresignedUrl(filename, 'video')
+
+      await fetch(presignedUrl, {
+        method: 'PUT',
+        body: camera.recordedBlob,
+        headers: { 'Content-Type': 'video/mp4' },
+      })
+
       await missionApi.submitVideo({
         missionId: mission.id,
-        videoUrl:  'mock://recorded-video',
+        videoUrl:  fileUrl,
         roomId:    Number(roomId) || room.id,
       })
     } catch (e) {
       console.error('제출 실패:', e)
+      setIsSubmitting(false)
+      return
     }
     navigate(ROUTES.MISSION_WAITING(Number(roomId) || room.id))
   }
