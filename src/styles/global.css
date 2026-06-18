@@ -103,7 +103,8 @@
 
 html, body {
   height: 100%;
-  overflow: hidden;          /* Capacitor: prevent overscroll bounce */
+  overflow: hidden;
+  overscroll-behavior: none; /* prevent overscroll bounce without blocking child scroll */
 }
 
 /* ── 스크롤바 숨기기 (모바일 앱 느낌) ────────────────────────────────────── */
