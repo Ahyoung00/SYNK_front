@@ -68,7 +68,9 @@ export default function RoomAlbumPage() {
                 <span className={styles.date}>{entry.date}</span>
                 <div className={styles.avatarStack}>
                   {entry.memberProfiles.slice(0, 5).map((p) => (
-                    <img key={p.userId} src={p.profileImage ?? '/SYNK.jpeg'} alt="" className={styles.avatarBubble} />
+                    p.profileImage
+                      ? <img key={p.userId} src={p.profileImage} alt="" className={styles.avatarBubble} />
+                      : <span key={p.userId} className={styles.avatarBubble}>👤</span>
                   ))}
                   {entry.memberProfiles.length > 5 && (
                     <span className={styles.avatarBubble}>+{entry.memberProfiles.length - 5}</span>

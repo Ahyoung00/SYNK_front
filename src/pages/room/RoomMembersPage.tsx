@@ -47,7 +47,10 @@ export default function RoomMembersPage() {
           <div key={m.userId} className={styles.memberRow}>
             <div className={styles.memberInfo}>
               <div className={styles.memberAvatar}>
-                <img src={m.profileImage ?? '/SYNK.jpeg'} alt={m.name} className={styles.memberAvatarImg} />
+                {m.profileImage
+                  ? <img src={m.profileImage} alt={m.name} className={styles.memberAvatarImg} />
+                  : <span className={styles.memberAvatarInitial}>👤</span>
+                }
               </div>
               <span className={styles.memberName}>{m.name}</span>
             </div>
