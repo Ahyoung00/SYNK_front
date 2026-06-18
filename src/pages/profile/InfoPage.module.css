@@ -1,0 +1,170 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  background: var(--color-bg);
+}
+
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--sp-4) var(--sp-5) calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px) + var(--sp-6));
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.lead {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text-sub);
+  padding: 0 var(--sp-1);
+}
+
+/* ── FAQ ──────────────────────────────────────────────────────────────────── */
+.faqList {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.faqItem {
+  border-bottom: 1px solid var(--color-border);
+}
+.faqItem:last-child { border-bottom: none; }
+
+.faqQuestion {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--sp-5);
+  text-align: left;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.faqArrow {
+  font-size: 18px;
+  color: var(--color-text-muted);
+  transform: rotate(90deg);
+  transition: transform var(--dur-fast) var(--ease-out);
+  flex-shrink: 0;
+}
+.faqArrowOpen { transform: rotate(-90deg); }
+
+.faqAnswer {
+  padding: 0 var(--sp-5) var(--sp-4);
+  font-size: var(--text-sm);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+/* ── 문의 카드 ────────────────────────────────────────────────────────────── */
+.contactCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-5);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+}
+
+.contactTitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-sub);
+}
+
+.contactLink {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+/* ── 버전 정보 ────────────────────────────────────────────────────────────── */
+.appHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-8) 0 var(--sp-4);
+}
+
+.appIcon {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+}
+
+.appName {
+  font-size: var(--text-xl);
+  font-weight: 900;
+  letter-spacing: -1px;
+  color: var(--color-text);
+}
+
+.appVersion {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.infoCard {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.infoRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) var(--sp-5);
+}
+
+.infoLabel {
+  font-size: var(--text-sm);
+  color: var(--color-text-sub);
+}
+
+.infoValue {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.infoDivider {
+  height: 1px;
+  background: var(--color-border);
+  margin: 0 var(--sp-5);
+}
+
+.linkRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--sp-4) var(--sp-5);
+}
+
+.linkArrow {
+  font-size: 18px;
+  color: var(--color-text-muted);
+}
+
+.copyright {
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--sp-2);
+}

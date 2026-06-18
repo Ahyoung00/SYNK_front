@@ -61,6 +61,8 @@ export const ROUTES = {
   PROFILE: '/profile',
   PROFILE_EDIT: '/profile/edit',
   WITHDRAW: '/profile/withdraw',
+  HELP: '/profile/help',
+  VERSION: '/profile/version',
 } as const
 
 // ── Storage keys ──────────────────────────────────────────────────────────────

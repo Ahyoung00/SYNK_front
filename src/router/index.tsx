@@ -40,6 +40,8 @@ import CollectionDetailPage from '@/pages/collection/CollectionDetailPage'
 import ProfilePage from '@/pages/profile/ProfilePage'
 import ProfileEditPage from '@/pages/profile/ProfileEditPage'
 import WithdrawPage from '@/pages/profile/WithdrawPage'
+import HelpPage from '@/pages/profile/HelpPage'
+import VersionPage from '@/pages/profile/VersionPage'
 
 // Auth guard
 import { AuthGuard } from './AuthGuard'
@@ -93,6 +95,8 @@ export const router = createBrowserRouter([
       // Profile
       { path: '/profile/edit',     element: <ProfileEditPage /> },
       { path: '/profile/withdraw', element: <WithdrawPage /> },
+      { path: '/profile/help',     element: <HelpPage /> },
+      { path: '/profile/version',  element: <VersionPage /> },
     ],
   },
 

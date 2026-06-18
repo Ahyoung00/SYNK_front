@@ -89,9 +89,9 @@ export default function ProfilePage() {
           <div className={styles.sectionCard}>
             <ThemeRow theme={theme} onChange={setTheme} />
             <div className={styles.divider} />
-            <LinkRow label="도움말" onPress={() => {}} />
+            <LinkRow label="도움말" onPress={() => navigate(ROUTES.HELP)} />
             <div className={styles.divider} />
-            <LinkRow label="버전 정보" onPress={() => {}} />
+            <LinkRow label="버전 정보" onPress={() => navigate(ROUTES.VERSION)} />
             <div className={styles.divider} />
             <LinkRow label="회원 탈퇴" onPress={() => navigate(ROUTES.WITHDRAW)} />
           </div>
