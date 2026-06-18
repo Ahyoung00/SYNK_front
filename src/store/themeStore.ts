@@ -17,20 +17,23 @@ function applyTheme(theme: Theme) {
 }
 
 // Apply saved theme immediately on module load (prevents flash on refresh)
+// 저장된 값이 없으면 기본값(dark) 적용
 try {
   const raw = localStorage.getItem('synk_theme')
   if (raw) {
     const parsed = JSON.parse(raw)
-    if (parsed?.state?.theme === 'dark') {
+    if (parsed?.state?.theme !== 'light') {
       document.documentElement.setAttribute('data-theme', 'dark')
     }
+  } else {
+    document.documentElement.setAttribute('data-theme', 'dark')
   }
 } catch { /* ignore */ }
 
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      theme: 'light',
+      theme: 'dark',
       setTheme: (theme) => {
         applyTheme(theme)
         set({ theme })
