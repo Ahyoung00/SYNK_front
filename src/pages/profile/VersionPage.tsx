@@ -1,3 +1,5 @@
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@/constants'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './InfoPage.module.css'
 
@@ -9,13 +11,15 @@ const INFO_ROWS: { label: string; value: string }[] = [
   { label: '개발', value: 'SYNK Team' },
 ]
 
-const LINKS: { label: string; href: string }[] = [
-  { label: '이용약관', href: '#' },
-  { label: '개인정보 처리방침', href: '#' },
-  { label: '오픈소스 라이선스', href: '#' },
-]
-
 export default function VersionPage() {
+  const navigate = useNavigate()
+
+  const LINKS: { label: string; to: string }[] = [
+    { label: '이용약관', to: ROUTES.TERMS },
+    { label: '개인정보 처리방침', to: ROUTES.PRIVACY },
+    { label: '오픈소스 라이선스', to: ROUTES.LICENSE },
+  ]
+
   return (
     <div className={styles.page}>
       <NavHeader title="버전 정보" />
@@ -43,10 +47,10 @@ export default function VersionPage() {
           {LINKS.map((link, idx) => (
             <div key={link.label}>
               {idx > 0 && <div className={styles.infoDivider} />}
-              <a className={styles.linkRow} href={link.href}>
+              <button className={styles.linkRow} onClick={() => navigate(link.to)}>
                 <span className={styles.infoLabel}>{link.label}</span>
                 <span className={styles.linkArrow}>›</span>
-              </a>
+              </button>
             </div>
           ))}
         </div>

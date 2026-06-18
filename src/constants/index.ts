@@ -63,6 +63,9 @@ export const ROUTES = {
   WITHDRAW: '/profile/withdraw',
   HELP: '/profile/help',
   VERSION: '/profile/version',
+  TERMS: '/profile/terms',
+  PRIVACY: '/profile/privacy',
+  LICENSE: '/profile/license',
 } as const
 
 // ── Storage keys ──────────────────────────────────────────────────────────────

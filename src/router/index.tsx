@@ -42,6 +42,9 @@ import ProfileEditPage from '@/pages/profile/ProfileEditPage'
 import WithdrawPage from '@/pages/profile/WithdrawPage'
 import HelpPage from '@/pages/profile/HelpPage'
 import VersionPage from '@/pages/profile/VersionPage'
+import TermsPage from '@/pages/profile/TermsPage'
+import PrivacyPage from '@/pages/profile/PrivacyPage'
+import LicensePage from '@/pages/profile/LicensePage'
 
 // Auth guard
 import { AuthGuard } from './AuthGuard'
@@ -97,6 +100,9 @@ export const router = createBrowserRouter([
       { path: '/profile/withdraw', element: <WithdrawPage /> },
       { path: '/profile/help',     element: <HelpPage /> },
       { path: '/profile/version',  element: <VersionPage /> },
+      { path: '/profile/terms',    element: <TermsPage /> },
+      { path: '/profile/privacy',  element: <PrivacyPage /> },
+      { path: '/profile/license',  element: <LicensePage /> },
     ],
   },
 
