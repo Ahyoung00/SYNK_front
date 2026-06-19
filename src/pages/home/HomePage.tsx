@@ -472,16 +472,8 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* ── 콜라주 처리 중 ────────────────────────────────────────────────── */}
-        {processingRoomId !== null && activeMissions.length === 0 && (
-          <div className={styles.missionCardProcessing}>
-            <div className={styles.missionCardProcessingSpinner} />
-            <span>영상 만드는 중...</span>
-          </div>
-        )}
-
         {/* ── 01_대기 화면 ──────────────────────────────────────────────────── */}
-        {activeMissions.length === 0 && !active && processingRoomId === null && (
+        {activeMissions.length === 0 && !active && (
           <div className={styles.waitingCard}>
             <span className={styles.waitingIcon}>🔕</span>
             <p className={styles.waitingTitle}>아직 아무런 미션이 울리지 않았어요 💤</p>
