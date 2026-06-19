@@ -247,7 +247,7 @@ export default function RoomChatPage() {
 
       {/* ── 오늘 미션 결과 배너 ──────────────────────────────────────────── */}
       {missionDone && (
-        <MissionResultBanner onPress={() => navigate(ROUTES.MISSION_RESULT(numRoomId))} />
+        <MissionResultBanner onPress={() => navigate(ROUTES.MISSION_RESULT('today'), { state: { roomId: numRoomId, returnTo: 'album' } })} />
       )}
 
       {/* ── 메시지 목록 ──────────────────────────────────────────────────── */}
