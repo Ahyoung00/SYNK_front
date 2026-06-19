@@ -208,7 +208,7 @@ export default function MissionResultPage() {
         </div>
 
         {/* 홈으로 */}
-        <button className={styles.homeBtn} onClick={() => navigate(ROUTES.HOME, { replace: true })}>
+        <button className={styles.homeBtn} onClick={() => { clearMission(); navigate(ROUTES.HOME, { replace: true }) }}>
           홈으로 돌아가기
         </button>
       </div>

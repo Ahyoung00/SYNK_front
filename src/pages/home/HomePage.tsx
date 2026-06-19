@@ -181,18 +181,12 @@ function HomeMissionCard({
       </div>
 
       {/* ── 버튼 ─────────────────────────────────────────────────────────── */}
-      {allDone ? (
-        // 전원 완료 → 카드가 곧 사라짐, 완료 메시지만 표시
-        <div className={styles.missionCardAllDone}>
-          🎉 모두 완료! 앨범에 저장돼요
+      {allDone || isExpired ? (
+        // 전원 완료 or 시간 종료 → 결과 만드는 중 인라인 표시
+        <div className={styles.missionCardProcessing}>
+          <div className={styles.missionCardProcessingSpinner} />
+          <span>결과 만드는 중...</span>
         </div>
-      ) : isExpired ? (
-        <button
-          className={[styles.missionCardCta, styles.missionCardCtaResult].join(' ')}
-          onClick={onViewResult}
-        >
-          미션 완료 보기 →
-        </button>
       ) : iDone ? (
         <div className={styles.missionCardDoneWrap}>
           <button
