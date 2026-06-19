@@ -1,51 +1,87 @@
 import { useEffect, useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
-import { useAuthStore } from '@/store/authStore'
+import { albumApi } from '@/services/api/endpoints'
 import { CollageGrid } from '@/components/collage/CollageGrid'
-import { buildCollageCells, createMockCells } from '@/utils/mockCollage'
+import { createMockCells } from '@/utils/mockCollage'
 import type { CollageCellData } from '@/utils/mockCollage'
+import type { CollageItem } from '@/types'
 import { ROUTES } from '@/constants'
 import styles from './MissionResultPage.module.css'
+
+/** CollageItem → CollageCellData[] 변환 */
+function collageToCells(collage: CollageItem): CollageCellData[] {
+  return collage.participants.map((p, i) => ({
+    user: { id: p.userId, name: p.name, profile_image: p.profileImage ?? undefined },
+    videoUrl:      p.videoUrl ?? undefined,
+    missionStartAt: collage.missionStartAt ?? new Date().toISOString(),
+    submittedAt:   p.submittedAt ?? undefined,
+    status:        p.state === 'done' ? 'submitted' : 'missed',
+    gradient:      CELL_GRADIENTS[i % CELL_GRADIENTS.length],
+  }))
+}
+
+const CELL_GRADIENTS = [
+  'linear-gradient(160deg, #1a1a3e 0%, #0f3460 100%)',
+  'linear-gradient(160deg, #2d1b69 0%, #11998e 100%)',
+  'linear-gradient(160deg, #4a0942 0%, #b91c5c 100%)',
+  'linear-gradient(160deg, #0f2027 0%, #2c5364 100%)',
+  'linear-gradient(160deg, #1f1c2c 0%, #6c63ff 100%)',
+  'linear-gradient(160deg, #16213e 0%, #0f3460 50%, #533483 100%)',
+  'linear-gradient(160deg, #2c003e 0%, #8b0000 100%)',
+  'linear-gradient(160deg, #003b36 0%, #1a7a4a 100%)',
+  'linear-gradient(160deg, #1a0533 0%, #3a0ca3 100%)',
+  'linear-gradient(160deg, #1e3a5f 0%, #2e86ab 100%)',
+]
+
+function todayString(): string {
+  const d = new Date()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${mm}-${dd}`
+}
 
 export default function MissionResultPage() {
   const navigate     = useNavigate()
   const location     = useLocation()
+  const { missionId: missionIdParam } = useParams<{ missionId: string }>()
   const active       = useMissionStore((s) => s.active)
   const clearMission = useMissionStore((s) => s.clearMission)
-  const previewUrl   = useMissionStore((s) => s.previewUrl)
-  const myUser       = useAuthStore((s) => s.user)
 
-  const [cells, setCells] = useState<CollageCellData[]>([])
+  const [cells, setCells]         = useState<CollageCellData[]>([])
+  const [collageVideoUrl, setCollageVideoUrl] = useState<string | null>(null)
+  const [missionTitle, setMissionTitle]       = useState<string>('미션 결과')
   const [showStats, setShowStats] = useState(false)
 
-  const isAlbumView = (location.state as { returnTo?: string } | null)?.returnTo === 'album'
-
-  // 셀 데이터 초기화
+  // 셀 데이터 초기화 — collage API로부터 실제 영상 URL 로드
   useEffect(() => {
-    let built: CollageCellData[]
+    const roomId   = active?.room.id ?? (location.state as { roomId?: number } | null)?.roomId
+    const missionId = Number(missionIdParam) || active?.mission.id
+    const date     = todayString()
 
-    if (active) {
-      const startAt = active.mission.targeted_at
-      built = buildCollageCells(active.participations, startAt)
-
-      // 현재 세션에서 녹화한 영상(previewUrl)을 내 셀에 주입
-      // 앨범 뷰에서는 handleViewCollage에서 미션별로 정확하게 이미 처리했으므로 여기서는 주입 안 함
-      if (previewUrl && myUser && !isAlbumView) {
-        built = built.map((c) => {
-          const uid = (c.user as unknown as { userId: number }).userId
-          return uid === myUser.userId ? { ...c, videoUrl: previewUrl } : c
-        })
-      }
-    } else {
-      built = createMockCells()
+    if (!roomId) {
+      setCells(createMockCells())
+      setTimeout(() => setShowStats(true), 400)
+      return
     }
 
-    setCells(built)
+    albumApi.getCollages(roomId, date)
+      .then((res) => {
+        const collages: CollageItem[] = res.data ?? []
+        const target = missionId
+          ? collages.find((c) => c.missionId === missionId) ?? collages[0]
+          : collages[0]
 
-    // 통계 영역은 0.4초 후 fade-in
-    const t = setTimeout(() => setShowStats(true), 400)
-    return () => clearTimeout(t)
+        if (target) {
+          setCollageVideoUrl(target.collageVideoUrl)
+          setMissionTitle(target.missionTitle)
+          setCells(collageToCells(target))
+        } else {
+          setCells(createMockCells())
+        }
+      })
+      .catch(() => setCells(createMockCells()))
+      .finally(() => setTimeout(() => setShowStats(true), 400))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleBack() {
@@ -68,14 +104,13 @@ export default function MissionResultPage() {
   }
 
   function handleSave() {
-    // 웹 환경: 녹화한 영상 blob이 있으면 다운로드, 없으면 안내
-    if (previewUrl) {
+    if (collageVideoUrl) {
       const a = document.createElement('a')
-      a.href = previewUrl
-      a.download = `synk_${new Date().toISOString().slice(0, 10)}.webm`
+      a.href = collageVideoUrl
+      a.download = `synk_${new Date().toISOString().slice(0, 10)}.mp4`
       a.click()
     } else {
-      alert('실제 기기에서는 갤러리에 저장됩니다.\n(웹 환경에서는 이번 세션의 영상만 저장할 수 있어요)')
+      alert('아직 콜라주 영상이 준비되지 않았어요.')
     }
   }
 
@@ -102,8 +137,7 @@ export default function MissionResultPage() {
   }
 
   // ── 미션 정보 ──────────────────────────────────────────────────────────────
-  const missionTitle = active?.mission.template?.title ?? '지금 네 표정 그대로 찍기'
-  const roomName = active?.room.name ?? '새벽반'
+  const roomName = active?.room.name ?? ''
   const missionDate = missionStartAt
     ? new Date(missionStartAt).toLocaleDateString('ko-KR', {
         year: 'numeric', month: 'long', day: 'numeric',
