@@ -97,7 +97,7 @@ export default function SynkLogDetailPage() {
         }
       }),
     })
-    navigate(ROUTES.MISSION_RESULT(item.missionId), { state: { returnTo: 'album' } })
+    navigate(ROUTES.MISSION_RESULT(item.missionId), { state: { returnTo: 'album', roomId: numRoomId } })
   }
 
   if (isLoading) {
