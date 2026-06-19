@@ -461,9 +461,9 @@ export default function HomePage() {
         {activeMissions.length === 0 && !active && (
           <div className={styles.waitingCard}>
             <span className={styles.waitingIcon}>🔕</span>
-            <p className={styles.waitingTitle}>아직 아무런 미션이<br />울리지 않았습니다</p>
-            <p className={styles.waitingDesc}>미션이 울리면 홈 화면에 바로 알려드릴게요</p>
-            <div className={styles.waitingBadge}>랜덤 알림을 기다리는 중</div>
+            <p className={styles.waitingTitle}>아직 아무런 미션이 울리지 않았어요 💤</p>
+            <p className={styles.waitingDesc}>미션이 울리면 홈 화면에 바로 알려드릴게요!</p>
+            <div className={styles.waitingBadge}>랜덤 알림 기다리는 중 👀 ... </div>
           </div>
         )}
 
@@ -472,7 +472,7 @@ export default function HomePage() {
           <button className={styles.alertBanner} onClick={handleEnterActiveMission}>
             <div className={styles.alertDot} />
             <div className={styles.alertText}>
-              <p className={styles.alertTitle}>⚡ {active.room.name}에서 미션이 울렸어요!</p>
+              <p className={styles.alertTitle}>⚡ {active.room.name}에서 미션이 울렸어요 ⚡</p>
               <p className={styles.alertSub}>{active.mission.template?.title} · 지금 바로 참여하세요</p>
             </div>
             <span className={styles.alertArrow}>›</span>
