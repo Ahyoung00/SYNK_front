@@ -145,7 +145,9 @@ function HomeMissionCard({
 
       {/* ── 상단 배너 ───────────────────────────────────────────────────── */}
       <div className={styles.missionCardHeader}>
-        <p className={styles.missionCardRoomBadge}>⚡ {mission.roomName}에서 미션이 울렸어요!</p>
+        <p className={styles.missionCardRoomBadge}>
+          <span className={styles.missionCardBolt}>⚡</span> {mission.roomName}에서 미션이 울렸어요!
+        </p>
         <p className={styles.missionCardSub}>5분 안에 참여해야 기록돼요</p>
       </div>
 
