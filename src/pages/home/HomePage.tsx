@@ -463,7 +463,7 @@ export default function HomePage() {
             <span className={styles.waitingIcon}>🔕</span>
             <p className={styles.waitingTitle}>아직 아무런 미션이 울리지 않았어요 💤</p>
             <p className={styles.waitingDesc}>미션이 울리면 홈 화면에 바로 알려드릴게요!</p>
-            <div className={styles.waitingBadge}>랜덤 알림 기다리는 중 👀 ... </div>
+            <div className={styles.waitingBadge}>랜덤 알림 기다리는 중 👀 </div>
           </div>
         )}
 
