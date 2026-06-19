@@ -70,7 +70,7 @@ export default function MissionCameraPage() {
       setIsSubmitting(false)
       return
     }
-    navigate(ROUTES.MISSION_WAITING(Number(roomId) || room.id))
+    navigate(ROUTES.HOME, { replace: true })
   }
 
   return (

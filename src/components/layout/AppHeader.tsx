@@ -19,8 +19,7 @@ export default function AppHeader({ subtitle }: AppHeaderProps) {
   return (
     <div className={styles.header}>
       <div>
-        <span className={styles.brand}>SYNK</span>
-        {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
+        <span className={styles.brand}>{subtitle ?? 'SYNK'}</span>
       </div>
       <button
         className={styles.bellBtn}

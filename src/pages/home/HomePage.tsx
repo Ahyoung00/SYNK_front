@@ -3,12 +3,19 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useMissionStore } from '@/store/missionStore'
 import { useSettingsStore } from '@/store/settingsStore'
-import { missionApi } from '@/services/api/endpoints'
+import { missionApi, albumApi } from '@/services/api/endpoints'
 import type { ActiveMissionItem, ActiveMissionParticipant, ActiveMissionState } from '@/types'
 import { ROUTES } from '@/constants'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import AppHeader from '@/components/layout/AppHeader'
 import styles from './HomePage.module.css'
+
+function todayString(): string {
+  const d = new Date()
+  const mm = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${d.getFullYear()}-${mm}-${dd}`
+}
 
 // ActiveMissionItem(API) → ActiveMissionState(store) 변환
 function toMissionState(item: ActiveMissionItem): ActiveMissionState {
@@ -239,6 +246,7 @@ export default function HomePage() {
 
   const [activeMissions, setActiveMissions]       = useState<ActiveMissionItem[]>([])
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null)
+  const [processingRoomId, setProcessingRoomId]   = useState<number | null>(null)
 
   // 다중 미션 선택 화면용 실시간 카운트다운 (id → 남은 초)
   const [localSeconds, setLocalSeconds] = useState<Record<number, number>>({})
@@ -323,8 +331,9 @@ export default function HomePage() {
     ) {
       setSelectedMissionId(null)
     }
-    // store의 active 미션이 목록에 없고 만료 미션도 아닌 경우만 클리어
+    // store의 active 미션이 목록에서 사라진 경우 → 콜라주 처리 중으로 전환
     if (active && !missions.some((m) => m.id === active.mission.id) && !expiredIdsRef.current.has(active.mission.id)) {
+      setProcessingRoomId(active.room.id)
       setActive(null)
     }
   }
@@ -349,6 +358,29 @@ export default function HomePage() {
     }, POLL_MS)
     return () => clearInterval(timer)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // 콜라주 완료 폴링 — processingRoomId 있을 때 3초마다 확인, 완료되면 제거
+  useEffect(() => {
+    if (!processingRoomId) return
+    const date = todayString()
+    const startedAt = Date.now()
+
+    async function checkCollage() {
+      try {
+        const res = await albumApi.getCollages(processingRoomId!, date)
+        const collages = res.data ?? []
+        if (collages.some((c) => c.status === 'COMPLETED')) {
+          setProcessingRoomId(null)
+          return
+        }
+      } catch {}
+      if (Date.now() - startedAt > 90_000) setProcessingRoomId(null)
+    }
+
+    checkCollage()
+    const id = setInterval(checkCollage, 3_000)
+    return () => clearInterval(id)
+  }, [processingRoomId])
 
   function handleEnterActiveMission() {
     if (!active) return
@@ -380,14 +412,16 @@ export default function HomePage() {
               }}
               onBack={activeMissions.length > 1 ? () => setSelectedMissionId(null) : undefined}
               onAllDone={() => {
-                // 전원 완료 → 카드 즉시 제거, active 클리어 (앨범에 자동 저장됨)
+                setProcessingRoomId(m.roomId)
                 setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
                 setSelectedMissionId(null)
                 setActive(null)
               }}
               onExpire={() => {
-                // 타이머 만료 → expiredIdsRef에 등록해 카드 유지 (결과 보기용)
-                expiredIdsRef.current.add(m.id)
+                setProcessingRoomId(m.roomId)
+                setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
+                setSelectedMissionId(null)
+                setActive(null)
               }}
               onViewWaiting={() => {
                 setActive(toMissionState(m))
@@ -441,8 +475,16 @@ export default function HomePage() {
           </div>
         )}
 
+        {/* ── 콜라주 처리 중 ────────────────────────────────────────────────── */}
+        {processingRoomId !== null && activeMissions.length === 0 && (
+          <div className={styles.missionCardProcessing}>
+            <div className={styles.missionCardProcessingSpinner} />
+            <span>영상 만드는 중...</span>
+          </div>
+        )}
+
         {/* ── 01_대기 화면 ──────────────────────────────────────────────────── */}
-        {activeMissions.length === 0 && !active && (
+        {activeMissions.length === 0 && !active && processingRoomId === null && (
           <div className={styles.waitingCard}>
             <span className={styles.waitingIcon}>🔕</span>
             <p className={styles.waitingTitle}>아직 아무런 미션이 울리지 않았어요 💤</p>
