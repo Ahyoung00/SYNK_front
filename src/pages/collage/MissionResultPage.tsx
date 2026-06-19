@@ -100,14 +100,6 @@ export default function MissionResultPage() {
     clearMission()
   }
 
-  function handleReplay() {
-    // 모든 video를 currentTime=0으로 리셋
-    document.querySelectorAll<HTMLVideoElement>('video').forEach((v) => {
-      v.currentTime = 0
-      v.play().catch(() => {})
-    })
-  }
-
   function handleSave() {
     if (collageVideoUrl) {
       const a = document.createElement('a')
