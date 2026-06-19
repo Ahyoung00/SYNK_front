@@ -88,7 +88,6 @@ function HomeMissionCard({
   onExpire,
   onAllDone,
   onViewWaiting,
-  onViewResult,
 }: {
   mission: ActiveMissionItem
   myUserId: number | undefined
@@ -97,7 +96,6 @@ function HomeMissionCard({
   onExpire?: () => void
   onAllDone?: () => void
   onViewWaiting?: () => void
-  onViewResult?: () => void
 }) {
   const [secondsLeft, setSecondsLeft] = useState(mission.remainingSeconds)
 
@@ -403,14 +401,6 @@ export default function HomePage() {
               onViewWaiting={() => {
                 setActive(toMissionState(m))
                 navigate(ROUTES.MISSION_WAITING(m.roomId))
-              }}
-              onViewResult={() => {
-                // 결과 화면으로 이동 — 더 이상 카드 유지 불필요
-                expiredIdsRef.current.delete(m.id)
-                setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
-                setSelectedMissionId(null)
-                setActive(toMissionState(m))
-                navigate(ROUTES.MISSION_RESULT(m.id))
               }}
             />
           )
