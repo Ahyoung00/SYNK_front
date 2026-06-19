@@ -60,8 +60,8 @@
   --sp-12: 48px;
 
   /* Typography */
-  --font-sans: -apple-system, BlinkMacSystemFont, 'Pretendard', 'Noto Sans KR',
-               'Segoe UI', sans-serif;
+  --font-sans: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont,
+               'Noto Sans KR', 'Segoe UI', sans-serif;
   --text-xs:   11px;
   --text-sm:   13px;
   --text-base: 15px;
