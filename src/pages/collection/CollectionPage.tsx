@@ -53,36 +53,39 @@ export default function CollectionPage() {
         </div>
 
         {/* ── 미션 목록 ──────────────────────────────────────────────────────── */}
-        <div className={styles.missionList}>
-          {isLoading ? (
-            <Loading />
-          ) : !data || data.missions.length === 0 ? (
-            <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-              아직 완료한 미션이 없어요
-            </p>
-          ) : (
-            data.missions.map((mission: CollectionMissionItem) => (
-              <button
-                key={mission.missionId}
-                className={styles.missionCard}
-                onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
-              >
-                {/* 썸네일 — URL 있으면 이미지, 없으면 그라디언트 */}
-                {mission.thumbnail ? (
-                  <img src={mission.thumbnail} alt={mission.title} className={styles.thumbnail} />
-                ) : (
-                  <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }} />
-                )}
-                <div className={styles.missionInfo}>
-                  <span className={styles.missionTitle}>{mission.title}</span>
-                  <span className={styles.missionMeta}>완료 횟수 {mission.completedTimes}회</span>
-                  <span className={styles.missionMeta}>최근 {mission.lastCompletedDate}</span>
-                </div>
-                <span className={styles.arrow}>›</span>
-              </button>
-            ))
-          )}
-        </div>
+        {isLoading ? (
+          // 방 탭과 동일하게 카드 없이 배경 위에 로딩 표시
+          <Loading />
+        ) : (
+          <div className={styles.missionList}>
+            {!data || data.missions.length === 0 ? (
+              <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                아직 완료한 미션이 없어요
+              </p>
+            ) : (
+              data.missions.map((mission: CollectionMissionItem) => (
+                <button
+                  key={mission.missionId}
+                  className={styles.missionCard}
+                  onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
+                >
+                  {/* 썸네일 — URL 있으면 이미지, 없으면 그라디언트 */}
+                  {mission.thumbnail ? (
+                    <img src={mission.thumbnail} alt={mission.title} className={styles.thumbnail} />
+                  ) : (
+                    <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }} />
+                  )}
+                  <div className={styles.missionInfo}>
+                    <span className={styles.missionTitle}>{mission.title}</span>
+                    <span className={styles.missionMeta}>완료 횟수 {mission.completedTimes}회</span>
+                    <span className={styles.missionMeta}>최근 {mission.lastCompletedDate}</span>
+                  </div>
+                  <span className={styles.arrow}>›</span>
+                </button>
+              ))
+            )}
+          </div>
+        )}
       </div>
     </div>
   )
