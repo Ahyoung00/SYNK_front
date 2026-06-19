@@ -13,6 +13,7 @@ export default function MissionCameraPage() {
   const navigate = useNavigate()
   const active          = useMissionStore((s) => s.active)
   const setRecordedBlob = useMissionStore((s) => s.setRecordedBlob)
+  const clearMission    = useMissionStore((s) => s.clearMission)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const camera = useCamera()
@@ -70,6 +71,7 @@ export default function MissionCameraPage() {
       setIsSubmitting(false)
       return
     }
+    clearMission()
     navigate(ROUTES.HOME, { replace: true })
   }
 

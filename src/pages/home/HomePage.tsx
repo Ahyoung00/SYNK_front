@@ -331,11 +331,6 @@ export default function HomePage() {
     ) {
       setSelectedMissionId(null)
     }
-    // store의 active 미션이 목록에서 사라진 경우 → 콜라주 처리 중으로 전환
-    if (active && !missions.some((m) => m.id === active.mission.id) && !expiredIdsRef.current.has(active.mission.id)) {
-      setProcessingRoomId(active.room.id)
-      setActive(null)
-    }
   }
 
   // 마운트 시 즉시 조회 (첫 로드 — 알림 없이 seen 등록만)
