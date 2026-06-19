@@ -3,7 +3,6 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
 import { albumApi } from '@/services/api/endpoints'
 import { CollageGrid } from '@/components/collage/CollageGrid'
-import { createMockCells } from '@/utils/mockCollage'
 import type { CollageCellData } from '@/utils/mockCollage'
 import type { CollageItem } from '@/types'
 import { ROUTES } from '@/constants'
@@ -52,15 +51,20 @@ export default function MissionResultPage() {
   const [collageVideoUrl, setCollageVideoUrl] = useState<string | null>(null)
   const [missionTitle, setMissionTitle]       = useState<string>('미션 결과')
   const [showStats, setShowStats] = useState(false)
+  const [loadError, setLoadError] = useState(false)
 
   // 셀 데이터 초기화 — collage API로부터 실제 영상 URL 로드
   useEffect(() => {
-    const roomId   = active?.room.id ?? (location.state as { roomId?: number } | null)?.roomId
+    const stateRoomId = (location.state as { roomId?: number } | null)?.roomId
+    // location.state.roomId 우선, 없으면 active store fallback
+    const roomId = stateRoomId ?? active?.room.id
     const missionId = Number(missionIdParam) || active?.mission.id
     const date     = todayString()
 
+    console.log('[MissionResultPage] roomId:', roomId, 'missionId:', missionId, 'date:', date)
+
     if (!roomId) {
-      setCells(createMockCells())
+      setLoadError(true)
       setTimeout(() => setShowStats(true), 400)
       return
     }
@@ -68,6 +72,7 @@ export default function MissionResultPage() {
     albumApi.getCollages(roomId, date)
       .then((res) => {
         const collages: CollageItem[] = res.data ?? []
+        console.log('[MissionResultPage] collages:', collages)
         const target = missionId
           ? collages.find((c) => c.missionId === missionId) ?? collages[0]
           : collages[0]
@@ -77,10 +82,10 @@ export default function MissionResultPage() {
           setMissionTitle(target.missionTitle)
           setCells(collageToCells(target))
         } else {
-          setCells(createMockCells())
+          setLoadError(true)
         }
       })
-      .catch(() => setCells(createMockCells()))
+      .catch((e) => { console.error('[MissionResultPage] getCollages error:', e); setLoadError(true) })
       .finally(() => setTimeout(() => setShowStats(true), 400))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -147,6 +152,13 @@ export default function MissionResultPage() {
         year: 'numeric', month: 'long', day: 'numeric',
         hour: '2-digit', minute: '2-digit',
       })
+
+  if (loadError) return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100dvh', gap: 12, color: 'var(--color-text-muted)' }}>
+      <p>아직 콜라주 결과가 없어요</p>
+      <button onClick={() => navigate(-1)} style={{ color: 'var(--color-primary)', fontWeight: 700 }}>돌아가기</button>
+    </div>
+  )
 
   if (cells.length === 0) return null
 
