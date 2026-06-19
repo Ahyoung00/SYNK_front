@@ -331,9 +331,18 @@ export default function HomePage() {
     ) {
       setSelectedMissionId(null)
     }
-    // store의 active 미션이 목록에 없고 만료 미션도 아닌 경우만 클리어 → alert 배너 방지
+    // store의 active 미션이 목록에서 사라진 경우
     if (active && !missions.some((m) => m.id === active.mission.id) && !expiredIdsRef.current.has(active.mission.id)) {
-      setActive(null)
+      // 내가 이미 제출한 미션이라면 → 콜라주 생성 중 화면으로 이동
+      const myId = useAuthStore.getState().user?.userId
+      const iSubmitted = active.participations.some(
+        (p) => p.user.userId === myId && p.state === 'done',
+      )
+      if (iSubmitted) {
+        navigate(ROUTES.MISSION_PROCESSING(active.room.id))
+      } else {
+        setActive(null)
+      }
     }
   }
 
