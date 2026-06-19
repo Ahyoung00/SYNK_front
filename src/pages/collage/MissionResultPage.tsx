@@ -210,16 +210,13 @@ export default function MissionResultPage() {
 
         {/* 버튼 행 */}
         <div className={styles.btnRow}>
-          <button className={styles.replayBtn} onClick={handleReplay}>
-            다시보기
-          </button>
           <button className={styles.saveBtn} onClick={handleSave}>
             저장하기
           </button>
         </div>
 
         {/* 홈으로 */}
-        <button className={styles.homeBtn} onClick={handleBack}>
+        <button className={styles.homeBtn} onClick={() => navigate(ROUTES.HOME, { replace: true })}>
           홈으로 돌아가기
         </button>
       </div>
