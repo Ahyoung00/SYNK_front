@@ -5,8 +5,7 @@
   align-items: stretch;
   background: var(--color-surface-2);
   border-top: 1px solid var(--color-border);
-  /* 배경은 화면 바닥(safe-area)까지 채우고, 아이콘은 padding-bottom 없이 중앙 배치 */
-  height: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom, 0px));
+  height: var(--bottom-nav-height);
   z-index: 100;
 }
 
