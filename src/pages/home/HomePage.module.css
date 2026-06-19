@@ -90,6 +90,12 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* 처음 등장할 때 주의를 끄는 깜빡임 (3회) */
+@keyframes missionCardBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.25; }
+}
+
 /* 은은한 글로우 호흡 — "지금 미션이 울리는 중"이라는 생동감 */
 @keyframes missionCardBreathe {
   0%, 100% {
@@ -109,9 +115,11 @@
   border: 1px solid rgba(220, 38, 38, 0.5);
   background: #dc2626;   /* danger: < 1분 */
   transition: background 0.6s ease, border-color 0.6s ease;
+  /* enter(0.45s) → blink 3회(0.35s×3=1.05s) → breathe 무한 */
   animation:
     missionCardEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both,
-    missionCardBreathe 3s ease-in-out 0.45s infinite;
+    missionCardBlink  0.35s ease-in-out 0.45s 3,
+    missionCardBreathe 3s ease-in-out 1.5s infinite;
 }
 
 /* ⚡ 번개 흔들림 */
@@ -143,9 +151,6 @@
 .missionCardSafe .missionCardHeader {
   background: rgba(30, 100, 220, 0.2);
 }
-.missionCardSafe .missionCardTimer {
-  background: rgba(30, 100, 220, 0.1);
-}
 
 /* 1~3분: 초록색 */
 .missionCardWarn {
@@ -154,9 +159,6 @@
 }
 .missionCardWarn .missionCardHeader {
   background: rgba(30, 130, 60, 0.2);
-}
-.missionCardWarn .missionCardTimer {
-  background: rgba(30, 130, 60, 0.1);
 }
 
 /* 다중 미션에서 돌아가기 버튼 */

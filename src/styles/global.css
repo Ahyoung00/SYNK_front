@@ -23,7 +23,7 @@
   /* Timer states */
   --color-timer-safe:   #2D8A45;
   --color-timer-warn:   #B87A0A;
-  --color-timer-danger: #DC2626;
+  --color-timer-danger: #ffffff;
 
   /* Status / badge colors */
   --color-status-done:        #2D8A45;
@@ -227,7 +227,7 @@ img, video {
 
   --color-timer-safe:   #4ade80;
   --color-timer-warn:   #facc15;
-  --color-timer-danger: #ef4444;
+  --color-timer-danger: #ffffff;
 
   --color-status-done:        #4ade80;
   --color-status-done-bg:     rgba(74, 222, 128, 0.2);
