@@ -17,6 +17,11 @@
   gap: var(--sp-4);
 }
 
+/* 스크롤 컨테이너의 직속 자식은 압축되지 않도록 (카드 마지막 줄 잘림 방지) */
+.scroll > * {
+  flex-shrink: 0;
+}
+
 .lead {
   font-size: var(--text-sm);
   font-weight: 700;
