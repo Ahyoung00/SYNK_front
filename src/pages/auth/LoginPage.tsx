@@ -63,7 +63,7 @@ export default function LoginPage() {
   async function handleKakaoCodeSuccess(code: string, redirectUri: string) {
     try {
       const loginRes = await authApi.kakaoLogin(code, redirectUri)
-      const { token } = loginRes.data
+      const { token, refreshToken = '' } = loginRes.data
       const user: User = {
         userId: loginRes.data.userId,
         name: loginRes.data.name,
@@ -72,10 +72,10 @@ export default function LoginPage() {
         resultNotification: true,
         highlightNotification: true,
       }
-      setAuth(user, token, '')
+      setAuth(user, token, refreshToken)
       useChatStore.getState().clearAll()
       navigate(redirectTo, { replace: true })
-      userApi.getMe().then((r) => setAuth(r.data, token, '')).catch(() => {})
+      userApi.getMe().then((r) => setAuth(r.data, token, refreshToken)).catch(() => {})
     } catch (e) {
       console.error(e)
       setOauthError('카카오 로그인에 실패했어요. 다시 시도해주세요.')
@@ -106,7 +106,7 @@ export default function LoginPage() {
   async function handleGoogleCodeSuccess(code: string, redirectUri: string) {
     try {
       const loginRes = await authApi.googleLogin(code, redirectUri)
-      const { token } = loginRes.data
+      const { token, refreshToken = '' } = loginRes.data
       const user: User = {
         userId: loginRes.data.userId,
         name: loginRes.data.name,
@@ -115,10 +115,10 @@ export default function LoginPage() {
         resultNotification: true,
         highlightNotification: true,
       }
-      setAuth(user, token, '')
+      setAuth(user, token, refreshToken)
       useChatStore.getState().clearAll()
       navigate(redirectTo, { replace: true })
-      userApi.getMe().then((r) => setAuth(r.data, token, '')).catch(() => {})
+      userApi.getMe().then((r) => setAuth(r.data, token, refreshToken)).catch(() => {})
     } catch (e) {
       console.error(e)
       setOauthError('Google 로그인에 실패했어요. 다시 시도해주세요.')

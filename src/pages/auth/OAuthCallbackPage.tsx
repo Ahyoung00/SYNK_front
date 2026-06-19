@@ -42,7 +42,7 @@ export default function OAuthCallbackPage({ provider }: Props) {
           ? await authApi.kakaoLogin(code!, redirectUri)
           : await authApi.googleLogin(code!, redirectUri)
 
-        const { token } = loginRes.data
+        const { token, refreshToken = '' } = loginRes.data
         const user: User = {
           userId:                loginRes.data.userId,
           name:                  loginRes.data.name,
@@ -51,11 +51,11 @@ export default function OAuthCallbackPage({ provider }: Props) {
           resultNotification:    true,
           highlightNotification: true,
         }
-        setAuth(user, token, '')
+        setAuth(user, token, refreshToken)
         useChatStore.getState().clearAll()
         navigate(ROUTES.HOME, { replace: true })
         userApi.getMe().then((r) => {
-          setAuth({ ...r.data, profileImage: toHttps(r.data.profileImage) }, token, '')
+          setAuth({ ...r.data, profileImage: toHttps(r.data.profileImage) }, token, refreshToken)
         }).catch(() => {})
       } catch {
         navigate('/login', { replace: true })

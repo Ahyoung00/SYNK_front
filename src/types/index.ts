@@ -460,10 +460,22 @@ export interface ApiResponse<T> {
  */
 export interface LoginResponse {
   token: string
+  /** 재발급용 Refresh Token (장기) */
+  refreshToken: string
   isNewUser: boolean
   userId: number
   name: string
   profileImage: string | null
+}
+
+/**
+ * POST /auth/refresh — Refresh Token으로 Access Token 재발급 응답
+ * { token, refreshToken? }
+ */
+export interface RefreshResponse {
+  token: string
+  /** 서버가 Refresh Token도 회전(rotate)하면 새 값 포함 */
+  refreshToken?: string
 }
 
 // ── Room 응답 ─────────────────────────────────────────────────────────────────
@@ -519,10 +531,12 @@ export interface SynklogCreatedResponse {
 
 /**
  * POST /rooms/{roomId}/chats — 채팅 메시지 전송 응답
- * { messageId, createdAt }
+ * { messageId, userId, createdAt }
  */
 export interface ChatSentResponse {
   messageId: number
+  /** 메시지를 보낸 사용자 ID */
+  userId: number
   /** ISO 8601 e.g. "2026-05-07T22:36:00" */
   createdAt: string
 }

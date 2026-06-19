@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
 import { useAuthStore } from '@/store/authStore'
+import { useRoomEvents } from '@/hooks/useRoomEvents'
 import { ROUTES } from '@/constants'
 import styles from './MissionWaitingPage.module.css'
 
@@ -17,6 +18,22 @@ export default function MissionWaitingPage() {
   const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
   const [showVideo, setShowVideo]     = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
+
+  // WebSocket: 다른 멤버가 제출하면 참여 현황 갱신 / 새 미션 발동 시 시작 화면 이동
+  useRoomEvents(Number(roomId) || active?.room.id, {
+    onMemberSubmitted: (e) => {
+      const cur = useMissionStore.getState().active
+      if (!cur || e.userId == null) return
+      const target = cur.participations.find((p) => p.user.userId === Number(e.userId))
+      if (target && target.state !== 'done') {
+        updateParticipation({ ...target, state: 'done' })
+      }
+    },
+    onMissionFired: (e) => {
+      const targetRoom = Number(e.roomId) || Number(roomId) || active?.room.id
+      if (targetRoom) navigate(ROUTES.MISSION_DETAIL(targetRoom))
+    },
+  })
 
   // 마운트 시: 내 상태를 즉시 '완료'로 표시
   useEffect(() => {

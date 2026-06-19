@@ -12,6 +12,7 @@ import type {
   CollectionListResponse,
   CollectionDetailResponse,
   LoginResponse,
+  RefreshResponse,
   RoomCreatedResponse,
   RoomJoinedResponse,
   RoomUpdateRequest,
@@ -41,6 +42,10 @@ export const authApi = {
     api.post<LoginResponse>('/auth/google', { code, redirectUri }),
 
   logout: () => api.post<void>('/auth/logout'),
+
+  /** Refresh Token으로 새 Access Token 발급 — POST /auth/refresh */
+  refresh: (refreshToken: string) =>
+    api.post<RefreshResponse>('/auth/refresh', { refreshToken }),
 }
 
 // ── User ──────────────────────────────────────────────────────────────────────
