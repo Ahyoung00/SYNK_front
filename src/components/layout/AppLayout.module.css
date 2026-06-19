@@ -9,6 +9,6 @@
   min-height: 0;          /* flex item이 content 크기로 팽창하지 않도록 */
   display: flex;           /* 자식 .page를 flex item으로 만들어 height chain 완성 */
   flex-direction: column;
-  overflow: hidden;
+  overflow: clip;
   /* padding-top 제거 — 각 탭 페이지가 자체 헤더에서 safe-top 처리 */
 }
