@@ -369,7 +369,8 @@ export default function HomePage() {
       try {
         const res = await albumApi.getCollages(processingRoomId!, date)
         const collages = res.data ?? []
-        if (collages.some((c) => c.status === 'COMPLETED')) {
+        // PROCESSING 상태가 없으면 (완료됐거나 아직 없거나) 제거
+        if (!collages.some((c) => c.status === 'PROCESSING')) {
           setProcessingRoomId(null)
           return
         }
@@ -418,6 +419,7 @@ export default function HomePage() {
                 setActive(null)
               }}
               onExpire={() => {
+                expiredIdsRef.current.add(m.id)
                 setProcessingRoomId(m.roomId)
                 setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
                 setSelectedMissionId(null)
