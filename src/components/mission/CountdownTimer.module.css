@@ -56,6 +56,16 @@
   letter-spacing: 0.5px;
 }
 
+/* lg(원형): 시간 숫자가 원 정중앙에 오도록 라벨은 흐름에서 빼서 아래에 배치 */
+.lg .label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: 2px;
+  white-space: nowrap;
+}
+
 /* ── 틱 애니메이션 (숫자 바뀔 때 살짝 scale) ────────────────────────────── */
 @keyframes tick {
   0%   { transform: scale(1.08); }
