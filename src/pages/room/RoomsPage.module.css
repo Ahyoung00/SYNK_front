@@ -4,60 +4,10 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background: var(--color-bg);
+  background: #070912;
   position: relative;
 }
 
-/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-5)) var(--sp-5) var(--sp-4);
-  flex-shrink: 0;
-}
-
-.brand {
-  font-size: var(--text-2xl);
-  font-weight: 900;
-  letter-spacing: -1px;
-  color: var(--color-text);
-}
-
-.greeting {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  margin-top: 4px;
-}
-
-.greetingName {
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-.bellBtn {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text);
-  margin-top: 4px;
-}
-
-.bellDot {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  background: var(--color-primary);
-  border-radius: 50%;
-  border: 2px solid var(--color-bg);
-}
-
-/* ── 스크롤 ───────────────────────────────────────────────────────────────── */
 .scroll {
   flex: 1;
   min-height: 0;
@@ -66,10 +16,9 @@
   padding: 0 var(--sp-5) calc(var(--bottom-nav-height) + 80px);
   display: flex;
   flex-direction: column;
-  gap: var(--sp-6);
+  gap: var(--sp-4);
 }
 
-/* ── 섹션 ─────────────────────────────────────────────────────────────────── */
 .section {
   display: flex;
   flex-direction: column;
@@ -77,19 +26,20 @@
 }
 
 .sectionLabel {
-  font-size: var(--text-sm);
+  font-size: 13px;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: #9AA0BD;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .sectionDesc {
-  font-size: var(--text-xs);
+  font-size: 11px;
   font-weight: 400;
-  color: var(--color-text-muted);
-  opacity: 0.7;
+  color: #5C6488;
 }
 
-/* ── 방 목록 ──────────────────────────────────────────────────────────────── */
 .roomList {
   display: flex;
   flex-direction: column;
@@ -98,34 +48,34 @@
 
 .roomCard {
   width: 100%;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  padding: var(--sp-4) var(--sp-5);
+  background: rgba(255, 255, 255, 0.045);
+  border: 1px solid rgba(255, 255, 255, 0.085);
+  border-radius: 18px;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
   text-align: left;
-  transition: background var(--dur-fast);
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .roomCard:active {
-  background: var(--color-surface-2);
+  background: rgba(255, 255, 255, 0.07);
 }
 
-/* 썸네일 + 텍스트 가로 배치 */
 .cardInner {
   display: flex;
   align-items: center;
-  gap: var(--sp-4);
+  gap: 14px;
 }
 
 .thumbnail {
   width: 52px;
   height: 52px;
-  border-radius: var(--radius-lg);
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -139,64 +89,51 @@
   object-fit: cover;
 }
 
-.thumbnailPlaceholder {
-  font-size: 24px;
-}
-
 .cardBody {
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
+  gap: 6px;
 }
 
 .cardTop {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .roomName {
-  font-size: var(--text-base);
+  font-size: 16px;
   font-weight: 800;
-  color: var(--color-text);
+  color: #F3F5FF;
 }
 
 .statusText {
-  font-size: var(--text-xs);
+  font-size: 12px;
   font-weight: 600;
 }
 
-.statusActive {
-  color: var(--color-text-muted);
-}
+.statusActive { color: #9AA0BD; }
+.statusDone   { color: #4ADE80; }
+.statusWaiting { color: #9AA0BD; }
 
-.statusDone {
-  color: #f97316; /* orange */
-}
-
-.statusWaiting {
-  color: var(--color-text-muted);
-}
-
-/* ── 멤버 아바타 ──────────────────────────────────────────────────────────── */
 .avatarStack {
   display: flex;
   flex-direction: row;
-  gap: var(--sp-2);
+  gap: 6px;
 }
 
 .avatarBubble {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
-  background: var(--color-surface-2);
-  border: 1.5px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1.5px solid rgba(255, 255, 255, 0.12);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   flex-shrink: 0;
   overflow: hidden;
@@ -209,15 +146,64 @@
 }
 
 .avatarBubbleInitial {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: #9AA0BD;
 }
 
 .avatarMore {
-  font-size: var(--text-xs);
+  font-size: 11px;
   font-weight: 700;
-  color: var(--color-text-muted);
+  color: #9AA0BD;
+}
+
+/* ── 방 만들기 CTA 카드 ───────────────────────────────────────────────────── */
+.createCard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 18px;
+  text-align: left;
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.createCard:active {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.createIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(70,215,255,.12), rgba(155,107,255,.12));
+  border: 1px solid rgba(255,255,255,.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.createText {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.createLabel {
+  font-size: 15px;
+  font-weight: 700;
+  color: #F3F5FF;
+}
+
+.createDesc {
+  font-size: 12px;
+  color: #9AA0BD;
 }
 
 /* ── 빈 상태 ──────────────────────────────────────────────────────────────── */
@@ -233,31 +219,31 @@
 .emptyIcon { font-size: 52px; }
 
 .emptyTitle {
-  font-size: var(--text-md);
+  font-size: 17px;
   font-weight: 700;
-  color: var(--color-text);
+  color: #F3F5FF;
 }
 
 .emptyDesc {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  font-size: 14px;
+  color: #9AA0BD;
   line-height: 1.6;
 }
 
 /* ── FAB ─────────────────────────────────────────────────────────────────── */
 .fab {
-  position: absolute;  /* fixed는 viewport 기준 → 데스크톱 centered 환경에서 밀림. absolute는 .page 기준 */
+  position: absolute;
   right: var(--sp-5);
   bottom: var(--sp-5);
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--color-primary);
-  box-shadow: 0 4px 16px var(--color-fab-shadow);
+  background: linear-gradient(135deg, #46D7FF 0%, #9B6BFF 100%);
+  box-shadow: 0 4px 20px rgba(70, 215, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform var(--dur-fast), opacity var(--dur-fast);
+  transition: transform 0.12s ease, opacity 0.12s ease;
   z-index: 10;
 }
 
@@ -276,11 +262,9 @@
 
 /* ── 바텀시트 ─────────────────────────────────────────────────────────────── */
 .overlay {
-  /* fixed가 아닌 absolute — #root(position:relative)에 Portal로 마운트되므로
-     앱 컨테이너(max-width 390px) 경계 안에 정확히 맞춰짐 */
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.55);
+  background: rgba(0, 0, 0, 0.65);
   z-index: 50;
   display: flex;
   align-items: flex-end;
@@ -294,8 +278,10 @@
 
 .sheet {
   width: 100%;
-  background: var(--color-surface);
-  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: #0E1226;
+  border: 1px solid rgba(255,255,255,.085);
+  border-bottom: none;
+  border-radius: 24px 24px 0 0;
   padding: var(--sp-3) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
@@ -312,22 +298,22 @@
   width: 36px;
   height: 4px;
   border-radius: 2px;
-  background: var(--color-border);
+  background: rgba(255,255,255,.15);
   align-self: center;
   margin-bottom: var(--sp-2);
 }
 
 .sheetTitle {
-  font-size: var(--text-base);
+  font-size: 16px;
   font-weight: 800;
-  color: var(--color-text);
+  color: #F3F5FF;
   text-align: center;
 }
 
 .sheetBtns {
-  background: var(--color-surface-2);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  background: rgba(255,255,255,.045);
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.085);
   overflow: hidden;
 }
 
@@ -338,12 +324,10 @@
   gap: var(--sp-3);
   padding: var(--sp-4) var(--sp-5);
   text-align: left;
-  transition: background var(--dur-fast);
+  transition: background 0.12s ease;
 }
 
-.sheetBtn:active {
-  background: var(--color-border);
-}
+.sheetBtn:active { background: rgba(255,255,255,.06); }
 
 .sheetBtnIcon {
   font-size: 22px;
@@ -360,39 +344,37 @@
 }
 
 .sheetBtnLabel {
-  font-size: var(--text-sm);
+  font-size: 15px;
   font-weight: 700;
-  color: var(--color-text);
+  color: #F3F5FF;
 }
 
 .sheetBtnDesc {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+  font-size: 12px;
+  color: #9AA0BD;
 }
 
 .sheetBtnArrow {
   font-size: 20px;
-  color: var(--color-text-muted);
+  color: #5C6488;
 }
 
 .sheetDivider {
   height: 1px;
-  background: var(--color-border);
+  background: rgba(255,255,255,.06);
   margin: 0 var(--sp-4);
 }
 
 .sheetCancel {
   width: 100%;
   padding: 16px;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-base);
+  background: rgba(255,255,255,.045);
+  border: 1px solid rgba(255,255,255,.085);
+  border-radius: 14px;
+  font-size: 15px;
   font-weight: 600;
-  color: var(--color-text-muted);
-  transition: background var(--dur-fast);
+  color: #9AA0BD;
+  transition: background 0.12s ease;
 }
 
-.sheetCancel:active {
-  background: var(--color-border);
-}
+.sheetCancel:active { background: rgba(255,255,255,.07); }

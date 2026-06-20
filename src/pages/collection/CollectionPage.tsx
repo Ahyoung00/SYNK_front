@@ -20,6 +20,33 @@ const GRADIENTS = [
 ]
 const gradient = (id: number) => GRADIENTS[(id - 1) % GRADIENTS.length]
 
+function RingChart({ rate }: { rate: number }) {
+  const r = 38
+  const circumference = 2 * Math.PI * r
+  const offset = circumference * (1 - rate / 100)
+  return (
+    <svg width="92" height="92" viewBox="0 0 92 92" className={styles.ring}>
+      <defs>
+        <linearGradient id="ringGrad" x1="0" y1="0" x2="92" y2="92" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#46D7FF" />
+          <stop offset="1" stopColor="#9B6BFF" />
+        </linearGradient>
+      </defs>
+      <circle cx="46" cy="46" r={r} fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="9" />
+      <circle
+        cx="46" cy="46" r={r}
+        fill="none"
+        stroke="url(#ringGrad)"
+        strokeWidth="9"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        transform="rotate(-90 46 46)"
+      />
+    </svg>
+  )
+}
+
 export default function CollectionPage() {
   const navigate = useNavigate()
   const [data, setData]         = useState<CollectionListResponse | null>(null)
@@ -36,55 +63,62 @@ export default function CollectionPage() {
   return (
     <div className={styles.page}>
       {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
-      <AppHeader subtitle="내가 완료한 미션" />
+      <AppHeader subtitle="내가 모은 미션 도감" />
 
       <div className={styles.scroll}>
         {/* ── 수집률 카드 ──────────────────────────────────────────────────────── */}
         <div className={styles.statsCard}>
-          <span className={styles.statsLabel}>수집률</span>
-          <div className={styles.statsRow}>
-            <span className={styles.statsRate}>
-              {isLoading ? '...' : `${data?.completionRate ?? 0}%`}
-            </span>
-            <span className={styles.statsCount}>
-              {isLoading ? '—' : `${data?.completedCount ?? 0} / ${data?.totalCount ?? 0} 미션 완료`}
-            </span>
+          <div className={styles.statsInner}>
+            <div className={styles.statsLeft}>
+              <span className={styles.statsLabel}>수집률</span>
+              <span className={styles.statsRate}>
+                {isLoading ? '...' : `${data?.completionRate ?? 0}%`}
+              </span>
+              <span className={styles.statsCount}>
+                {isLoading ? '—' : `${data?.completedCount ?? 0} / ${data?.totalCount ?? 0} 미션 완료`}
+              </span>
+            </div>
+            <RingChart rate={isLoading ? 0 : (data?.completionRate ?? 0)} />
           </div>
         </div>
 
         {/* ── 미션 목록 ──────────────────────────────────────────────────────── */}
         {isLoading ? (
-          // 방 탭과 동일하게 카드 없이 배경 위에 로딩 표시
           <Loading />
         ) : (
-          <div className={styles.missionList}>
-            {!data || data.missions.length === 0 ? (
-              <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-                아직 완료한 미션이 없어요
-              </p>
-            ) : (
-              data.missions.map((mission: CollectionMissionItem) => (
-                <button
-                  key={mission.missionId}
-                  className={styles.missionCard}
-                  onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
-                >
-                  {/* 썸네일 — URL 있으면 이미지, 없으면 그라디언트 */}
-                  {mission.thumbnail ? (
-                    <img src={mission.thumbnail} alt={mission.title} className={styles.thumbnail} />
-                  ) : (
-                    <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }} />
-                  )}
-                  <div className={styles.missionInfo}>
-                    <span className={styles.missionTitle}>{mission.title}</span>
-                    <span className={styles.missionMeta}>완료 횟수 {mission.completedTimes}회</span>
-                    <span className={styles.missionMeta}>최근 {mission.lastCompletedDate}</span>
-                  </div>
-                  <span className={styles.arrow}>›</span>
-                </button>
-              ))
-            )}
-          </div>
+          <>
+            <div className={styles.sectionHeader}>
+              <span className={styles.sectionHeaderIcon}>⚡</span>
+              <span className={styles.sectionHeaderTitle}>완료한 미션</span>
+            </div>
+            <div className={styles.missionList}>
+              {!data || data.missions.length === 0 ? (
+                <p className={styles.emptyText}>아직 완료한 미션이 없어요</p>
+              ) : (
+                data.missions.map((mission: CollectionMissionItem) => (
+                  <button
+                    key={mission.missionId}
+                    className={styles.missionCard}
+                    onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
+                  >
+                    {mission.thumbnail ? (
+                      <img src={mission.thumbnail} alt={mission.title} className={styles.thumbnail} />
+                    ) : (
+                      <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }} />
+                    )}
+                    <div className={styles.missionInfo}>
+                      <span className={styles.missionTitle}>{mission.title}</span>
+                      <span className={styles.missionMeta}>최근 {mission.lastCompletedDate}</span>
+                    </div>
+                    <div className={styles.completeBadge}>
+                      <span className={styles.completeCount}>완료 {mission.completedTimes}회</span>
+                      <span className={styles.completeCheck}>✓</span>
+                    </div>
+                  </button>
+                ))
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>

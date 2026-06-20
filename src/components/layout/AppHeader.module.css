@@ -10,13 +10,16 @@
   font-size: var(--text-2xl);
   font-weight: 900;
   letter-spacing: -1px;
-  color: var(--color-primary);
   line-height: 1;
+  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  color: #9AA0BD;
   margin-top: 4px;
 }
 

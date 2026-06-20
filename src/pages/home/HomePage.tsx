@@ -388,7 +388,13 @@ export default function HomePage() {
   return (
     <div className={styles.page}>
       {/* ── 헤더 ──────────────────────────────────────────────────────────── */}
-      <AppHeader subtitle={`안녕하세요, ${firstName}님 👋`} />
+      <AppHeader subtitle={
+        <span>
+          안녕하세요,{' '}
+          <b className={styles.greetingName}>{firstName}</b>
+          {' '}님 👋
+        </span>
+      } />
 
       <div className={styles.scroll}>
 
@@ -475,10 +481,15 @@ export default function HomePage() {
         {/* ── 01_대기 화면 ──────────────────────────────────────────────────── */}
         {activeMissions.length === 0 && !active && (
           <div className={styles.waitingCard}>
-            <span className={styles.waitingIcon}>🔕</span>
-            <p className={styles.waitingTitle}>아직 아무런 미션이 울리지 않았어요 💤</p>
-            <p className={styles.waitingDesc}>미션이 울리면 홈 화면에 바로 알려드릴게요!</p>
-            <div className={styles.waitingBadge}>랜덤 알림 기다리는 중 👀 </div>
+            <div className={styles.waitingIconWrap}>
+              <span className={styles.waitingIconGlow} />
+              <span className={styles.waitingIconEmoji}>🔔</span>
+            </div>
+            <p className={styles.waitingTitle}>아직 미션이 울리지 않았어요</p>
+            <p className={styles.waitingDesc}>
+              랜덤한 순간에 미션이 도착해요.<br />알림을 켜두면 놓치지 않아요.
+            </p>
+            <div className={styles.waitingBadge}>대기 중</div>
           </div>
         )}
 

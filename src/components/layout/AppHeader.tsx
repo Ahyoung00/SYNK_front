@@ -1,3 +1,4 @@
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useNotificationStore } from '@/store/notificationStore'
 import { ROUTES } from '@/constants'
@@ -5,7 +6,7 @@ import styles from './AppHeader.module.css'
 
 interface AppHeaderProps {
   /** 브랜드 아래 소제목 (예: "아영님의 방", "내가 완료한 미션") */
-  subtitle?: string
+  subtitle?: React.ReactNode
 }
 
 /**

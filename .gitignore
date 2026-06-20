@@ -49,3 +49,4 @@ coverage/
 # ── 기타
 *.pem
 .cache/
+.vercel

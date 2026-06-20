@@ -4,68 +4,13 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background: var(--color-bg);
-}
-
-/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
-.header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-5)) var(--sp-6) var(--sp-4);
-  flex-shrink: 0;
-}
-
-.title {
-  font-size: var(--text-2xl);
-  font-weight: 900;
-  letter-spacing: -1px;
-  color: var(--color-text);
-}
-
-.subtitle {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  margin-top: 2px;
-}
-
-.bellBtn {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-sub);
-  flex-shrink: 0;
-  margin-top: var(--sp-1);
-}
-
-.bellBadge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  background: var(--color-accent);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--color-bg);
+  background: #070912;
 }
 
 /* ── 스크롤 ─────────────────────────────────────────────────────────────── */
 .scroll {
   flex: 1;
-  min-height: 0; /* flex 아이템이 콘텐츠 크기로 팽창하는 것을 막아 overflow-y: auto 활성화 */
+  min-height: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 0 var(--sp-5) calc(var(--bottom-nav-height) + var(--sp-6));
@@ -77,40 +22,70 @@
 /* ── 수집률 카드 ──────────────────────────────────────────────────────────── */
 .statsCard {
   flex-shrink: 0;
-  padding: var(--sp-5) var(--sp-6);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  padding: 20px 22px 22px;
+  background: rgba(255, 255, 255, 0.045);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
+}
+
+.statsInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.statsLeft {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: 6px;
 }
 
 .statsLabel {
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.statsRow {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9AA0BD;
+  letter-spacing: 0.2px;
 }
 
 .statsRate {
-  font-size: 40px;
+  font-size: 44px;
   font-weight: 900;
-  color: var(--color-primary);
-  letter-spacing: -1px;
+  letter-spacing: -2px;
   line-height: 1;
+  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-
-
 .statsCount {
-  font-size: var(--text-sm);
-  color: var(--color-text-sub);
+  font-size: 13px;
+  color: #9AA0BD;
+  font-weight: 500;
+}
+
+.ring {
+  flex-shrink: 0;
+}
+
+/* ── 섹션 헤더 ────────────────────────────────────────────────────────────── */
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 2px 0;
+}
+
+.sectionHeaderIcon {
+  font-size: 15px;
+}
+
+.sectionHeaderTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: #9AA0BD;
+  letter-spacing: 0.2px;
 }
 
 /* ── 미션 목록 ────────────────────────────────────────────────────────────── */
@@ -118,9 +93,9 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.045);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
   overflow: hidden;
 }
 
@@ -128,11 +103,12 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-4) var(--sp-5);
+  gap: 14px;
+  padding: 14px 18px;
   text-align: left;
-  border-bottom: 1px solid var(--color-border);
-  transition: background var(--dur-fast);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .missionCard:last-child {
@@ -140,14 +116,15 @@
 }
 
 .missionCard:active {
-  background: var(--color-surface-2);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .thumbnail {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-md);
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
   flex-shrink: 0;
+  object-fit: cover;
 }
 
 .missionInfo {
@@ -159,21 +136,49 @@
 }
 
 .missionTitle {
-  font-size: var(--text-base);
+  font-size: 15px;
   font-weight: 700;
-  color: var(--color-text);
+  color: #F3F5FF;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .missionMeta {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+  font-size: 12px;
+  color: #9AA0BD;
 }
 
-.arrow {
-  font-size: 20px;
-  color: var(--color-text-muted);
+.completeBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   flex-shrink: 0;
+}
+
+.completeCount {
+  font-size: 12px;
+  font-weight: 600;
+  color: #9AA0BD;
+}
+
+.completeCheck {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #46D7FF 0%, #9B6BFF 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: #fff;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.emptyText {
+  padding: 48px 20px;
+  text-align: center;
+  color: #5C6488;
+  font-size: 14px;
 }

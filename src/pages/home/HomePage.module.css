@@ -4,7 +4,7 @@
   flex: 1;
   min-height: 0;
   overflow: clip;
-  background: var(--color-bg);
+  background: #070912;
 }
 
 /* ── 헤더 ─────────────────────────────────────────────────────────────────── */
@@ -582,39 +582,98 @@
   color: var(--color-primary);
 }
 
+/* ── greeting name gradient ───────────────────────────────────────────────── */
+.greetingName {
+  font-weight: 800;
+  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 /* ── 대기 카드 ────────────────────────────────────────────────────────────── */
+@keyframes waitingFloat {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+
+@keyframes waitingGlow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50%       { opacity: 0.9; transform: scale(1.15); }
+}
+
 .waitingCard {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-10) var(--sp-6);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  gap: 16px;
+  padding: 48px 28px;
+  background: rgba(255, 255, 255, 0.045);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.085);
   text-align: center;
+  margin-top: 8px;
 }
 
-.waitingIcon { font-size: 40px; }
+.waitingIconWrap {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: waitingFloat 3.5s ease-in-out infinite;
+}
+
+.waitingIconGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(70, 215, 255, 0.3), rgba(123, 92, 255, 0.2) 60%, transparent 80%);
+  filter: blur(10px);
+  animation: waitingGlow 3.5s ease-in-out infinite;
+}
+
+.waitingIconEmoji {
+  font-size: 36px;
+  position: relative;
+  z-index: 1;
+}
 
 .waitingTitle {
-  font-size: var(--text-md);
-  font-weight: 700;
-  color: var(--color-text);
-  line-height: 1.5;
+  font-size: 18px;
+  font-weight: 800;
+  color: #F3F5FF;
+  line-height: 1.4;
 }
 
 .waitingDesc {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  font-size: 14px;
+  color: #9AA0BD;
+  line-height: 1.6;
 }
 
 .waitingBadge {
-  padding: 6px 14px;
-  background: var(--color-surface-2);
-  border-radius: var(--radius-full);
-  font-size: var(--text-xs);
-  color: var(--color-text-sub);
+  padding: 7px 18px;
+  background: linear-gradient(135deg, rgba(70,215,255,.15), rgba(155,107,255,.15));
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: #9AA0BD;
+}
+
+.waitingBadge {
+  padding: 7px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(70,215,255,.08);
+  border: 1px solid rgba(70,215,255,.25);
+  color: #46D7FF;
+  letter-spacing: 0.3px;
 }
 
 /* ── 상태 카드 ────────────────────────────────────────────────────────────── */
