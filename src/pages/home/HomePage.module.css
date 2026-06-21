@@ -4,7 +4,7 @@
   flex: 1;
   min-height: 0;
   overflow: clip;
-  background: #070912;
+  background: var(--page-bg);
 }
 
 /* ── 헤더 ─────────────────────────────────────────────────────────────────── */
@@ -90,35 +90,64 @@
   to   { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* 은은한 글로우 호흡 — safe/warn 상태의 생동감 */
 @keyframes missionCardBreathe {
-  0%, 100% {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25), 0 0 0 0 rgba(124, 108, 255, 0);
-  }
-  50% {
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35), 0 0 26px 2px rgba(124, 108, 255, 0.3);
-  }
+  0%, 100% { box-shadow: 0 4px 16px rgba(0,0,0,0.08); }
+  50%       { box-shadow: 0 8px 28px rgba(0,0,0,0.14); }
 }
 
-/* 1분 미만 danger 상태 — 느린 깜빡임으로 긴박감 */
 @keyframes missionCardDangerBlink {
   0%, 100% { opacity: 1; }
-  50%       { opacity: 0.55; }
+  50%       { opacity: 0.6; }
 }
 
+/* ── 기본(danger) 상태 ──────────────────────────────────────────────────── */
 .missionCard {
   display: flex;
   flex-direction: column;
-  border-radius: var(--radius-lg);
+  border-radius: 22px;
   overflow: hidden;
   flex-shrink: 0;
-  border: 1px solid rgba(220, 38, 38, 0.5);
-  background: #dc2626;   /* danger: < 1분 */
-  transition: background 0.6s ease, border-color 0.6s ease;
-  /* danger 기본 상태: 입장 후 느린 깜빡임 무한 반복 */
+  border: 1px solid var(--mission-border-danger);
+  background: var(--mission-bg-danger);
+  position: relative;
+  transition: border-color 0.6s ease, background 0.6s ease;
   animation:
     missionCardEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both,
-    missionCardDangerBlink 0.6s ease-in-out 0.45s infinite;
+    missionCardDangerBlink 1.2s ease-in-out 0.45s infinite;
+}
+
+.missionCard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 200px;
+  background: radial-gradient(ellipse 80% 140px at 50% -10px, var(--mission-glow-danger) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── 3분 이상: 초록 ─────────────────────────────────────────────────────── */
+.missionCardSafe {
+  border-color: var(--mission-border-safe);
+  background: var(--mission-bg-safe);
+  animation:
+    missionCardEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both,
+    missionCardBreathe 3.5s ease-in-out 0.45s infinite;
+}
+.missionCardSafe::before {
+  background: radial-gradient(ellipse 80% 140px at 50% -10px, var(--mission-glow-safe) 0%, transparent 70%);
+}
+
+/* ── 1~3분: 앰버 ────────────────────────────────────────────────────────── */
+.missionCardWarn {
+  border-color: var(--mission-border-warn);
+  background: var(--mission-bg-warn);
+  animation:
+    missionCardEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both,
+    missionCardBreathe 2.5s ease-in-out 0.45s infinite;
+}
+.missionCardWarn::before {
+  background: radial-gradient(ellipse 80% 140px at 50% -10px, var(--mission-glow-warn) 0%, transparent 70%);
 }
 
 /* ⚡ 번개 흔들림 */
@@ -136,37 +165,12 @@
   transform-origin: center;
 }
 
-/* 모션 최소화 설정 존중 */
 @media (prefers-reduced-motion: reduce) {
   .missionCard { animation: missionCardEnter 0.3s ease both; }
   .missionCardBolt { animation: none; }
 }
 
-/* 3분 이상: 파란색 — blink 없이 breathe만 */
-.missionCardSafe {
-  background: #1e3a6b;
-  border-color: rgba(59, 130, 246, 0.5);
-  animation:
-    missionCardEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both,
-    missionCardBreathe 3s ease-in-out 0.45s infinite;
-}
-.missionCardSafe .missionCardHeader {
-  background: rgba(30, 100, 220, 0.2);
-}
-
-/* 1~3분: 초록색 — blink 없이 breathe만 */
-.missionCardWarn {
-  background: #1a3d20;
-  border-color: rgba(34, 197, 94, 0.5);
-  animation:
-    missionCardEnter 0.45s cubic-bezier(0.22, 1, 0.36, 1) both,
-    missionCardBreathe 3s ease-in-out 0.45s infinite;
-}
-.missionCardWarn .missionCardHeader {
-  background: rgba(30, 130, 60, 0.2);
-}
-
-/* 다중 미션에서 돌아가기 버튼 */
+/* 다중 미션 돌아가기 */
 .missionCardBack {
   display: flex;
   align-items: center;
@@ -174,73 +178,79 @@
   padding: var(--sp-3) var(--sp-4);
   font-size: var(--text-sm);
   font-weight: 600;
-  /* 어두운 미션 카드 배경 위에서 잘 보이도록 밝은 색 */
-  color: rgba(255, 255, 255, 0.75);
+  color: var(--mission-back);
   transition: color var(--dur-fast);
 }
-.missionCardBack:active { color: #fff; }
 
 .missionCardHeader {
-  padding: var(--sp-3) var(--sp-5) var(--sp-2);
-  background: rgba(0, 0, 0, 0.06);
+  padding: 18px var(--sp-5) 10px;
   text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
+  position: relative;
+  z-index: 1;
 }
 
 .missionCardRoomBadge {
-  font-size: var(--text-base);
+  font-size: 16px;
   font-weight: 800;
-  color: #fff;
+  color: var(--mission-room-badge);
 }
 
 .missionCardSub {
-  font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.75);
+  font-size: 12px;
+  color: var(--mission-sub);
 }
 
 .missionCardTimer {
   display: flex;
   justify-content: center;
-  padding: var(--sp-2) 0 var(--sp-3);
+  padding: 12px 0 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .missionCardInfo {
-  margin: var(--sp-3) var(--sp-4);
+  margin: 0 var(--sp-4) var(--sp-3);
   padding: var(--sp-4) var(--sp-5);
-  background: rgba(0, 0, 0, 0.35);
-  border-radius: var(--radius-md);
+  background: var(--mission-info-bg);
+  border: 1px solid var(--mission-info-border);
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   gap: 6px;
+  position: relative;
+  z-index: 1;
 }
 
 .missionCardLabel {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--color-primary);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--mission-label);
   letter-spacing: 0.5px;
 }
 
 .missionCardTitle {
-  font-size: var(--text-lg);
+  font-size: 20px;
   font-weight: 800;
-  color: #fff;
-  line-height: 1.35;
+  color: var(--mission-title);
+  line-height: 1.3;
 }
 
 .missionCardDesc {
-  font-size: var(--text-sm);
-  color: rgba(255, 255, 255, 0.55);
+  font-size: 13px;
+  color: var(--mission-desc);
 }
 
 /* ── 참여 현황 ───────────────────────────────────────────────────────────── */
 .missionCardParticipants {
-  padding: var(--sp-1) var(--sp-4) var(--sp-3);
+  padding: 0 var(--sp-4) var(--sp-3);
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
+  position: relative;
+  z-index: 1;
 }
 
 .missionCardParticipantsRow {
@@ -252,13 +262,13 @@
 .missionCardParticipantsLabel {
   font-size: var(--text-sm);
   font-weight: 600;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--mission-ptcp);
 }
 
 .missionCardParticipantsCount {
   font-size: var(--text-sm);
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--mission-sub);
 }
 
 .missionCardAvatarRow {
@@ -278,15 +288,15 @@
 }
 
 .participantAvatar {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface-2);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--mission-avatar-bg);
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid var(--color-border);
+  border: 2px solid var(--mission-avatar-border);
 }
 
 .participantAvatarImg {
@@ -298,12 +308,12 @@
 .participantAvatarInitial {
   font-size: var(--text-base);
   font-weight: 700;
-  color: var(--color-text);
+  color: var(--mission-ptcp);
 }
 
 .participantName {
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--mission-name);
 }
 
 .participantStatus {
@@ -324,59 +334,64 @@
 }
 
 .statusWaiting {
-  background: var(--color-status-neutral-bg);
-  color: var(--color-text-muted);
-}
-
-/* 어두운 미션 카드 위에서는 밝은 색으로 */
-.missionCard .statusDone {
-  background: rgba(74, 222, 128, 0.2);
-  color: #4ade80;
-}
-
-.missionCard .statusRecording {
-  background: rgba(250, 204, 21, 0.2);
-  color: #facc15;
-}
-
-.missionCard .statusWaiting {
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.6);
+  background: var(--mission-status-wait-bg);
+  color: var(--mission-status-wait-c);
 }
 
 /* ── 참여하기 CTA ─────────────────────────────────────────────────────────── */
 .missionCardCta {
-  margin: var(--sp-1) var(--sp-4) var(--sp-4);
-  padding: var(--sp-4);
-  background: var(--color-primary);
-  border-radius: var(--radius-lg);
+  margin: 0 var(--sp-4) var(--sp-4);
+  padding: 15px;
+  background: var(--grad-action);
+  border-radius: 14px;
   color: #fff;
-  font-size: var(--text-base);
+  font-size: 16px;
   font-weight: 800;
-  letter-spacing: 0.5px;
-  transition: opacity var(--dur-fast);
+  letter-spacing: 0.3px;
+  transition: opacity 0.12s ease;
+  position: relative;
+  z-index: 1;
 }
 
-.missionCardCta:active { opacity: 0.8; }
+.missionCardCta:active { opacity: 0.82; }
 .missionCardCta:disabled {
-  background: var(--color-surface-2);
-  color: var(--color-text-muted);
+  background: var(--mission-retake-bg);
+  color: var(--mission-sub);
 }
 
 /* 결과 만드는 중 인라인 */
 .missionCardProcessing {
-  margin: var(--sp-1) var(--sp-4) var(--sp-4);
-  padding: var(--sp-4);
+  margin: 0 var(--sp-4) var(--sp-4);
+  padding: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: var(--sp-3);
-  background: rgba(0, 0, 0, 0.25);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-base);
+  background: var(--mission-processing-bg);
+  border: 1px solid var(--mission-processing-border);
+  border-radius: 14px;
+  font-size: 15px;
   font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--mission-processing-color);
+  position: relative;
+  z-index: 1;
 }
+
+/* 결과 보기 버튼 */
+.missionCardCtaResult {
+  margin: 0 var(--sp-4) var(--sp-4);
+  padding: 15px;
+  background: var(--mission-result-bg);
+  border: 1px solid var(--mission-result-border);
+  border-radius: 14px;
+  color: var(--mission-result-color);
+  font-size: 16px;
+  font-weight: 700;
+  transition: opacity 0.12s ease;
+  position: relative;
+  z-index: 1;
+}
+.missionCardCtaResult:active { opacity: 0.75; }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
@@ -385,14 +400,14 @@
 .missionCardProcessingSpinner {
   width: 18px;
   height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top-color: #fff;
+  border: 2px solid var(--mission-avatar-border);
+  border-top-color: var(--mission-title);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   flex-shrink: 0;
 }
 
-/* 전원 완료 메시지 (카드가 곧 사라짐) */
+/* 전원 완료 메시지 */
 .missionCardAllDone {
   margin: var(--sp-1) var(--sp-4) var(--sp-4);
   padding: var(--sp-4);
@@ -405,7 +420,7 @@
   color: var(--color-status-done);
 }
 
-/* 참여완료 상태 — 초록 계열로 구분 */
+/* 참여완료 상태 */
 .missionCardCtaDone {
   background: var(--color-done-cta);
   color: var(--color-done-cta-text);
@@ -417,29 +432,23 @@
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
-  padding: var(--sp-1) var(--sp-4) var(--sp-4);
+  padding: 0 var(--sp-4) var(--sp-4);
+  position: relative;
+  z-index: 1;
 }
 
-/* 재촬영 버튼 (카드 다크 배경 위의 보조 버튼) */
+/* 재촬영 버튼 */
 .missionCardRetake {
   width: 100%;
   padding: 10px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: var(--mission-retake-bg);
+  border: 1px solid var(--mission-retake-border);
   border-radius: var(--radius-lg);
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--mission-retake-color);
   font-size: var(--text-sm);
   font-weight: 600;
   transition: background var(--dur-fast);
 }
-.missionCardRetake:active { background: rgba(255, 255, 255, 0.20); }
-
-/* 만료 후 결과 보기 — 보라 계열 */
-.missionCardCtaResult {
-  background: var(--color-primary);
-  color: #fff;
-}
-.missionCardCtaResult:active { opacity: 0.85; }
 
 /* ── 03_방 선택 화면 ──────────────────────────────────────────────────────── */
 .missionSelectSection {
@@ -585,7 +594,7 @@
 /* ── greeting name gradient ───────────────────────────────────────────────── */
 .greetingName {
   font-weight: 800;
-  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  background: var(--brand-grad);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -608,11 +617,16 @@
   align-items: center;
   gap: 16px;
   padding: 48px 28px;
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--card-bg);
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.085);
+  border: 1px solid var(--card-border);
   text-align: center;
   margin-top: 8px;
+}
+
+:global(:root:not([data-theme="dark"])) .waitingCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
 }
 
 .waitingIconWrap {
@@ -643,13 +657,13 @@
 .waitingTitle {
   font-size: 18px;
   font-weight: 800;
-  color: #F3F5FF;
+  color: var(--ink);
   line-height: 1.4;
 }
 
 .waitingDesc {
   font-size: 14px;
-  color: #9AA0BD;
+  color: var(--ink-sub);
   line-height: 1.6;
 }
 
@@ -674,6 +688,151 @@
   border: 1px solid rgba(70,215,255,.25);
   color: #46D7FF;
   letter-spacing: 0.3px;
+}
+
+/* ── 내 방의 오늘 미션 섹션 ───────────────────────────────────────────────── */
+.todaySection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.todaySectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2px;
+}
+
+.todaySectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-sub);
+}
+
+.todaySeeAll {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--nav-active);
+}
+
+.todayRoomList {
+  display: flex;
+  flex-direction: column;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+:global(:root:not([data-theme="dark"])) .todayRoomList {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
+}
+
+.todayRoomCard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--divider-color);
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.todayRoomCard:last-child {
+  border-bottom: none;
+}
+
+.todayRoomCard:active {
+  background: var(--card-bg-soft);
+}
+
+.todayRoomThumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.todayRoomThumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.todayRoomThumbInitial {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink-sub);
+}
+
+.todayRoomBody {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.todayRoomTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.todayRoomName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.todayRoomDone {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--nav-active);
+  flex-shrink: 0;
+}
+
+.todayRoomProgress {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--nav-active);
+  flex-shrink: 0;
+}
+
+.todayRoomMeta {
+  font-size: 12px;
+  color: var(--ink-sub);
+  font-weight: 500;
+}
+
+.todayProgressTrack {
+  width: 100%;
+  height: 4px;
+  background: var(--ring-track);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.todayProgressFill {
+  height: 100%;
+  background: var(--grad-action);
+  border-radius: 999px;
+  transition: width 0.4s ease;
 }
 
 /* ── 상태 카드 ────────────────────────────────────────────────────────────── */

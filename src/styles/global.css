@@ -48,6 +48,69 @@
   /* FAB shadow */
   --color-fab-shadow:   rgba(149, 201, 109, 0.45);
 
+  /* ── Page / card / ink / nav tokens (light) ─────────────────────────────── */
+  --page-bg:            #fffdf5;
+  --card-bg:            rgba(255, 255, 255, 0.80);
+  --card-bg-soft:       rgba(255, 255, 255, 0.55);
+  --card-border:        rgba(0, 0, 0, 0.07);
+  --divider-color:      rgba(0, 0, 0, 0.06);
+  --ink:                #263A1A;
+  --ink-sub:            rgba(38, 58, 26, 0.62);
+  --ink-muted:          rgba(38, 58, 26, 0.35);
+  --grad-action:        linear-gradient(135deg, #5DB85A 0%, #2D8A45 100%);
+  --grad-action-2:      linear-gradient(135deg, #7ED36F 0%, #3C9D5F 100%);
+  --grad-soft:          linear-gradient(135deg, rgba(93,184,90,.12), rgba(149,201,109,.08));
+  --toggle-off-bg:      rgba(0, 0, 0, 0.10);
+  --nav-bg:             #eef5e0;
+  --nav-border:         rgba(0, 0, 0, 0.07);
+  --nav-inactive:       rgba(38, 58, 26, 0.35);
+  --nav-active:         #2D8A45;
+  --brand-grad:         linear-gradient(135deg, #5DB85A 0%, #2D8A45 100%);
+  --header-subtitle:    rgba(38, 58, 26, 0.55);
+  --devbtn-bg:          rgba(0, 0, 0, 0.04);
+  --devbtn-border:      rgba(0, 0, 0, 0.15);
+  --devbtn-color:       rgba(38, 58, 26, 0.6);
+  --ring-track:         rgba(0, 0, 0, 0.12);
+
+  /* Mission card tokens (light) */
+  --mission-bg-safe:           rgba(93, 184, 90, 0.08);
+  --mission-bg-warn:           rgba(230, 160, 30, 0.08);
+  --mission-bg-danger:         rgba(255, 80, 80, 0.08);
+  --mission-border-safe:       rgba(93, 184, 90, 0.25);
+  --mission-border-warn:       rgba(220, 140, 30, 0.25);
+  --mission-border-danger:     rgba(220, 50, 50, 0.22);
+  --mission-glow-safe:         rgba(93, 184, 90, 0.18);
+  --mission-glow-warn:         rgba(230, 160, 30, 0.20);
+  --mission-glow-danger:       rgba(255, 80, 80, 0.18);
+  --mission-room-badge:        var(--ink);
+  --mission-sub:               var(--ink-sub);
+  --mission-info-bg:           rgba(255, 255, 255, 0.80);
+  --mission-info-border:       rgba(0, 0, 0, 0.07);
+  --mission-label:             var(--nav-active);
+  --mission-title:             var(--ink);
+  --mission-desc:              var(--ink-sub);
+  --mission-ptcp:              var(--ink-sub);
+  --mission-avatar-bg:         rgba(0, 0, 0, 0.06);
+  --mission-avatar-border:     rgba(0, 0, 0, 0.10);
+  --mission-name:              var(--ink-sub);
+  --mission-status-wait-bg:    rgba(38, 58, 26, 0.07);
+  --mission-status-wait-c:     rgba(38, 58, 26, 0.45);
+  --mission-back:              var(--ink-muted);
+  --mission-retake-bg:         rgba(0, 0, 0, 0.05);
+  --mission-retake-border:     rgba(0, 0, 0, 0.10);
+  --mission-retake-color:      var(--ink-sub);
+  --mission-processing-bg:     rgba(0, 0, 0, 0.04);
+  --mission-processing-border: rgba(0, 0, 0, 0.08);
+  --mission-processing-color:  var(--ink-sub);
+  --mission-result-bg:         rgba(0, 0, 0, 0.05);
+  --mission-result-border:     rgba(0, 0, 0, 0.10);
+  --mission-result-color:      var(--ink);
+
+  /* Timer label (light) */
+  --timer-label-safe:   rgba(38, 58, 26, 0.40);
+  --timer-label-warn:   #B87A0A;
+  --timer-label-danger: #C0392B;
+
   /* Spacing (4px grid) */
   --sp-1: 4px;
   --sp-2: 8px;
@@ -140,6 +203,7 @@ body {
   display: flex;
   flex-direction: column;
   background-color: var(--color-bg);
+  position: relative;
 }
 
 /* 데스크톱: 폰 너비로 제한 + 그림자로 기기 느낌 */
@@ -246,11 +310,75 @@ img, video {
   --color-done-cta-text: #bbf7d0;
 
   --color-fab-shadow:   rgba(108, 99, 255, 0.45);
+
+  /* ── Page / card / ink / nav tokens (dark) ──────────────────────────────── */
+  --page-bg:            #070912;
+  --card-bg:            rgba(255, 255, 255, 0.045);
+  --card-bg-soft:       rgba(255, 255, 255, 0.03);
+  --card-border:        rgba(255, 255, 255, 0.085);
+  --divider-color:      rgba(255, 255, 255, 0.07);
+  --ink:                #F3F5FF;
+  --ink-sub:            #9AA0BD;
+  --ink-muted:          #5C6488;
+  --grad-action:        linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  --grad-action-2:      linear-gradient(135deg, #6E8BFF 0%, #9B6BFF 100%);
+  --grad-soft:          linear-gradient(135deg, rgba(70,215,255,.08), rgba(155,107,255,.06));
+  --toggle-off-bg:      rgba(255, 255, 255, 0.10);
+  --nav-bg:             #070912;
+  --nav-border:         rgba(255, 255, 255, 0.085);
+  --nav-inactive:       #5C6488;
+  --nav-active:         #9B8BFF;
+  --brand-grad:         linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  --header-subtitle:    #9AA0BD;
+  --devbtn-bg:          rgba(255, 255, 255, 0.04);
+  --devbtn-border:      rgba(255, 255, 255, 0.15);
+  --devbtn-color:       rgba(255, 255, 255, 0.5);
+  --ring-track:         rgba(255, 255, 255, 0.10);
+
+  /* Mission card tokens (dark) */
+  --mission-bg-safe:           #0E1226;
+  --mission-bg-warn:           #0E1226;
+  --mission-bg-danger:         #0E1226;
+  --mission-border-safe:       rgba(74, 222, 128, 0.25);
+  --mission-border-warn:       rgba(255, 194, 75, 0.30);
+  --mission-border-danger:     rgba(255, 107, 107, 0.30);
+  --mission-glow-safe:         rgba(74, 222, 128, 0.20);
+  --mission-glow-warn:         rgba(255, 194, 75, 0.22);
+  --mission-glow-danger:       rgba(255, 80, 80, 0.22);
+  --mission-room-badge:        #ffffff;
+  --mission-sub:               rgba(255, 255, 255, 0.50);
+  --mission-info-bg:           rgba(255, 255, 255, 0.05);
+  --mission-info-border:       rgba(255, 255, 255, 0.08);
+  --mission-label:             #9B8BFF;
+  --mission-title:             #ffffff;
+  --mission-desc:              rgba(255, 255, 255, 0.50);
+  --mission-ptcp:              rgba(255, 255, 255, 0.70);
+  --mission-avatar-bg:         rgba(255, 255, 255, 0.10);
+  --mission-avatar-border:     rgba(255, 255, 255, 0.15);
+  --mission-name:              rgba(255, 255, 255, 0.70);
+  --mission-status-wait-bg:    rgba(255, 255, 255, 0.10);
+  --mission-status-wait-c:     rgba(255, 255, 255, 0.60);
+  --mission-back:              rgba(255, 255, 255, 0.75);
+  --mission-retake-bg:         rgba(255, 255, 255, 0.12);
+  --mission-retake-border:     rgba(255, 255, 255, 0.22);
+  --mission-retake-color:      rgba(255, 255, 255, 0.85);
+  --mission-processing-bg:     rgba(255, 255, 255, 0.07);
+  --mission-processing-border: rgba(255, 255, 255, 0.10);
+  --mission-processing-color:  rgba(255, 255, 255, 0.70);
+  --mission-result-bg:         rgba(255, 255, 255, 0.08);
+  --mission-result-border:     rgba(255, 255, 255, 0.14);
+  --mission-result-color:      #ffffff;
+
+  /* Timer label (dark) */
+  --timer-label-safe:   rgba(255, 255, 255, 0.50);
+  --timer-label-warn:   #FFC24B;
+  --timer-label-danger: #FF6B6B;
 }
 
 [data-theme="dark"] body {
   background-color: #07070b;
 }
+
 
 @media (min-width: 500px) {
   [data-theme="dark"] #root {

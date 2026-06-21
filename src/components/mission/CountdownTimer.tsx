@@ -52,8 +52,11 @@ export function CountdownTimer({ secondsLeft, size = 'lg', showLabel = true }: P
           {isExpired ? '00:00' : formatTime(secondsLeft)}
         </span>
         {showLabel && (
-          <span className={styles.label}>
-            {isExpired ? '시간 초과' : '남은 시간'}
+          <span className={[
+            styles.label,
+            isExpired ? styles.labelDanger : isDanger ? styles.labelDanger : isWarn ? styles.labelWarn : styles.labelSafe,
+          ].join(' ')}>
+            {isExpired ? '시간 초과' : isWarn ? '서둘러요!' : '남은 시간'}
           </span>
         )}
       </div>

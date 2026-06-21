@@ -4,56 +4,56 @@ import { useAuthStore } from '@/store/authStore'
 import { roomApi, uploadApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import NavHeader from '@/components/layout/NavHeader'
-import TimePicker from '@/components/ui/TimePicker'
+import DualRangeSlider from '@/components/ui/DualRangeSlider'
 import styles from './RoomSettingsPage.module.css'
 
-export default function RoomSettingsPage() {
-  const { roomId }    = useParams<{ roomId: string }>()
-  const navigate      = useNavigate()
-  const myUser        = useAuthStore((s) => s.user)
-  const id            = Number(roomId)
+const MISSION_OPTIONS = [1, 2, 3, 4, 5]
+const HOUR_MIN = 0
+const HOUR_MAX = 24
 
-  const [roomName, setRoomName]               = useState('')
-  const [missionCount, setMissionCount]       = useState(1)
-  const [missionStartTime, setMissionStartTime] = useState('10:00')
-  const [missionEndTime,   setMissionEndTime]   = useState('22:00')
-  const [memberCount, setMemberCount]         = useState(0)
-  const [maxMembers, setMaxMembers]           = useState(10)
-  const [isOwner, setIsOwner]                 = useState(false)
-  const [thumbUrl, setThumbUrl]               = useState<string | null>(null)
-  const [newThumbFile, setNewThumbFile]       = useState<File | null>(null)
-  const [dirty, setDirty]                     = useState(false)
-  const [saving, setSaving]                   = useState(false)
-  const [saveError, setSaveError]             = useState<string | null>(null)
-  const [isLoading, setIsLoading]             = useState(true)
+function toHourNum(time: string) {
+  const [h, m] = time.split(':').map(Number)
+  return h + m / 60
+}
+
+function toTimeStr(hour: number) {
+  const h = Math.floor(hour)
+  return `${String(h).padStart(2, '0')}:00`
+}
+
+export default function RoomSettingsPage() {
+  const { roomId } = useParams<{ roomId: string }>()
+  const navigate   = useNavigate()
+  const myUser     = useAuthStore((s) => s.user)
+  const id         = Number(roomId)
+
+  const [roomName, setRoomName]                   = useState('')
+  const [missionCount, setMissionCount]           = useState(3)
+  const [startHour, setStartHour]                 = useState(10)
+  const [endHour, setEndHour]                     = useState(22)
+  const [memberCount, setMemberCount]             = useState(0)
+  const [roomCode, setRoomCode]                   = useState('')
+  const [isOwner, setIsOwner]                     = useState(false)
+  const [thumbUrl, setThumbUrl]                   = useState<string | null>(null)
+  const [newThumbFile, setNewThumbFile]           = useState<File | null>(null)
+  const [dirty, setDirty]                         = useState(false)
+  const [saving, setSaving]                       = useState(false)
+  const [saveError, setSaveError]                 = useState<string | null>(null)
+  const [isLoading, setIsLoading]                 = useState(true)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  function handleThumbClick() {
-    if (!isOwner) return
-    fileInputRef.current?.click()
-  }
-
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    setNewThumbFile(file)
-    setThumbUrl(URL.createObjectURL(file))
-    setDirty(true)
-  }
 
   useEffect(() => {
     if (!id) return
     roomApi.getRoom(id)
-      .then((roomRes) => {
-        const room = roomRes.data
-        console.log('[RoomSettings] GET room.thumbnail:', room.thumbnail)
+      .then((res) => {
+        const room = res.data
         setRoomName(room.name)
         setMissionCount(room.dailyMissionCount)
-        setMissionStartTime(room.missionStartTime?.slice(0, 5) ?? '10:00')
-        setMissionEndTime(room.missionEndTime?.slice(0, 5)     ?? '22:00')
+        setStartHour(toHourNum(room.missionStartTime?.slice(0, 5) ?? '10:00'))
+        setEndHour(toHourNum(room.missionEndTime?.slice(0, 5) ?? '22:00'))
         setMemberCount(room.currentMembers)
-        setMaxMembers(room.maxMembers)
+        setRoomCode(room.code)
         setIsOwner(room.ownerId === myUser?.userId)
         setThumbUrl(room.thumbnail ?? null)
       })
@@ -74,24 +74,29 @@ export default function RoomSettingsPage() {
         thumbnailUrl = fileUrl
         setThumbUrl(fileUrl)
       }
-      const updatePayload = {
-        name:              roomName,
+      await roomApi.updateRoom(id, {
+        name: roomName,
         dailyMissionCount: missionCount,
-        missionStartTime,
-        missionEndTime,
-        maxMembers,
+        missionStartTime: toTimeStr(startHour),
+        missionEndTime:   toTimeStr(endHour),
         ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
-      }
-      console.log('[RoomSettings] PATCH payload:', updatePayload)
-      const updateRes = await roomApi.updateRoom(id, updatePayload)
-      console.log('[RoomSettings] PATCH response:', updateRes.data)
+      })
       setDirty(false)
       navigate(-1)
     } catch (e) {
       setSaveError(e instanceof Error ? e.message : '저장에 실패했어요')
-      console.error(e)
     } finally {
       setSaving(false)
+    }
+  }
+
+  async function handleLeave() {
+    if (!window.confirm('방에서 나가시겠어요?')) return
+    try {
+      await roomApi.leaveRoom(id)
+      navigate(ROUTES.ROOMS, { replace: true })
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -110,7 +115,7 @@ export default function RoomSettingsPage() {
       <div className={styles.page}>
         <NavHeader title="방 설정" />
         <div className={styles.scroll}>
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>불러오는 중...</p>
+          <p style={{ padding: '40px 20px', textAlign: 'center', color: '#9AA0BD' }}>불러오는 중...</p>
         </div>
       </div>
     )
@@ -118,7 +123,6 @@ export default function RoomSettingsPage() {
 
   return (
     <div className={styles.page}>
-      {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <NavHeader
         title="방 설정"
         right={isOwner ? (
@@ -127,18 +131,18 @@ export default function RoomSettingsPage() {
             onClick={handleSave}
             disabled={!dirty || saving}
           >
-            {saving ? '저장 중...' : '저장'}
+            {saving ? '저장 중' : '저장'}
           </button>
         ) : undefined}
       />
 
       <div className={styles.scroll}>
-        {/* ── 방 썸네일 + 이름 ────────────────────────────────────────────────── */}
+
+        {/* ── 방 정보 헤더 ──────────────────────────────────────────────────── */}
         <div className={styles.roomHeader}>
           <button
             className={styles.roomThumb}
-            onClick={handleThumbClick}
-            disabled={!isOwner}
+            onClick={() => isOwner && fileInputRef.current?.click()}
             style={{ cursor: isOwner ? 'pointer' : 'default' }}
           >
             {thumbUrl
@@ -156,104 +160,174 @@ export default function RoomSettingsPage() {
             type="file"
             accept="image/*"
             style={{ display: 'none' }}
-            onChange={handleFileChange}
+            onChange={(e) => {
+              const file = e.target.files?.[0]
+              if (!file) return
+              setNewThumbFile(file)
+              setThumbUrl(URL.createObjectURL(file))
+              setDirty(true)
+            }}
           />
-          {isOwner ? (
-            <input
-              className={styles.roomNameInput}
-              value={roomName}
-              onChange={(e) => { setRoomName(e.target.value); setDirty(true) }}
-              maxLength={20}
-              placeholder="방 이름"
+          <div className={styles.roomInfo}>
+            {isOwner ? (
+              <input
+                className={styles.roomNameInput}
+                value={roomName}
+                onChange={(e) => { setRoomName(e.target.value); setDirty(true) }}
+                maxLength={20}
+                placeholder="방 이름"
+              />
+            ) : (
+              <span className={styles.roomName}>{roomName}</span>
+            )}
+            <span className={styles.roomMeta}>코드 {roomCode} · {memberCount}명 참여 중</span>
+          </div>
+        </div>
+
+        {/* ── 미션 설정 ──────────────────────────────────────────────────────── */}
+        <span className={styles.sectionLabel}>미션 설정</span>
+        <div className={styles.card}>
+          {/* 일일 미션 횟수 */}
+          <div className={styles.missionCountRow}>
+            <div className={styles.missionIconWrap}>
+              <LightningIcon />
+            </div>
+            <span className={styles.missionCountLabel}>일일 미션 횟수</span>
+            <div className={styles.chips}>
+              {MISSION_OPTIONS.map((n) => (
+                <button
+                  key={n}
+                  className={[styles.chip, missionCount === n ? styles.chipActive : ''].join(' ')}
+                  onClick={() => { setMissionCount(n); setDirty(true) }}
+                  disabled={!isOwner}
+                >
+                  {n}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.cardDivider} />
+
+          {/* 미션 알림 시간대 */}
+          <div className={styles.timeRow}>
+            <div className={styles.timeRowTop}>
+              <span className={styles.timeLabel}>미션 알림 시간대</span>
+              <span className={styles.timeValue}>
+                {toTimeStr(startHour)} – {toTimeStr(endHour)}
+              </span>
+            </div>
+            <DualRangeSlider
+              min={HOUR_MIN}
+              max={HOUR_MAX}
+              step={1}
+              start={startHour}
+              end={endHour}
+              disabled={!isOwner}
+              onStartChange={(v) => { setStartHour(v); setDirty(true) }}
+              onEndChange={(v)   => { setEndHour(v);   setDirty(true) }}
             />
-          ) : (
-            <span className={styles.roomName}>{roomName}</span>
-          )}
-        </div>
-
-        <div className={styles.divider} />
-
-        {/* ── 방 설정 섹션 ────────────────────────────────────────────────────── */}
-        <div className={styles.sectionGroup}>
-          <div className={styles.sectionHeader}>
-            <span className={styles.sectionTitle}>방 설정</span>
-            <span className={styles.sectionMeta}>{memberCount}명 참여 중</span>
-          </div>
-
-          <div className={styles.settingCard}>
-            {/* 일일 미션 횟수 */}
-            <div className={styles.settingRow}>
-              <div className={styles.settingIcon}><span>⚡</span></div>
-              <span className={styles.settingLabel}>일일 미션 횟수</span>
-              {isOwner ? (
-                <div className={styles.stepper}>
-                  <button
-                    className={styles.stepBtn}
-                    onClick={() => { setMissionCount((v) => Math.max(1, v - 1)); setDirty(true) }}
-                    disabled={missionCount <= 1}
-                  >−</button>
-                  <span className={styles.stepValue}>{missionCount}회</span>
-                  <button
-                    className={styles.stepBtn}
-                    onClick={() => { setMissionCount((v) => Math.min(5, v + 1)); setDirty(true) }}
-                    disabled={missionCount >= 5}
-                  >+</button>
-                </div>
-              ) : (
-                <span className={styles.settingValue}>{missionCount}회</span>
-              )}
-            </div>
-
-            <div className={styles.rowDivider} />
-
-            {/* 미션 알림 시간대 */}
-            <div className={styles.settingRowTime}>
-              <span className={styles.settingLabel}>미션 알림 시간대</span>
-              {isOwner ? (
-                <div className={styles.timeInputRow}>
-                  <TimePicker
-                    value={missionStartTime}
-                    onChange={(v) => { setMissionStartTime(v); setDirty(true) }}
-                  />
-                  <span className={styles.timeDash}>–</span>
-                  <TimePicker
-                    value={missionEndTime}
-                    onChange={(v) => { setMissionEndTime(v); setDirty(true) }}
-                  />
-                </div>
-              ) : (
-                <span className={styles.settingValue}>{missionStartTime}–{missionEndTime}</span>
-              )}
-            </div>
           </div>
         </div>
 
-        {/* ── 저장 에러 ────────────────────────────────────────────────────────── */}
-        {saveError && (
-          <p style={{ padding: '0 20px 8px', color: '#ef4444', fontSize: 13, textAlign: 'center' }}>
-            {saveError}
-          </p>
-        )}
+        {/* ── 관리 ───────────────────────────────────────────────────────────── */}
+        <span className={styles.sectionLabel}>관리</span>
+        <div className={styles.card}>
+          <button className={styles.manageRow} onClick={() => navigate(ROUTES.ROOM_MEMBERS(id))}>
+            <div className={styles.manageIcon}><MembersIcon /></div>
+            <span className={styles.manageLabel}>멤버 관리</span>
+            <ChevronIcon className={styles.manageArrow} />
+          </button>
+          <div className={styles.cardDivider} />
+          <button className={styles.manageRow} onClick={() => fileInputRef.current?.click()}>
+            <div className={styles.manageIcon}><CoverIcon /></div>
+            <span className={styles.manageLabel}>방 이름·커버 변경</span>
+            <ChevronIcon className={styles.manageArrow} />
+          </button>
+        </div>
 
-        {/* ── 멤버 관리 ────────────────────────────────────────────────────────── */}
-        <button
-          className={styles.memberBtn}
-          onClick={() => navigate(ROUTES.ROOM_MEMBERS(id))}
-        >
-          <span className={styles.memberBtnIcon}>
-            <svg xmlns="http://www.w3.org/2000/svg" height="22px" viewBox="0 -960 960 960" width="22px" fill="currentColor"><path d="M287-527q-47-47-47-113t47-113q47-47 113-47t113 47q47 47 47 113t-47 113q-47 47-113 47t-113-47ZM80-160v-112q0-33 17-62t47-44q51-26 115-44t141-18h14q6 0 12 2-8 18-13.5 37.5T404-360h-4q-71 0-127.5 18T180-306q-9 5-14.5 14t-5.5 20v32h252q6 21 16 41.5t22 38.5H80Zm560 40-12-60q-12-5-22.5-10.5T584-204l-58 18-40-68 46-40q-2-14-2-26t2-26l-46-40 40-68 58 18q11-8 21.5-13.5T628-460l12-60h80l12 60q12 5 22.5 11t21.5 15l58-20 40 70-46 40q2 12 2 25t-2 25l46 40-40 68-58-18q-11 8-21.5 13.5T732-180l-12 60h-80Zm96.5-143.5Q760-287 760-320t-23.5-56.5Q713-400 680-400t-56.5 23.5Q600-353 600-320t23.5 56.5Q647-240 680-240t56.5-23.5Zm-280-320Q480-607 480-640t-23.5-56.5Q433-720 400-720t-56.5 23.5Q320-673 320-640t23.5 56.5Q367-560 400-560t56.5-23.5ZM400-640Zm12 400Z"/></svg>
-          </span>
-          <span className={styles.memberBtnLabel}>멤버 관리</span>
-          <span className={styles.memberBtnArrow}>›</span>
+        {saveError && <p className={styles.saveError}>{saveError}</p>}
+
+        {/* ── 방 나가기 ────────────────────────────────────────────────────── */}
+        <button className={styles.leaveBtn} onClick={handleLeave}>
+          <LeaveIcon />
+          방 나가기
         </button>
 
-        {/* ── 방 삭제 (방장 전용) ──────────────────────────────────────────────── */}
         {isOwner && (
-          <button className={styles.deleteRoomBtn} onClick={handleDeleteRoom}>
-            🗑️ 방 삭제하기
-          </button>
+          <div className={styles.deleteSection}>
+            <button className={styles.deleteRoomBtn} onClick={handleDeleteRoom}>
+              <TrashIcon />
+              방 삭제하기
+            </button>
+            <p className={styles.deleteDesc}>방을 삭제하면 모든 멤버의 콜라주와 기록이 사라져요</p>
+          </div>
         )}
       </div>
     </div>
+  )
+}
+
+/* ── 아이콘 ───────────────────────────────────────────────────────────────── */
+
+function LightningIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M13 2L4.5 13.5H12L11 22L19.5 10.5H12L13 2Z" />
+    </svg>
+  )
+}
+
+function MembersIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="9" cy="7" r="3" />
+      <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
+      <circle cx="18" cy="7" r="2.5" />
+      <path d="M21 20c0-2.8-1.6-5-4-5.5" />
+    </svg>
+  )
+}
+
+function CoverIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="3.2" />
+      <path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2" />
+    </svg>
+  )
+}
+
+function ChevronIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 6l6 6-6 6" />
+    </svg>
+  )
+}
+
+function TrashIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="3 6 5 6 21 6" />
+      <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+      <path d="M10 11v6M14 11v6" />
+      <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2" />
+    </svg>
+  )
+}
+
+function LeaveIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M14 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v14a1 1 0 001 1h8a1 1 0 001-1v-3" />
+      <path d="M10 12h10m0 0l-3-3m3 3l-3 3" />
+    </svg>
   )
 }

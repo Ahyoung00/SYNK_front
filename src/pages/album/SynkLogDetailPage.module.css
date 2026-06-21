@@ -2,239 +2,350 @@
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  background: var(--color-bg);
+  background: var(--page-bg);
 }
 
 /* ── 헤더 ─────────────────────────────────────────────────────────────────── */
 .header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
   align-items: center;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
+  padding: calc(var(--safe-top) + var(--sp-3)) var(--sp-4) var(--sp-3);
   flex-shrink: 0;
 }
 
 .backBtn {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-text);
+  color: var(--ink);
 }
 
 .headerTitle {
-  font-size: var(--text-base);
+  font-size: 16px;
   font-weight: 700;
-  color: var(--color-text);
+  color: var(--ink);
+  text-align: center;
 }
 
-.headerRight { width: 36px; }
+.headerRight { width: 40px; }
+
+.loadingWrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--ink-muted);
+}
 
 /* ── 스크롤 ───────────────────────────────────────────────────────────────── */
 .scroll {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: var(--sp-4) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
+  padding: var(--sp-2) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
-  align-items: center;
+  gap: var(--sp-4);
 }
 
-/* ── 미션 카드 ────────────────────────────────────────────────────────────── */
-.missionCard {
-  width: 100%;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-xl);
-  padding: var(--sp-6);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sp-3);
-}
-
-.missionHeader {
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--color-text-muted);
-  letter-spacing: 0.04em;
-}
-
-.missionRow {
-  width: 100%;
+/* ── 방 정보 행 ───────────────────────────────────────────────────────────── */
+.roomRow {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--sp-3);
+  gap: 10px;
+  padding: 2px 0 4px;
 }
 
-.missionText {
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--color-text);
-  flex: 1;
-}
-
-.collageBtn {
-  flex-shrink: 0;
-  padding: 5px 12px;
-  background: var(--color-primary);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: #fff;
-  transition: opacity var(--dur-fast);
-}
-
-.collageBtn:active {
-  opacity: 0.8;
-}
-
-.missionMeta {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-}
-
-/* ── 참여자 아바타 행 ─────────────────────────────────────────────────────── */
-.avatarRow {
-  display: flex;
-  gap: var(--sp-2);
-  flex-wrap: wrap;
-  justify-content: center;
-  margin: var(--sp-1) 0;
-}
-
-.avatarItem {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-full);
+.roomThumb {
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 2px solid transparent;
+  flex-shrink: 0;
 }
 
-.avatarDone {
-  border-color: var(--color-status-done);
-}
-
-.avatarMissed {
-  border-color: var(--color-border);
-  opacity: 0.5;
-}
-
-.avatarImg {
+.roomThumbImg {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.avatarInitial {
-  font-size: var(--text-base);
+.roomThumbEmoji { font-size: 18px; }
+
+.roomName {
+  font-size: 15px;
   font-weight: 700;
-  color: var(--color-text);
-  background: var(--color-surface-2);
-  width: 100%;
-  height: 100%;
+  color: var(--ink);
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.roomChip {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-sub);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  padding: 4px 10px;
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+/* ── 미션 카드 ────────────────────────────────────────────────────────────── */
+.missionCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+:global(:root:not([data-theme="dark"])) .missionCard {
+  background: linear-gradient(135deg, rgba(96,196,80,.14), rgba(140,220,110,.12));
+  border-color: rgba(80, 170, 55, 0.28);
+}
+
+/* 미션 헤더 */
+.missionHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.missionIconWrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: var(--grad-action);
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.synkBtn {
-  margin-top: var(--sp-3);
-  padding: 12px 40px;
-  background: var(--color-primary);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-base);
-  font-weight: 900;
-  color: #fff;
-  letter-spacing: 2px;
-  transition: opacity var(--dur-fast);
-}
-
-.synkBtn:active {
-  opacity: 0.82;
-}
-
-/* ── 포토 그리드 ──────────────────────────────────────────────────────────── */
-.photoGrid {
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--sp-2);
-}
-
-.photoThumb {
-  aspect-ratio: 1;
-  border-radius: var(--radius-md);
-  transition: opacity var(--dur-fast);
-}
-
-.photoThumb:active {
-  opacity: 0.8;
-}
-
-/* ── 사진 전체 화면 ───────────────────────────────────────────────────────── */
-.photoPage {
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-  background: #000;
-}
-
-.photoHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
   flex-shrink: 0;
 }
 
-.photoHeaderTitle {
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: #fff;
+.missionEmoji { font-size: 18px; }
+
+.missionInfo {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
-.photoFull {
-  flex: 1;
+.missionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.missionMeta {
+  font-size: 12px;
+  color: var(--ink-sub);
+  font-weight: 500;
+}
+
+.collageChip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--nav-active);
+  transition: opacity 0.12s ease;
+}
+
+.collageChip:active { opacity: 0.7; }
+
+/* 참여자 포토 그리드 */
+.photoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 0 2px;
+}
+
+.photoCell {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.photo {
+  width: 100%;
+  aspect-ratio: 1;
   object-fit: cover;
 }
 
-.photoFooter {
+.photoPlaceholder {
+  width: 100%;
+  aspect-ratio: 1;
+  background: linear-gradient(135deg, rgba(96,196,80,.16), rgba(140,220,150,.10)), #EDF0E8;
+}
+
+:global([data-theme="dark"]) .photoPlaceholder {
+  background: linear-gradient(135deg, rgba(124,111,240,.18), rgba(70,215,255,.12)), #171c34;
+}
+
+.photoName {
+  position: absolute;
+  bottom: 8px;
+  left: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0,0,0,.35);
+  padding: 2px 6px;
+  border-radius: 999px;
+  backdrop-filter: blur(4px);
+}
+
+/* 리액션 행 */
+.reactionRow {
   display: flex;
-  gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
-  flex-shrink: 0;
+  align-items: center;
+  gap: 6px;
+  padding: 12px 16px;
 }
 
-.photoShareBtn {
-  flex: 1;
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.15);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-base);
+.reactionChip {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-sub);
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
+  padding: 5px 11px;
+  border-radius: 999px;
+}
+
+.reactionSpacer { flex: 1; }
+
+.chatIcon {
+  font-size: 20px;
+  color: var(--ink-muted);
+}
+
+/* ── 섹션 레이블 ──────────────────────────────────────────────────────────── */
+.sectionLabel {
+  font-size: 12px;
   font-weight: 700;
-  color: #fff;
+  color: var(--ink-muted);
+  letter-spacing: 0.04em;
+  padding: 4px 2px 0;
 }
 
-.photoSaveBtn {
-  flex: 1;
-  padding: 14px;
-  background: var(--color-primary);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: #fff;
-  transition: opacity var(--dur-fast);
+/* ── SYNKLOG 카드 ─────────────────────────────────────────────────────────── */
+.synklogCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  overflow: hidden;
 }
 
-.photoSaveBtn:active {
-  opacity: 0.85;
+:global(:root:not([data-theme="dark"])) .synklogCard {
+  background: rgba(255,255,255,.85);
+  border-color: rgba(120, 162, 58, 0.20);
+}
+
+.synklogEmpty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 32px 24px 28px;
+  text-align: center;
+}
+
+.synklogIconWrap {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: var(--grad-soft);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.synklogIcon { font-size: 28px; }
+
+.synklogEmptyTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.synklogEmptyDesc {
+  font-size: 13px;
+  color: var(--ink-sub);
+  line-height: 1.6;
+}
+
+.synklogBtn {
+  margin-top: 8px;
+  width: 100%;
+  padding: 16px;
+  background: var(--grad-action);
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 0.3px;
+  transition: opacity 0.12s ease;
+}
+
+.synklogBtn:active { opacity: 0.82; }
+.synklogBtn:disabled { opacity: 0.6; }
+
+/* SYNKLOG 완성 상태 */
+.synklogComplete {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+
+.synklogThumb {
+  width: 100%;
+  border-radius: 14px;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+}
+
+.synklogCompleteInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.synklogCompleteTitle {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.synklogMission {
+  font-size: 13px;
+  color: var(--ink-sub);
 }

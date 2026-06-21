@@ -4,58 +4,9 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background: var(--color-bg);
+  background: var(--page-bg);
 }
 
-/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-5)) var(--sp-6) var(--sp-4);
-  flex-shrink: 0;
-}
-
-.title {
-  font-size: var(--text-2xl);
-  font-weight: 900;
-  letter-spacing: -1px;
-  color: var(--color-text);
-}
-
-.bellBtn {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-sub);
-  flex-shrink: 0;
-}
-
-.bellBadge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  background: var(--color-accent);
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid var(--color-bg);
-}
-
-/* ── 스크롤 ─────────────────────────────────────────────────────────────── */
 .scroll {
   flex: 1;
   min-height: 0;
@@ -64,41 +15,47 @@
   padding: 0 var(--sp-5) calc(var(--bottom-nav-height) + var(--sp-6));
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
+  gap: var(--sp-3);
 }
 
 /* ── 프로필 카드 ──────────────────────────────────────────────────────────── */
 .profileCard {
   display: flex;
   align-items: center;
-  gap: var(--sp-4);
-  padding: var(--sp-4) var(--sp-5);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--card-bg);
+  border-radius: 18px;
+  border: 1px solid var(--card-border);
+}
+
+:global(:root:not([data-theme="dark"])) .profileCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
 }
 
 .avatarWrap {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface-2);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--grad-action-2);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-}
-
-.avatarEmoji {
-  font-size: 28px;
-  line-height: 1;
+  overflow: hidden;
 }
 
 .avatarImg {
   width: 100%;
   height: 100%;
-  border-radius: var(--radius-full);
   object-fit: cover;
+}
+
+.avatarInitial {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
 }
 
 .profileInfo {
@@ -106,60 +63,94 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .profileName {
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: var(--color-text);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--ink);
 }
 
-.profileId {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+.profileMeta {
+  font-size: 12px;
+  color: var(--ink-sub);
+  font-weight: 500;
 }
 
 .editBtn {
-  padding: 6px 14px;
-  background: var(--color-surface-2);
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
+  padding: 7px 16px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--color-text-sub);
+  color: var(--ink-sub);
   flex-shrink: 0;
-  transition: background var(--dur-fast);
+  transition: background 0.12s ease;
 }
 
-.editBtn:active {
-  background: var(--color-border);
+/* ── 스탯 행 ──────────────────────────────────────────────────────────────── */
+.statsRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.statCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+:global(:root:not([data-theme="dark"])) .statCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.09), rgba(166,216,95,.07));
+  border-color: rgba(120, 162, 58, 0.20);
+}
+
+.statValue {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--ink);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-muted);
 }
 
 /* ── 섹션 ─────────────────────────────────────────────────────────────────── */
 .section {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-2);
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .sectionLabel {
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-text-sub);
-  padding: 0 var(--sp-1);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  padding: 0 2px;
 }
 
 .sectionCard {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+  background: var(--card-bg);
+  border-radius: 18px;
+  border: 1px solid var(--card-border);
   overflow: hidden;
 }
 
 .divider {
   height: 1px;
-  background: var(--color-border);
-  margin: 0 var(--sp-5);
+  background: var(--divider-color);
+  margin: 0 18px;
 }
 
 /* ── 토글 행 ──────────────────────────────────────────────────────────────── */
@@ -167,7 +158,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--sp-4) var(--sp-5);
+  padding: 14px 18px;
   gap: var(--sp-4);
 }
 
@@ -176,82 +167,82 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 3px;
 }
 
 .rowLabel {
-  font-size: var(--text-sm);
+  font-size: 15px;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--ink);
 }
 
 .rowDesc {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+  font-size: 12px;
+  color: var(--ink-sub);
 }
 
 /* iOS-style toggle */
 .toggle {
-  width: 48px;
-  height: 28px;
-  border-radius: 14px;
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
+  width: 50px;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--toggle-off-bg);
+  border: none;
   position: relative;
   flex-shrink: 0;
-  transition: background 0.2s, border-color 0.2s;
+  transition: background 0.2s ease;
 }
 
 .toggleOn {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: var(--grad-action-2);
 }
 
 .toggleThumb {
   position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 22px;
-  height: 22px;
-  border-radius: 11px;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
   background: #fff;
-  transition: transform 0.2s;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  transition: transform 0.2s ease;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
 }
 
 .toggleOn .toggleThumb {
   transform: translateX(20px);
 }
 
-/* ── 테마 토글 행 ─────────────────────────────────────────────────────────── */
+/* ── 테마 행 ──────────────────────────────────────────────────────────────── */
 .themeRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--sp-4) var(--sp-5);
+  padding: 14px 18px;
   gap: var(--sp-4);
 }
 
 .themeToggleGroup {
   display: flex;
-  gap: var(--sp-2);
+  background: var(--toggle-off-bg);
+  border-radius: 10px;
+  padding: 3px;
+  gap: 2px;
 }
 
 .themeBtn {
-  padding: 6px 14px;
-  border-radius: var(--radius-full);
-  font-size: var(--text-sm);
+  padding: 5px 14px;
+  border-radius: 7px;
+  font-size: 13px;
   font-weight: 600;
-  color: var(--color-text-sub);
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  transition: background var(--dur-fast), color var(--dur-fast), border-color var(--dur-fast);
+  color: var(--ink-sub);
+  background: transparent;
+  transition: all 0.15s ease;
 }
 
 .themeBtnActive {
-  background: var(--color-primary);
+  background: var(--grad-action-2);
   color: #fff;
-  border-color: var(--color-primary);
 }
 
 /* ── 링크 행 ──────────────────────────────────────────────────────────────── */
@@ -260,32 +251,36 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--sp-4) var(--sp-5);
-  transition: background var(--dur-fast);
-}
-
-.linkRow:active {
-  background: var(--color-surface-2);
+  padding: 15px 18px;
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .linkArrow {
-  font-size: 20px;
-  color: var(--color-text-muted);
+  color: var(--ink-muted);
+  font-size: 18px;
+}
+
+.linkValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink-muted);
+}
+
+.linkRowDanger .rowLabel {
+  color: #EF4444;
 }
 
 /* ── 로그아웃 ─────────────────────────────────────────────────────────────── */
 .logoutBtn {
   width: 100%;
-  padding: var(--sp-4);
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
-  font-size: var(--text-base);
-  font-weight: 600;
-  color: var(--color-accent);
-  transition: background var(--dur-fast);
-}
-
-.logoutBtn:active {
-  background: var(--color-surface-2);
+  padding: 16px;
+  background: var(--card-bg);
+  border-radius: 18px;
+  border: 1px solid var(--card-border);
+  font-size: 16px;
+  font-weight: 700;
+  color: #EF4444;
+  transition: background 0.12s ease;
+  margin-top: 4px;
 }

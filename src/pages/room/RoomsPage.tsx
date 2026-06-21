@@ -41,7 +41,10 @@ export default function RoomsPage() {
         {/* 참여중 */}
         {!isLoading && activeRooms.length > 0 && (
           <div className={styles.section}>
-            <span className={styles.sectionLabel}>참여중</span>
+            <div className={styles.sectionLabel}>
+              참여 중
+              <span className={styles.sectionCount}>{activeRooms.length}</span>
+            </div>
             <div className={styles.roomList}>
               {activeRooms.map((room) => (
                 <ActiveRoomCard
@@ -57,10 +60,10 @@ export default function RoomsPage() {
         {/* 대기중 */}
         {!isLoading && waitingRooms.length > 0 && (
           <div className={styles.section}>
-            <span className={styles.sectionLabel}>
-              대기중{' '}
-              <span className={styles.sectionDesc}>인원이 다 차면 참여중인 방으로 이동</span>
-            </span>
+            <div className={styles.sectionLabel}>
+              대기 중
+              <span className={styles.sectionCount}>{waitingRooms.length}</span>
+            </div>
             <div className={styles.roomList}>
               {waitingRooms.map((room) => (
                 <WaitingRoomCard
@@ -85,12 +88,18 @@ export default function RoomsPage() {
             </p>
           </div>
         )}
-      </div>
 
-      {/* ── FAB ─────────────────────────────────────────────────────────────── */}
-      <button className={styles.fab} onClick={() => setSheet(true)} aria-label="방 추가">
-        <span className={styles.fabIcon}>+</span>
-      </button>
+        {/* 방 만들기 인라인 카드 */}
+        {!isLoading && (
+          <button className={styles.createCard} onClick={() => setSheet(true)}>
+            <div className={styles.createIcon}>＋</div>
+            <div className={styles.createText}>
+              <span className={styles.createLabel}>새로운 방 만들기</span>
+              <span className={styles.createDesc}>친구를 초대해 같은 순간을 담아요</span>
+            </div>
+          </button>
+        )}
+      </div>
 
       {/* ── 방 추가 바텀시트 — #root 기준으로 Portal 렌더링 ──────────────────── */}
       {sheet && createPortal(
@@ -147,10 +156,7 @@ function RoomThumbnail({ src }: { src: string | null }) {
 }
 
 function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
-  const statusText = room.isAllCompleted
-    ? `오늘 미션 ${room.completedMissions}/${room.totalMissions} 🔥`
-    : `오늘 미션 ${room.completedMissions}/${room.totalMissions}`
-  const statusClass = room.isAllCompleted ? styles.statusDone : styles.statusActive
+  const allDone = room.isAllCompleted
 
   return (
     <button className={styles.roomCard} onClick={onClick}>
@@ -159,28 +165,34 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
         <div className={styles.cardBody}>
           <div className={styles.cardTop}>
             <span className={styles.roomName}>{room.name}</span>
-            <span className={[styles.statusText, statusClass].join(' ')}>{statusText}</span>
+            <span className={allDone ? styles.missionBadgeDone : styles.missionBadge}>
+              오늘 미션 {room.completedMissions}/{room.totalMissions}{allDone ? ' ✓' : ''}
+            </span>
           </div>
-          <div className={styles.avatarStack}>
-            {room.memberProfiles.slice(0, 5).map((m, i) => (
-              <div
-                key={m.userId}
-                className={styles.avatarBubble}
-                style={{ zIndex: room.memberProfiles.length - i }}
-              >
-                {m.profileImage
-                  ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-                  : <img src="/SYNK.jpeg" alt="" className={styles.avatarBubbleImg} />
-                }
-              </div>
-            ))}
-            {room.memberProfiles.length > 5 && (
-              <div className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
-                +{room.memberProfiles.length - 5}
-              </div>
-            )}
+          <div className={styles.cardBottom}>
+            <div className={styles.avatarStack}>
+              {room.memberProfiles.slice(0, 5).map((m, i) => (
+                <div
+                  key={m.userId}
+                  className={styles.avatarBubble}
+                  style={{ zIndex: room.memberProfiles.length - i }}
+                >
+                  {m.profileImage
+                    ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
+                    : <img src="/SYNK.jpeg" alt="" className={styles.avatarBubbleImg} />
+                  }
+                </div>
+              ))}
+              {room.memberProfiles.length > 5 && (
+                <div className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
+                  +{room.memberProfiles.length - 5}
+                </div>
+              )}
+            </div>
+            <span className={styles.memberCount}>멤버 {room.memberProfiles.length}명</span>
           </div>
         </div>
+        <span className={styles.enterArrow}>›</span>
       </div>
     </button>
   )
@@ -194,25 +206,29 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
         <div className={styles.cardBody}>
           <div className={styles.cardTop}>
             <span className={styles.roomName}>{room.name}</span>
-            <span className={[styles.statusText, styles.statusWaiting].join(' ')}>
-              {room.waitingCount}명 더 기다리는 중..
+            <span className={styles.missionBadge}>
+              {room.waitingCount}명 더 기다리는 중
             </span>
           </div>
-          <div className={styles.avatarStack}>
-            {room.memberProfiles.slice(0, 5).map((m, i) => (
-              <div
-                key={m.userId}
-                className={styles.avatarBubble}
-                style={{ zIndex: room.memberProfiles.length - i }}
-              >
-                {m.profileImage
-                  ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-                  : <img src="/SYNK.jpeg" alt="" className={styles.avatarBubbleImg} />
-                }
-              </div>
-            ))}
+          <div className={styles.cardBottom}>
+            <div className={styles.avatarStack}>
+              {room.memberProfiles.slice(0, 5).map((m, i) => (
+                <div
+                  key={m.userId}
+                  className={styles.avatarBubble}
+                  style={{ zIndex: room.memberProfiles.length - i }}
+                >
+                  {m.profileImage
+                    ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
+                    : <img src="/SYNK.jpeg" alt="" className={styles.avatarBubbleImg} />
+                  }
+                </div>
+              ))}
+            </div>
+            <span className={styles.memberCount}>멤버 {room.currentMembers}명</span>
           </div>
         </div>
+        <span className={styles.enterArrow}>›</span>
       </div>
     </button>
   )

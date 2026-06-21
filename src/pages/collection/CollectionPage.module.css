@@ -4,10 +4,9 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background: #070912;
+  background: var(--page-bg);
 }
 
-/* ── 스크롤 ─────────────────────────────────────────────────────────────── */
 .scroll {
   flex: 1;
   min-height: 0;
@@ -23,9 +22,19 @@
 .statsCard {
   flex-shrink: 0;
   padding: 20px 22px 22px;
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--card-bg);
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.085);
+  border: 1px solid var(--card-border);
+}
+
+:global(:root:not([data-theme="dark"])) .statsCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
+}
+
+:global(:root:not([data-theme="dark"])) .missionList {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
 }
 
 .statsInner {
@@ -44,7 +53,7 @@
 .statsLabel {
   font-size: 13px;
   font-weight: 600;
-  color: #9AA0BD;
+  color: var(--ink-sub);
   letter-spacing: 0.2px;
 }
 
@@ -53,7 +62,7 @@
   font-weight: 900;
   letter-spacing: -2px;
   line-height: 1;
-  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  background: var(--grad-action);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -61,7 +70,7 @@
 
 .statsCount {
   font-size: 13px;
-  color: #9AA0BD;
+  color: var(--ink-sub);
   font-weight: 500;
 }
 
@@ -84,7 +93,7 @@
 .sectionHeaderTitle {
   font-size: 14px;
   font-weight: 700;
-  color: #9AA0BD;
+  color: var(--ink-sub);
   letter-spacing: 0.2px;
 }
 
@@ -93,9 +102,9 @@
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
-  background: rgba(255, 255, 255, 0.045);
+  background: var(--card-bg);
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.085);
+  border: 1px solid var(--card-border);
   overflow: hidden;
 }
 
@@ -106,7 +115,7 @@
   gap: 14px;
   padding: 14px 18px;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--divider-color);
   transition: background 0.12s ease;
   -webkit-tap-highlight-color: transparent;
 }
@@ -116,7 +125,7 @@
 }
 
 .missionCard:active {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--card-bg-soft);
 }
 
 .thumbnail {
@@ -138,7 +147,7 @@
 .missionTitle {
   font-size: 15px;
   font-weight: 700;
-  color: #F3F5FF;
+  color: var(--ink);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -146,7 +155,7 @@
 
 .missionMeta {
   font-size: 12px;
-  color: #9AA0BD;
+  color: var(--ink-sub);
 }
 
 .completeBadge {
@@ -159,14 +168,14 @@
 .completeCount {
   font-size: 12px;
   font-weight: 600;
-  color: #9AA0BD;
+  color: var(--ink-sub);
 }
 
 .completeCheck {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #46D7FF 0%, #9B6BFF 100%);
+  background: var(--grad-action-2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -179,6 +188,6 @@
 .emptyText {
   padding: 48px 20px;
   text-align: center;
-  color: #5C6488;
+  color: var(--ink-muted);
   font-size: 14px;
 }

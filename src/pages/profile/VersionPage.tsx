@@ -26,7 +26,9 @@ export default function VersionPage() {
 
       <div className={styles.scroll}>
         <div className={styles.appHeader}>
-          <img src="/icon-192.png" alt="SYNK" className={styles.appIcon} />
+          <div className={styles.appIconWrap}>
+            <img src="/icon-192.png" alt="SYNK" className={styles.appIcon} />
+          </div>
           <p className={styles.appName}>SYNK</p>
           <p className={styles.appVersion}>v{APP_VERSION}</p>
         </div>

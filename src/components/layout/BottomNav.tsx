@@ -37,39 +37,38 @@ export default function BottomNav() {
 
 function IconHome() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5z" />
-      <path d="M9 21V12h6v9" />
-    </svg>
-  )
-}
-
-function IconBook() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
-      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
-      <line x1="9" y1="7" x2="15" y2="7" />
-      <line x1="9" y1="11" x2="13" y2="11" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3.9 10.7 12 4.3l8.1 6.4" />
+      <path d="M5.7 9.6V18a1.6 1.6 0 0 0 1.6 1.6h2.4V15a2.3 2.3 0 0 1 4.6 0v4.6h2.4A1.6 1.6 0 0 0 18.3 18V9.6" />
     </svg>
   )
 }
 
 function IconDoor() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="2" width="18" height="20" rx="2" />
-      <path d="M9 2v20" />
-      <circle cx="6" cy="12" r="1" fill="currentColor" stroke="none" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9">
+      <rect x="4" y="4" width="7" height="7" rx="2.3" fill="none" />
+      <rect x="13" y="4" width="7" height="7" rx="2.3" fill="none" />
+      <rect x="4" y="13" width="7" height="7" rx="2.3" fill="none" />
+      <rect x="13" y="13" width="7" height="7" rx="2.3" fill="none" />
+    </svg>
+  )
+}
+
+function IconBook() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
     </svg>
   )
 }
 
 function IconUser() {
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="8.2" r="3.6" fill="none" />
+      <path d="M5.3 19.4c0-3.7 3-6.2 6.7-6.2s6.7 2.5 6.7 6.2" fill="none" />
     </svg>
   )
 }

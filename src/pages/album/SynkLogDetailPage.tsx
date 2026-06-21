@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { albumApi } from '@/services/api/endpoints'
+import { albumApi, roomApi } from '@/services/api/endpoints'
 import { useMissionStore } from '@/store/missionStore'
 import { useAuthStore } from '@/store/authStore'
 import { ROUTES } from '@/constants'
-import type { CollageItem, SynklogDetailResponse } from '@/types'
+import type { CollageItem, SynklogDetailResponse, RoomDetail } from '@/types'
 import styles from './SynkLogDetailPage.module.css'
+
 
 export default function SynkLogDetailPage() {
   const { roomId, date } = useParams<{ roomId: string; date: string }>()
@@ -15,25 +16,30 @@ export default function SynkLogDetailPage() {
   const myUser      = useAuthStore((s) => s.user)
   const numRoomId   = Number(roomId)
 
-  const [collages, setCollages]             = useState<CollageItem[]>([])
-  const [synklog, setSynklog]               = useState<SynklogDetailResponse | null>(null)
+  const [collages, setCollages]         = useState<CollageItem[]>([])
+  const [synklog, setSynklog]           = useState<SynklogDetailResponse | null>(null)
   const [synklogMissing, setSynklogMissing] = useState(false)
-  const [isLoading, setIsLoading]           = useState(true)
-  const [error, setError]                   = useState(false)
-  const [creatingLog, setCreatingLog]       = useState(false)
+  const [room, setRoom]                 = useState<RoomDetail | null>(null)
+  const [isLoading, setIsLoading]       = useState(true)
+  const [creatingLog, setCreatingLog]   = useState(false)
 
   useEffect(() => {
     if (!date) return
-
-    albumApi.getCollages(numRoomId, date)
-      .then((res) => setCollages(res.data))
-      .catch(() => setError(true))
+    Promise.all([
+      albumApi.getCollages(numRoomId, date),
+      roomApi.getRoom(numRoomId),
+    ])
+      .then(([collageRes, roomRes]) => {
+        setCollages(collageRes.data)
+        setRoom(roomRes.data)
+      })
+      .catch(console.error)
       .finally(() => setIsLoading(false))
 
     albumApi.getSynklog(numRoomId, date)
       .then((res) => setSynklog(res.data))
       .catch(() => setSynklogMissing(true))
-  }, [numRoomId, date])
+  }, [numRoomId, date]) // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleCreateSynklog() {
     if (creatingLog) return
@@ -65,9 +71,9 @@ export default function SynkLogDetailPage() {
       },
       room: {
         id:                  numRoomId,
-        name:                '',
+        name:                room?.name ?? '',
         code:                '',
-        thumbnail:           null,
+        thumbnail:           room?.thumbnail ?? null,
         owner_id:            0,
         max_members:         item.participants.length,
         current_members:     item.participants.length,
@@ -86,12 +92,8 @@ export default function SynkLogDetailPage() {
           user: { userId: p.userId, name: p.name, profileImage: p.profileImage },
           state: p.state,
           submission: p.state === 'done' ? {
-            id:           0,
-            user_id:      p.userId,
-            room_id:      numRoomId,
-            mission_id:   item.missionId,
-            video_url:    effectiveVideoUrl ?? '',
-            status:       'SUBMITTED' as const,
+            id: 0, user_id: p.userId, room_id: numRoomId, mission_id: item.missionId,
+            video_url: effectiveVideoUrl ?? '', status: 'SUBMITTED' as const,
             submitted_at: p.submittedAt,
           } : undefined,
         }
@@ -100,98 +102,132 @@ export default function SynkLogDetailPage() {
     navigate(ROUTES.MISSION_RESULT(item.missionId), { state: { returnTo: 'album', roomId: numRoomId } })
   }
 
-  if (isLoading) {
-    return (
-      <div className={styles.page}>
-        <SynkHeader date={date ?? ''} onBack={() => navigate(-1)} />
-        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-          불러오는 중...
-        </p>
-      </div>
-    )
+  function formatTime(iso: string | null): string {
+    if (!iso) return ''
+    const d = new Date(iso)
+    const hh = String(d.getHours()).padStart(2, '0')
+    const mm = String(d.getMinutes()).padStart(2, '0')
+    return `${hh}:${mm}`
   }
 
-  if (error) {
-    return (
-      <div className={styles.page}>
-        <SynkHeader date={date ?? ''} onBack={() => navigate(-1)} />
-        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-          데이터를 불러올 수 없어요
-        </p>
-      </div>
-    )
-  }
-
-  if (!isLoading && collages.length === 0) {
-    return (
-      <div className={styles.page}>
-        <SynkHeader date={date ?? ''} onBack={() => navigate(-1)} />
-        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-          아직 완료된 미션이 없어요 🌱
-        </p>
-      </div>
-    )
-  }
+  if (isLoading) return (
+    <div className={styles.page}>
+      <PageHeader date={date ?? ''} onBack={() => navigate(-1)} />
+      <div className={styles.loadingWrap}>불러오는 중...</div>
+    </div>
+  )
 
   return (
     <div className={styles.page}>
-      <SynkHeader date={collages[0] ? date ?? '' : ''} onBack={() => navigate(-1)} />
+      <PageHeader date={date ?? ''} onBack={() => navigate(-1)} />
 
       <div className={styles.scroll}>
 
-        {/* ── 미션별 콜라주 ────────────────────────────────────────────────── */}
+        {/* ── 방 정보 행 ────────────────────────────────────────────────── */}
+        {room && (
+          <div className={styles.roomRow}>
+            <div className={styles.roomThumb}>
+              {room.thumbnail
+                ? <img src={room.thumbnail} alt={room.name} className={styles.roomThumbImg} />
+                : <span className={styles.roomThumbEmoji}>🏠</span>
+              }
+            </div>
+            <span className={styles.roomName}>{room.name}</span>
+            <span className={styles.roomChip}>
+              미션 {collages.length} · 콜라주 {collages.filter(c => c.collageVideoUrl).length}
+            </span>
+          </div>
+        )}
+
+        {/* ── 미션별 콜라주 카드 ─────────────────────────────────────────── */}
         {collages.map((item) => (
           <div key={item.missionId} className={styles.missionCard}>
-            <div className={styles.missionRow}>
-              <p className={styles.missionText}>{item.missionTitle}</p>
+            {/* 미션 헤더 */}
+            <div className={styles.missionHeader}>
+              <div className={styles.missionIconWrap}>
+                <span className={styles.missionEmoji}>⚡</span>
+              </div>
+              <div className={styles.missionInfo}>
+                <span className={styles.missionTitle}>{item.missionTitle}</span>
+                <span className={styles.missionMeta}>
+                  {formatTime(item.missionStartAt)} · {item.participants.length}명 참여
+                </span>
+              </div>
               <button
-                className={styles.collageBtn}
+                className={styles.collageChip}
                 onClick={() => handleViewCollage(item)}
               >
                 콜라주
               </button>
             </div>
+
+            {/* 참여자 포토 그리드 */}
+            <div className={styles.photoGrid}>
+              {item.participants.map((p) => (
+                <div key={p.userId} className={styles.photoCell}>
+                  {p.videoUrl
+                    ? <video src={p.videoUrl} className={styles.photo} muted playsInline />
+                    : <div className={styles.photoPlaceholder} />
+                  }
+                  <span className={styles.photoName}>{p.name}</span>
+                </div>
+              ))}
+            </div>
+
           </div>
         ))}
 
-        {/* ── SYNKLOG 합본 영상 ────────────────────────────────────────────── */}
-        <div className={styles.missionCard}>
-          <p className={styles.missionHeader}>🎬 오늘의 SYNKLOG</p>
+        {/* ── SYNKLOG 섹션 ──────────────────────────────────────────────── */}
+        <p className={styles.sectionLabel}>오늘의 SYNKLOG</p>
 
+        <div className={styles.synklogCard}>
           {synklogMissing && (
-            <>
-              <p className={styles.missionMeta}>아직 SYNKLOG가 생성되지 않았어요</p>
+            <div className={styles.synklogEmpty}>
+              <div className={styles.synklogIconWrap}>
+                <span className={styles.synklogIcon}>📹</span>
+              </div>
+              <p className={styles.synklogEmptyTitle}>아직 SYNKLOG가 없어요</p>
+              <p className={styles.synklogEmptyDesc}>
+                오늘의 콜라주를 짧은 영상으로<br />자동으로 만들어 드려요.
+              </p>
               <button
-                className={styles.synkBtn}
+                className={styles.synklogBtn}
                 onClick={handleCreateSynklog}
                 disabled={creatingLog}
               >
-                {creatingLog ? '생성 중...' : 'SYNKLOG 생성하기'}
+                ⚡ {creatingLog ? '생성 중...' : 'SYNKLOG 생성하기'}
               </button>
-            </>
+            </div>
           )}
 
           {synklog?.status === 'PROCESSING' && (
-            <p className={styles.missionMeta}>⏳ SYNKLOG 생성 중...</p>
+            <div className={styles.synklogEmpty}>
+              <div className={styles.synklogIconWrap}>
+                <span className={styles.synklogIcon}>⏳</span>
+              </div>
+              <p className={styles.synklogEmptyTitle}>SYNKLOG 생성 중...</p>
+              <p className={styles.synklogEmptyDesc}>잠시 후 완성돼요</p>
+            </div>
           )}
 
           {synklog?.status === 'COMPLETED' && (
-            <>
-              {synklog.missions?.map((m, i) => (
-                <p key={i} className={styles.missionText}>· {m.missionTitle}</p>
-              ))}
-              <button
-                className={styles.synkBtn}
-                onClick={() => {
-                  if (synklog.synklogVideoUrl) {
-                    window.open(synklog.synklogVideoUrl, '_blank')
-                  }
-                }}
-                disabled={!synklog.synklogVideoUrl}
-              >
-                SYNKLOG 보기
-              </button>
-            </>
+            <div className={styles.synklogComplete}>
+              {synklog.thumbnail && (
+                <img src={synklog.thumbnail} alt="SYNKLOG" className={styles.synklogThumb} />
+              )}
+              <div className={styles.synklogCompleteInfo}>
+                <p className={styles.synklogCompleteTitle}>SYNKLOG 완성!</p>
+                {synklog.missions?.map((m, i) => (
+                  <p key={i} className={styles.synklogMission}>· {m.missionTitle}</p>
+                ))}
+                <button
+                  className={styles.synklogBtn}
+                  onClick={() => synklog.synklogVideoUrl && window.open(synklog.synklogVideoUrl, '_blank')}
+                >
+                  SYNKLOG 보기
+                </button>
+              </div>
+            </div>
           )}
         </div>
 
@@ -200,13 +236,13 @@ export default function SynkLogDetailPage() {
   )
 }
 
-function SynkHeader({ date, onBack }: { date: string; onBack: () => void }) {
+function PageHeader({ date, onBack }: { date: string; onBack: () => void }) {
   return (
     <div className={styles.header}>
       <button className={styles.backBtn} onClick={onBack} aria-label="뒤로">
         <BackIcon />
       </button>
-      <h1 className={styles.headerTitle}>{date} SYNK</h1>
+      <h1 className={styles.headerTitle}>{date}</h1>
       <div className={styles.headerRight} />
     </div>
   )

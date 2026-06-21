@@ -21,14 +21,11 @@ export default function CollectionDetailPage() {
 
   return (
     <div className={styles.page}>
-      {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <NavHeader title="미션 상세" />
 
       <div className={styles.scroll}>
         {isLoading && (
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-            불러오는 중...
-          </p>
+          <p className={styles.empty}>불러오는 중...</p>
         )}
 
         {!isLoading && detail && (
@@ -36,34 +33,38 @@ export default function CollectionDetailPage() {
             {/* ── 미션 설명 카드 ──────────────────────────────────────────────── */}
             <div className={styles.missionCard}>
               <div className={styles.missionAvatar}>
-                <span className={styles.missionAvatarText}>🎯</span>
+                <span className={styles.missionAvatarEmoji}>😊</span>
               </div>
               <div className={styles.missionText}>
                 <span className={styles.missionTitle}>{detail.title}</span>
-                <span className={styles.missionDesc}>{detail.description}</span>
+                {detail.description && (
+                  <span className={styles.missionDesc}>{detail.description}</span>
+                )}
               </div>
             </div>
 
-            {/* ── 통계 ────────────────────────────────────────────────────────── */}
-            <div className={styles.statsRow}>
-              <div className={styles.statItem}>
+            {/* ── 통계 카드 2개 ────────────────────────────────────────────────── */}
+            <div className={styles.statsGrid}>
+              <div className={styles.statCard}>
                 <span className={styles.statLabel}>완료 횟수</span>
-                <span className={styles.statValue}>{detail.completedTimes}회</span>
+                <span className={styles.statValue}>{detail.completedTimes}<span className={styles.statUnit}>회</span></span>
               </div>
-              <div className={styles.statDivider} />
-              <div className={styles.statItem}>
+              <div className={styles.statCard}>
                 <span className={styles.statLabel}>마지막 완료</span>
-                <span className={styles.statValue}>{detail.lastCompletedDate || '—'}</span>
+                <span className={styles.statValueDate}>{detail.lastCompletedDate || '—'}</span>
               </div>
             </div>
 
             {/* ── 내 기록 ─────────────────────────────────────────────────────── */}
-            <div>
-              <h2 className={styles.sectionTitle}>내 기록</h2>
+            <div className={styles.recordSection}>
+              <h2 className={styles.sectionTitle}>
+                내 기록
+                {detail.records.length > 0 && (
+                  <span className={styles.sectionCount}> · {detail.records.length}</span>
+                )}
+              </h2>
               {detail.records.length === 0 ? (
-                <p style={{ padding: '16px 20px', color: 'var(--color-text-muted)', fontSize: 13 }}>
-                  기록이 없어요
-                </p>
+                <p className={styles.emptyRecords}>기록이 없어요</p>
               ) : (
                 <div className={styles.photoGrid}>
                   {detail.records.map((r: CollectionRecordItem) => (
@@ -71,9 +72,9 @@ export default function CollectionDetailPage() {
                       {r.thumbnail ? (
                         <img src={r.thumbnail} alt={r.date} className={styles.photo} />
                       ) : (
-                        <div className={styles.photo} style={{ background: 'var(--color-surface-2)' }} />
+                        <div className={styles.photoPlaceholder} />
                       )}
-                      <span className={styles.photoLabel}>{r.roomName} · {r.date}</span>
+                      <span className={styles.photoLabel}>{r.roomName} · {r.date.slice(5)}</span>
                     </div>
                   ))}
                 </div>
@@ -83,9 +84,7 @@ export default function CollectionDetailPage() {
         )}
 
         {!isLoading && !detail && (
-          <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-            미션 정보를 찾을 수 없어요
-          </p>
+          <p className={styles.empty}>미션 정보를 찾을 수 없어요</p>
         )}
       </div>
     </div>

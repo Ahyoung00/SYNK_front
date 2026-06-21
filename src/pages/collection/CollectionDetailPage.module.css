@@ -2,35 +2,7 @@
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  background: var(--color-bg);
-}
-
-/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
-  flex-shrink: 0;
-}
-
-.backBtn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text);
-}
-
-.headerTitle {
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.headerRight {
-  width: 36px;
+  background: var(--page-bg);
 }
 
 /* ── 스크롤 ─────────────────────────────────────────────────────────────── */
@@ -38,10 +10,10 @@
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: var(--sp-2) var(--sp-5) var(--sp-8);
+  padding: var(--sp-4) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: var(--sp-6);
+  gap: var(--sp-4);
 }
 
 /* ── 미션 설명 카드 ───────────────────────────────────────────────────────── */
@@ -50,106 +22,165 @@
   align-items: center;
   gap: var(--sp-4);
   padding: var(--sp-4) var(--sp-5);
-  background: var(--color-surface);
-  border: 1px solid rgba(122, 181, 103, 0.35);
-  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+}
+
+:global(:root:not([data-theme="dark"])) .missionCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
 }
 
 .missionAvatar {
-  width: 36px;
-  height: 36px;
-  border-radius: var(--radius-full);
-  background: var(--color-primary-dim);
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7B5CE0, #9B6BFF);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
 }
 
-.missionAvatarText {
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--color-primary);
+.missionAvatarEmoji {
+  font-size: 26px;
 }
 
 .missionText {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
+  flex: 1;
+  min-width: 0;
 }
 
 .missionTitle {
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: var(--color-text);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.3;
 }
 
 .missionDesc {
-  font-size: var(--text-sm);
-  color: var(--color-text-sub);
+  font-size: 13px;
+  color: var(--ink-sub);
 }
 
-/* ── 통계 ─────────────────────────────────────────────────────────────────── */
-.statsRow {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-4);
+/* ── 통계 카드 2개 ────────────────────────────────────────────────────────── */
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-.statItem {
+.statCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
+  gap: 6px;
+}
+
+:global(:root:not([data-theme="dark"])) .statCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.09), rgba(166,216,95,.07));
+  border-color: rgba(120, 162, 58, 0.20);
 }
 
 .statLabel {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
 }
 
 .statValue {
-  font-size: var(--text-2xl);
+  font-size: 32px;
   font-weight: 900;
-  color: var(--color-text);
+  color: var(--ink);
   letter-spacing: -1px;
+  line-height: 1.1;
 }
 
-.statDivider {
-  width: 1px;
-  height: 44px;
-  background: var(--color-border);
-  flex-shrink: 0;
-  align-self: center;
-}
-
-/* ── 내 기록 ──────────────────────────────────────────────────────────────── */
-.sectionTitle {
-  font-size: var(--text-base);
+.statUnit {
+  font-size: 18px;
   font-weight: 700;
-  color: var(--color-text);
-  margin-bottom: var(--sp-3);
+  letter-spacing: 0;
 }
 
+.statValueDate {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+}
+
+/* ── 내 기록 섹션 ─────────────────────────────────────────────────────────── */
+.recordSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-sub);
+  padding: 2px 2px 0;
+}
+
+.sectionCount {
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+/* ── 포토 그리드 ──────────────────────────────────────────────────────────── */
 .photoGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--sp-3);
+  gap: 10px;
 }
 
 .photoCell {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
+  gap: 6px;
 }
 
 .photo {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: var(--radius-md);
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.photoPlaceholder {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
 }
 
 .photoLabel {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--ink-muted);
+  padding: 0 2px;
+}
+
+/* ── 빈 상태 / 로딩 ───────────────────────────────────────────────────────── */
+.empty {
+  padding: 40px 20px;
   text-align: center;
+  color: var(--ink-muted);
+  font-size: 14px;
+}
+
+.emptyRecords {
+  padding: 16px 2px;
+  color: var(--ink-muted);
+  font-size: 13px;
 }

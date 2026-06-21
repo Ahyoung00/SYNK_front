@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { albumApi } from '@/services/api/endpoints'
+import { albumApi, roomApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
-import type { AlbumItem } from '@/types'
+import type { AlbumItem, RoomDetail } from '@/types'
 import Loading from '@/components/ui/Loading'
 import styles from './RoomAlbumPage.module.css'
 
-/** "YYYY.MM.DD" → "YYYY-MM-DD" (URL 파라미터용) */
 function toUrlDate(dotDate: string): string {
   return dotDate.replace(/\./g, '-')
 }
@@ -17,14 +16,24 @@ export default function RoomAlbumPage() {
   const numRoomId  = Number(roomId)
 
   const [albums, setAlbums]     = useState<AlbumItem[]>([])
+  const [room, setRoom]         = useState<RoomDetail | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    albumApi.getAlbums(numRoomId)
-      .then((res) => setAlbums(res.data))
+    Promise.all([
+      albumApi.getAlbums(numRoomId),
+      roomApi.getRoom(numRoomId),
+    ])
+      .then(([albumRes, roomRes]) => {
+        setAlbums(albumRes.data)
+        setRoom(roomRes.data)
+      })
       .catch(console.error)
       .finally(() => setIsLoading(false))
   }, [numRoomId])
+
+  const latest = albums[0] ?? null
+  const past   = albums.slice(1)
 
   return (
     <div className={styles.page}>
@@ -37,50 +46,88 @@ export default function RoomAlbumPage() {
         <div className={styles.headerRight} />
       </div>
 
-      {/* ── 서브타이틀 ──────────────────────────────────────────────────────── */}
-      <p className={styles.subtitle}>우리의 소중한 추억들</p>
-
-      {/* ── 목록 ────────────────────────────────────────────────────────────── */}
       {isLoading ? (
         <Loading />
       ) : albums.length === 0 ? (
-        <p style={{ padding: '40px 20px', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-          아직 앨범이 없어요
-        </p>
+        <div className={styles.empty}>아직 앨범이 없어요 🌱</div>
       ) : (
-        <div className={styles.list}>
-          {albums.map((entry) => (
-            <button
-              key={entry.date}
-              className={styles.entry}
-              onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, toUrlDate(entry.date)))}
-            >
-              {/* 썸네일 */}
-              <div className={styles.thumb}>
-                {entry.thumbnail
-                  ? <img src={entry.thumbnail} alt={entry.date} className={styles.thumbImg} />
-                  : <div className={styles.thumbPlaceholder} />
-                }
-              </div>
+        <div className={styles.scroll}>
+          {/* ── 서브타이틀 행 ─────────────────────────────────────────────── */}
+          <div className={styles.subtitleRow}>
+            <span className={styles.subtitle}>우리의 소중한 순간들</span>
+            <span className={styles.countChip}>{albums.length}일</span>
+          </div>
 
-              {/* 정보 */}
-              <div className={styles.info}>
-                <span className={styles.date}>{entry.date}</span>
-                <div className={styles.avatarStack}>
-                  {entry.memberProfiles.slice(0, 5).map((p) => (
-                    p.profileImage
-                      ? <img key={p.userId} src={p.profileImage} alt="" className={styles.avatarBubble} />
-                      : <span key={p.userId} className={styles.avatarBubble}>👤</span>
-                  ))}
-                  {entry.memberProfiles.length > 5 && (
-                    <span className={styles.avatarBubble}>+{entry.memberProfiles.length - 5}</span>
-                  )}
+          {/* ── 히어로: 최신 앨범 ─────────────────────────────────────────── */}
+          {latest && (
+            <button
+              className={styles.hero}
+              onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, toUrlDate(latest.date)))}
+            >
+              {/* 사진 그리드 영역 */}
+              <div className={styles.heroGrid}>
+                <div className={[styles.heroCell, styles.heroCellMain].join(' ')}>
+                  {latest.thumbnail
+                    ? <img src={latest.thumbnail} alt={latest.date} className={styles.heroCellImg} />
+                    : null
+                  }
+                  <div className={styles.heroCellScrim}>
+                    <span className={styles.heroDate}>{latest.date}</span>
+                    <span className={styles.synklogBadge}>SYNKLOG</span>
+                  </div>
+                </div>
+                <div className={styles.heroCellSide}>
+                  <div className={[styles.heroCell, styles.heroCellSm].join(' ')} />
+                  <div className={[styles.heroCell, styles.heroCellSm, styles.heroCellDark].join(' ')}>
+                    <div className={styles.playBtn}>▶</div>
+                  </div>
                 </div>
               </div>
-
-              <span className={styles.arrow}>›</span>
             </button>
-          ))}
+          )}
+
+          {/* ── 지난 날들 ─────────────────────────────────────────────────── */}
+          {past.length > 0 && (
+            <>
+              <p className={styles.sectionLabel}>지난 날들</p>
+              <div className={styles.list}>
+                {past.map((entry) => (
+                  <button
+                    key={entry.date}
+                    className={styles.entry}
+                    onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, toUrlDate(entry.date)))}
+                  >
+                    {/* 모자이크 썸네일 */}
+                    <div className={styles.mosaic}>
+                      {[0,1,2,3].map((i) => (
+                        <div key={i} className={styles.mosaicCell} />
+                      ))}
+                      {entry.memberProfiles.length > 4 && (
+                        <div className={styles.mosaicMore}>+{entry.memberProfiles.length - 4}</div>
+                      )}
+                    </div>
+
+                    {/* 정보 */}
+                    <div className={styles.entryInfo}>
+                      <span className={styles.entryDate}>{entry.date}</span>
+                      <div className={styles.entryMeta}>
+                        <div className={styles.avatarStack}>
+                          {entry.memberProfiles.slice(0, 3).map((p) => (
+                            p.profileImage
+                              ? <img key={p.userId} src={p.profileImage} alt="" className={styles.avatarBubble} />
+                              : <div key={p.userId} className={styles.avatarBubble} />
+                          ))}
+                        </div>
+                        <span className={styles.entryRoomName}>{room?.name ?? ''}</span>
+                      </div>
+                    </div>
+
+                    <span className={styles.arrow}>›</span>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       )}
     </div>

@@ -26,24 +26,25 @@ function RingChart({ rate }: { rate: number }) {
   const offset = circumference * (1 - rate / 100)
   return (
     <svg width="92" height="92" viewBox="0 0 92 92" className={styles.ring}>
-      <defs>
-        <linearGradient id="ringGrad" x1="0" y1="0" x2="92" y2="92" gradientUnits="userSpaceOnUse">
-          <stop offset="0" stopColor="#46D7FF" />
-          <stop offset="1" stopColor="#9B6BFF" />
-        </linearGradient>
-      </defs>
-      <circle cx="46" cy="46" r={r} fill="none" stroke="rgba(255,255,255,.1)" strokeWidth="9" />
-      <circle
-        cx="46" cy="46" r={r}
-        fill="none"
-        stroke="url(#ringGrad)"
-        strokeWidth="9"
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        transform="rotate(-90 46 46)"
-      />
-    </svg>
+        <defs>
+          <linearGradient id="ringGrad" x1="0" y1="0" x2="92" y2="92" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="#46D7FF" />
+            <stop offset="1" stopColor="#9B6BFF" />
+          </linearGradient>
+        </defs>
+        <circle cx="46" cy="46" r={r} fill="none" stroke="var(--ring-track)" strokeWidth="9" />
+        <circle
+          cx="46" cy="46" r={r}
+          fill="none"
+          stroke="url(#ringGrad)"
+          strokeWidth="9"
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          transform="rotate(-90 46 46)"
+        />
+        <image href="/bolt.png" x="20" y="20" width="52" height="52" />
+      </svg>
   )
 }
 

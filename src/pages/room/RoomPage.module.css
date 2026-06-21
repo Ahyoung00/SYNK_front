@@ -2,127 +2,108 @@
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  background: var(--color-bg);
+  background: var(--page-bg);
 }
 
-/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
-  flex-shrink: 0;
-}
-
-.backBtn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text);
-}
-
-.headerCenter {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-}
-
-.headerTitle {
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.chatBtn {
-  font-size: 20px;
-  line-height: 1;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-  transition: opacity var(--dur-fast);
-}
-
-.chatBtn:active {
-  opacity: 0.65;
-}
-
-.headerRight { width: 36px; }
-
-/* ── 스크롤 ───────────────────────────────────────────────────────────────── */
 .scroll {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: var(--sp-4) var(--sp-5);
+  padding: var(--sp-4) var(--sp-5) var(--sp-4);
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
-}
-
-/* ── 코드 행 ──────────────────────────────────────────────────────────────── */
-.codeRow {
-  display: flex;
-  align-items: center;
   gap: var(--sp-3);
 }
 
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 16px 18px;
+}
+
+/* ── 초대 코드 카드 ──────────────────────────────────────────────────────── */
+.codeCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .codeLabel {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  font-size: 12px;
   font-weight: 600;
+  color: var(--ink-sub);
+  flex-shrink: 0;
 }
 
 .codeValue {
-  font-size: var(--text-base);
+  font-size: 16px;
   font-weight: 800;
-  color: var(--color-text);
-  letter-spacing: 2px;
+  color: var(--ink);
+  letter-spacing: 3px;
   flex: 1;
 }
 
 .copyBtn {
-  width: 32px;
-  height: 32px;
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--color-text-muted);
-  border-radius: var(--radius-sm);
-  transition: color var(--dur-fast);
+  gap: 5px;
+  padding: 6px 12px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-sub);
+  flex-shrink: 0;
+  transition: background 0.12s ease;
 }
 
-.copyBtn:active {
-  color: var(--color-text);
-}
-
-/* ── 구분선 ───────────────────────────────────────────────────────────────── */
-.divider {
-  height: 1px;
-  background: var(--color-border);
-}
-
-/* ── 섹션 타이틀 ──────────────────────────────────────────────────────────── */
-.section {
+/* ── 섹션 헤더 ────────────────────────────────────────────────────────────── */
+.sectionHeader {
   display: flex;
   align-items: center;
-  gap: var(--sp-2);
-}
-
-.sectionIcon {
-  font-size: 16px;
+  justify-content: space-between;
+  padding: 4px 2px;
 }
 
 .sectionTitle {
-  font-size: var(--text-sm);
+  font-size: 13px;
   font-weight: 700;
-  color: var(--color-text);
+  color: var(--ink-sub);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-/* ── 멤버 ─────────────────────────────────────────────────────────────────── */
+.sectionAction {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ── 멤버 카드 ────────────────────────────────────────────────────────────── */
+.memberCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .memberRow {
   display: flex;
-  gap: var(--sp-5);
+  align-items: center;
+  gap: 14px;
   flex-wrap: wrap;
 }
 
@@ -130,18 +111,26 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--sp-2);
+  gap: 7px;
+  position: relative;
+}
+
+.memberAvatarWrap {
+  position: relative;
 }
 
 .memberAvatar {
-  width: 52px;
-  height: 52px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
-  background: var(--color-surface-2);
+  background: var(--card-bg-soft);
+  border: 1.5px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink-sub);
   overflow: hidden;
 }
 
@@ -151,125 +140,231 @@
   object-fit: cover;
 }
 
+.meBadge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: var(--grad-action);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 800;
+  padding: 1px 4px;
+  border-radius: 4px;
+  border: 1.5px solid var(--page-bg);
+}
+
 .memberName {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+  font-size: 11px;
   font-weight: 600;
+  color: var(--ink-sub);
+  max-width: 52px;
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.inviteBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 7px;
+}
+
+.inviteBtnIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--card-bg-soft);
+  border: 1.5px dashed var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: var(--ink-muted);
+}
+
+.inviteBtnLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--ink-muted);
+}
+
+/* ── 미션 상태 카드 ───────────────────────────────────────────────────────── */
+.missionCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 16px 18px;
+}
+
+.missionRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.missionLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.missionStatus {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.missionDesc {
+  font-size: 12px;
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.missionIconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--grad-action-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  flex-shrink: 0;
+  opacity: 0.85;
 }
 
 /* ── 앨범 ─────────────────────────────────────────────────────────────────── */
-.albumHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.viewAllBtn {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--color-text-muted);
+.albumEmpty {
+  padding: 20px 18px;
+  font-size: 13px;
+  color: var(--ink-muted);
+  text-align: center;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
 }
 
 .albumGrid {
-  display: flex;
-  gap: var(--sp-2);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-.albumThumb {
-  flex: 1;
+.albumThumbBtn {
   aspect-ratio: 1;
-  border-radius: var(--radius-md);
+  border-radius: 16px;
   overflow: hidden;
-  max-width: calc(50% - var(--sp-1));
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s ease;
 }
 
-.albumPlaceholder {
+.albumThumbBtn:active {
+  opacity: 0.75;
+}
+
+.albumThumbImg {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--color-surface-2) 0%, var(--color-surface) 100%);
+  object-fit: cover;
+}
+
+.albumThumbPlaceholder {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: flex-end;
-  padding: var(--sp-2);
-  min-height: 120px;
+  padding: 10px 12px;
 }
 
 .albumDate {
-  font-size: 10px;
-  color: var(--color-text-muted);
+  font-size: 11px;
   font-weight: 600;
+  color: var(--ink-muted);
 }
 
-/* ── 방 설정 버튼 ─────────────────────────────────────────────────────────── */
+/* ── 방 설정 / 방 나가기 ──────────────────────────────────────────────────── */
+.footerBtns {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-top: 4px;
+  margin-bottom: 24px;
+}
+
+.actionCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  overflow: hidden;
+}
+
+.actionDivider {
+  height: 1px;
+  background: var(--divider-color);
+  margin: 0 18px;
+}
+
 .settingsBtn {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-5);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  transition: background var(--dur-fast);
-}
-
-.settingsBtn:active {
-  background: var(--color-surface-2);
-}
-
-.settingsBtnIcon {
-  font-size: 18px;
+  gap: 12px;
+  padding: 16px 18px;
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .settingsBtnLabel {
   flex: 1;
-  font-size: var(--text-sm);
+  font-size: 15px;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--ink);
   text-align: left;
 }
 
 .settingsBtnArrow {
-  font-size: 20px;
-  color: var(--color-text-muted);
-}
-
-/* ── 방 나가기 ────────────────────────────────────────────────────────────── */
-.footer {
-  padding: var(--sp-3) var(--sp-5) max(var(--sp-6), env(safe-area-inset-bottom));
-  flex-shrink: 0;
+  color: var(--ink-muted);
 }
 
 .leaveBtn {
   width: 100%;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: var(--sp-2);
-  padding: 16px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--color-text-muted);
-  transition: background var(--dur-fast);
+  gap: 12px;
+  padding: 16px 18px;
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.leaveBtn:active {
-  background: var(--color-surface-2);
+.leaveBtnLabel {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: #EF4444;
+  text-align: left;
 }
 
+.leaveBtnArrow {
+  color: var(--ink-muted);
+}
+
+/* ── 방 썸네일 ──────────────────────────────────────────────────────────── */
 .roomThumb {
   width: 28px;
   height: 28px;
-  border-radius: var(--radius-full);
+  border-radius: 50%;
   overflow: hidden;
-  background: var(--color-surface-2);
+  background: var(--card-bg-soft);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-right: 6px;
+  margin-right: 4px;
 }
 
 .roomThumbImg {
@@ -278,7 +373,68 @@
   object-fit: cover;
 }
 
-.roomThumbEmoji {
-  font-size: 14px;
+.chatBtn {
+  font-size: 20px;
   line-height: 1;
+  padding: 4px;
+  border-radius: 8px;
+  transition: opacity 0.12s ease;
+  color: var(--ink-sub);
+}
+
+.chatBtn:active {
+  opacity: 0.65;
+}
+
+/* ── 라이트 모드 그린 카드 ────────────────────────────────────────────────── */
+:global(:root:not([data-theme="dark"])) .codeCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
+}
+
+:global(:root:not([data-theme="dark"])) .memberCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
+}
+
+:global(:root:not([data-theme="dark"])) .missionCard {
+  background: linear-gradient(135deg, rgba(96,196,80,.14), rgba(140,220,110,.12));
+  border-color: rgba(80, 170, 55, 0.28);
+}
+
+:global(:root:not([data-theme="dark"])) .albumThumbBtn {
+  background: linear-gradient(135deg, rgba(96,196,80,.16), rgba(140,220,150,.10)), #EDF0E8;
+  border-color: rgba(120, 162, 58, 0.20);
+}
+
+:global(:root:not([data-theme="dark"])) .albumDate {
+  color: rgba(30, 40, 20, 0.50);
+}
+
+:global(:root:not([data-theme="dark"])) .actionCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
+}
+
+/* ── 개발용 버튼 ──────────────────────────────────────────────────────────── */
+.devBtns {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.devBtn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+  background: var(--devbtn-bg);
+  border: 1px dashed var(--devbtn-border);
+  color: var(--devbtn-color);
+}
+
+.devBtn:disabled {
+  opacity: 0.5;
 }

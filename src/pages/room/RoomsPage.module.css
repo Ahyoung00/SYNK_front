@@ -4,7 +4,7 @@
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  background: #070912;
+  background: var(--page-bg);
   position: relative;
 }
 
@@ -28,16 +28,30 @@
 .sectionLabel {
   font-size: 13px;
   font-weight: 700;
-  color: #9AA0BD;
+  color: var(--ink-sub);
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 7px;
+}
+
+.sectionCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--card-bg-soft);
+  color: var(--nav-active);
+  font-size: 11px;
+  font-weight: 700;
 }
 
 .sectionDesc {
   font-size: 11px;
   font-weight: 400;
-  color: #5C6488;
+  color: var(--ink-muted);
 }
 
 .roomList {
@@ -48,8 +62,8 @@
 
 .roomCard {
   width: 100%;
-  background: rgba(255, 255, 255, 0.045);
-  border: 1px solid rgba(255, 255, 255, 0.085);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 18px;
   padding: 16px 18px;
   display: flex;
@@ -60,8 +74,14 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.roomCard:active {
-  background: rgba(255, 255, 255, 0.07);
+:global(:root:not([data-theme="dark"])) .roomCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
+}
+
+:global(:root:not([data-theme="dark"])) .createCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.09), rgba(166,216,95,.07));
+  border-color: rgba(120, 162, 58, 0.20);
 }
 
 .cardInner {
@@ -74,8 +94,8 @@
   width: 52px;
   height: 52px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -100,23 +120,46 @@
 .cardTop {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
 }
 
 .roomName {
   font-size: 16px;
   font-weight: 800;
-  color: #F3F5FF;
+  color: var(--ink);
 }
 
-.statusText {
+.missionBadge {
   font-size: 12px;
   font-weight: 600;
+  color: var(--ink-sub);
 }
 
-.statusActive { color: #9AA0BD; }
-.statusDone   { color: #4ADE80; }
-.statusWaiting { color: #9AA0BD; }
+.missionBadgeDone {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-timer-safe);
+}
+
+.cardBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 2px;
+}
+
+.memberCount {
+  font-size: 11px;
+  color: var(--ink-muted);
+  font-weight: 500;
+}
+
+.enterArrow {
+  font-size: 20px;
+  color: var(--ink-muted);
+  flex-shrink: 0;
+  margin-left: 4px;
+}
 
 .avatarStack {
   display: flex;
@@ -128,8 +171,8 @@
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.07);
-  border: 1.5px solid rgba(255, 255, 255, 0.12);
+  background: var(--card-bg-soft);
+  border: 1.5px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -148,13 +191,13 @@
 .avatarBubbleInitial {
   font-size: 13px;
   font-weight: 700;
-  color: #9AA0BD;
+  color: var(--ink-sub);
 }
 
 .avatarMore {
   font-size: 11px;
   font-weight: 700;
-  color: #9AA0BD;
+  color: var(--ink-sub);
 }
 
 /* ── 방 만들기 CTA 카드 ───────────────────────────────────────────────────── */
@@ -164,24 +207,20 @@
   align-items: center;
   gap: 14px;
   padding: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
+  background: var(--card-bg-soft);
+  border: 1px dashed var(--card-border);
   border-radius: 18px;
   text-align: left;
   transition: background 0.12s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.createCard:active {
-  background: rgba(255, 255, 255, 0.06);
-}
-
 .createIcon {
   width: 44px;
   height: 44px;
   border-radius: 12px;
-  background: linear-gradient(135deg, rgba(70,215,255,.12), rgba(155,107,255,.12));
-  border: 1px solid rgba(255,255,255,.1);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -198,12 +237,12 @@
 .createLabel {
   font-size: 15px;
   font-weight: 700;
-  color: #F3F5FF;
+  color: var(--ink);
 }
 
 .createDesc {
   font-size: 12px;
-  color: #9AA0BD;
+  color: var(--ink-sub);
 }
 
 /* ── 빈 상태 ──────────────────────────────────────────────────────────────── */
@@ -221,51 +260,21 @@
 .emptyTitle {
   font-size: 17px;
   font-weight: 700;
-  color: #F3F5FF;
+  color: var(--ink);
 }
 
 .emptyDesc {
   font-size: 14px;
-  color: #9AA0BD;
+  color: var(--ink-sub);
   line-height: 1.6;
-}
-
-/* ── FAB ─────────────────────────────────────────────────────────────────── */
-.fab {
-  position: absolute;
-  right: var(--sp-5);
-  bottom: var(--sp-5);
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #46D7FF 0%, #9B6BFF 100%);
-  box-shadow: 0 4px 20px rgba(70, 215, 255, 0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.12s ease, opacity 0.12s ease;
-  z-index: 10;
-}
-
-.fab:active {
-  transform: scale(0.93);
-  opacity: 0.88;
-}
-
-.fabIcon {
-  font-size: 28px;
-  font-weight: 300;
-  color: #fff;
-  line-height: 1;
-  margin-top: -2px;
 }
 
 /* ── 바텀시트 ─────────────────────────────────────────────────────────────── */
 .overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  z-index: 50;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 200;
   display: flex;
   align-items: flex-end;
   animation: overlayIn 0.18s ease;
@@ -278,8 +287,8 @@
 
 .sheet {
   width: 100%;
-  background: #0E1226;
-  border: 1px solid rgba(255,255,255,.085);
+  background: var(--page-bg);
+  border: 1px solid var(--card-border);
   border-bottom: none;
   border-radius: 24px 24px 0 0;
   padding: var(--sp-3) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
@@ -298,7 +307,7 @@
   width: 36px;
   height: 4px;
   border-radius: 2px;
-  background: rgba(255,255,255,.15);
+  background: var(--card-border);
   align-self: center;
   margin-bottom: var(--sp-2);
 }
@@ -306,14 +315,14 @@
 .sheetTitle {
   font-size: 16px;
   font-weight: 800;
-  color: #F3F5FF;
+  color: var(--ink);
   text-align: center;
 }
 
 .sheetBtns {
-  background: rgba(255,255,255,.045);
+  background: var(--card-bg);
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.085);
+  border: 1px solid var(--card-border);
   overflow: hidden;
 }
 
@@ -326,8 +335,6 @@
   text-align: left;
   transition: background 0.12s ease;
 }
-
-.sheetBtn:active { background: rgba(255,255,255,.06); }
 
 .sheetBtnIcon {
   font-size: 22px;
@@ -346,35 +353,33 @@
 .sheetBtnLabel {
   font-size: 15px;
   font-weight: 700;
-  color: #F3F5FF;
+  color: var(--ink);
 }
 
 .sheetBtnDesc {
   font-size: 12px;
-  color: #9AA0BD;
+  color: var(--ink-sub);
 }
 
 .sheetBtnArrow {
   font-size: 20px;
-  color: #5C6488;
+  color: var(--ink-muted);
 }
 
 .sheetDivider {
   height: 1px;
-  background: rgba(255,255,255,.06);
+  background: var(--divider-color);
   margin: 0 var(--sp-4);
 }
 
 .sheetCancel {
   width: 100%;
   padding: 16px;
-  background: rgba(255,255,255,.045);
-  border: 1px solid rgba(255,255,255,.085);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 14px;
   font-size: 15px;
   font-weight: 600;
-  color: #9AA0BD;
+  color: var(--ink-sub);
   transition: background 0.12s ease;
 }
-
-.sheetCancel:active { background: rgba(255,255,255,.07); }

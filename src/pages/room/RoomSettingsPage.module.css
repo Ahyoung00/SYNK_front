@@ -2,76 +2,39 @@
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  background: var(--color-bg);
-}
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
-  flex-shrink: 0;
-}
-
-.backBtn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text);
-}
-
-.headerTitle {
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.headerRight { width: 36px; }
-
-.saveBtn {
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--color-text-muted);
-  padding: 4px 8px;
-  min-width: 36px;
-  transition: color var(--dur-fast);
-}
-
-.saveBtnActive {
-  color: #3b82f6;
+  background: var(--page-bg);
 }
 
 .scroll {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: var(--sp-4) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
+  padding: var(--sp-4) var(--sp-5) max(var(--sp-10), env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
+  gap: var(--sp-3);
 }
 
 /* ── 방 헤더 ──────────────────────────────────────────────────────────────── */
 .roomHeader {
   display: flex;
   align-items: center;
-  gap: var(--sp-4);
+  gap: 16px;
+  padding: 4px 0 8px;
 }
 
 .roomThumb {
   position: relative;
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-md);
-  background: var(--color-surface-2);
+  width: 64px;
+  height: 64px;
+  border-radius: 16px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   overflow: hidden;
-  border: none;
 }
 
 .roomThumbImg {
@@ -83,262 +46,327 @@
 .roomThumbOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.35);
+  background: rgba(0, 0, 0, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   opacity: 0;
-  transition: opacity var(--dur-fast);
+  transition: opacity 0.12s ease;
 }
 
-.roomThumb:hover .roomThumbOverlay,
 .roomThumb:active .roomThumbOverlay {
   opacity: 1;
 }
 
-.roomThumbCamera {
-  font-size: 18px;
-}
+.roomThumbCamera { font-size: 20px; }
+.roomThumbEmoji  { font-size: 32px; }
 
-.roomThumbEmoji {
-  font-size: 28px;
+.roomInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
 }
 
 .roomName {
-  font-size: var(--text-lg);
+  font-size: 20px;
   font-weight: 800;
-  color: var(--color-text);
+  color: var(--ink);
+  line-height: 1.2;
 }
 
 .roomNameInput {
-  flex: 1;
   background: transparent;
   border: none;
-  border-bottom: 1.5px solid var(--color-border);
+  border-bottom: 1.5px solid var(--card-border);
   outline: none;
-  font-size: var(--text-lg);
+  font-size: 20px;
   font-weight: 800;
-  color: var(--color-text);
-  padding: 4px 0;
+  color: var(--ink);
+  padding: 2px 0;
   min-width: 0;
-  transition: border-color var(--dur-fast);
+  width: 100%;
+  transition: border-color 0.15s ease;
 }
 
 .roomNameInput:focus {
-  border-bottom-color: var(--color-primary);
+  border-bottom-color: var(--nav-active);
 }
 
-.divider {
-  height: 1px;
-  background: var(--color-border);
+.roomMeta {
+  font-size: 13px;
+  color: var(--ink-sub);
+  font-weight: 500;
 }
 
-/* ── 섹션 그룹 ────────────────────────────────────────────────────────────── */
-.sectionGroup {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sp-3);
-}
-
-.sectionHeader {
-  display: flex;
-  align-items: baseline;
-  gap: var(--sp-2);
-}
-
-.sectionTitle {
-  font-size: var(--text-base);
+/* ── 섹션 레이블 ──────────────────────────────────────────────────────────── */
+.sectionLabel {
+  font-size: 12px;
   font-weight: 700;
-  color: var(--color-text);
+  color: var(--ink-muted);
+  letter-spacing: 0.3px;
+  padding: 4px 2px 0;
 }
 
-.sectionMeta {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-}
-
-/* ── 설정 카드 ────────────────────────────────────────────────────────────── */
-.settingCard {
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+/* ── 공통 카드 ────────────────────────────────────────────────────────────── */
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
   overflow: hidden;
 }
 
-.settingRow {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-5);
-}
-
-.rowDivider {
+.cardDivider {
   height: 1px;
-  background: var(--color-border);
-  margin: 0 var(--sp-5);
+  background: var(--divider-color);
+  margin: 0 18px;
 }
 
-.settingIcon {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-sm);
-  background: rgba(250, 204, 21, 0.2);
+/* ── 미션 설정 카드 ───────────────────────────────────────────────────────── */
+.missionCountRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.missionIconWrap {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 16px;
+  color: var(--nav-active);
   flex-shrink: 0;
 }
 
-.settingIconGray {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  color: var(--color-text-muted);
-  flex-shrink: 0;
-}
-
-.settingLabel {
+.missionCountLabel {
   flex: 1;
-  font-size: var(--text-sm);
+  font-size: 15px;
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--ink);
 }
 
-.settingValue {
-  font-size: var(--text-sm);
-  color: var(--color-text-sub);
-}
-
-/* ── 스테퍼 ──────────────────────────────────────────────────────────────── */
-.stepper {
+.chips {
   display: flex;
-  align-items: center;
-  gap: var(--sp-3);
+  gap: 6px;
 }
 
-.stepBtn {
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-full);
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
-  font-size: 18px;
-  font-weight: 300;
+.chip {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-sub);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--dur-fast);
+  transition: all 0.12s ease;
+  flex-shrink: 0;
 }
 
-.stepBtn:active:not(:disabled) {
-  background: var(--color-primary-dim);
+.chip:disabled {
+  cursor: default;
 }
 
-.stepBtn:disabled {
-  opacity: 0.35;
+.chipActive {
+  background: var(--grad-action-2);
+  border-color: transparent;
+  color: #fff;
 }
 
-.stepValue {
-  font-size: var(--text-sm);
+/* ── 시간 슬라이더 ────────────────────────────────────────────────────────── */
+.timeRow {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 18px 18px;
+}
+
+.timeRowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timeLabel {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.timeValue {
+  font-size: 14px;
   font-weight: 700;
-  color: var(--color-text);
-  min-width: 28px;
-  text-align: center;
+  background: var(--grad-action);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-/* ── 멤버 관리 버튼 ───────────────────────────────────────────────────────── */
-.memberBtn {
+.sliderWrap {
+  position: relative;
+  height: 28px;
+  display: flex;
+  align-items: center;
+}
+
+.sliderTrack {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--toggle-off-bg);
+}
+
+.sliderFill {
+  position: absolute;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--grad-action);
+  pointer-events: none;
+}
+
+.sliderInput {
+  position: absolute;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 4px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  pointer-events: none;
+  outline: none;
+}
+
+.sliderInput::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--nav-active);
+  pointer-events: all;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+  transition: border-color 0.12s ease;
+}
+
+/* ── 관리 카드 행 ─────────────────────────────────────────────────────────── */
+.manageRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 18px;
+  width: 100%;
+  text-align: left;
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.manageIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--card-bg-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-sub);
+  flex-shrink: 0;
+}
+
+.manageLabel {
+  flex: 1;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.manageArrow {
+  color: var(--ink-muted);
+}
+
+/* ── 저장 버튼 ────────────────────────────────────────────────────────────── */
+.saveBtn {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  padding: 4px 8px;
+  transition: color 0.12s ease;
+}
+
+.saveBtnActive {
+  color: var(--nav-active);
+}
+
+.saveError {
+  font-size: 12px;
+  color: #ef4444;
+  text-align: center;
+  padding: 0 4px;
+}
+
+/* ── 라이트 모드 그린 카드 ────────────────────────────────────────────────── */
+:global(:root:not([data-theme="dark"])) .card {
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
+}
+
+/* ── 방 나가기 버튼 ───────────────────────────────────────────────────────── */
+.leaveBtn {
   width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-5);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  transition: background var(--dur-fast);
-}
-
-.memberBtn:active {
-  background: var(--color-surface-2);
-}
-
-.memberBtnIcon {
-  font-size: 18px;
-}
-
-.memberBtnLabel {
-  flex: 1;
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-text);
-  text-align: left;
-}
-
-.memberBtnArrow {
-  font-size: 20px;
-  color: var(--color-text-muted);
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.20);
+  border-radius: 18px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #EF4444;
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+  margin-top: 4px;
 }
 
 /* ── 방 삭제 버튼 ─────────────────────────────────────────────────────────── */
-.deleteRoomBtn {
-  width: 100%;
-  padding: var(--sp-4);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: #ef4444;
-  text-align: center;
-  transition: opacity var(--dur-fast);
-}
-
-.deleteRoomBtn:active {
-  opacity: 0.7;
-}
-
-/* ── 시간 선택 ────────────────────────────────────────────────────────────── */
-.settingRowTime {
+.deleteSection {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-5);
+  gap: 10px;
 }
 
-.timeInputRow {
+.deleteRoomBtn {
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: var(--sp-3);
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+  background: rgba(185, 50, 50, 0.55);
+  border: 1px solid rgba(220, 80, 80, 0.35);
+  border-radius: 18px;
+  font-size: 16px;
+  font-weight: 700;
+  color: #FFAAAA;
+  transition: background 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.timeInput {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--sp-2) var(--sp-3);
-  font-size: var(--text-sm);
-  font-weight: 600;
-  color: var(--color-text);
-  color-scheme: dark;
-  outline: none;
-  transition: border-color var(--dur-fast);
-  cursor: pointer;
-}
-
-.timeInput::-webkit-calendar-picker-indicator {
-  display: none;
-}
-
-.timeInput:focus {
-  border-color: var(--color-primary);
-}
-
-.timeDash {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
+.deleteDesc {
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-align: center;
 }

@@ -3,8 +3,8 @@ import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useMissionStore } from '@/store/missionStore'
 import { useSettingsStore } from '@/store/settingsStore'
-import { missionApi, albumApi } from '@/services/api/endpoints'
-import type { ActiveMissionItem, ActiveMissionParticipant, ActiveMissionState } from '@/types'
+import { missionApi, albumApi, roomApi } from '@/services/api/endpoints'
+import type { ActiveMissionItem, ActiveMissionParticipant, ActiveMissionState, ActiveRoom } from '@/types'
 import { ROUTES } from '@/constants'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import AppHeader from '@/components/layout/AppHeader'
@@ -186,8 +186,14 @@ function HomeMissionCard({
       </div>
 
       {/* ── 버튼 ─────────────────────────────────────────────────────────── */}
-      {allDone || isExpired ? (
-        // 전원 완료 or 시간 종료 → 결과 만드는 중 인라인 표시
+      {isExpired ? (
+        <button
+          className={styles.missionCardCtaResult}
+          onClick={() => onViewWaiting?.()}
+        >
+          결과 보기 →
+        </button>
+      ) : allDone ? (
         <div className={styles.missionCardProcessing}>
           <div className={styles.missionCardProcessingSpinner} />
           <span>결과 만드는 중...</span>
@@ -206,7 +212,7 @@ function HomeMissionCard({
           className={styles.missionCardCta}
           onClick={onParticipate}
         >
-          참여하기
+          {secondsLeft <= 180 ? '지금 참여하기' : '참여하기'}
         </button>
       )}
     </div>
@@ -247,6 +253,7 @@ export default function HomePage() {
   const [activeMissions, setActiveMissions]       = useState<ActiveMissionItem[]>([])
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null)
   const [processingRoomId, setProcessingRoomId]   = useState<number | null>(null)
+  const [myRooms, setMyRooms]                     = useState<ActiveRoom[]>([])
 
   // 다중 미션 선택 화면용 실시간 카운트다운 (id → 남은 초)
   const [localSeconds, setLocalSeconds] = useState<Record<number, number>>({})
@@ -340,6 +347,9 @@ export default function HomePage() {
         applyMissions(res.data)
         initialLoadDoneRef.current = true  // 이후 폴링부터 알림 활성화
       })
+      .catch(console.error)
+    roomApi.getMyRooms()
+      .then((res) => setMyRooms(res.data.active))
       .catch(console.error)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -490,6 +500,59 @@ export default function HomePage() {
               랜덤한 순간에 미션이 도착해요.<br />알림을 켜두면 놓치지 않아요.
             </p>
             <div className={styles.waitingBadge}>대기 중</div>
+          </div>
+        )}
+
+        {/* ── 내 방의 오늘 미션 ──────────────────────────────────────────── */}
+        {myRooms.length > 0 && (
+          <div className={styles.todaySection}>
+            <div className={styles.todaySectionHeader}>
+              <span className={styles.todaySectionTitle}>내 방의 오늘 미션</span>
+              <button className={styles.todaySeeAll} onClick={() => navigate(ROUTES.ROOMS)}>
+                전체 보기 ›
+              </button>
+            </div>
+            <div className={styles.todayRoomList}>
+              {myRooms.map((room) => {
+                const memberCount = room.memberProfiles.length
+                const progress = room.totalMissions > 0
+                  ? (room.completedMissions / room.totalMissions) * 100
+                  : 0
+                return (
+                  <button
+                    key={room.id}
+                    className={styles.todayRoomCard}
+                    onClick={() => navigate(ROUTES.ROOM(room.id))}
+                  >
+                    <div className={styles.todayRoomThumb}>
+                      {room.roomThumbnail
+                        ? <img src={room.roomThumbnail} alt={room.name} className={styles.todayRoomThumbImg} />
+                        : <span className={styles.todayRoomThumbInitial}>{room.name.charAt(0)}</span>
+                      }
+                    </div>
+                    <div className={styles.todayRoomBody}>
+                      <div className={styles.todayRoomTop}>
+                        <span className={styles.todayRoomName}>{room.name}</span>
+                        {room.isAllCompleted ? (
+                          <span className={styles.todayRoomDone}>오늘 완료 ✓</span>
+                        ) : (
+                          <span className={styles.todayRoomProgress}>
+                            {room.completedMissions}/{room.totalMissions}
+                          </span>
+                        )}
+                      </div>
+                      <span className={styles.todayRoomMeta}>맴버 {memberCount}명</span>
+                      <div className={styles.todayProgressTrack}>
+                        <div
+                          className={styles.todayProgressFill}
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
           </div>
         )}
 

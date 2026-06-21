@@ -2,58 +2,31 @@
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  background: var(--color-bg);
+  background: var(--page-bg);
 }
-
-.header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: calc(var(--safe-top) + var(--sp-4)) var(--sp-4) var(--sp-4);
-  flex-shrink: 0;
-}
-
-.backBtn {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text);
-}
-
-.headerTitle {
-  font-size: var(--text-base);
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.headerRight { width: 36px; }
 
 .scroll {
   flex: 1;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
-  padding: var(--sp-2) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
+  padding: var(--sp-4) var(--sp-5) max(var(--sp-8), env(safe-area-inset-bottom));
   display: flex;
   flex-direction: column;
-  gap: var(--sp-5);
+  gap: var(--sp-4);
 }
 
 /* ── 경고 카드 ────────────────────────────────────────────────────────────── */
 .warnCard {
   padding: var(--sp-5);
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.10);
+  border: 1px solid rgba(239, 68, 68, 0.30);
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
 }
 
-.warnIcon {
-  font-size: 24px;
-}
+.warnIcon { font-size: 24px; }
 
 .warnTitle {
   font-size: var(--text-base);
@@ -63,7 +36,7 @@
 
 .warnDesc {
   font-size: var(--text-sm);
-  color: var(--color-text-sub);
+  color: var(--ink-sub);
   line-height: 1.6;
 }
 
@@ -77,7 +50,8 @@
 .deleteSectionTitle {
   font-size: var(--text-sm);
   font-weight: 700;
-  color: var(--color-text-sub);
+  color: var(--ink-sub);
+  padding: 0 var(--sp-1);
 }
 
 .deleteList {
@@ -90,10 +64,10 @@
   display: flex;
   align-items: center;
   gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-4);
-  background: var(--color-surface);
+  padding: var(--sp-4);
+  background: var(--card-bg);
   border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--card-border);
 }
 
 .deleteCheck {
@@ -112,7 +86,7 @@
 
 .deleteText {
   font-size: var(--text-sm);
-  color: var(--color-text);
+  color: var(--ink);
 }
 
 /* ── 확인 입력 ────────────────────────────────────────────────────────────── */
@@ -124,17 +98,17 @@
 
 .confirmLabel {
   font-size: var(--text-sm);
-  color: var(--color-text-sub);
+  color: var(--ink-sub);
   text-align: center;
 }
 
 .confirmInput {
   width: 100%;
   padding: 14px var(--sp-5);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: var(--radius-lg);
-  color: var(--color-text);
+  color: var(--ink);
   font-size: var(--text-base);
   font-family: inherit;
   text-align: center;
@@ -147,7 +121,7 @@
 }
 
 .confirmInput::placeholder {
-  color: var(--color-text-muted);
+  color: var(--ink-muted);
 }
 
 /* ── 버튼 그룹 ────────────────────────────────────────────────────────────── */
@@ -165,12 +139,12 @@
   font-size: var(--text-base);
   font-weight: 700;
   color: #fff;
-  background: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.35);
   transition: background var(--dur-fast);
 }
 
 .withdrawBtnActive {
-  background: #ef4444;
+  background: #c0392b;
 }
 
 .withdrawBtn:active:not(:disabled) {
@@ -181,6 +155,6 @@
   width: 100%;
   padding: var(--sp-3);
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  color: var(--ink-muted);
   text-align: center;
 }
