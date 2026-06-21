@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ROUTES } from '@/constants'
-import { roomApi, albumApi, debugApi } from '@/services/api/endpoints'
+import { roomApi, albumApi } from '@/services/api/endpoints'
 import type { RoomDetail, AlbumItem } from '@/types'
 import { useAuthStore } from '@/store/authStore'
 import NavHeader from '@/components/layout/NavHeader'
