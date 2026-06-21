@@ -1243,7 +1243,7 @@
       "mission_template_id": 10,
       "time_slot_id": 20,
       "date": "2026-06-21",
-      "status": "PENDING"
+      "status": "EXPIRED"
     },
     {
       "id": 141,
@@ -1251,7 +1251,7 @@
       "mission_template_id": 1,
       "time_slot_id": 24,
       "date": "2026-06-21",
-      "status": "PENDING"
+      "status": "EXPIRED"
     },
     {
       "id": 142,
@@ -1259,7 +1259,7 @@
       "mission_template_id": 10,
       "time_slot_id": 16,
       "date": "2026-06-21",
-      "status": "PENDING"
+      "status": "EXPIRED"
     },
     {
       "id": 143,
@@ -1267,7 +1267,7 @@
       "mission_template_id": 1,
       "time_slot_id": 18,
       "date": "2026-06-21",
-      "status": "PENDING"
+      "status": "EXPIRED"
     },
     {
       "id": 144,
@@ -1307,7 +1307,7 @@
       "mission_template_id": 1,
       "time_slot_id": 19,
       "date": "2026-06-21",
-      "status": "PENDING"
+      "status": "EXPIRED"
     },
     {
       "id": 149,
@@ -1315,7 +1315,7 @@
       "mission_template_id": 6,
       "time_slot_id": 23,
       "date": "2026-06-21",
-      "status": "PENDING"
+      "status": "COMPLETED"
     },
     {
       "id": 150,
@@ -1323,7 +1323,7 @@
       "mission_template_id": 6,
       "time_slot_id": 21,
       "date": "2026-06-21",
-      "status": "PENDING"
+      "status": "COMPLETED"
     },
     {
       "id": 151,
@@ -1331,7 +1331,7 @@
       "mission_template_id": 3,
       "time_slot_id": 17,
       "date": "2026-06-21",
-      "status": "PENDING"
+      "status": "EXPIRED"
     },
     {
       "id": 152,
@@ -1347,7 +1347,7 @@
       "mission_template_id": 8,
       "time_slot_id": 20,
       "date": "2026-06-21",
-      "status": "PENDING"
+      "status": "EXPIRED"
     },
     {
       "id": 154,
@@ -1355,6 +1355,86 @@
       "mission_template_id": 3,
       "time_slot_id": 15,
       "date": "2026-06-21",
+      "status": "EXPIRED"
+    },
+    {
+      "id": 155,
+      "room_id": 1,
+      "mission_template_id": 6,
+      "time_slot_id": 21,
+      "date": "2026-06-22",
+      "status": "PENDING"
+    },
+    {
+      "id": 156,
+      "room_id": 1,
+      "mission_template_id": 4,
+      "time_slot_id": 15,
+      "date": "2026-06-22",
+      "status": "PENDING"
+    },
+    {
+      "id": 157,
+      "room_id": 2,
+      "mission_template_id": 8,
+      "time_slot_id": 17,
+      "date": "2026-06-22",
+      "status": "PENDING"
+    },
+    {
+      "id": 158,
+      "room_id": 2,
+      "mission_template_id": 2,
+      "time_slot_id": 21,
+      "date": "2026-06-22",
+      "status": "PENDING"
+    },
+    {
+      "id": 159,
+      "room_id": 1,
+      "mission_template_id": 6,
+      "time_slot_id": 18,
+      "date": "2026-06-22",
+      "status": "PENDING"
+    },
+    {
+      "id": 160,
+      "room_id": 1,
+      "mission_template_id": 7,
+      "time_slot_id": 22,
+      "date": "2026-06-22",
+      "status": "PENDING"
+    },
+    {
+      "id": 161,
+      "room_id": 2,
+      "mission_template_id": 10,
+      "time_slot_id": 15,
+      "date": "2026-06-22",
+      "status": "PENDING"
+    },
+    {
+      "id": 162,
+      "room_id": 2,
+      "mission_template_id": 7,
+      "time_slot_id": 19,
+      "date": "2026-06-22",
+      "status": "PENDING"
+    },
+    {
+      "id": 163,
+      "room_id": 1,
+      "mission_template_id": 10,
+      "time_slot_id": 19,
+      "date": "2026-06-22",
+      "status": "PENDING"
+    },
+    {
+      "id": 164,
+      "room_id": 2,
+      "mission_template_id": 10,
+      "time_slot_id": 18,
+      "date": "2026-06-22",
       "status": "PENDING"
     }
   ],
@@ -3140,6 +3220,96 @@
       "status": "SUBMITTED",
       "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
       "submitted_at": "2026-06-01T05:34:08.923Z"
+    },
+    {
+      "id": 199,
+      "user_id": 3,
+      "room_id": 2,
+      "mission_id": 150,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T07:01:38.628Z"
+    },
+    {
+      "id": 200,
+      "user_id": 4,
+      "room_id": 2,
+      "mission_id": 150,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T07:01:38.769Z"
+    },
+    {
+      "id": 201,
+      "user_id": 5,
+      "room_id": 2,
+      "mission_id": 150,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T07:02:44.352Z"
+    },
+    {
+      "id": 202,
+      "user_id": 2,
+      "room_id": 2,
+      "mission_id": 150,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T07:02:44.552Z"
+    },
+    {
+      "id": 203,
+      "user_id": 1,
+      "room_id": 2,
+      "mission_id": 150,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T07:03:27.577Z"
+    },
+    {
+      "id": 204,
+      "user_id": 1,
+      "room_id": 1,
+      "mission_id": 149,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T08:02:44.443Z"
+    },
+    {
+      "id": 205,
+      "user_id": 2,
+      "room_id": 1,
+      "mission_id": 149,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T08:03:09.975Z"
+    },
+    {
+      "id": 206,
+      "user_id": 4,
+      "room_id": 1,
+      "mission_id": 149,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T08:03:23.448Z"
+    },
+    {
+      "id": 207,
+      "user_id": 5,
+      "room_id": 1,
+      "mission_id": 149,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T08:03:26.475Z"
+    },
+    {
+      "id": 208,
+      "user_id": 3,
+      "room_id": 1,
+      "mission_id": 149,
+      "status": "SUBMITTED",
+      "video_url": "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+      "submitted_at": "2026-06-21T08:03:59.794Z"
     }
   ],
   "collages": [],
@@ -9409,6 +9579,506 @@
       "related_id": 152,
       "is_read": false,
       "created_at": "2026-06-20T14:20:01.773Z"
+    },
+    {
+      "id": 625,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 13:00",
+      "related_id": 154,
+      "is_read": false,
+      "created_at": "2026-06-21T04:24:14.131Z"
+    },
+    {
+      "id": 626,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 13:00",
+      "related_id": 154,
+      "is_read": false,
+      "created_at": "2026-06-21T04:24:14.131Z"
+    },
+    {
+      "id": 627,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 13:00",
+      "related_id": 154,
+      "is_read": false,
+      "created_at": "2026-06-21T04:24:14.131Z"
+    },
+    {
+      "id": 628,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 13:00",
+      "related_id": 154,
+      "is_read": false,
+      "created_at": "2026-06-21T04:24:14.131Z"
+    },
+    {
+      "id": 629,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 13:00",
+      "related_id": 154,
+      "is_read": false,
+      "created_at": "2026-06-21T04:24:14.131Z"
+    },
+    {
+      "id": 630,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 13:30",
+      "related_id": 142,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.154Z"
+    },
+    {
+      "id": 631,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 13:30",
+      "related_id": 142,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.154Z"
+    },
+    {
+      "id": 632,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 13:30",
+      "related_id": 142,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.154Z"
+    },
+    {
+      "id": 633,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 13:30",
+      "related_id": 142,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.154Z"
+    },
+    {
+      "id": 634,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 13:30",
+      "related_id": 142,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.154Z"
+    },
+    {
+      "id": 635,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 새벽반 · 14:30",
+      "related_id": 143,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.166Z"
+    },
+    {
+      "id": 636,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 새벽반 · 14:30",
+      "related_id": 143,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.166Z"
+    },
+    {
+      "id": 637,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 새벽반 · 14:30",
+      "related_id": 143,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.166Z"
+    },
+    {
+      "id": 638,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 새벽반 · 14:30",
+      "related_id": 143,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.166Z"
+    },
+    {
+      "id": 639,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 새벽반 · 14:30",
+      "related_id": 143,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.166Z"
+    },
+    {
+      "id": 640,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 14:00",
+      "related_id": 151,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.180Z"
+    },
+    {
+      "id": 641,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 14:00",
+      "related_id": 151,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.180Z"
+    },
+    {
+      "id": 642,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 14:00",
+      "related_id": 151,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.180Z"
+    },
+    {
+      "id": 643,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 14:00",
+      "related_id": 151,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.180Z"
+    },
+    {
+      "id": 644,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "발밑 찍기 · 새벽반 · 14:00",
+      "related_id": 151,
+      "is_read": false,
+      "created_at": "2026-06-21T05:30:28.180Z"
+    },
+    {
+      "id": 645,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 15:00",
+      "related_id": 148,
+      "is_read": false,
+      "created_at": "2026-06-21T06:14:27.314Z"
+    },
+    {
+      "id": 646,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 15:00",
+      "related_id": 148,
+      "is_read": false,
+      "created_at": "2026-06-21T06:14:27.314Z"
+    },
+    {
+      "id": 647,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 15:00",
+      "related_id": 148,
+      "is_read": false,
+      "created_at": "2026-06-21T06:14:27.314Z"
+    },
+    {
+      "id": 648,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 15:00",
+      "related_id": 148,
+      "is_read": false,
+      "created_at": "2026-06-21T06:14:27.314Z"
+    },
+    {
+      "id": 649,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 15:00",
+      "related_id": 148,
+      "is_read": false,
+      "created_at": "2026-06-21T06:14:27.314Z"
+    },
+    {
+      "id": 650,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 15:30",
+      "related_id": 140,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.685Z"
+    },
+    {
+      "id": 651,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 15:30",
+      "related_id": 140,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.685Z"
+    },
+    {
+      "id": 652,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 15:30",
+      "related_id": 140,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.685Z"
+    },
+    {
+      "id": 653,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 15:30",
+      "related_id": 140,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.685Z"
+    },
+    {
+      "id": 654,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 마시는 것 찍기 · 아침반 · 15:30",
+      "related_id": 140,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.685Z"
+    },
+    {
+      "id": 655,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "가장 가까운 식물 찍기 · 새벽반 · 15:30",
+      "related_id": 153,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.703Z"
+    },
+    {
+      "id": 656,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "가장 가까운 식물 찍기 · 새벽반 · 15:30",
+      "related_id": 153,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.703Z"
+    },
+    {
+      "id": 657,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "가장 가까운 식물 찍기 · 새벽반 · 15:30",
+      "related_id": 153,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.703Z"
+    },
+    {
+      "id": 658,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "가장 가까운 식물 찍기 · 새벽반 · 15:30",
+      "related_id": 153,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.703Z"
+    },
+    {
+      "id": 659,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "가장 가까운 식물 찍기 · 새벽반 · 15:30",
+      "related_id": 153,
+      "is_read": false,
+      "created_at": "2026-06-21T06:38:52.703Z"
+    },
+    {
+      "id": 660,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 새벽반 · 16:00",
+      "related_id": 150,
+      "is_read": false,
+      "created_at": "2026-06-21T07:00:19.858Z"
+    },
+    {
+      "id": 661,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 새벽반 · 16:00",
+      "related_id": 150,
+      "is_read": false,
+      "created_at": "2026-06-21T07:00:19.858Z"
+    },
+    {
+      "id": 662,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 새벽반 · 16:00",
+      "related_id": 150,
+      "is_read": false,
+      "created_at": "2026-06-21T07:00:19.858Z"
+    },
+    {
+      "id": 663,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 새벽반 · 16:00",
+      "related_id": 150,
+      "is_read": false,
+      "created_at": "2026-06-21T07:00:19.858Z"
+    },
+    {
+      "id": 664,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 새벽반 · 16:00",
+      "related_id": 150,
+      "is_read": false,
+      "created_at": "2026-06-21T07:00:19.858Z"
+    },
+    {
+      "id": 665,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 아침반 · 17:00",
+      "related_id": 149,
+      "is_read": false,
+      "created_at": "2026-06-21T08:00:38.893Z"
+    },
+    {
+      "id": 666,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 아침반 · 17:00",
+      "related_id": 149,
+      "is_read": false,
+      "created_at": "2026-06-21T08:00:38.893Z"
+    },
+    {
+      "id": 667,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 아침반 · 17:00",
+      "related_id": 149,
+      "is_read": false,
+      "created_at": "2026-06-21T08:00:38.893Z"
+    },
+    {
+      "id": 668,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 아침반 · 17:00",
+      "related_id": 149,
+      "is_read": false,
+      "created_at": "2026-06-21T08:00:38.893Z"
+    },
+    {
+      "id": 669,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "창문 밖 풍경 찍기 · 아침반 · 17:00",
+      "related_id": 149,
+      "is_read": false,
+      "created_at": "2026-06-21T08:00:38.893Z"
+    },
+    {
+      "id": 670,
+      "user_id": 1,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 17:30",
+      "related_id": 141,
+      "is_read": false,
+      "created_at": "2026-06-21T08:49:48.135Z"
+    },
+    {
+      "id": 671,
+      "user_id": 2,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 17:30",
+      "related_id": 141,
+      "is_read": false,
+      "created_at": "2026-06-21T08:49:48.135Z"
+    },
+    {
+      "id": 672,
+      "user_id": 3,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 17:30",
+      "related_id": 141,
+      "is_read": false,
+      "created_at": "2026-06-21T08:49:48.135Z"
+    },
+    {
+      "id": 673,
+      "user_id": 4,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 17:30",
+      "related_id": 141,
+      "is_read": false,
+      "created_at": "2026-06-21T08:49:48.135Z"
+    },
+    {
+      "id": 674,
+      "user_id": 5,
+      "type": "MISSION_START",
+      "title": "미션이 울렸어요! ⚡",
+      "content": "지금 네 표정 그대로 찍기 · 아침반 · 17:30",
+      "related_id": 141,
+      "is_read": false,
+      "created_at": "2026-06-21T08:49:48.135Z"
     }
   ],
   "collection_records": [
@@ -11192,6 +11862,51 @@
       "room_id": 2,
       "submission_id": 193,
       "date": "2026-06-01",
+      "thumbnail": null
+    },
+    {
+      "id": 199,
+      "user_id": 3,
+      "mission_template_id": 6,
+      "room_id": 2,
+      "submission_id": 199,
+      "date": "2026-06-21",
+      "thumbnail": null
+    },
+    {
+      "id": 200,
+      "user_id": 4,
+      "mission_template_id": 6,
+      "room_id": 2,
+      "submission_id": 200,
+      "date": "2026-06-21",
+      "thumbnail": null
+    },
+    {
+      "id": 201,
+      "user_id": 5,
+      "mission_template_id": 6,
+      "room_id": 2,
+      "submission_id": 201,
+      "date": "2026-06-21",
+      "thumbnail": null
+    },
+    {
+      "id": 202,
+      "user_id": 2,
+      "mission_template_id": 6,
+      "room_id": 2,
+      "submission_id": 202,
+      "date": "2026-06-21",
+      "thumbnail": null
+    },
+    {
+      "id": 203,
+      "user_id": 1,
+      "mission_template_id": 6,
+      "room_id": 2,
+      "submission_id": 203,
+      "date": "2026-06-21",
       "thumbnail": null
     }
   ],
