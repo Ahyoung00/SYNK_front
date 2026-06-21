@@ -376,8 +376,11 @@
 .chatBtn {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
+  /*
   padding: 7px 12px 7px 10px;
+  */
+  padding: 10px 16px;
   border-radius: 999px;
   background: var(--card-bg);
   border: 1px solid var(--card-border);
@@ -389,8 +392,8 @@
 }
 
 :global(:root:not([data-theme="dark"])) .chatBtn {
-  background: rgba(255,255,255,.75);
-  border-color: rgba(120,162,58,.22);
+  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
+  border-color: rgba(120, 162, 58, 0.32);
 }
 
 .chatBtn:active { opacity: 0.65; }
