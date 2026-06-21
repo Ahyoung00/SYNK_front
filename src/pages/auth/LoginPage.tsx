@@ -345,13 +345,6 @@ export default function LoginPage() {
   const [oauthError,   setOauthError]   = useState<string | null>(null)
 
   useEffect(() => {
-    if (!localStorage.getItem('synk_onboarded')) {
-      navigate('/onboarding', { replace: true })
-      return
-    }
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
     const kakaoCode  = searchParams.get('kakao_code')
     const kakaoError = searchParams.get('kakao_error')
     const googleCode  = searchParams.get('google_code')

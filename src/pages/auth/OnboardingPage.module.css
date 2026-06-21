@@ -295,3 +295,185 @@
   opacity: 0.85;
   transform: scale(0.98);
 }
+
+/* ── 로그인 슬라이드 (4번째) ────────────────────────────────────────────── */
+.loginSlide {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 28px 0;
+  text-align: center;
+}
+
+.loginLogoWrap {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 16px;
+}
+
+.loginLogoGlow {
+  position: absolute;
+  inset: 6px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(70,215,255,.4), rgba(123,92,255,.25) 45%, transparent 70%);
+  filter: blur(12px);
+}
+
+.loginLogoImg {
+  position: relative;
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  z-index: 2;
+}
+
+.loginWordmark {
+  font-size: 42px;
+  font-weight: 900;
+  letter-spacing: -1px;
+  background: linear-gradient(135deg, #fff 30%, rgba(200,220,255,.75));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-family: 'Archivo', 'Pretendard', system-ui, sans-serif;
+  margin-bottom: 8px;
+}
+
+.loginSlogan {
+  font-size: 15px;
+  color: rgba(244,247,255,.55);
+  margin-bottom: 36px;
+  font-weight: 400;
+}
+
+.loginSlogan b {
+  color: rgba(244,247,255,.82);
+  font-weight: 700;
+}
+
+.loginCta {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loginError {
+  font-size: 13px;
+  color: #ff7070;
+  text-align: center;
+  padding: 8px 0 4px;
+}
+
+.loginBtnKakao {
+  width: 100%;
+  height: 54px;
+  border-radius: 16px;
+  background: #FEE500;
+  border: none;
+  font-size: 15px;
+  font-weight: 700;
+  color: #181600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+
+.loginBtnKakao:active { opacity: 0.85; }
+
+.loginBtnGoogle {
+  width: 100%;
+  height: 54px;
+  border-radius: 16px;
+  background: #fff;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+
+.loginBtnGoogle:active { opacity: 0.85; }
+
+.loginTerms {
+  font-size: 11px;
+  color: rgba(244,247,255,.3);
+  line-height: 1.7;
+  margin-top: 4px;
+}
+
+.loginTerms a {
+  color: rgba(244,247,255,.5);
+  text-decoration: underline;
+}
+
+/* DEV 로그인 섹션 */
+.loginDev {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.loginDevDivider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: rgba(244,247,255,.25);
+  font-weight: 600;
+}
+
+.loginDevLine {
+  flex: 1;
+  height: 1px;
+  background: rgba(244,247,255,.1);
+}
+
+.loginDevBtn {
+  width: 100%;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(127,184,74,.08);
+  border: 1px dashed rgba(127,184,74,.3);
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(127,220,80,.85);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 16px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: opacity 0.12s ease;
+}
+
+.loginDevBtn:active { opacity: 0.75; }
+
+.loginDevAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(127,184,74,.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: rgba(160,230,100,.9);
+  flex-shrink: 0;
+}
