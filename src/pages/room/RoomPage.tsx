@@ -20,7 +20,7 @@ export default function RoomPage() {
   const [albums, setAlbums]           = useState<AlbumItem[]>([])
   const [codeCopied, setCodeCopied]   = useState(false)
   const [isLoading, setIsLoading]     = useState(true)
-  const [triggering, setTriggering]   = useState(false)
+
   const [notMember, setNotMember]     = useState(false)
   const [joining, setJoining]         = useState(false)
 
@@ -65,19 +65,6 @@ export default function RoomPage() {
       .catch(console.error)
   }
 
-  async function handleTriggerMission() {
-    if (triggering) return
-    setTriggering(true)
-    try {
-      const res = await debugApi.triggerMission(id)
-      alert(`✅ 미션 발동!\n"${res.data.title}"\n\n홈으로 이동하면 미션 카드가 떠요.`)
-      navigate(ROUTES.HOME)
-    } catch {
-      alert('미션 발동 실패 (이미 활성 미션이 있을 수 있어요)')
-    } finally {
-      setTriggering(false)
-    }
-  }
 
   async function handleTestNotification() {
     try {
