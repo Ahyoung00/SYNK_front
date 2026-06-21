@@ -83,9 +83,11 @@ export default function OnboardingPage() {
       <div className={styles.bottom}>
         <div className={styles.dots}>
           {SLIDES.map((_, i) => (
-            <div
+            <button
               key={i}
               className={`${styles.dot} ${i === idx ? styles.dotActive : ''}`}
+              onClick={() => setIdx(i)}
+              aria-label={`슬라이드 ${i + 1}`}
             />
           ))}
         </div>

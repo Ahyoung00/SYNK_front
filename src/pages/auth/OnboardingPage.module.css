@@ -265,6 +265,9 @@
   border-radius: 50%;
   background: rgba(255,255,255,.22);
   transition: all 0.25s ease;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .dotActive {
