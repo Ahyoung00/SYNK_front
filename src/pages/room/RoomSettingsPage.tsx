@@ -241,7 +241,7 @@ export default function RoomSettingsPage() {
           <div className={styles.cardDivider} />
           <button className={styles.manageRow} onClick={() => fileInputRef.current?.click()}>
             <div className={styles.manageIcon}><CoverIcon /></div>
-            <span className={styles.manageLabel}>방 이름·커버 변경</span>
+            <span className={styles.manageLabel}>방 커버 변경</span>
             <ChevronIcon className={styles.manageArrow} />
           </button>
         </div>
