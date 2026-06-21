@@ -145,6 +145,8 @@ export default function RoomPage() {
             aria-label="채팅"
           >
             <ChatIcon />
+            <span>채팅</span>
+            <span className={styles.chatDot} />
           </button>
         }
       />
@@ -284,8 +286,8 @@ function MissionIcon() {
 
 function ChatIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M4 5h16v11H9l-4 3v-3H4z" />
     </svg>
   )

@@ -374,16 +374,33 @@
 }
 
 .chatBtn {
-  font-size: 20px;
-  line-height: 1;
-  padding: 4px;
-  border-radius: 8px;
-  transition: opacity 0.12s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 12px 7px 10px;
+  border-radius: 999px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   color: var(--ink-sub);
+  font-size: 13px;
+  font-weight: 600;
+  transition: opacity 0.12s ease;
+  position: relative;
 }
 
-.chatBtn:active {
-  opacity: 0.65;
+:global(:root:not([data-theme="dark"])) .chatBtn {
+  background: rgba(255,255,255,.75);
+  border-color: rgba(120,162,58,.22);
+}
+
+.chatBtn:active { opacity: 0.65; }
+
+.chatDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4CAF50;
+  flex-shrink: 0;
 }
 
 /* ── 라이트 모드 그린 카드 ────────────────────────────────────────────────── */
