@@ -258,13 +258,6 @@ export default function RoomPage() {
         <div className={styles.footerBtns}>
           <div className={styles.devBtns}>
             <button
-              onClick={handleTriggerMission}
-              disabled={triggering}
-              className={styles.devBtn}
-            >
-              {triggering ? '발동 중...' : '🧪 랜덤 미션 발송'}
-            </button>
-            <button
               onClick={handleTestNotification}
               className={styles.devBtn}
             >
