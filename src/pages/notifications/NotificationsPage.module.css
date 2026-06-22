@@ -130,114 +130,156 @@
   flex-shrink: 0;
 }
 
-/* ── 빈 상태 ──────────────────────────────────────────────────────────────── */
-.empty {
+/* ── 빈 상태 (synk-notif-empty 디자인) ───────────────────────────────────── */
+.esWrap {
   /* 다크(기본) */
-  --nb-accent: #9B7BFF;
-  --nb-dot1: #4F8BFF;
-  --nb-dot2: #7C6FF0;
-  --nb-tile: #1d2752;
-  --nb-ring: rgba(124, 111, 240, 0.18);
+  --es-ink: #F3F5FF;
+  --es-muted: #9AA0BD;
+  --es-surface: rgba(122, 162, 255, 0.07);
+  --es-border: rgba(150, 180, 255, 0.13);
+  --es-border-hi: rgba(150, 180, 255, 0.22);
+  --es-violet-2: #9B8BFF;
+  --es-grad: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  --es-glow: rgba(124, 111, 240, 0.30);
+  --es-shadow: 0 12px 30px -12px rgba(70, 120, 255, 0.45);
 
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
   text-align: center;
-  padding: 40px 24px;
+  padding: 0 36px;
+  transform: translateY(-26px);
 }
 
-:global(:root:not([data-theme="dark"])) .empty {
-  --nb-accent: #3DA838;
-  --nb-dot1: #4ADE80;
-  --nb-dot2: #6FD05A;
-  --nb-tile: #FFFFFF;
-  --nb-ring: rgba(74, 222, 128, 0.22);
+:global(:root:not([data-theme="dark"])) .esWrap {
+  --es-ink: #1F2A18;
+  --es-muted: #7E867A;
+  --es-surface: #FFFFFF;
+  --es-border: rgba(40, 55, 25, 0.10);
+  --es-border-hi: rgba(40, 55, 25, 0.18);
+  --es-violet-2: #3FA23A;
+  --es-grad: linear-gradient(135deg, #6FD05A 0%, #54BF45 52%, #3DA838 100%);
+  --es-glow: rgba(96, 196, 80, 0.30);
+  --es-shadow: 0 12px 30px -14px rgba(80, 170, 55, 0.4);
 }
 
-.emptyScene {
+.esMark {
   position: relative;
-  width: 180px;
-  height: 180px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 6px;
+  width: 132px;
+  height: 132px;
+  display: grid;
+  place-items: center;
 }
 
-.emptyRing {
+.esRing {
   position: absolute;
+  border-radius: 50%;
+}
+
+.esRingR1 {
   inset: 0;
-  border-radius: 50%;
-  border: 1px solid var(--nb-ring);
-  box-shadow: 0 0 0 18px color-mix(in srgb, var(--nb-ring) 45%, transparent);
+  border: 1px solid var(--es-border);
+  opacity: 0.8;
 }
 
-.emptyTile {
-  width: 92px;
-  height: 92px;
-  border-radius: 26px;
-  background: var(--nb-tile);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--nb-accent);
-  position: relative;
-  z-index: 1;
+.esRingR2 {
+  inset: 20px;
+  border: 1px solid var(--es-border);
+  opacity: 0.5;
 }
 
-.emptyDot {
+.esGlow {
   position: absolute;
-  width: 13px;
-  height: 13px;
+  inset: 26px;
   border-radius: 50%;
-  z-index: 2;
+  background: radial-gradient(circle, var(--es-glow), transparent 70%);
+  filter: blur(14px);
 }
 
-.emptyDotTR {
-  top: 44px;
-  right: 50px;
-  background: var(--nb-dot1);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--nb-dot1) 70%, transparent);
+.esTile {
+  width: 84px;
+  height: 84px;
+  border-radius: 26px;
+  position: relative;
+  background: var(--es-surface);
+  border: 1px solid var(--es-border-hi);
+  display: grid;
+  place-items: center;
+  color: var(--es-violet-2);
+  box-shadow: var(--es-shadow);
 }
 
-.emptyDotBL {
-  bottom: 48px;
-  left: 52px;
-  background: var(--nb-dot2);
-  box-shadow: 0 0 10px color-mix(in srgb, var(--nb-dot2) 70%, transparent);
+.esTile svg {
+  width: 40px;
+  height: 40px;
 }
 
-.emptyTitle {
-  font-size: 20px;
+.esSpark {
+  position: absolute;
+  border-radius: 50%;
+  background: var(--es-grad);
+}
+
+.esSparkS1 {
+  width: 9px;
+  height: 9px;
+  top: 8px;
+  right: 14px;
+  animation: es-float 3s ease-in-out infinite;
+}
+
+.esSparkS2 {
+  width: 6px;
+  height: 6px;
+  bottom: 16px;
+  left: 10px;
+  animation: es-float 3.4s ease-in-out infinite 0.4s;
+}
+
+@keyframes es-float {
+  0%, 100% { transform: translateY(0); opacity: 0.9; }
+  50%      { transform: translateY(-7px); opacity: 0.5; }
+}
+
+.esTitle {
+  font-size: 19px;
   font-weight: 800;
-  color: var(--color-text);
+  color: var(--es-ink);
+  margin-top: 30px;
+  letter-spacing: -0.01em;
 }
 
-.emptyDesc {
-  font-size: 14px;
+.esSub {
+  font-size: 13.5px;
+  color: var(--es-muted);
+  margin-top: 9px;
   line-height: 1.6;
-  color: var(--color-text-muted);
 }
 
-.emptyBtn {
-  margin-top: 10px;
+.esCta {
+  margin-top: 22px;
+  height: 44px;
+  padding: 0 22px;
+  border-radius: 14px;
+  border: 1px solid var(--es-border-hi);
+  background: var(--es-surface);
+  color: var(--es-ink);
+  font-size: 13.5px;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 13px 22px;
-  border-radius: 999px;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--color-text);
-  transition: opacity 0.12s ease;
+  cursor: pointer;
 }
 
-.emptyBtn:active { opacity: 0.7; }
+.esCta svg {
+  width: 16px;
+  height: 16px;
+  color: var(--es-violet-2);
+}
 
-.emptyBtnBolt { color: var(--nb-accent); }
+@media (prefers-reduced-motion: reduce) {
+  .esSpark { animation: none; }
+}

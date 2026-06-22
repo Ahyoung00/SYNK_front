@@ -113,25 +113,27 @@ export default function NotificationsPage() {
       {/* ── 알림 목록 ─────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
         {isEmpty ? (
-          <div className={styles.empty}>
-            <div className={styles.emptyScene}>
-              <span className={styles.emptyRing} />
-              <div className={styles.emptyTile}>
-                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
-                  <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+          <div className={styles.esWrap}>
+            <div className={styles.esMark}>
+              <div className={[styles.esRing, styles.esRingR1].join(' ')} />
+              <div className={[styles.esRing, styles.esRingR2].join(' ')} />
+              <div className={styles.esGlow} />
+              <div className={styles.esTile}>
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M10.3 21a2 2 0 0 0 3.4 0" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                 </svg>
+                <span className={[styles.esSpark, styles.esSparkS1].join(' ')} />
+                <span className={[styles.esSpark, styles.esSparkS2].join(' ')} />
               </div>
-              <span className={[styles.emptyDot, styles.emptyDotTR].join(' ')} />
-              <span className={[styles.emptyDot, styles.emptyDotBL].join(' ')} />
             </div>
-            <p className={styles.emptyTitle}>아직 새 알림이 없어요</p>
-            <p className={styles.emptyDesc}>
+            <div className={styles.esTitle}>아직 새 알림이 없어요</div>
+            <div className={styles.esSub}>
               미션이 시작되거나 결과가 나오면<br />여기로 가장 먼저 알려드릴게요.
-            </p>
-            <button className={styles.emptyBtn} onClick={() => navigate(ROUTES.ROOMS)}>
-              <span className={styles.emptyBtnBolt}>⚡</span> 내 방으로 가기
+            </div>
+            <button className={styles.esCta} onClick={() => navigate(ROUTES.ROOMS)}>
+              <svg viewBox="0 0 24 24" fill="none"><path d="M13 3L5 13h5l-1 8 8-11h-5l1-7z" fill="currentColor" /></svg>
+              내 방으로 가기
             </button>
           </div>
         ) : (
