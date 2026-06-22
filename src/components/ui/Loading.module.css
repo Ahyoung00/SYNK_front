@@ -1,25 +1,116 @@
 .wrap {
+  /* 다크(기본) */
+  --ld-cyan: #46D7FF;
+  --ld-violet: #9B6BFF;
+  --ld-mid: #6E8BFF;
+  --ld-muted: #9AA0BD;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: var(--sp-3);
+  gap: 20px;
   padding: var(--sp-10) var(--sp-6);
 }
 
-.icon {
-  width: 56px;
-  height: 56px;
-  border-radius: var(--radius-lg);
-  animation: pulse 1.2s ease-in-out infinite;
+:global(:root:not([data-theme="dark"])) .wrap {
+  --ld-cyan: #6FD05A;
+  --ld-violet: #3DA838;
+  --ld-mid: #54BF45;
+  --ld-muted: #7E867A;
 }
 
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50%      { transform: scale(0.88); opacity: 0.55; }
+/* ── 번개 + 회전하는 점 ───────────────────────────────────────────────────── */
+.ldB {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
 }
 
+.glyph svg {
+  filter: drop-shadow(0 0 14px rgba(110, 139, 255, 0.55));
+  animation: ldB-flick 1.6s ease-in-out infinite;
+}
+
+:global(:root:not([data-theme="dark"])) .glyph svg {
+  filter: drop-shadow(0 0 14px rgba(84, 191, 69, 0.5));
+}
+
+.orb {
+  position: absolute;
+  inset: 0;
+  animation: ldB-spin 1.4s linear infinite;
+}
+
+.orb::before,
+.orb::after {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  left: 50%;
+  margin-left: -4.5px;
+}
+
+.orb::before {
+  top: -1px;
+  background: var(--ld-cyan);
+  box-shadow: 0 0 10px var(--ld-cyan);
+}
+
+.orb::after {
+  bottom: -1px;
+  background: var(--ld-violet);
+  box-shadow: 0 0 10px var(--ld-violet);
+}
+
+@keyframes ldB-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes ldB-flick {
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1; }
+}
+
+/* ── 라벨 + 통통 튀는 점 ──────────────────────────────────────────────────── */
 .label {
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ld-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dots {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.dots i {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ld-muted);
+  display: block;
+  animation: ld-bounce 1s ease-in-out infinite;
+}
+
+.dots i:nth-child(2) { animation-delay: 0.15s; }
+.dots i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes ld-bounce {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50%      { opacity: 1;   transform: translateY(-4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .orb,
+  .glyph svg,
+  .dots i { animation: none; }
 }
