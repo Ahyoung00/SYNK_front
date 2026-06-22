@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ROUTES } from '@/constants'
-import { roomApi, albumApi } from '@/services/api/endpoints'
+import { roomApi, albumApi, chatApi } from '@/services/api/endpoints'
 import type { RoomDetail, AlbumItem } from '@/types'
 import { useAuthStore } from '@/store/authStore'
+import { hasUnread } from '@/utils/chatRead'
 import NavHeader from '@/components/layout/NavHeader'
 import Loading from '@/components/ui/Loading'
 import styles from './RoomPage.module.css'
@@ -23,6 +24,7 @@ export default function RoomPage() {
 
   const [notMember, setNotMember]     = useState(false)
   const [joining, setJoining]         = useState(false)
+  const [hasNewChat, setHasNewChat]   = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -41,6 +43,14 @@ export default function RoomPage() {
         setNotMember(true)
       })
       .finally(() => setIsLoading(false))
+
+    // 새 채팅 여부: 최신 messageId가 마지막으로 읽은 id보다 크면 도트 표시
+    chatApi.getMessages(id)
+      .then((res) => {
+        const latestId = res.data.messages.reduce((max, m) => (m.messageId > max ? m.messageId : max), 0)
+        setHasNewChat(hasUnread(id, latestId))
+      })
+      .catch(() => setHasNewChat(false))
   }, [id])
 
   async function handleJoin() {
@@ -149,7 +159,7 @@ export default function RoomPage() {
           >
             <ChatIcon />
             <span>채팅</span>
-            <span className={styles.chatDot} />
+            {hasNewChat && <span className={styles.chatDot} />}
           </button>
         }
       />
