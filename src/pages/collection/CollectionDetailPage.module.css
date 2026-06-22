@@ -147,13 +147,72 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  position: relative;
+  text-align: left;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s ease;
 }
+
+.photoCell:active { opacity: 0.8; }
+.photoCell:disabled { cursor: default; }
 
 .photo {
   width: 100%;
   aspect-ratio: 1;
   border-radius: 14px;
   object-fit: cover;
+}
+
+/* 재생 배지 */
+.playBadge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  padding-left: 2px;
+}
+
+/* ── 영상 재생 오버레이 ───────────────────────────────────────────────────── */
+.videoOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.videoPlayer {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  border-radius: 14px;
+  background: #000;
+}
+
+.videoClose {
+  position: absolute;
+  top: max(16px, env(safe-area-inset-top));
+  right: 18px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .photoPlaceholder {

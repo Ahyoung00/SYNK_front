@@ -5,10 +5,16 @@ import type { CollectionDetailResponse, CollectionRecordItem } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './CollectionDetailPage.module.css'
 
+function toHttps(url: string | null | undefined): string | null {
+  if (!url) return null
+  return url.replace(/^http:\/\//, 'https://')
+}
+
 export default function CollectionDetailPage() {
   const { missionId }             = useParams<{ missionId: string }>()
   const [detail, setDetail]       = useState<CollectionDetailResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [playingUrl, setPlayingUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (!missionId) return
@@ -67,16 +73,31 @@ export default function CollectionDetailPage() {
                 <p className={styles.emptyRecords}>기록이 없어요</p>
               ) : (
                 <div className={styles.photoGrid}>
-                  {detail.records.map((r: CollectionRecordItem) => (
-                    <div key={r.recordId} className={styles.photoCell}>
-                      {r.thumbnail ? (
-                        <img src={r.thumbnail} alt={r.date} className={styles.photo} />
-                      ) : (
-                        <div className={styles.photoPlaceholder} />
-                      )}
-                      <span className={styles.photoLabel}>{r.roomName} · {r.date.slice(5)}</span>
-                    </div>
-                  ))}
+                  {detail.records.map((r: CollectionRecordItem) => {
+                    const video = toHttps(r.videoUrl)
+                    return (
+                      <button
+                        key={r.recordId}
+                        className={styles.photoCell}
+                        onClick={() => video && setPlayingUrl(video)}
+                        disabled={!video}
+                      >
+                        {r.thumbnail ? (
+                          <img src={r.thumbnail} alt={r.date} className={styles.photo} />
+                        ) : (
+                          <div className={styles.photoPlaceholder} />
+                        )}
+                        {video && (
+                          <span className={styles.playBadge}>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                              <path d="M8 5v14l11-7z" />
+                            </svg>
+                          </span>
+                        )}
+                        <span className={styles.photoLabel}>{r.roomName} · {r.date.slice(5)}</span>
+                      </button>
+                    )
+                  })}
                 </div>
               )}
             </div>
@@ -87,6 +108,20 @@ export default function CollectionDetailPage() {
           <p className={styles.empty}>미션 정보를 찾을 수 없어요</p>
         )}
       </div>
+
+      {playingUrl && (
+        <div className={styles.videoOverlay} onClick={() => setPlayingUrl(null)}>
+          <button className={styles.videoClose} onClick={() => setPlayingUrl(null)} aria-label="닫기">✕</button>
+          <video
+            src={playingUrl}
+            className={styles.videoPlayer}
+            controls
+            autoPlay
+            playsInline
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   )
 }
