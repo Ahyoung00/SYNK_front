@@ -32,10 +32,8 @@ export default function RoomAlbumPage() {
       .finally(() => setIsLoading(false))
   }, [numRoomId])
 
-  const now        = new Date()
-  const todayDot   = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`
-  const todayEntry = albums.find((a) => a.date === todayDot) ?? null
-  const past       = albums.filter((a) => a.date !== todayDot)
+  const latest = albums[0] ?? null
+  const past   = albums.slice(1)
 
   return (
     <div className={styles.page}>
@@ -50,6 +48,8 @@ export default function RoomAlbumPage() {
 
       {isLoading ? (
         <Loading />
+      ) : albums.length === 0 ? (
+        <div className={styles.empty}>아직 앨범이 없어요 🌱</div>
       ) : (
         <div className={styles.scroll}>
           {/* ── 서브타이틀 행 ─────────────────────────────────────────────── */}
@@ -58,21 +58,21 @@ export default function RoomAlbumPage() {
             <span className={styles.countChip}>{albums.length}일</span>
           </div>
 
-          {/* ── 오늘 ──────────────────────────────────────────────────────── */}
-          <p className={styles.sectionLabel}>오늘 · {todayDot.replace(/\./g, '-')}</p>
-          {todayEntry ? (
+          {/* ── 히어로: 최신 앨범 ─────────────────────────────────────────── */}
+          {latest && (
             <button
               className={styles.hero}
-              onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, toUrlDate(todayEntry.date)))}
+              onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, toUrlDate(latest.date)))}
             >
+              {/* 사진 그리드 영역 */}
               <div className={styles.heroGrid}>
                 <div className={[styles.heroCell, styles.heroCellMain].join(' ')}>
-                  {todayEntry.thumbnail
-                    ? <img src={todayEntry.thumbnail} alt={todayEntry.date} className={styles.heroCellImg} />
+                  {latest.thumbnail
+                    ? <img src={latest.thumbnail} alt={latest.date} className={styles.heroCellImg} />
                     : null
                   }
                   <div className={styles.heroCellScrim}>
-                    <span className={styles.heroDate}>{todayEntry.date}</span>
+                    <span className={styles.heroDate}>{latest.date}</span>
                     <span className={styles.synklogBadge}>SYNKLOG</span>
                   </div>
                 </div>
@@ -84,20 +84,6 @@ export default function RoomAlbumPage() {
                 </div>
               </div>
             </button>
-          ) : (
-            <div className={styles.todayEmpty}>
-              <div className={styles.todayEmptyIcon}>
-                <CameraIcon />
-              </div>
-              <p className={styles.todayEmptyTitle}>아직 담은 순간이 없어요</p>
-              <p className={styles.todayEmptyDesc}>
-                오늘 미션이 도착하면<br />여기에 콜라주가 모여요.
-              </p>
-              <span className={styles.todayEmptyBadge}>
-                <span className={styles.todayEmptyDot} />
-                미션 대기 중
-              </span>
-            </div>
           )}
 
           {/* ── 지난 날들 ─────────────────────────────────────────────────── */}
@@ -153,16 +139,6 @@ function BackIcon() {
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M19 12H5M12 5l-7 7 7 7" />
-    </svg>
-  )
-}
-
-function CameraIcon() {
-  return (
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 7h3l2-2h8l2 2h3v12H3z" />
-      <circle cx="12" cy="13" r="3.5" />
     </svg>
   )
 }
