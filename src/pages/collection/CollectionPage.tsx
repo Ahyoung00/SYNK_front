@@ -43,7 +43,7 @@ function RingChart({ rate }: { rate: number }) {
           strokeDashoffset={offset}
           transform="rotate(-90 46 46)"
         />
-        <image href="/bolt.png" x="20" y="20" width="52" height="52" />
+        <image href="/synk-bolt.png" x="20" y="20" width="52" height="52" />
       </svg>
   )
 }
