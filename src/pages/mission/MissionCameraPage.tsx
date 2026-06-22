@@ -21,10 +21,18 @@ export default function MissionCameraPage() {
   // 녹화된 영상 미리보기용 별도 video ref
   const reviewRef = useRef<HTMLVideoElement | null>(null)
   const [facing, setFacing] = useState<CameraFacing>('front')
+  const [hasMultiCam, setHasMultiCam] = useState(false)
 
   // 페이지 진입 시 카메라 켜기
   useEffect(() => {
     camera.startPreview('front')
+    // 카메라가 2개 이상일 때만 전환 버튼 노출 (권한 부여 후 라벨/개수 정확)
+    navigator.mediaDevices?.enumerateDevices?.()
+      .then((devices) => {
+        const cams = devices.filter((d) => d.kind === 'videoinput')
+        setHasMultiCam(cams.length > 1)
+      })
+      .catch(() => setHasMultiCam(false))
     return () => {
       camera.stopPreview()
     }
@@ -139,7 +147,7 @@ export default function MissionCameraPage() {
               <path d="M19 12H5M12 5l-7 7 7 7" />
             </svg>
           </button>
-          {(camera.state === 'previewing' || camera.state === 'idle') && (
+          {hasMultiCam && (camera.state === 'previewing' || camera.state === 'idle') && (
             <button className={styles.iconBtn} onClick={handleFlipCamera} aria-label="카메라 전환">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M2 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" />
