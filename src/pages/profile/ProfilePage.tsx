@@ -24,11 +24,16 @@ export default function ProfilePage() {
 
   const [completionRate, setCompletionRate] = useState<number | null>(null)
   const [completedCount, setCompletedCount] = useState<number | null>(null)
+  const [joinDays, setJoinDays] = useState<number | null>(null)
 
   useEffect(() => {
     collectionApi.getMyCollection().then((res) => {
       setCompletionRate(res.data.completionRate)
       setCompletedCount(res.data.completedCount)
+    }).catch(() => {})
+
+    userApi.getMe().then((res) => {
+      setJoinDays(daysSinceJoin(res.data.createdAt))
     }).catch(() => {})
   }, [])
 
@@ -59,7 +64,9 @@ export default function ProfilePage() {
           </div>
           <div className={styles.profileInfo}>
             <span className={styles.profileName}>{user?.name ?? '내 프로필'}</span>
-            <span className={styles.profileMeta}>SYNK</span>
+            <span className={styles.profileMeta}>
+              {joinDays != null ? `SYNK ${joinDays}일째` : 'SYNK'}
+            </span>
           </div>
           <button className={styles.editBtn} onClick={() => navigate(ROUTES.PROFILE_EDIT)}>
             수정
@@ -134,6 +141,18 @@ export default function ProfilePage() {
       </div>
     </div>
   )
+}
+
+/** 가입일로부터 며칠째인지 (가입 당일 = 1일째) */
+function daysSinceJoin(createdAt?: string | null): number | null {
+  if (!createdAt) return null
+  const start = new Date(createdAt)
+  if (isNaN(start.getTime())) return null
+  const startDay = new Date(start.getFullYear(), start.getMonth(), start.getDate())
+  const now = new Date()
+  const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const diff = Math.floor((nowDay.getTime() - startDay.getTime()) / 86400000)
+  return diff >= 0 ? diff + 1 : null
 }
 
 /* ── 서브 컴포넌트 ──────────────────────────────────────────────────────────── */
