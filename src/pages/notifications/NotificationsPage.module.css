@@ -129,3 +129,115 @@
 .scroll > * {
   flex-shrink: 0;
 }
+
+/* ── 빈 상태 ──────────────────────────────────────────────────────────────── */
+.empty {
+  /* 다크(기본) */
+  --nb-accent: #9B7BFF;
+  --nb-dot1: #4F8BFF;
+  --nb-dot2: #7C6FF0;
+  --nb-tile: #1d2752;
+  --nb-ring: rgba(124, 111, 240, 0.18);
+
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  text-align: center;
+  padding: 40px 24px;
+}
+
+:global(:root:not([data-theme="dark"])) .empty {
+  --nb-accent: #3DA838;
+  --nb-dot1: #4ADE80;
+  --nb-dot2: #6FD05A;
+  --nb-tile: #FFFFFF;
+  --nb-ring: rgba(74, 222, 128, 0.22);
+}
+
+.emptyScene {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.emptyRing {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 1px solid var(--nb-ring);
+  box-shadow: 0 0 0 18px color-mix(in srgb, var(--nb-ring) 45%, transparent);
+}
+
+.emptyTile {
+  width: 92px;
+  height: 92px;
+  border-radius: 26px;
+  background: var(--nb-tile);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--nb-accent);
+  position: relative;
+  z-index: 1;
+}
+
+.emptyDot {
+  position: absolute;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  z-index: 2;
+}
+
+.emptyDotTR {
+  top: 44px;
+  right: 50px;
+  background: var(--nb-dot1);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--nb-dot1) 70%, transparent);
+}
+
+.emptyDotBL {
+  bottom: 48px;
+  left: 52px;
+  background: var(--nb-dot2);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--nb-dot2) 70%, transparent);
+}
+
+.emptyTitle {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--color-text);
+}
+
+.emptyDesc {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+}
+
+.emptyBtn {
+  margin-top: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 22px;
+  border-radius: 999px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text);
+  transition: opacity 0.12s ease;
+}
+
+.emptyBtn:active { opacity: 0.7; }
+
+.emptyBtnBolt { color: var(--nb-accent); }

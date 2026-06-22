@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useNotificationStore } from '@/store/notificationStore'
 import { notificationApi } from '@/services/api/endpoints'
+import { ROUTES } from '@/constants'
 import type { AppNotification, NotificationsResponse } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './NotificationsPage.module.css'
@@ -54,6 +56,7 @@ function NotifGroup({
 }
 
 export default function NotificationsPage() {
+  const navigate = useNavigate()
   const { setNotifications, markAllRead: storeMarkAllRead } = useNotificationStore()
   const [data, setData] = useState<NotificationsResponse | null>(null)
 
@@ -110,11 +113,26 @@ export default function NotificationsPage() {
       {/* ── 알림 목록 ─────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
         {isEmpty ? (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12, padding: '60px 20px' }}>
-            <img src="/icon-notifications-off.svg" alt="" style={{ width: 48, height: 48 }} />
-            <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: 'var(--text-sm)' }}>
-              알림이 없어요
+          <div className={styles.empty}>
+            <div className={styles.emptyScene}>
+              <span className={styles.emptyRing} />
+              <div className={styles.emptyTile}>
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+                  <path d="M13.7 21a2 2 0 0 1-3.4 0" />
+                </svg>
+              </div>
+              <span className={[styles.emptyDot, styles.emptyDotTR].join(' ')} />
+              <span className={[styles.emptyDot, styles.emptyDotBL].join(' ')} />
+            </div>
+            <p className={styles.emptyTitle}>아직 새 알림이 없어요</p>
+            <p className={styles.emptyDesc}>
+              미션이 시작되거나 결과가 나오면<br />여기로 가장 먼저 알려드릴게요.
             </p>
+            <button className={styles.emptyBtn} onClick={() => navigate(ROUTES.ROOMS)}>
+              <span className={styles.emptyBtnBolt}>⚡</span> 내 방으로 가기
+            </button>
           </div>
         ) : (
           <>
