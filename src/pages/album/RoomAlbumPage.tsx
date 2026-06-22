@@ -25,7 +25,8 @@ export default function RoomAlbumPage() {
       roomApi.getRoom(numRoomId),
     ])
       .then(([albumRes, roomRes]) => {
-        setAlbums(albumRes.data)
+        // 제출(참여)이 0인 날은 실제 콘텐츠가 없으므로 제외
+        setAlbums(albumRes.data.filter((a) => (a.memberProfiles?.length ?? 0) > 0))
         setRoom(roomRes.data)
       })
       .catch(console.error)

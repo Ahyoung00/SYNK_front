@@ -32,7 +32,8 @@ export default function RoomPage() {
     ])
       .then(([roomRes, albumsRes]) => {
         setRoom(roomRes.data)
-        setAlbums(albumsRes.data)
+        // 제출(참여)이 0인 날은 실제 콘텐츠가 없으므로 제외
+        setAlbums(albumsRes.data.filter((a) => (a.memberProfiles?.length ?? 0) > 0))
       })
       .catch(() => {
         setNotMember(true)
