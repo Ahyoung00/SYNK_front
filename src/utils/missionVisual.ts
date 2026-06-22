@@ -16,11 +16,11 @@ const RULES: ReadonlyArray<readonly [RegExp, string]> = [
   [/마시|마실|커피|음료|물/, '☕'],
 ]
 
-/** 미션 제목에 맞는 대표 이모지. 매칭 없으면 기본 📷 */
+/** 미션 제목에 맞는 대표 이모지. 등록되지 않은(매칭 없는) 미션은 기본 ⚡ */
 export function missionEmoji(title: string | null | undefined): string {
   const t = title ?? ''
   for (const [re, emoji] of RULES) {
     if (re.test(t)) return emoji
   }
-  return '📷'
+  return '⚡'
 }
