@@ -103,13 +103,9 @@ export default function CollectionPage() {
                     className={styles.missionCard}
                     onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
                   >
-                    {mission.thumbnail ? (
-                      <img src={mission.thumbnail} alt={mission.title} className={styles.thumbnail} />
-                    ) : (
-                      <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }}>
-                        <span className={styles.thumbnailEmoji}>{missionEmoji(mission.title)}</span>
-                      </div>
-                    )}
+                    <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }}>
+                      <span className={styles.thumbnailEmoji}>{missionEmoji(mission.title)}</span>
+                    </div>
                     <div className={styles.missionInfo}>
                       <span className={styles.missionTitle}>{mission.title}</span>
                       <span className={styles.missionMeta}>최근 {mission.lastCompletedDate}</span>
