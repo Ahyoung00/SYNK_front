@@ -2,12 +2,17 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { albumApi, roomApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
-import type { AlbumItem, RoomDetail } from '@/types'
+import type { AlbumItem, RoomDetail, CollageItem } from '@/types'
 import Loading from '@/components/ui/Loading'
 import styles from './RoomAlbumPage.module.css'
 
 function toUrlDate(dotDate: string): string {
   return dotDate.replace(/\./g, '-')
+}
+
+function toHttps(url: string | null | undefined): string | null {
+  if (!url) return null
+  return url.replace(/^http:\/\//, 'https://')
 }
 
 export default function RoomAlbumPage() {
@@ -21,7 +26,7 @@ export default function RoomAlbumPage() {
 
   const [albums, setAlbums]               = useState<AlbumItem[]>([])
   const [room, setRoom]                   = useState<RoomDetail | null>(null)
-  const [todayHasContent, setTodayContent] = useState(false)
+  const [todayCollages, setTodayCollages] = useState<CollageItem[]>([])
   const [isLoading, setIsLoading]         = useState(true)
 
   useEffect(() => {
@@ -36,13 +41,13 @@ export default function RoomAlbumPage() {
       .catch(console.error)
       .finally(() => setIsLoading(false))
 
-    // 오늘 SYNKLOG 존재 여부로 오늘 콘텐츠 판단 (없으면 data null / 404)
-    albumApi.getSynklog(numRoomId, todayDash)
-      .then((res) => setTodayContent(res.data != null))
-      .catch(() => setTodayContent(false))
+    // 오늘의 콜라주 목록으로 오늘 콘텐츠 판단 + 미션별 칸 구성 (미션 없으면 404)
+    albumApi.getCollages(numRoomId, todayDash)
+      .then((res) => setTodayCollages(res.data ?? []))
+      .catch(() => setTodayCollages([]))
   }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const todayEntry = albums.find((a) => a.date === todayDot) ?? null
+  const todayHasContent = todayCollages.length > 0
   const past       = albums.filter((a) => a.date !== todayDot)
   const dayCount   = past.length + (todayHasContent ? 1 : 0)
 
@@ -74,23 +79,31 @@ export default function RoomAlbumPage() {
               className={styles.hero}
               onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, todayDash))}
             >
-              <div className={styles.heroGrid}>
-                <div className={[styles.heroCell, styles.heroCellMain].join(' ')}>
-                  {todayEntry?.thumbnail
-                    ? <img src={todayEntry.thumbnail} alt={todayDot} className={styles.heroCellImg} />
-                    : null
-                  }
-                  <div className={styles.heroCellScrim}>
-                    <span className={styles.heroDate}>{todayDot}</span>
-                    <span className={styles.synklogBadge}>SYNKLOG</span>
-                  </div>
-                </div>
-                <div className={styles.heroCellSide}>
-                  <div className={[styles.heroCell, styles.heroCellSm].join(' ')} />
-                  <div className={[styles.heroCell, styles.heroCellSm, styles.heroCellDark].join(' ')}>
-                    <div className={styles.playBtn}>▶</div>
-                  </div>
-                </div>
+              <div className={styles.todayGrid}>
+                {todayCollages.map((c, i) => {
+                  const video = toHttps(c.collageVideoUrl)
+                  return (
+                    <div key={c.missionId} className={styles.todayCell}>
+                      {video ? (
+                        <video
+                          src={`${video}#t=0.1`}
+                          className={styles.heroCellImg}
+                          muted
+                          playsInline
+                          preload="metadata"
+                        />
+                      ) : (
+                        <div className={styles.todayCellPending}>처리 중</div>
+                      )}
+                      {i === 0 && (
+                        <div className={styles.heroCellScrim}>
+                          <span className={styles.heroDate}>{todayDot}</span>
+                          <span className={styles.synklogBadge}>SYNKLOG</span>
+                        </div>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </button>
           ) : (
