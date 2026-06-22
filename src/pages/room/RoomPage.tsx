@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore'
 import { hasUnread } from '@/utils/chatRead'
 import NavHeader from '@/components/layout/NavHeader'
 import Loading from '@/components/ui/Loading'
+import InviteSheet from '@/components/room/InviteSheet'
 import styles from './RoomPage.module.css'
 
 export default function RoomPage() {
@@ -25,6 +26,7 @@ export default function RoomPage() {
   const [notMember, setNotMember]     = useState(false)
   const [joining, setJoining]         = useState(false)
   const [hasNewChat, setHasNewChat]   = useState(false)
+  const [inviteOpen, setInviteOpen]   = useState(false)
 
   useEffect(() => {
     if (!id) return
@@ -199,7 +201,7 @@ export default function RoomPage() {
             {room.currentMembers < room.maxMembers && (
               <button
                 className={styles.inviteBtn}
-                onClick={() => navigate(ROUTES.ROOM_SETTINGS(id))}
+                onClick={() => setInviteOpen(true)}
               >
                 <div className={styles.inviteBtnIcon}>＋</div>
                 <span className={styles.inviteBtnLabel}>초대</span>
@@ -282,6 +284,13 @@ export default function RoomPage() {
         </div>
 
       </div>
+
+      <InviteSheet
+        roomId={id}
+        roomCode={room.code}
+        open={inviteOpen}
+        onClose={() => setInviteOpen(false)}
+      />
     </div>
   )
 }
