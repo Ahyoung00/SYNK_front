@@ -157,3 +157,8 @@
   font-weight: 600;
   color: #EF4444;
 }
+
+/* flex 컬럼 스크롤에서 자식 카드가 압착·잘리지 않도록 고정 */
+.scroll > * {
+  flex-shrink: 0;
+}

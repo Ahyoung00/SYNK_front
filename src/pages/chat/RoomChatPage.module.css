@@ -445,3 +445,8 @@
   transform: scale(0.82);
   background: var(--color-surface-2);
 }
+
+/* flex 컬럼 스크롤에서 메시지가 압착되지 않도록 고정 */
+.msgList > * {
+  flex-shrink: 0;
+}
