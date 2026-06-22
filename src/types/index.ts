@@ -19,7 +19,7 @@ export interface User {
   resultNotification: boolean
   highlightNotification: boolean
   /** 가입일 (ISO) — "SYNK N일째" 계산용. 백엔드 /users/me 응답 기준 */
-  createdAt?: string | null
+  created_at?: string | null
 }
 
 // ── Room ──────────────────────────────────────────────────────────────────────
