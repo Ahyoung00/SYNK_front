@@ -1,5 +1,6 @@
 import { API_BASE_URL, STORAGE_KEYS } from '@/constants'
 import type { ApiResponse } from '@/types'
+import { setOnlineStatus } from '@/services/networkStatus'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Lightweight fetch wrapper
@@ -114,7 +115,16 @@ async function request<T>(
     ...(options.headers ?? {}),
   }
 
-  const res = await fetch(`${API_BASE_URL}${path}`, { ...options, headers })
+  let res: Response
+  try {
+    res = await fetch(`${API_BASE_URL}${path}`, { ...options, headers })
+  } catch (e) {
+    // fetch 자체가 실패 = 네트워크 도달 불가 → 오프라인
+    setOnlineStatus(false)
+    throw e
+  }
+  // 서버가 응답함(에러 응답 포함) → 온라인
+  setOnlineStatus(true)
 
   // HTTP 401: Refresh Token으로 재발급 후 한 번만 재시도
   if (res.status === 401) {
