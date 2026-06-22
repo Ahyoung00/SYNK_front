@@ -1436,6 +1436,86 @@
       "time_slot_id": 18,
       "date": "2026-06-22",
       "status": "PENDING"
+    },
+    {
+      "id": 165,
+      "room_id": 1,
+      "mission_template_id": 5,
+      "time_slot_id": 18,
+      "date": "2026-06-23",
+      "status": "PENDING"
+    },
+    {
+      "id": 166,
+      "room_id": 1,
+      "mission_template_id": 8,
+      "time_slot_id": 22,
+      "date": "2026-06-23",
+      "status": "PENDING"
+    },
+    {
+      "id": 167,
+      "room_id": 2,
+      "mission_template_id": 5,
+      "time_slot_id": 18,
+      "date": "2026-06-23",
+      "status": "PENDING"
+    },
+    {
+      "id": 168,
+      "room_id": 1,
+      "mission_template_id": 4,
+      "time_slot_id": 23,
+      "date": "2026-06-23",
+      "status": "PENDING"
+    },
+    {
+      "id": 169,
+      "room_id": 1,
+      "mission_template_id": 10,
+      "time_slot_id": 16,
+      "date": "2026-06-23",
+      "status": "PENDING"
+    },
+    {
+      "id": 170,
+      "room_id": 2,
+      "mission_template_id": 5,
+      "time_slot_id": 21,
+      "date": "2026-06-23",
+      "status": "PENDING"
+    },
+    {
+      "id": 171,
+      "room_id": 2,
+      "mission_template_id": 8,
+      "time_slot_id": 16,
+      "date": "2026-06-23",
+      "status": "PENDING"
+    },
+    {
+      "id": 172,
+      "room_id": 1,
+      "mission_template_id": 2,
+      "time_slot_id": 20,
+      "date": "2026-06-23",
+      "status": "PENDING"
+    },
+    {
+      "id": 173,
+      "room_id": 2,
+      "mission_template_id": 3,
+      "time_slot_id": 15,
+      "date": "2026-06-23",
+      "status": "PENDING"
+    },
+    {
+      "id": 174,
+      "room_id": 2,
+      "mission_template_id": 9,
+      "time_slot_id": 20,
+      "date": "2026-06-23",
+      "status": "PENDING"
     }
   ],
   "submissions": [
