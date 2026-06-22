@@ -81,7 +81,9 @@ export default function RoomAlbumPage() {
             >
               <div className={styles.todayGrid}>
                 {todayCollages.map((c, i) => {
-                  const video = toHttps(c.collageVideoUrl)
+                  // 합성 콜라주 영상이 아직 없으면 참여자 제출 영상 첫 프레임으로 폴백
+                  const firstParticipantVid = c.participants.find((p) => p.videoUrl)?.videoUrl
+                  const video = toHttps(c.collageVideoUrl) ?? toHttps(firstParticipantVid)
                   return (
                     <div key={c.missionId} className={styles.todayCell}>
                       {video ? (
