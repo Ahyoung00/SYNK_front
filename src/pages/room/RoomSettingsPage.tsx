@@ -8,17 +8,20 @@ import DualRangeSlider from '@/components/ui/DualRangeSlider'
 import styles from './RoomSettingsPage.module.css'
 
 const MISSION_OPTIONS = [1, 2, 3, 4, 5]
-const HOUR_MIN = 0
-const HOUR_MAX = 24
+const TIME_MIN = 0          // 00:00
+const TIME_MAX = 1440       // 24:00
+const TIME_STEP = 5         // 5분 단위
 
-function toHourNum(time: string) {
+function toMinutes(time: string) {
   const [h, m] = time.split(':').map(Number)
-  return h + m / 60
+  return h * 60 + m
 }
 
-function toTimeStr(hour: number) {
-  const h = Math.floor(hour)
-  return `${String(h).padStart(2, '0')}:00`
+function toTimeStr(min: number) {
+  const c = Math.round(min / TIME_STEP) * TIME_STEP
+  const h = Math.floor(c / 60)
+  const m = c % 60
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
 }
 
 export default function RoomSettingsPage() {
@@ -29,8 +32,8 @@ export default function RoomSettingsPage() {
 
   const [roomName, setRoomName]                   = useState('')
   const [missionCount, setMissionCount]           = useState(3)
-  const [startHour, setStartHour]                 = useState(10)
-  const [endHour, setEndHour]                     = useState(22)
+  const [startMin, setStartMin]                   = useState(600)  // 10:00
+  const [endMin, setEndMin]                       = useState(1320) // 22:00
   const [memberCount, setMemberCount]             = useState(0)
   const [roomCode, setRoomCode]                   = useState('')
   const [isOwner, setIsOwner]                     = useState(false)
@@ -50,8 +53,8 @@ export default function RoomSettingsPage() {
         const room = res.data
         setRoomName(room.name)
         setMissionCount(room.dailyMissionCount)
-        setStartHour(toHourNum(room.missionStartTime?.slice(0, 5) ?? '10:00'))
-        setEndHour(toHourNum(room.missionEndTime?.slice(0, 5) ?? '22:00'))
+        setStartMin(toMinutes(room.missionStartTime?.slice(0, 5) ?? '10:00'))
+        setEndMin(toMinutes(room.missionEndTime?.slice(0, 5) ?? '22:00'))
         setMemberCount(room.currentMembers)
         setRoomCode(room.code)
         setIsOwner(room.ownerId === myUser?.userId)
@@ -77,8 +80,8 @@ export default function RoomSettingsPage() {
       await roomApi.updateRoom(id, {
         name: roomName,
         dailyMissionCount: missionCount,
-        missionStartTime: toTimeStr(startHour),
-        missionEndTime:   toTimeStr(endHour),
+        missionStartTime: toTimeStr(startMin),
+        missionEndTime:   toTimeStr(endMin),
         ...(thumbnailUrl ? { thumbnail: thumbnailUrl } : {}),
       })
       setDirty(false)
@@ -214,18 +217,18 @@ export default function RoomSettingsPage() {
             <div className={styles.timeRowTop}>
               <span className={styles.timeLabel}>미션 알림 시간대</span>
               <span className={styles.timeValue}>
-                {toTimeStr(startHour)} – {toTimeStr(endHour)}
+                {toTimeStr(startMin)} – {toTimeStr(endMin)}
               </span>
             </div>
             <DualRangeSlider
-              min={HOUR_MIN}
-              max={HOUR_MAX}
-              step={1}
-              start={startHour}
-              end={endHour}
+              min={TIME_MIN}
+              max={TIME_MAX}
+              step={TIME_STEP}
+              start={startMin}
+              end={endMin}
               disabled={!isOwner}
-              onStartChange={(v) => { setStartHour(v); setDirty(true) }}
-              onEndChange={(v)   => { setEndHour(v);   setDirty(true) }}
+              onStartChange={(v) => { setStartMin(v); setDirty(true) }}
+              onEndChange={(v)   => { setEndMin(v);   setDirty(true) }}
             />
           </div>
         </div>
