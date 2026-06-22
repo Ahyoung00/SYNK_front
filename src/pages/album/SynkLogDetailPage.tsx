@@ -42,6 +42,25 @@ export default function SynkLogDetailPage() {
       .catch(() => setSynklogMissing(true))
   }, [numRoomId, date]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // SYNKLOG가 생성 중이면 완료될 때까지 폴링 (완료/최대시간 도달 시 중지)
+  useEffect(() => {
+    if (synklog?.status !== 'PROCESSING' || !date) return
+    const startedAt = Date.now()
+    const MAX_POLL_MS = 120_000
+    const id = window.setInterval(async () => {
+      try {
+        const res = await albumApi.getSynklog(numRoomId, date)
+        setSynklog(res.data)
+        if (res.data?.status === 'COMPLETED' || Date.now() - startedAt > MAX_POLL_MS) {
+          window.clearInterval(id)
+        }
+      } catch {
+        // 일시적 오류는 무시하고 다음 주기에 재시도
+      }
+    }, 5000)
+    return () => window.clearInterval(id)
+  }, [synklog?.status, numRoomId, date])
+
   async function handleCreateSynklog() {
     if (creatingLog) return
     setCreatingLog(true)
