@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import { useNotificationStore } from '@/store/notificationStore'
 import { notificationApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
@@ -7,49 +7,136 @@ import type { AppNotification, NotificationsResponse } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './NotificationsPage.module.css'
 
-// 알림 타입별 아이콘 및 색상
-const TYPE_META: Record<string, { icon: string; bg: string }> = {
-  MISSION_START:    { icon: '⚡', bg: 'rgba(250, 204, 21, 0.15)'  },
-  MISSION_COMPLETE: { icon: '✅', bg: 'rgba(74, 222, 128, 0.15)'  },
-  SYNKLOG_CREATED:  { icon: '🎬', bg: 'rgba(168, 85, 247, 0.15)'  },
-  MEMBER_JOIN:      { icon: '👤', bg: 'var(--color-surface-2)'     },
-  ACHIEVEMENT:      { icon: '🔥', bg: 'rgba(249, 115, 22, 0.15)'  },
+type Tone = 'mission' | 'result' | 'member' | 'system'
+
+const TONE_CLASS: Record<Tone, string> = {
+  mission: styles.toneMission,
+  result:  styles.toneResult,
+  member:  styles.toneMember,
+  system:  styles.toneSystem,
+}
+
+function toneFor(type: string): Tone {
+  switch (type) {
+    case 'MISSION_START':    return 'mission'
+    case 'MISSION_COMPLETE':
+    case 'SYNKLOG_CREATED':  return 'result'
+    case 'MEMBER_JOIN':      return 'member'
+    default:                 return 'system'
+  }
+}
+
+function ToneIcon({ tone }: { tone: Tone }) {
+  if (tone === 'mission') return (
+    <svg viewBox="0 0 24 24"><path d="M13 3L5 13h5l-1 8 8-11h-5l1-7z" fill="currentColor" /></svg>
+  )
+  if (tone === 'result') return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M8 21h8M12 17v4" /><path d="M7 4h10v4a5 5 0 0 1-10 0V4z" />
+      <path d="M7 6H4v1a3 3 0 0 0 3 3" /><path d="M17 6h3v1a3 3 0 0 1-3 3" />
+    </svg>
+  )
+  if (tone === 'member') return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v2" /><circle cx="9.5" cy="8" r="3.5" />
+      <path d="M19 8v6M22 11h-6" />
+    </svg>
+  )
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M10.3 21a2 2 0 0 0 3.4 0" />
+    </svg>
+  )
+}
+
+/** ISO → "방금/N분 전/N시간 전/요일" */
+function relTime(iso: string): string {
+  const t = new Date(iso).getTime()
+  if (isNaN(t)) return ''
+  const m = Math.floor((Date.now() - t) / 60000)
+  if (m < 1) return '방금'
+  if (m < 60) return `${m}분 전`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}시간 전`
+  return new Date(iso).toLocaleDateString('ko-KR', { weekday: 'short' })
+}
+
+function NotifItem({
+  item,
+  onRead,
+  navigate,
+}: {
+  item: AppNotification
+  onRead: (id: number) => void
+  navigate: NavigateFunction
+}) {
+  const tone = toneFor(item.type)
+  const unread = !item.isRead
+
+  function go(e: React.MouseEvent, to?: string) {
+    e.stopPropagation()
+    if (unread) onRead(item.id)
+    if (to) navigate(to)
+  }
+
+  let actions: React.ReactNode = null
+  if (item.type === 'MISSION_START') {
+    actions = (
+      <div className={styles.ntActions}>
+        <button className={[styles.ntBtn, styles.solid].join(' ')} onClick={(e) => go(e, ROUTES.HOME)}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" />
+          </svg>
+          지금 하기
+        </button>
+        <button className={[styles.ntBtn, styles.ghost].join(' ')} onClick={(e) => go(e)}>나중에</button>
+      </div>
+    )
+  } else if (item.type === 'MISSION_COMPLETE' || item.type === 'SYNKLOG_CREATED') {
+    actions = (
+      <div className={styles.ntActions}>
+        <button className={[styles.ntBtn, styles.solid].join(' ')} onClick={(e) => go(e, ROUTES.HOME)}>결과 보기</button>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className={[styles.ntRow, TONE_CLASS[tone], unread ? styles.ntUnread : ''].join(' ')}
+      onClick={() => unread && onRead(item.id)}
+    >
+      <div className={styles.ntIc}><ToneIcon tone={tone} /></div>
+      <div className={styles.ntMain}>
+        <div className={styles.ntHead}>
+          <div className={styles.ttl}>{item.title}</div>
+          <div className={styles.ntTime}>{relTime(item.createdAt)}</div>
+        </div>
+        <div className={styles.bod}>{item.content}</div>
+        {actions}
+      </div>
+    </div>
+  )
 }
 
 function NotifGroup({
   label,
   items,
   onRead,
+  navigate,
 }: {
   label: string
   items: AppNotification[]
   onRead: (id: number) => void
+  navigate: NavigateFunction
 }) {
   if (items.length === 0) return null
   return (
     <div className={styles.group}>
       <p className={styles.groupLabel}>{label}</p>
-      <div className={styles.groupList}>
-        {items.map((item) => {
-          const meta = TYPE_META[item.type] ?? TYPE_META['MEMBER_JOIN']
-          return (
-            <div
-              key={item.id}
-              className={styles.notifRow}
-              onClick={() => !item.isRead && onRead(item.id)}
-              style={{ cursor: item.isRead ? 'default' : 'pointer' }}
-            >
-              <div className={styles.iconWrap} style={{ background: meta.bg }}>
-                <span className={styles.notifIcon}>{meta.icon}</span>
-              </div>
-              <div className={styles.notifText}>
-                <span className={styles.notifTitle}>{item.title}</span>
-                <span className={styles.notifSub}>{item.content}</span>
-              </div>
-              {!item.isRead && <span className={styles.unreadDot} />}
-            </div>
-          )
-        })}
+      <div className={styles.ntCard}>
+        {items.map((item) => (
+          <NotifItem key={item.id} item={item} onRead={onRead} navigate={navigate} />
+        ))}
       </div>
     </div>
   )
@@ -138,8 +225,8 @@ export default function NotificationsPage() {
           </div>
         ) : (
           <>
-            <NotifGroup label="오늘"    items={data?.today    ?? []} onRead={handleRead} />
-            <NotifGroup label="이번 주" items={data?.thisWeek ?? []} onRead={handleRead} />
+            <NotifGroup label="오늘"    items={data?.today    ?? []} onRead={handleRead} navigate={navigate} />
+            <NotifGroup label="이번 주" items={data?.thisWeek ?? []} onRead={handleRead} navigate={navigate} />
           </>
         )}
       </div>

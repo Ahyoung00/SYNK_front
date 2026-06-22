@@ -62,67 +62,153 @@
   padding: 0 var(--sp-1);
 }
 
-.groupList {
-  display: flex;
-  flex-direction: column;
-  background: var(--color-surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--color-border);
+/* ── 알림 카드 (synk-notif-action 디자인) ─────────────────────────────────── */
+.ntCard {
+  /* 다크(기본) */
+  --na-ink: #F3F5FF;
+  --na-muted: #9AA0BD;
+  --na-faint: #5C6488;
+  --na-surface: rgba(122, 162, 255, 0.07);
+  --na-border: rgba(150, 180, 255, 0.13);
+  --nt-mission: #46D7FF;
+  --nt-result: #9B6BFF;
+  --nt-member: #4ADE80;
+  --nt-system: #FFC24B;
+  --na-btn-ink: #07111f;
+
+  background: var(--na-surface);
+  border: 1px solid var(--na-border);
+  border-radius: 18px;
   overflow: hidden;
 }
 
-/* ── 알림 행 ──────────────────────────────────────────────────────────────── */
-.notifRow {
+:global(:root:not([data-theme="dark"])) .ntCard {
+  --na-ink: #1F2A18;
+  --na-muted: #7E867A;
+  --na-faint: #ABB1A6;
+  --na-surface: #FFFFFF;
+  --na-border: rgba(40, 55, 25, 0.10);
+  --nt-mission: #2FA8C8;
+  --nt-result: #7B4FD8;
+  --nt-member: #3FA23A;
+  --nt-system: #D69E28;
+  --na-btn-ink: #FFFFFF;
+}
+
+/* 타입 토큰 매핑 */
+.toneMission { --nt: var(--nt-mission); }
+.toneResult  { --nt: var(--nt-result); }
+.toneMember  { --nt: var(--nt-member); }
+.toneSystem  { --nt: var(--nt-system); }
+
+/* ── 액션형 행 ────────────────────────────────────────────────────────────── */
+.ntRow {
   display: flex;
-  align-items: center;
-  gap: var(--sp-3);
-  padding: var(--sp-4) var(--sp-4);
-  border-bottom: 1px solid var(--color-border);
+  gap: 12px;
+  padding: 14px 16px 14px 18px;
+  position: relative;
 }
 
-.notifRow:last-child {
-  border-bottom: none;
+.ntRow + .ntRow {
+  border-top: 1px solid var(--na-border);
 }
 
-.iconWrap {
-  width: 40px;
-  height: 40px;
-  border-radius: var(--radius-full);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
+.ntUnread::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 12px;
+  bottom: 12px;
+  width: 3px;
+  border-radius: 2px;
+  background: var(--nt, var(--nt-result));
 }
 
-.notifIcon {
-  font-size: 18px;
+.ntIc {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: var(--nt);
+  background: color-mix(in srgb, var(--nt) 16%, transparent);
+  border: 1px solid color-mix(in srgb, var(--nt) 34%, transparent);
 }
 
-.notifText {
+.ntIc svg {
+  width: 22px;
+  height: 22px;
+}
+
+.ntMain {
   flex: 1;
   min-width: 0;
+}
+
+.ntHead {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.notifTitle {
-  font-size: var(--text-sm);
+.ttl {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--na-ink);
+}
+
+.bod {
+  font-size: 12.5px;
+  color: var(--na-muted);
+  margin-top: 2px;
+  line-height: 1.4;
+}
+
+.ntTime {
+  font-size: 11.5px;
+  color: var(--na-faint);
   font-weight: 600;
-  color: var(--color-text);
+  flex: 0 0 auto;
 }
 
-.notifSub {
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
+.ntActions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
 }
 
-.unreadDot {
-  width: 8px;
-  height: 8px;
-  border-radius: var(--radius-full);
-  background: var(--color-primary);
-  flex-shrink: 0;
+.ntBtn {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-size: 12.5px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: opacity 0.12s ease;
+}
+
+.ntBtn:active { opacity: 0.75; }
+
+.ntBtn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.solid {
+  background: var(--nt);
+  color: var(--na-btn-ink);
+}
+
+.ghost {
+  background: var(--na-surface);
+  border: 1px solid var(--na-border);
+  color: var(--na-ink);
 }
 
 /* flex 컬럼 스크롤에서 자식 카드가 압착·잘리지 않도록 고정 */
