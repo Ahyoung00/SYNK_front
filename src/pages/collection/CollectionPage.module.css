@@ -134,6 +134,14 @@
   border-radius: 12px;
   flex-shrink: 0;
   object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbnailEmoji {
+  font-size: 26px;
+  line-height: 1;
 }
 
 .missionInfo {

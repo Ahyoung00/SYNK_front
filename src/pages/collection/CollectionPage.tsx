@@ -5,6 +5,7 @@ import { collectionApi } from '@/services/api/endpoints'
 import type { CollectionListResponse, CollectionMissionItem } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
 import Loading from '@/components/ui/Loading'
+import { missionEmoji } from '@/utils/missionVisual'
 import styles from './CollectionPage.module.css'
 
 // thumbnail 없을 때 미션 ID 기반 그라디언트 폴백
@@ -105,7 +106,9 @@ export default function CollectionPage() {
                     {mission.thumbnail ? (
                       <img src={mission.thumbnail} alt={mission.title} className={styles.thumbnail} />
                     ) : (
-                      <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }} />
+                      <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }}>
+                        <span className={styles.thumbnailEmoji}>{missionEmoji(mission.title)}</span>
+                      </div>
                     )}
                     <div className={styles.missionInfo}>
                       <span className={styles.missionTitle}>{mission.title}</span>
