@@ -1058,8 +1058,6 @@ app.get('/rooms/:id/albums', (req, res) => {
       memberProfiles,
     }
   })
-  // 제출(참여)이 0인 날은 콘텐츠가 없으므로 제외
-  .filter((a) => a.memberProfiles.length > 0)
 
   ok(res, data, '앨범 목록 조회 성공')
 })

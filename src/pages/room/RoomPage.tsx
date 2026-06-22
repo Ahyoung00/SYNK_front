@@ -32,8 +32,10 @@ export default function RoomPage() {
     ])
       .then(([roomRes, albumsRes]) => {
         setRoom(roomRes.data)
-        // 제출(참여)이 0인 날은 실제 콘텐츠가 없으므로 제외
-        setAlbums(albumsRes.data.filter((a) => (a.memberProfiles?.length ?? 0) > 0))
+        // 오늘은 아직 수행한 미션이 없으면 앨범에 노출하지 않음 (지난 날은 빈 날도 유지)
+        const now = new Date()
+        const todayDot = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`
+        setAlbums(albumsRes.data.filter((a) => !(a.date === todayDot && (a.memberProfiles?.length ?? 0) === 0)))
       })
       .catch(() => {
         setNotMember(true)
