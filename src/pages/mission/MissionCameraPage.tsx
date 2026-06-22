@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { useCamera, VIDEO_MIN_S, VIDEO_MAX_S } from '@/hooks/useCamera'
+import { useCamera, VIDEO_MIN_S, VIDEO_MAX_S, type CameraFacing } from '@/hooks/useCamera'
 import { useMissionStore } from '@/store/missionStore'
 import { missionApi, uploadApi } from '@/services/api/endpoints'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
@@ -20,6 +20,7 @@ export default function MissionCameraPage() {
   const previewVideoRef = camera.previewRef as React.RefObject<HTMLVideoElement>
   // 녹화된 영상 미리보기용 별도 video ref
   const reviewRef = useRef<HTMLVideoElement | null>(null)
+  const [facing, setFacing] = useState<CameraFacing>('front')
 
   // 페이지 진입 시 카메라 켜기
   useEffect(() => {
@@ -28,6 +29,14 @@ export default function MissionCameraPage() {
       camera.stopPreview()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleFlipCamera() {
+    if (camera.state !== 'previewing') return
+    const next: CameraFacing = facing === 'front' ? 'back' : 'front'
+    setFacing(next)
+    camera.stopPreview()
+    await camera.startPreview(next)
+  }
 
   // 녹화 완료되면 미리보기 재생
   useEffect(() => {
@@ -84,6 +93,7 @@ export default function MissionCameraPage() {
           ref={previewVideoRef}
           className={[
             styles.video,
+            facing === 'back' ? styles.noMirror : '',
             camera.state === 'done' ? styles.hidden : '',
           ].join(' ')}
           autoPlay
@@ -122,6 +132,23 @@ export default function MissionCameraPage() {
 
       {/* ── 상단 오버레이 ────────────────────────────────────────────────────── */}
       <div className={styles.overlayTop}>
+        {/* 뒤로가기 / 카메라 전환 */}
+        <div className={styles.topControls}>
+          <button className={styles.iconBtn} onClick={() => navigate(-1)} aria-label="뒤로">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M19 12H5M12 5l-7 7 7 7" />
+            </svg>
+          </button>
+          {(camera.state === 'previewing' || camera.state === 'idle') && (
+            <button className={styles.iconBtn} onClick={handleFlipCamera} aria-label="카메라 전환">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" />
+                <path d="M22 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" />
+              </svg>
+            </button>
+          )}
+        </div>
+
         <div className={styles.topRow}>
           <span className={styles.roomName}>{room.name}</span>
           <CountdownTimer secondsLeft={secondsLeft} size="sm" showLabel={false} />

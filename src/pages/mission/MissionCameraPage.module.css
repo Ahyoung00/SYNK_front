@@ -26,6 +26,34 @@
   display: none;
 }
 
+.noMirror {
+  transform: none;
+}
+
+/* ── 상단 컨트롤 (뒤로가기 / 카메라 전환) ─────────────────────────────────── */
+.topControls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--sp-3);
+}
+
+.iconBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s ease;
+}
+
+.iconBtn:active { opacity: 0.6; }
+
 .errorPlaceholder {
   display: flex;
   flex-direction: column;
