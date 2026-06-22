@@ -369,6 +369,20 @@ export default function LoginPage() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // OAuth 페이지에서 뒤로가기로 취소하면 bfcache로 복원되며 로딩 상태가
+  // 'kakao'/'google'로 남아 버튼이 영구 disabled → 로그인 불가.
+  // pageshow(persisted=뒤로가기 복원) 시 로딩 상태를 해제한다.
+  useEffect(() => {
+    function onPageShow(e: PageTransitionEvent) {
+      if (e.persisted) {
+        setOauthLoading(null)
+        setLoading(null)
+      }
+    }
+    window.addEventListener('pageshow', onPageShow)
+    return () => window.removeEventListener('pageshow', onPageShow)
+  }, [])
+
   async function handleKakaoCodeSuccess(code: string, redirectUri: string) {
     try {
       const loginRes = await authApi.kakaoLogin(code, redirectUri)
