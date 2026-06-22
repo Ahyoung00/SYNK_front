@@ -250,6 +250,71 @@
   color: var(--ink-muted);
 }
 
+/* ── 미션 없는 날: 빈 상태 카드 ───────────────────────────────────────────── */
+.emptyCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 44px 24px 36px;
+  text-align: center;
+  margin-top: 4px;
+}
+
+:global(:root:not([data-theme="dark"])) .emptyCard {
+  background: rgba(255,255,255,.85);
+  border-color: rgba(120, 162, 58, 0.20);
+}
+
+.emptyIconWrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 20px;
+  background: var(--grad-soft);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--nav-active);
+  margin-bottom: 4px;
+}
+
+.emptyTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.emptyDesc {
+  font-size: 13px;
+  color: var(--ink-sub);
+  line-height: 1.6;
+}
+
+.emptyBadge {
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: var(--card-bg-soft);
+  border: 1px solid var(--card-border);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--nav-active);
+}
+
+.emptyDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--nav-active);
+}
+
 /* ── 섹션 레이블 ──────────────────────────────────────────────────────────── */
 .sectionLabel {
   font-size: 12px;

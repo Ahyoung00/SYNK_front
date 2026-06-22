@@ -117,6 +117,11 @@ export default function SynkLogDetailPage() {
     </div>
   )
 
+  const now = new Date()
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+  const isToday = date === todayStr
+  const isEmpty = collages.length === 0
+
   return (
     <div className={styles.page}>
       <PageHeader date={date ?? ''} onBack={() => navigate(-1)} />
@@ -124,7 +129,7 @@ export default function SynkLogDetailPage() {
       <div className={styles.scroll}>
 
         {/* ── 방 정보 행 ────────────────────────────────────────────────── */}
-        {room && (
+        {room && !isEmpty && (
           <div className={styles.roomRow}>
             <div className={styles.roomThumb}>
               {room.thumbnail
@@ -136,6 +141,27 @@ export default function SynkLogDetailPage() {
             <span className={styles.roomChip}>
               미션 {collages.length} · 콜라주 {collages.filter(c => c.collageVideoUrl).length}
             </span>
+          </div>
+        )}
+
+        {/* ── 미션이 없는 날: 빈 상태 ───────────────────────────────────── */}
+        {isEmpty && (
+          <div className={styles.emptyCard}>
+            <div className={styles.emptyIconWrap}>
+              <CameraIcon />
+            </div>
+            <p className={styles.emptyTitle}>아직 담은 순간이 없어요</p>
+            <p className={styles.emptyDesc}>
+              {isToday
+                ? <>오늘 미션이 도착하면<br />여기에 콜라주가 모여요.</>
+                : '이 날은 진행된 미션이 없어요.'}
+            </p>
+            {isToday && (
+              <span className={styles.emptyBadge}>
+                <span className={styles.emptyDot} />
+                미션 대기 중
+              </span>
+            )}
           </div>
         )}
 
@@ -177,7 +203,8 @@ export default function SynkLogDetailPage() {
           </div>
         ))}
 
-        {/* ── SYNKLOG 섹션 ──────────────────────────────────────────────── */}
+        {/* ── SYNKLOG 섹션 (미션이 있을 때만) ──────────────────────────── */}
+        {!isEmpty && <>
         <p className={styles.sectionLabel}>오늘의 SYNKLOG</p>
 
         <div className={styles.synklogCard}>
@@ -230,9 +257,20 @@ export default function SynkLogDetailPage() {
             </div>
           )}
         </div>
+        </>}
 
       </div>
     </div>
+  )
+}
+
+function CameraIcon() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 7h3l2-2h8l2 2h3v12H3z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
   )
 }
 
