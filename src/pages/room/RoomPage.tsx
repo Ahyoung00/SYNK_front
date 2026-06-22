@@ -36,10 +36,12 @@ export default function RoomPage() {
     ])
       .then(([roomRes, albumsRes]) => {
         setRoom(roomRes.data)
-        // 오늘 날짜는 앨범에 노출하지 않음 (지난 날만 표시)
+        // 오늘은 '콘텐츠가 없을 때만' 제외 (제출/썸네일 있으면 앨범 페이지처럼 표시)
         const now = new Date()
         const todayDot = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`
-        setAlbums(albumsRes.data.filter((a) => a.date !== todayDot))
+        setAlbums(albumsRes.data.filter((a) =>
+          a.date !== todayDot || (a.memberProfiles?.length ?? 0) > 0 || !!a.thumbnail
+        ))
       })
       .catch(() => {
         setNotMember(true)
