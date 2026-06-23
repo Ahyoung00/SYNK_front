@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
-import { chatApi, roomApi } from '@/services/api/endpoints'
+import { chatApi, roomApi, albumApi } from '@/services/api/endpoints'
 import { connectStomp, publishChat } from '@/services/websocket/client'
 import { ROUTES } from '@/constants'
 import { MOCK_CHAT_MESSAGES, formatDateLabel, formatTime } from '@/utils/mockChat'
@@ -114,7 +114,21 @@ export default function RoomChatPage() {
       .then((res) => {
         setRoomName(res.data.roomName)
         setMemberCount(res.data.memberCount)
-        setMissionDone(res.data.todayMissionCompleted)
+
+        // todayMissionCompleted=true여도 실제 제출된 콜라주가 있는지 추가 검증
+        if (res.data.todayMissionCompleted) {
+          const today = new Date()
+          const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`
+          albumApi.getCollages(numRoomId, todayStr)
+            .then((colRes) => {
+              const hasSubmission = (colRes.data ?? []).some((c) =>
+                c.participants.some((p) => p.state === 'done')
+              )
+              setMissionDone(hasSubmission)
+            })
+            .catch(() => setMissionDone(false))
+        }
+
         const msgs = res.data.messages.length > 0
           ? res.data.messages.map((m) => ({
               ...m,
