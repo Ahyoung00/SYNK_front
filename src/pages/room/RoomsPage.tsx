@@ -17,14 +17,20 @@ export default function RoomsPage() {
   const [sheet, setSheet] = useState(false)
 
   useEffect(() => {
-    roomApi
-      .getMyRooms()
-      .then((res) => {
-        setActiveRooms(res.data.active ?? [])
-        setWaitingRooms(res.data.waiting ?? [])
-      })
-      .catch(console.error)
-      .finally(() => setIsLoading(false))
+    function refresh() {
+      roomApi
+        .getMyRooms()
+        .then((res) => {
+          setActiveRooms(res.data.active ?? [])
+          setWaitingRooms(res.data.waiting ?? [])
+        })
+        .catch(console.error)
+        .finally(() => setIsLoading(false))
+    }
+    refresh()
+    // 15초마다 재조회 — lastMessageId 갱신으로 새 채팅 dot 실시간 반영
+    const id = window.setInterval(refresh, 15_000)
+    return () => window.clearInterval(id)
   }, [])
 
   const rooms = [...activeRooms, ...waitingRooms]
