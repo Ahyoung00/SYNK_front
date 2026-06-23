@@ -1056,14 +1056,18 @@
   color: #7E867A;
 }
 
-/* ── 콜라주 생성중 로딩 화면 ─────────────────────────────────────────────────── */
-.processingScreen {
+/* ── 콜라주 생성중 전환 오버레이 ─────────────────────────────────────────────── */
+.processingOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 20px;
-  padding: 24px 0 8px;
-  flex-shrink: 0;
+  padding: 32px 24px;
+  background: var(--page-bg, #0E1430);
 }
 
 /* 썸네일 그리드 */
