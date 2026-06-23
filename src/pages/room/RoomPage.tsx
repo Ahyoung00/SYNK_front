@@ -82,6 +82,13 @@ export default function RoomPage() {
       .catch(console.error)
   }
 
+  function handleDeleteRoom() {
+    if (!window.confirm('방을 삭제하시겠어요?\n방의 모든 기록이 사라지며 되돌릴 수 없어요.')) return
+    roomApi.deleteRoom(id)
+      .then(() => navigate(ROUTES.ROOMS, { replace: true }))
+      .catch(console.error)
+  }
+
 
   async function handleTestNotification() {
     try {
@@ -277,11 +284,19 @@ export default function RoomPage() {
               <ChevronIcon />
             </button>
             <div className={styles.actionDivider} />
-            <button className={styles.leaveBtn} onClick={handleLeave}>
-              <LeaveIcon />
-              <span className={styles.leaveBtnLabel}>방 나가기</span>
-              <ChevronIcon />
-            </button>
+            {room.ownerId === myUserId ? (
+              <button className={styles.leaveBtn} onClick={handleDeleteRoom}>
+                <LeaveIcon />
+                <span className={styles.leaveBtnLabel}>방 삭제하기</span>
+                <ChevronIcon />
+              </button>
+            ) : (
+              <button className={styles.leaveBtn} onClick={handleLeave}>
+                <LeaveIcon />
+                <span className={styles.leaveBtnLabel}>방 나가기</span>
+                <ChevronIcon />
+              </button>
+            )}
           </div>
         </div>
 

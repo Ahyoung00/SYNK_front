@@ -251,11 +251,13 @@ export default function RoomSettingsPage() {
 
         {saveError && <p className={styles.saveError}>{saveError}</p>}
 
-        {/* ── 방 나가기 ────────────────────────────────────────────────────── */}
-        <button className={styles.leaveBtn} onClick={handleLeave}>
-          <LeaveIcon />
-          방 나가기
-        </button>
+        {/* ── 방 나가기 (방장은 삭제만 노출) ──────────────────────────────── */}
+        {!isOwner && (
+          <button className={styles.leaveBtn} onClick={handleLeave}>
+            <LeaveIcon />
+            방 나가기
+          </button>
+        )}
 
         {isOwner && (
           <div className={styles.deleteSection}>
