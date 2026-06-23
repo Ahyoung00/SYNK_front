@@ -441,22 +441,31 @@ export default function HomePage() {
     roomApi.getMyRooms()
       .then((res) => {
         setMyRooms(res.data.active)
-        console.log('[HomePage] myRooms:', res.data.active.map(r => ({ id: r.id, name: r.name, isAllCompleted: r.isAllCompleted, completedMissions: r.completedMissions, totalMissions: r.totalMissions })))
-        // 이미 전원 완료된 방이 있으면 오늘 콜라주에서 미션 정보를 가져와 배너 세팅
-        const completedRoom = res.data.active.find((r) => r.isAllCompleted)
-        if (completedRoom) {
-          const today = todayString()
-          albumApi.getCollages(completedRoom.id, today)
+        // 이미 localStorage에 완료 정보가 있으면 재탐색 불필요
+        const saved = localStorage.getItem('synk_completed_mission')
+        if (saved) return
+        // 오늘 콜라주에서 전원 완료 + 30분 이내 미션 탐색
+        const today = todayString()
+        const THIRTY_MIN = 30 * 60 * 1000
+        const now = Date.now()
+        for (const room of res.data.active) {
+          albumApi.getCollages(room.id, today)
             .then((colRes) => {
               const collages = colRes.data ?? []
-              const latest = collages[0]
-              if (latest) {
-                setCompletedMission({
-                  roomId: completedRoom.id,
-                  missionId: latest.missionId,
-                  missionTitle: latest.missionTitle,
-                  roomName: completedRoom.name,
-                })
+              // 가장 최근 미션부터 확인
+              const sorted = [...collages].sort(
+                (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
+              )
+              for (const c of sorted) {
+                const allDone = c.participants.length > 0 && c.participants.every((p) => p.state === 'done')
+                if (!allDone) continue
+                // 마지막 제출 시각이 30분 이내인 경우만
+                const lastSubmitMs = c.participants
+                  .map((p) => new Date(p.submittedAt ?? 0).getTime())
+                  .reduce((a, b) => Math.max(a, b), 0)
+                if (now - lastSubmitMs > THIRTY_MIN) continue
+                setCompletedMission({ roomId: room.id, missionId: c.missionId, missionTitle: c.missionTitle, roomName: room.name })
+                break
               }
             })
             .catch(() => {})
