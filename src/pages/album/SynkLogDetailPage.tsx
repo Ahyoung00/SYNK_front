@@ -119,7 +119,7 @@ export default function SynkLogDetailPage() {
         }
       }),
     })
-    navigate(ROUTES.MISSION_RESULT(item.missionId), { state: { returnTo: 'album', roomId: numRoomId } })
+    navigate(ROUTES.MISSION_RESULT(item.missionId), { state: { returnTo: 'album', roomId: numRoomId, date } })
   }
 
   function formatTime(iso: string | null): string {

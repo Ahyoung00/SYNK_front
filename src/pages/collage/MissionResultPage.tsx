@@ -55,11 +55,13 @@ export default function MissionResultPage() {
 
   // 셀 데이터 초기화 — collage API로부터 실제 영상 URL 로드
   useEffect(() => {
-    const stateRoomId = (location.state as { roomId?: number } | null)?.roomId
+    const navState = location.state as { roomId?: number; date?: string } | null
+    const stateRoomId = navState?.roomId
     // location.state.roomId 우선, 없으면 active store fallback
     const roomId = stateRoomId ?? active?.room.id
     const missionId = Number(missionIdParam) || active?.mission.id
-    const date     = todayString()
+    // 앨범에서 진입 시 해당 날짜로 조회 (없으면 오늘)
+    const date     = navState?.date ?? todayString()
 
     console.log('[MissionResultPage] roomId:', roomId, 'missionId:', missionId, 'date:', date)
 
