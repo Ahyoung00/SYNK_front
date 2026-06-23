@@ -241,8 +241,23 @@
   position: relative;
 }
 
+.mosaicThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  grid-column: 1 / -1;
+  grid-row: 1 / -1;
+}
+
 .mosaicCell {
   background: linear-gradient(135deg, rgba(96,196,80,.16), rgba(140,220,150,.10)), #EDF0E8;
+  overflow: hidden;
+}
+
+.mosaicCellImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 :global([data-theme="dark"]) .mosaicCell {

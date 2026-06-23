@@ -135,13 +135,20 @@ export default function RoomAlbumPage() {
                     className={styles.entry}
                     onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, toUrlDate(entry.date)))}
                   >
-                    {/* 모자이크 썸네일 */}
+                    {/* 썸네일 */}
                     <div className={styles.mosaic}>
-                      {[0,1,2,3].map((i) => (
-                        <div key={i} className={styles.mosaicCell} />
-                      ))}
-                      {entry.memberProfiles.length > 4 && (
-                        <div className={styles.mosaicMore}>+{entry.memberProfiles.length - 4}</div>
+                      {entry.thumbnail ? (
+                        <img src={toHttps(entry.thumbnail)!} alt={entry.date} className={styles.mosaicThumb} />
+                      ) : (
+                        <>
+                          {[0,1,2,3].map((i) => (
+                            <div key={i} className={styles.mosaicCell}>
+                              {entry.memberProfiles[i]?.profileImage && (
+                                <img src={entry.memberProfiles[i].profileImage!} alt="" className={styles.mosaicCellImg} />
+                              )}
+                            </div>
+                          ))}
+                        </>
                       )}
                     </div>
 
