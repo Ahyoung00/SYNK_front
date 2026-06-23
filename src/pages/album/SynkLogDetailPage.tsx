@@ -159,7 +159,7 @@ export default function SynkLogDetailPage() {
             </div>
             <span className={styles.roomName}>{room.name}</span>
             <span className={styles.roomChip}>
-              미션 {collages.length} · 콜라주 {collages.filter(c => c.collageVideoUrl).length}
+              미션 {collages.length}
             </span>
           </div>
         )}
