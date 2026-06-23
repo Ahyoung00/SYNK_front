@@ -415,7 +415,28 @@ export default function HomePage() {
       })
       .catch(console.error)
     roomApi.getMyRooms()
-      .then((res) => setMyRooms(res.data.active))
+      .then((res) => {
+        setMyRooms(res.data.active)
+        // 이미 전원 완료된 방이 있으면 오늘 콜라주에서 미션 정보를 가져와 배너 세팅
+        const completedRoom = res.data.active.find((r) => r.isAllCompleted)
+        if (completedRoom) {
+          const today = todayString()
+          albumApi.getCollages(completedRoom.id, today)
+            .then((colRes) => {
+              const collages = colRes.data ?? []
+              const latest = collages[0]
+              if (latest) {
+                setCompletedMission({
+                  roomId: completedRoom.id,
+                  missionId: latest.missionId,
+                  missionTitle: latest.missionTitle,
+                  roomName: completedRoom.name,
+                })
+              }
+            })
+            .catch(() => {})
+        }
+      })
       .catch(console.error)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
