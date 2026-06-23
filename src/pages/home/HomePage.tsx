@@ -220,6 +220,95 @@ function HomeMissionCard({
   )
 }
 
+// ── 콜라주 생성중 로딩 화면 ──────────────────────────────────────────────────
+
+function CollageProcessingScreen({
+  missionTitle,
+  roomName,
+  memberCount,
+  participants,
+}: {
+  missionTitle: string
+  roomName: string
+  memberCount: number
+  participants: Array<{ userId: number; name: string; profileImage: string | null }>
+}) {
+  const [progress, setProgress] = useState(12)
+
+  // 진행 바 애니메이션 (최대 92%까지, 실제 완료는 부모가 제어)
+  useEffect(() => {
+    const id = setInterval(() => {
+      setProgress((p) => {
+        if (p >= 92) { clearInterval(id); return p }
+        return p + Math.random() * 3
+      })
+    }, 800)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div className={styles.processingScreen}>
+      {/* 썸네일 그리드 플레이스홀더 */}
+      <div className={styles.processingGrid}>
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className={styles.processingCell} />
+        ))}
+      </div>
+
+      {/* Charge Ring 로더 (Style A) */}
+      <div className={styles.processingLoader}>
+        <div className={styles.ldA}>
+          <svg className={styles.ldARing} viewBox="0 0 96 96">
+            <defs>
+              <linearGradient id="ld-grad-proc" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="var(--ld-cyan, #46D7FF)" />
+                <stop offset="48%" stopColor="#6E8BFF" />
+                <stop offset="100%" stopColor="var(--ld-violet, #9B6BFF)" />
+              </linearGradient>
+            </defs>
+            <circle cx="48" cy="48" r="42" className={styles.ldATrack} />
+            <circle cx="48" cy="48" r="42" className={styles.ldAArc} stroke="url(#ld-grad-proc)" />
+          </svg>
+          <div className={styles.ldACore}>
+            <svg viewBox="0 0 24 33" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M13.5 2L3 17.5H12.5L11 31L21 15.5H12L13.5 2Z"
+                fill="url(#ld-grad-proc)" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* 텍스트 */}
+      <div className={styles.processingTextRow}>
+        <h2 className={styles.processingTitle}>콜라주 생성중</h2>
+        <span className={styles.processingDots}>
+          <i /><i /><i />
+        </span>
+      </div>
+      <p className={styles.processingDesc}>{memberCount}명의 순간을 한 장으로 엮고 있어요</p>
+
+      {/* 진행 바 */}
+      <div className={styles.processingTrack}>
+        <div className={styles.processingFill} style={{ width: `${progress}%` }} />
+      </div>
+
+      {/* 참여자 아바타 */}
+      <div className={styles.processingAvatars}>
+        {participants.map((p) => (
+          <div key={p.userId} className={styles.processingAvatar}>
+            {p.profileImage
+              ? <img src={p.profileImage} alt={p.name} className={styles.processingAvatarImg} />
+              : <span className={styles.processingAvatarInitial}>{p.name.charAt(0)}</span>
+            }
+          </div>
+        ))}
+      </div>
+
+      <p className={styles.processingRoomName}>{roomName}</p>
+    </div>
+  )
+}
+
 // ── 전원 미션 완료 배너 ───────────────────────────────────────────────────────
 
 function MissionCompletedBanner({
@@ -306,6 +395,10 @@ export default function HomePage() {
   const [activeMissions, setActiveMissions]       = useState<ActiveMissionItem[]>([])
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null)
   const [processingRoomId, setProcessingRoomId]   = useState<number | null>(null)
+  const [processingInfo, setProcessingInfo]       = useState<{
+    missionTitle: string; roomName: string; memberCount: number
+    participants: Array<{ userId: number; name: string; profileImage: string | null }>
+  } | null>(null)
   const [myRooms, setMyRooms]                     = useState<ActiveRoom[]>([])
   const [completedMission, setCompletedMissionRaw]   = useState<{
     roomId: number; missionId: number; missionTitle: string; roomName: string
@@ -495,8 +588,13 @@ export default function HomePage() {
       try {
         const res = await albumApi.getCollages(processingRoomId!, date)
         const collages = res.data ?? []
-        // PROCESSING 상태가 없으면 (완료됐거나 아직 없거나) 제거
+        // PROCESSING 상태가 없으면 완료 → 배너 세팅 후 로딩 화면 제거
         if (!collages.some((c) => c.status === 'PROCESSING')) {
+          const latest = collages[0]
+          if (latest && processingInfo) {
+            setCompletedMission({ roomId: processingRoomId!, missionId: latest.missionId, missionTitle: latest.missionTitle, roomName: processingInfo.roomName })
+          }
+          setProcessingInfo(null)
           setProcessingRoomId(null)
           return
         }
@@ -545,7 +643,15 @@ export default function HomePage() {
               }}
               onBack={activeMissions.length > 1 ? () => setSelectedMissionId(null) : undefined}
               onAllDone={() => {
-                setCompletedMission({ roomId: m.roomId, missionId: m.id, missionTitle: m.title, roomName: m.roomName })
+                setProcessingRoomId(m.roomId)
+                setProcessingInfo({
+                  missionTitle: m.title,
+                  roomName: m.roomName,
+                  memberCount: m.totalMembers,
+                  participants: (m.participants ?? []).map((p) => ({
+                    userId: p.userId, name: p.name, profileImage: p.profileImage ?? null,
+                  })),
+                })
                 setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
                 setSelectedMissionId(null)
                 setActive(null)
@@ -607,6 +713,16 @@ export default function HomePage() {
               )
             })}
           </div>
+        )}
+
+        {/* ── 콜라주 생성중 로딩 화면 ───────────────────────────────────────── */}
+        {processingRoomId && processingInfo && (
+          <CollageProcessingScreen
+            missionTitle={processingInfo.missionTitle}
+            roomName={processingInfo.roomName}
+            memberCount={processingInfo.memberCount}
+            participants={processingInfo.participants}
+          />
         )}
 
         {/* ── 전원 완료 배너 ─────────────────────────────────────────────────── */}
