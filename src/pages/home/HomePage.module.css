@@ -885,13 +885,14 @@
 }
 
 /* ── 전원 완료 배너 ─────────────────────────────────────────────────────────── */
+/* 완료 배너 — 기본: 라이트 (data-theme 없음), 다크: [data-theme="dark"] */
 .completedBanner {
   position: relative;
   margin: 16px 0;
   padding: 28px 20px 20px;
   border-radius: 24px;
-  background: rgba(122,162,255,.07);
-  border: 1px solid rgba(150,180,255,.13);
+  background: rgba(96,196,80,.06);
+  border: 1px solid rgba(80,170,55,.18);
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -905,25 +906,21 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    radial-gradient(90% 50% at 50% 0%, rgba(124,111,240,.18), transparent 70%),
-    radial-gradient(70% 40% at 80% 90%, rgba(70,215,255,.12), transparent 70%);
+  background: radial-gradient(90% 50% at 50% 0%, rgba(96,196,80,.14), transparent 70%);
 }
 
-.completedChipRow {
-  margin-bottom: 14px;
-}
+.completedChipRow { margin-bottom: 14px; }
 .completedChip {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(130,165,255,.11);
-  border: 1px solid rgba(150,180,255,.22);
+  background: rgba(96,196,80,.12);
+  border: 1px solid rgba(80,170,55,.25);
   font-size: 12.5px;
   font-weight: 700;
-  color: #c7cdea;
+  color: #2d6a1f;
 }
 .completedChipDot {
   width: 7px;
@@ -936,14 +933,14 @@
 .completedTitle {
   font-size: 22px;
   font-weight: 800;
-  color: var(--color-text, #F3F5FF);
+  color: #1F2A18;
   line-height: 1.2;
   margin-bottom: 10px;
 }
 
 .completedDesc {
   font-size: 14px;
-  color: var(--color-text-muted, #9AA0BD);
+  color: #7E867A;
   line-height: 1.6;
   margin-bottom: 18px;
 }
@@ -955,40 +952,34 @@
   gap: 14px;
   padding: 14px 16px;
   border-radius: 16px;
-  background: rgba(10,16,42,.5);
-  border: 1px solid rgba(150,180,255,.13);
+  background: #ffffff;
+  border: 1px solid rgba(40,55,25,.10);
   margin-bottom: 16px;
   text-align: left;
+  box-shadow: 0 2px 8px rgba(30,45,15,.08);
 }
 
 .completedMissionIcon {
   width: 48px;
   height: 48px;
   border-radius: 14px;
-  background: linear-gradient(135deg, #7C6FF0, #9B6BFF);
+  background: linear-gradient(135deg, #57B947, #3FA23A);
   display: grid;
   place-items: center;
   flex-shrink: 0;
 }
-.completedMissionEmoji {
-  font-size: 22px;
-  line-height: 1;
-}
+.completedMissionEmoji { font-size: 22px; line-height: 1; }
 
-.completedMissionInfo {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
+.completedMissionInfo { display: flex; flex-direction: column; gap: 3px; }
 .completedMissionRoom {
   font-size: 11.5px;
   font-weight: 600;
-  color: #7C6FF0;
+  color: #3FA23A;
 }
 .completedMissionTitle {
   font-size: 15px;
   font-weight: 700;
-  color: var(--color-text, #F3F5FF);
+  color: #1F2A18;
 }
 
 .completedCta {
@@ -1004,57 +995,50 @@
   font-size: 15px;
   font-weight: 700;
   font-family: inherit;
-  color: #08101f;
-  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
-  box-shadow: 0 8px 24px -8px rgba(124,111,240,.6);
+  color: #fff;
+  background: linear-gradient(135deg, #6FD05A 0%, #54BF45 52%, #3DA838 100%);
+  box-shadow: 0 8px 24px -8px rgba(80,180,60,.5);
   margin-bottom: 10px;
 }
 
 .completedNote {
   font-size: 12px;
-  color: var(--color-text-muted, #9AA0BD);
+  color: #7E867A;
 }
 
-/* 라이트 테마 */
-:global([data-theme="light"]) .completedBanner {
-  background: rgba(96,196,80,.06);
-  border-color: rgba(80,170,55,.2);
+/* 다크 테마 */
+:global([data-theme="dark"]) .completedBanner {
+  background: rgba(122,162,255,.07);
+  border-color: rgba(150,180,255,.13);
 }
-:global([data-theme="light"]) .completedGlow {
-  background: radial-gradient(90% 50% at 50% 0%, rgba(96,196,80,.18), transparent 70%);
+:global([data-theme="dark"]) .completedGlow {
+  background:
+    radial-gradient(90% 50% at 50% 0%, rgba(124,111,240,.18), transparent 70%),
+    radial-gradient(70% 40% at 80% 90%, rgba(70,215,255,.12), transparent 70%);
 }
-:global([data-theme="light"]) .completedChip {
-  background: rgba(96,196,80,.12);
-  border-color: rgba(80,170,55,.25);
-  color: #2d6a1f;
+:global([data-theme="dark"]) .completedChip {
+  background: rgba(130,165,255,.11);
+  border-color: rgba(150,180,255,.22);
+  color: #c7cdea;
 }
-:global([data-theme="light"]) .completedTitle {
-  color: #1F2A18;
+:global([data-theme="dark"]) .completedTitle { color: #F3F5FF; }
+:global([data-theme="dark"]) .completedDesc  { color: #9AA0BD; }
+:global([data-theme="dark"]) .completedMissionCard {
+  background: rgba(10,16,42,.5);
+  border-color: rgba(150,180,255,.13);
+  box-shadow: none;
 }
-:global([data-theme="light"]) .completedDesc {
-  color: #7E867A;
+:global([data-theme="dark"]) .completedMissionIcon {
+  background: linear-gradient(135deg, #7C6FF0, #9B6BFF);
 }
-:global([data-theme="light"]) .completedMissionCard {
-  background: #ffffff;
-  border-color: rgba(40,55,25,.10);
+:global([data-theme="dark"]) .completedMissionRoom  { color: #7C6FF0; }
+:global([data-theme="dark"]) .completedMissionTitle { color: #F3F5FF; }
+:global([data-theme="dark"]) .completedCta {
+  color: #08101f;
+  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  box-shadow: 0 8px 24px -8px rgba(124,111,240,.6);
 }
-:global([data-theme="light"]) .completedMissionIcon {
-  background: linear-gradient(135deg, #57B947, #3FA23A);
-}
-:global([data-theme="light"]) .completedMissionRoom {
-  color: #3FA23A;
-}
-:global([data-theme="light"]) .completedMissionTitle {
-  color: #1F2A18;
-}
-:global([data-theme="light"]) .completedCta {
-  background: linear-gradient(135deg, #6FD05A 0%, #54BF45 52%, #3DA838 100%);
-  box-shadow: 0 8px 24px -8px rgba(80,180,60,.5);
-  color: #fff;
-}
-:global([data-theme="light"]) .completedNote {
-  color: #7E867A;
-}
+:global([data-theme="dark"]) .completedNote { color: #9AA0BD; }
 
 /* ── 콜라주 생성중 전환 오버레이 ─────────────────────────────────────────────── */
 .processingOverlay {
