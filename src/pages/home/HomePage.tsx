@@ -403,9 +403,12 @@ export default function HomePage() {
     for (const m of missions) {
       const doneCount = (m.participants ?? []).filter((p) => p.status === '완료').length
       if (doneCount >= m.totalMembers && m.totalMembers > 0) {
-        setCompletedMission((prev) =>
-          prev ? prev : { roomId: m.roomId, missionId: m.id, missionTitle: m.title, roomName: m.roomName }
-        )
+        setCompletedMissionRaw((prev) => {
+          if (prev) return prev
+          const next = { roomId: m.roomId, missionId: m.id, missionTitle: m.title, roomName: m.roomName }
+          localStorage.setItem('synk_completed_mission', JSON.stringify({ ...next, savedAt: Date.now() }))
+          return next
+        })
       }
     }
 
