@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import { useNotificationStore } from '@/store/notificationStore'
-import { notificationApi } from '@/services/api/endpoints'
+import { notificationApi, missionApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import type { AppNotification, NotificationsResponse } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
@@ -65,13 +65,19 @@ function NotifItem({
   item,
   onRead,
   navigate,
+  activeIds,
 }: {
   item: AppNotification
   onRead: (id: number) => void
   navigate: NavigateFunction
+  activeIds: Set<number>
 }) {
   const tone = toneFor(item.type)
   const unread = !item.isRead
+  // 진행 중인 미션일 때만 '지금 하기' 액션 노출 (끝난 미션은 일반 항목으로)
+  const missionActive = item.type === 'MISSION_START'
+    && item.relatedId != null
+    && activeIds.has(item.relatedId)
 
   function go(e: React.MouseEvent, to?: string) {
     e.stopPropagation()
@@ -80,7 +86,7 @@ function NotifItem({
   }
 
   let actions: React.ReactNode = null
-  if (item.type === 'MISSION_START') {
+  if (item.type === 'MISSION_START' && missionActive) {
     actions = (
       <div className={styles.ntActions}>
         <button className={[styles.ntBtn, styles.solid].join(' ')} onClick={(e) => go(e, ROUTES.HOME)}>
@@ -123,11 +129,13 @@ function NotifGroup({
   items,
   onRead,
   navigate,
+  activeIds,
 }: {
   label: string
   items: AppNotification[]
   onRead: (id: number) => void
   navigate: NavigateFunction
+  activeIds: Set<number>
 }) {
   if (items.length === 0) return null
   return (
@@ -135,7 +143,7 @@ function NotifGroup({
       <p className={styles.groupLabel}>{label}</p>
       <div className={styles.ntCard}>
         {items.map((item) => (
-          <NotifItem key={item.id} item={item} onRead={onRead} navigate={navigate} />
+          <NotifItem key={item.id} item={item} onRead={onRead} navigate={navigate} activeIds={activeIds} />
         ))}
       </div>
     </div>
@@ -146,8 +154,14 @@ export default function NotificationsPage() {
   const navigate = useNavigate()
   const { setNotifications, markAllRead: storeMarkAllRead } = useNotificationStore()
   const [data, setData] = useState<NotificationsResponse | null>(null)
+  const [activeIds, setActiveIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
+    // 진행 중인 미션 id 집합 — MISSION_START 알림의 액션 노출 판단용
+    missionApi.getActiveMission()
+      .then((res) => setActiveIds(new Set(res.data.map((m) => m.id))))
+      .catch(() => setActiveIds(new Set()))
+
     notificationApi
       .getNotifications()
       .then((res) => {
@@ -225,8 +239,8 @@ export default function NotificationsPage() {
           </div>
         ) : (
           <>
-            <NotifGroup label="오늘"    items={data?.today    ?? []} onRead={handleRead} navigate={navigate} />
-            <NotifGroup label="이번 주" items={data?.thisWeek ?? []} onRead={handleRead} navigate={navigate} />
+            <NotifGroup label="오늘"    items={data?.today    ?? []} onRead={handleRead} navigate={navigate} activeIds={activeIds} />
+            <NotifGroup label="이번 주" items={data?.thisWeek ?? []} onRead={handleRead} navigate={navigate} activeIds={activeIds} />
           </>
         )}
       </div>
