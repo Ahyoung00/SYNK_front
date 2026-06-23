@@ -73,9 +73,13 @@ export default function MissionResultPage() {
       .then((res) => {
         const collages: CollageItem[] = res.data ?? []
         console.log('[MissionResultPage] collages:', collages)
+        // 특정 미션 미지정/미발견 시 최신(가장 늦게 시작된) 미션 결과로
+        const latest = [...collages].sort(
+          (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
+        )[0]
         const target = missionId
-          ? collages.find((c) => c.missionId === missionId) ?? collages[0]
-          : collages[0]
+          ? collages.find((c) => c.missionId === missionId) ?? latest
+          : latest
 
         if (target) {
           setCollageVideoUrl(target.collageVideoUrl)
