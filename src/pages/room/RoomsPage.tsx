@@ -6,6 +6,7 @@ import { roomApi } from '@/services/api/endpoints'
 import type { ActiveRoom, WaitingRoom } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
 import Loading from '@/components/ui/Loading'
+import { getLastReadMessageId } from '@/utils/chatRead'
 import styles from './RoomsPage.module.css'
 
 export default function RoomsPage() {
@@ -157,6 +158,7 @@ function RoomThumbnail({ src }: { src: string | null }) {
 
 function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
   const allDone = room.isAllCompleted
+  const hasNewChat = (room.lastMessageId ?? 0) > getLastReadMessageId(room.id)
 
   return (
     <button className={styles.roomCard} onClick={onClick}>
@@ -164,7 +166,10 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
         <RoomThumbnail src={room.roomThumbnail} />
         <div className={styles.cardBody}>
           <div className={styles.cardTop}>
-            <span className={styles.roomName}>{room.name}</span>
+            <span className={styles.roomName}>
+              {room.name}
+              {hasNewChat && <span className={styles.chatDot} />}
+            </span>
             <span className={allDone ? styles.missionBadgeDone : styles.missionBadge}>
               오늘 미션 {room.completedMissions}/{room.totalMissions}{allDone ? ' ✓' : ''}
             </span>

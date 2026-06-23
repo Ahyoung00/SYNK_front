@@ -72,6 +72,8 @@ export interface ActiveRoom {
   isAllCompleted: boolean
   roomThumbnail: string | null
   memberProfiles: Array<{ userId: number; profileImage: string | null }>
+  /** 방 최신 채팅 messageId — 새 채팅 dot 판단용 (없으면 null) */
+  lastMessageId?: number | null
 }
 
 /**
