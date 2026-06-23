@@ -3,6 +3,7 @@ import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import { useNotificationStore } from '@/store/notificationStore'
 import { notificationApi, missionApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
+import { getReadIds, addReadIds } from '@/utils/notifRead'
 import type { AppNotification, NotificationsResponse } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './NotificationsPage.module.css'
@@ -166,9 +167,18 @@ export default function NotificationsPage() {
       notificationApi
         .getNotifications()
         .then((res) => {
-          setData(res.data)
+          // 로컬에 저장된 읽음 상태 병합 (서버 read API 미확정 보완)
+          const readSet = getReadIds()
+          const applyRead = (list: AppNotification[]) =>
+            list.map((n) => (readSet.has(n.id) ? { ...n, isRead: true } : n))
+          const merged: NotificationsResponse = {
+            ...res.data,
+            today: applyRead(res.data.today),
+            thisWeek: applyRead(res.data.thisWeek),
+          }
+          setData(merged)
           // 스토어엔 flat 배열로 저장 (unreadCount 계산용)
-          setNotifications([...res.data.today, ...res.data.thisWeek])
+          setNotifications([...merged.today, ...merged.thisWeek])
         })
         .catch(console.error)
     }
@@ -182,6 +192,7 @@ export default function NotificationsPage() {
   /** 단건 읽음 처리 */
   function handleRead(id: number) {
     notificationApi.markRead(id).catch(console.error)
+    addReadIds([id])
     setData((prev) => {
       if (!prev) return prev
       const mark = (list: AppNotification[]) =>
@@ -194,6 +205,7 @@ export default function NotificationsPage() {
   function handleMarkAllRead() {
     notificationApi.markAllRead().catch(console.error)
     storeMarkAllRead()
+    if (data) addReadIds([...data.today, ...data.thisWeek].map((n) => n.id))
     setData((prev) => {
       if (!prev) return prev
       const markAll = (list: AppNotification[]) => list.map((n) => ({ ...n, isRead: true }))
