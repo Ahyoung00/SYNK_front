@@ -157,19 +157,26 @@ export default function NotificationsPage() {
   const [activeIds, setActiveIds] = useState<Set<number>>(new Set())
 
   useEffect(() => {
-    // 진행 중인 미션 id 집합 — MISSION_START 알림의 액션 노출 판단용
-    missionApi.getActiveMission()
-      .then((res) => setActiveIds(new Set(res.data.map((m) => m.id))))
-      .catch(() => setActiveIds(new Set()))
+    function refresh() {
+      // 진행 중인 미션 id 집합 — MISSION_START 알림의 액션 노출 판단용
+      missionApi.getActiveMission()
+        .then((res) => setActiveIds(new Set(res.data.map((m) => m.id))))
+        .catch(() => setActiveIds(new Set()))
 
-    notificationApi
-      .getNotifications()
-      .then((res) => {
-        setData(res.data)
-        // 스토어엔 flat 배열로 저장 (unreadCount 계산용)
-        setNotifications([...res.data.today, ...res.data.thisWeek])
-      })
-      .catch(console.error)
+      notificationApi
+        .getNotifications()
+        .then((res) => {
+          setData(res.data)
+          // 스토어엔 flat 배열로 저장 (unreadCount 계산용)
+          setNotifications([...res.data.today, ...res.data.thisWeek])
+        })
+        .catch(console.error)
+    }
+
+    refresh()
+    // 30초마다 실시간 갱신 (열어둔 채 미션 종료/새 알림 반영)
+    const id = window.setInterval(refresh, 30_000)
+    return () => window.clearInterval(id)
   }, [setNotifications])
 
   /** 단건 읽음 처리 */
