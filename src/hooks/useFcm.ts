@@ -53,18 +53,31 @@ export function useFcm() {
       const appNotif = mapToAppNotification(data)
       if (appNotif) prependNotification(appNotif)
 
-      if (payload.notification) {
+      const fmt = formatPush(data)
+      const title = fmt?.title ?? payload.notification?.title ?? ''
+      const body  = fmt?.body  ?? payload.notification?.body  ?? ''
+      if (title || body) {
         navigator.serviceWorker.ready.then((registration) => {
-          registration.showNotification(payload.notification!.title ?? '', {
-            body: payload.notification!.body,
-            icon: '/icon-192.png',
-          })
+          registration.showNotification(title, { body, icon: '/icon-192.png' })
         })
       }
     })
 
     return unsubscribe
   }, [token])
+}
+
+/** 푸시 data → 타입별 문구 재구성 (없으면 null → 백엔드 문구 사용) */
+export function formatPush(data: Record<string, string>): { title: string; body: string } | null {
+  const content = data.content ?? data.body ?? ''
+  if (data.type === 'MISSION_START') {
+    const missionName = (content.split(' · ')[0] ?? '').trim()
+    return {
+      title: '⚡ 지금이야! 미션 도착',
+      body: missionName ? `${missionName} · 5분 안에 찍어 올려요!` : '5분 안에 찍어 올려요!',
+    }
+  }
+  return null
 }
 
 function mapToAppNotification(data: Record<string, string>): AppNotification | null {
