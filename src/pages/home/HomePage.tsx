@@ -307,9 +307,30 @@ export default function HomePage() {
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null)
   const [processingRoomId, setProcessingRoomId]   = useState<number | null>(null)
   const [myRooms, setMyRooms]                     = useState<ActiveRoom[]>([])
-  const [completedMission, setCompletedMission]   = useState<{
+  const [completedMission, setCompletedMissionRaw]   = useState<{
     roomId: number; missionId: number; missionTitle: string; roomName: string
-  } | null>(null)
+  } | null>(() => {
+    try {
+      const saved = localStorage.getItem('synk_completed_mission')
+      if (!saved) return null
+      const parsed = JSON.parse(saved) as { roomId: number; missionId: number; missionTitle: string; roomName: string; savedAt: number }
+      // 10분 이내 완료만 유효
+      if (Date.now() - parsed.savedAt > 10 * 60 * 1000) {
+        localStorage.removeItem('synk_completed_mission')
+        return null
+      }
+      return parsed
+    } catch { return null }
+  })
+
+  function setCompletedMission(v: { roomId: number; missionId: number; missionTitle: string; roomName: string } | null) {
+    setCompletedMissionRaw(v)
+    if (v) {
+      localStorage.setItem('synk_completed_mission', JSON.stringify({ ...v, savedAt: Date.now() }))
+    } else {
+      localStorage.removeItem('synk_completed_mission')
+    }
+  }
 
   // 다중 미션 선택 화면용 실시간 카운트다운 (id → 남은 초)
   const [localSeconds, setLocalSeconds] = useState<Record<number, number>>({})
@@ -417,6 +438,7 @@ export default function HomePage() {
     roomApi.getMyRooms()
       .then((res) => {
         setMyRooms(res.data.active)
+        console.log('[HomePage] myRooms:', res.data.active.map(r => ({ id: r.id, name: r.name, isAllCompleted: r.isAllCompleted, completedMissions: r.completedMissions, totalMissions: r.totalMissions })))
         // 이미 전원 완료된 방이 있으면 오늘 콜라주에서 미션 정보를 가져와 배너 세팅
         const completedRoom = res.data.active.find((r) => r.isAllCompleted)
         if (completedRoom) {
