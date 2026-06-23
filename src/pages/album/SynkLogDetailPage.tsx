@@ -203,7 +203,7 @@ export default function SynkLogDetailPage() {
                 className={styles.collageChip}
                 onClick={() => handleViewCollage(item)}
               >
-                콜라주
+                미션 보기
               </button>
             </div>
 
