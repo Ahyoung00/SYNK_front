@@ -8,6 +8,7 @@ import type { ActiveMissionItem, ActiveMissionParticipant, ActiveMissionState, A
 import { ROUTES } from '@/constants'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import AppHeader from '@/components/layout/AppHeader'
+import { missionEmoji } from '@/utils/missionVisual'
 import styles from './HomePage.module.css'
 
 function todayString(): string {
@@ -219,6 +220,58 @@ function HomeMissionCard({
   )
 }
 
+// ── 전원 미션 완료 배너 ───────────────────────────────────────────────────────
+
+function MissionCompletedBanner({
+  missionTitle,
+  roomName,
+  onViewCollage,
+}: {
+  missionTitle: string
+  roomName: string
+  onViewCollage: () => void
+}) {
+  const emoji = missionEmoji(missionTitle)
+  return (
+    <div className={styles.completedBanner}>
+      <div className={styles.completedGlow} />
+
+      {/* 전원 참여 완료 칩 */}
+      <div className={styles.completedChipRow}>
+        <span className={styles.completedChip}>
+          <span className={styles.completedChipDot} />
+          전원 참여 완료
+        </span>
+      </div>
+
+      {/* 타이틀 */}
+      <h2 className={styles.completedTitle}>오늘의 미션 종료 🎉</h2>
+      <p className={styles.completedDesc}>
+        마지막 멤버까지 참여를 마쳤어요.<br />
+        다 같이 만든 콜라주가 도착했어요.
+      </p>
+
+      {/* 미션 정보 카드 */}
+      <div className={styles.completedMissionCard}>
+        <div className={styles.completedMissionIcon}>
+          <span className={styles.completedMissionEmoji}>{emoji}</span>
+        </div>
+        <div className={styles.completedMissionInfo}>
+          <span className={styles.completedMissionRoom}>오늘의 미션 · {roomName}</span>
+          <span className={styles.completedMissionTitle}>{missionTitle}</span>
+        </div>
+      </div>
+
+      {/* CTA */}
+      <button className={styles.completedCta} onClick={onViewCollage}>
+        <span>⚡</span>
+        미션 종료 · 콜라주 보러가기
+      </button>
+      <p className={styles.completedNote}>모든 멤버에게 동시에 공개돼요</p>
+    </div>
+  )
+}
+
 function ParticipantItem({ participant: p }: { participant: ActiveMissionParticipant }) {
   const statusClass =
     p.status === '완료'   ? styles.statusDone
@@ -254,6 +307,9 @@ export default function HomePage() {
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null)
   const [processingRoomId, setProcessingRoomId]   = useState<number | null>(null)
   const [myRooms, setMyRooms]                     = useState<ActiveRoom[]>([])
+  const [completedMission, setCompletedMission]   = useState<{
+    roomId: number; missionId: number; missionTitle: string; roomName: string
+  } | null>(null)
 
   // 다중 미션 선택 화면용 실시간 카운트다운 (id → 남은 초)
   const [localSeconds, setLocalSeconds] = useState<Record<number, number>>({})
@@ -321,6 +377,16 @@ export default function HomePage() {
     }
     // 본 미션 ID 등록
     missions.forEach((m) => seenMissionIdsRef.current.add(m.id))
+
+    // 폴링에서 전원 완료 감지 → 완료 배너 세팅 (다른 멤버도 인지하도록)
+    for (const m of missions) {
+      const doneCount = (m.participants ?? []).filter((p) => p.status === '완료').length
+      if (doneCount >= m.totalMembers && m.totalMembers > 0) {
+        setCompletedMission((prev) =>
+          prev ? prev : { roomId: m.roomId, missionId: m.id, missionTitle: m.title, roomName: m.roomName }
+        )
+      }
+    }
 
     setActiveMissions((prev) => {
       const serverIds = new Set(missions.map((m) => m.id))
@@ -424,7 +490,7 @@ export default function HomePage() {
               }}
               onBack={activeMissions.length > 1 ? () => setSelectedMissionId(null) : undefined}
               onAllDone={() => {
-                setProcessingRoomId(m.roomId)
+                setCompletedMission({ roomId: m.roomId, missionId: m.id, missionTitle: m.title, roomName: m.roomName })
                 setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
                 setSelectedMissionId(null)
                 setActive(null)
@@ -488,8 +554,21 @@ export default function HomePage() {
           </div>
         )}
 
+        {/* ── 전원 완료 배너 ─────────────────────────────────────────────────── */}
+        {completedMission && (
+          <MissionCompletedBanner
+            missionTitle={completedMission.missionTitle}
+            roomName={completedMission.roomName}
+            onViewCollage={() => {
+              navigate(ROUTES.MISSION_RESULT(completedMission.missionId), {
+                state: { roomId: completedMission.roomId, returnTo: 'home' },
+              })
+            }}
+          />
+        )}
+
         {/* ── 01_대기 화면 ──────────────────────────────────────────────────── */}
-        {activeMissions.length === 0 && !active && (
+        {activeMissions.length === 0 && !active && !completedMission && (
           <div className={styles.waitingCard}>
             <div className={styles.waitingIconWrap}>
               <span className={styles.waitingIconGlow} />

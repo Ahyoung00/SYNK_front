@@ -883,3 +883,175 @@
 .scroll > * {
   flex-shrink: 0;
 }
+
+/* ── 전원 완료 배너 ─────────────────────────────────────────────────────────── */
+.completedBanner {
+  position: relative;
+  margin: 16px 0;
+  padding: 28px 20px 20px;
+  border-radius: 24px;
+  background: rgba(122,162,255,.07);
+  border: 1px solid rgba(150,180,255,.13);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+  flex-shrink: 0;
+}
+
+.completedGlow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(90% 50% at 50% 0%, rgba(124,111,240,.18), transparent 70%),
+    radial-gradient(70% 40% at 80% 90%, rgba(70,215,255,.12), transparent 70%);
+}
+
+.completedChipRow {
+  margin-bottom: 14px;
+}
+.completedChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(130,165,255,.11);
+  border: 1px solid rgba(150,180,255,.22);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: #c7cdea;
+}
+.completedChipDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 8px rgba(74,222,128,.6);
+}
+
+.completedTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-text, #F3F5FF);
+  line-height: 1.2;
+  margin-bottom: 10px;
+}
+
+.completedDesc {
+  font-size: 14px;
+  color: var(--color-text-muted, #9AA0BD);
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.completedMissionCard {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(10,16,42,.5);
+  border: 1px solid rgba(150,180,255,.13);
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.completedMissionIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7C6FF0, #9B6BFF);
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.completedMissionEmoji {
+  font-size: 22px;
+  line-height: 1;
+}
+
+.completedMissionInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.completedMissionRoom {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: #7C6FF0;
+}
+.completedMissionTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-text, #F3F5FF);
+}
+
+.completedCta {
+  width: 100%;
+  height: 52px;
+  border-radius: 15px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: inherit;
+  color: #08101f;
+  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  box-shadow: 0 8px 24px -8px rgba(124,111,240,.6);
+  margin-bottom: 10px;
+}
+
+.completedNote {
+  font-size: 12px;
+  color: var(--color-text-muted, #9AA0BD);
+}
+
+/* 라이트 테마 */
+:global([data-theme="light"]) .completedBanner {
+  background: rgba(96,196,80,.06);
+  border-color: rgba(80,170,55,.2);
+}
+:global([data-theme="light"]) .completedGlow {
+  background: radial-gradient(90% 50% at 50% 0%, rgba(96,196,80,.18), transparent 70%);
+}
+:global([data-theme="light"]) .completedChip {
+  background: rgba(96,196,80,.12);
+  border-color: rgba(80,170,55,.25);
+  color: #2d6a1f;
+}
+:global([data-theme="light"]) .completedTitle {
+  color: #1F2A18;
+}
+:global([data-theme="light"]) .completedDesc {
+  color: #7E867A;
+}
+:global([data-theme="light"]) .completedMissionCard {
+  background: #ffffff;
+  border-color: rgba(40,55,25,.10);
+}
+:global([data-theme="light"]) .completedMissionIcon {
+  background: linear-gradient(135deg, #57B947, #3FA23A);
+}
+:global([data-theme="light"]) .completedMissionRoom {
+  color: #3FA23A;
+}
+:global([data-theme="light"]) .completedMissionTitle {
+  color: #1F2A18;
+}
+:global([data-theme="light"]) .completedCta {
+  background: linear-gradient(135deg, #6FD05A 0%, #54BF45 52%, #3DA838 100%);
+  box-shadow: 0 8px 24px -8px rgba(80,180,60,.5);
+  color: #fff;
+}
+:global([data-theme="light"]) .completedNote {
+  color: #7E867A;
+}
