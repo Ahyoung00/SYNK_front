@@ -227,12 +227,16 @@ export default function RoomChatPage() {
   const handleReactionToggle = useCallback((msgId: number, emoji: string) => {
     const rKey = `${numRoomId}:${msgId}`
     const myEmojis = myReactions[rKey] ?? []
+
     if (myEmojis.includes(emoji)) {
+      // 같은 이모지 → 토글 해제
       removeReaction(numRoomId, msgId, emoji)
-    } else {
+    } else if (myEmojis.length === 0) {
+      // 아직 리액션 없을 때만 추가 허용
       addReaction(numRoomId, msgId, emoji)
       chatApi.addReaction(numRoomId, msgId, emoji).catch(console.error)
     }
+    // 이미 다른 이모지로 반응한 경우 → 무시 (서버 500 방지)
     closePicker()
   }, [myReactions, numRoomId, addReaction, removeReaction, setReactionTarget]) // eslint-disable-line react-hooks/exhaustive-deps
 
