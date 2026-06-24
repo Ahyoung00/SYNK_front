@@ -3,6 +3,7 @@ import { getToken, onMessage } from 'firebase/messaging'
 import { messaging } from '@/lib/firebase'
 import { useNotificationStore } from '@/store/notificationStore'
 import { useAuthStore } from '@/store/authStore'
+import { useSettingsStore } from '@/store/settingsStore'
 import { userApi } from '@/services/api/endpoints'
 import type { AppNotification, NotificationType } from '@/types'
 
@@ -38,6 +39,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
 export function useFcm() {
   const prependNotification = useNotificationStore((s) => s.prependNotification)
   const token = useAuthStore((s) => s.token)
+  const missionAlert = useSettingsStore((s) => s.missionAlert)
 
   useEffect(() => {
     if (!token) return
@@ -50,6 +52,10 @@ export function useFcm() {
 
     const unsubscribe = onMessage(messaging, (payload) => {
       const data = payload.data ?? {}
+
+      // 미션 알림이 꺼져 있으면 MISSION_START 알림을 표시하지 않음
+      if (data.type === 'MISSION_START' && !missionAlert) return
+
       const appNotif = mapToAppNotification(data)
       if (appNotif) prependNotification(appNotif)
 
