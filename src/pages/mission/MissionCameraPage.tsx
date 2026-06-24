@@ -25,14 +25,15 @@ export default function MissionCameraPage() {
 
   // 페이지 진입 시 카메라 켜기
   useEffect(() => {
-    camera.startPreview('front')
-    // 카메라가 2개 이상일 때만 전환 버튼 노출 (권한 부여 후 라벨/개수 정확)
-    navigator.mediaDevices?.enumerateDevices?.()
-      .then((devices) => {
-        const cams = devices.filter((d) => d.kind === 'videoinput')
-        setHasMultiCam(cams.length > 1)
-      })
-      .catch(() => setHasMultiCam(false))
+    // 권한 부여 후 enumerateDevices를 해야 카메라 개수가 정확히 잡힘
+    camera.startPreview('front').then(() => {
+      navigator.mediaDevices?.enumerateDevices?.()
+        .then((devices) => {
+          const cams = devices.filter((d) => d.kind === 'videoinput')
+          setHasMultiCam(cams.length > 1)
+        })
+        .catch(() => setHasMultiCam(false))
+    })
     return () => {
       camera.stopPreview()
     }
