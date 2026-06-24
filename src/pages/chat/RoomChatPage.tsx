@@ -234,7 +234,15 @@ export default function RoomChatPage() {
     } else if (myEmojis.length === 0) {
       // 아직 리액션 없을 때만 추가 허용
       addReaction(numRoomId, msgId, emoji)
-      chatApi.addReaction(numRoomId, msgId, emoji).catch(console.error)
+      chatApi.addReaction(numRoomId, msgId, emoji).catch((err) => {
+        const status = err?.response?.status
+        if (status === 500 || status === 409) {
+          // 서버에 이미 리액션 존재 — UI는 그대로, 이후 중복 시도 차단됨(myReactions 이미 등록)
+        } else {
+          // 다른 에러 → optimistic 롤백
+          removeReaction(numRoomId, msgId, emoji)
+        }
+      })
     }
     // 이미 다른 이모지로 반응한 경우 → 무시 (서버 500 방지)
     closePicker()
