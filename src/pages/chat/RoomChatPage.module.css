@@ -243,11 +243,25 @@
   font-size: var(--text-sm);
 }
 
+/* ── 버블 + 시간 가로 묶음 ────────────────────────────────────────────────── */
+.bubbleTimeRow {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.bubbleTimeRowMe {
+  flex-direction: row-reverse;
+}
+
 /* ── 시간 ─────────────────────────────────────────────────────────────────── */
 .msgTime {
   font-size: 10px;
   color: var(--color-text-muted);
-  padding: 0 var(--sp-1);
+  white-space: nowrap;
+  flex-shrink: 0;
+  padding-bottom: 3px;
 }
 
 .msgTimeMe {

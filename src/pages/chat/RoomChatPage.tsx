@@ -423,31 +423,33 @@ function MsgBubble({
           <span className={styles.senderName}>{msg.userName}</span>
         )}
 
-        {/* 버블 */}
-        <div
-          className={[
-            styles.bubble,
-            isMe ? styles.bubbleMe : styles.bubbleOther,
-            isGroupLast ? (isMe ? styles.tailMe : styles.tailOther) : '',
-          ].filter(Boolean).join(' ')}
-          onMouseDown={onLongPressStart}
-          onMouseUp={onLongPressEnd}
-          onMouseLeave={onLongPressEnd}
-          onTouchStart={onLongPressStart}
-          onTouchEnd={onLongPressEnd}
-          onContextMenu={(e) => { e.preventDefault(); onOpenPicker() }}
-        >
-          <span className={styles.bubbleText}>{msg.content}</span>
+        {/* 버블 + 시간 가로 묶음 */}
+        <div className={[styles.bubbleTimeRow, isMe ? styles.bubbleTimeRowMe : ''].filter(Boolean).join(' ')}>
+          <div
+            className={[
+              styles.bubble,
+              isMe ? styles.bubbleMe : styles.bubbleOther,
+              isGroupLast ? (isMe ? styles.tailMe : styles.tailOther) : '',
+            ].filter(Boolean).join(' ')}
+            onMouseDown={onLongPressStart}
+            onMouseUp={onLongPressEnd}
+            onMouseLeave={onLongPressEnd}
+            onTouchStart={onLongPressStart}
+            onTouchEnd={onLongPressEnd}
+            onContextMenu={(e) => { e.preventDefault(); onOpenPicker() }}
+          >
+            <span className={styles.bubbleText}>{msg.content}</span>
+          </div>
+
+          {/* 시간 (그룹 마지막만) */}
+          {isGroupLast && (
+            <span className={[styles.msgTime, isMe ? styles.msgTimeMe : ''].filter(Boolean).join(' ')}>
+              {formatTime(msg.createdAt)}
+            </span>
+          )}
         </div>
 
-        {/* 시간 (그룹 마지막만) */}
-        {isGroupLast && (
-          <span className={[styles.msgTime, isMe ? styles.msgTimeMe : ''].filter(Boolean).join(' ')}>
-            {formatTime(msg.createdAt)}
-          </span>
-        )}
-
-        {/* 리액션 */}
+        {/* 리액션 — 버블 바로 아래 */}
         {reactions.length > 0 && (
           <div className={[styles.reactions, isMe ? styles.reactionsMe : ''].filter(Boolean).join(' ')}>
             {reactions.map(({ emoji, count }) => (
