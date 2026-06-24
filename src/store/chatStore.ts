@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 import type { RoomChatMessage } from '@/types'
 
 interface ChatState {
@@ -25,7 +26,9 @@ interface ChatState {
   clearAll: () => void
 }
 
-export const useChatStore = create<ChatState>()((set) => ({
+export const useChatStore = create<ChatState>()(
+  persist(
+    (set) => ({
   messages:      {},
   reactionTarget: null,
   myReactions:   {},
@@ -91,4 +94,11 @@ export const useChatStore = create<ChatState>()((set) => ({
   setReactionTarget: (chatId) => set({ reactionTarget: chatId }),
 
   clearAll: () => set({ messages: {}, myReactions: {}, reactionTarget: null }),
-}))
+    }),
+    {
+      name: 'synk_chat_reactions',
+      // messages는 서버에서 로드하므로 myReactions만 저장
+      partialize: (s) => ({ myReactions: s.myReactions }),
+    },
+  )
+)
