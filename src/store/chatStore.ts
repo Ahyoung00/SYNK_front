@@ -55,11 +55,12 @@ export const useChatStore = create<ChatState>()((set) => ({
       const rKey = `${roomId}:${msgId}`
       const msgs = (s.messages[key] ?? []).map((m) => {
         if (m.messageId !== msgId) return m
-        const idx = m.reactions.findIndex((r) => r.emoji === emoji)
+        const existing = m.reactions ?? []
+        const idx = existing.findIndex((r) => r.emoji === emoji)
         const reactions =
           idx >= 0
-            ? m.reactions.map((r, i) => i === idx ? { ...r, count: r.count + 1 } : r)
-            : [...m.reactions, { emoji, count: 1 }]
+            ? existing.map((r, i) => i === idx ? { ...r, count: r.count + 1 } : r)
+            : [...existing, { emoji, count: 1 }]
         return { ...m, reactions }
       })
       const myReactions = {
@@ -75,7 +76,7 @@ export const useChatStore = create<ChatState>()((set) => ({
       const rKey = `${roomId}:${msgId}`
       const msgs = (s.messages[key] ?? []).map((m) => {
         if (m.messageId !== msgId) return m
-        const reactions = m.reactions
+        const reactions = (m.reactions ?? [])
           .map((r) => r.emoji === emoji ? { ...r, count: r.count - 1 } : r)
           .filter((r) => r.count > 0)
         return { ...m, reactions }
