@@ -72,3 +72,24 @@
   color: var(--color-text-muted);
   padding: var(--sp-2);
 }
+
+/* ── 카카오톡 인앱 브라우저 안내 배너 ────────────────────────────────────── */
+.inAppBanner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 999;
+  background: #FEE500;
+  color: #391B1B;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 14px var(--sp-5);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.5;
+}

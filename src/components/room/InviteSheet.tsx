@@ -12,7 +12,8 @@ interface InviteSheetProps {
 export default function InviteSheet({ roomId, roomCode, open, onClose }: InviteSheetProps) {
   const [copied, setCopied] = useState(false)
 
-  const inviteLink = `https://synk-front.vercel.app/room/${roomId}?code=${roomCode}`
+  const baseUrl    = import.meta.env.VITE_APP_URL ?? 'https://synk-front.vercel.app'
+  const inviteLink = `${baseUrl}/invite/${roomCode}`
   const shareText  = `SYNK 방에 초대합니다! 코드: ${roomCode}\n${inviteLink}`
 
   function handleCopyCode() {
