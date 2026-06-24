@@ -197,8 +197,9 @@ export default function RoomChatPage() {
     if (!content) return
 
     // optimistic update — 즉시 화면에 표시
+    // 음수 ID: localStorage에 저장되지 않도록 (Date.now()를 쓰면 서버 ID와 비교 불가)
     const tempMsg: RoomChatMessage = {
-      messageId:    Date.now(),
+      messageId:    -Date.now(),
       userId:       myUserId,
       userName:     myUser?.name ?? '나',
       profileImage: myUser?.profileImage ?? null,
