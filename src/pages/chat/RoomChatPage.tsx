@@ -87,6 +87,8 @@ export default function RoomChatPage() {
   const [roomName, setRoomName]     = useState('')
   const [memberCount, setMemberCount] = useState(0)
   const [missionDone, setMissionDone] = useState(false)
+  // 리액션 피커 앵커 위치 { top, isMe }
+  const [pickerAnchor, setPickerAnchor] = useState<{ top: number; isMe: boolean } | null>(null)
   // userId → profileImage 맵 (STOMP 메시지에 profileImage 없을 때 보완용)
   const memberProfileMap = useRef<Map<number, string | null>>(new Map())
 
@@ -231,15 +233,27 @@ export default function RoomChatPage() {
       addReaction(numRoomId, msgId, emoji)
       chatApi.addReaction(numRoomId, msgId, emoji).catch(console.error)
     }
-    setReactionTarget(null)
-  }, [myReactions, numRoomId, addReaction, removeReaction, setReactionTarget])
+    closePicker()
+  }, [myReactions, numRoomId, addReaction, removeReaction, setReactionTarget]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── 롱프레스 ─────────────────────────────────────────────────────────────
-  function startLongPress(msgId: number) {
-    longPressTimer.current = setTimeout(() => setReactionTarget(msgId), LONG_PRESS_MS)
+  function startLongPress(msgId: number, e: React.TouchEvent | React.MouseEvent, isMe: boolean) {
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    longPressTimer.current = setTimeout(() => {
+      // 피커를 버블 위쪽에 띄움 (공간 부족하면 아래)
+      const pickerH = 72
+      const top = rect.top - pickerH > 8 ? rect.top - pickerH : rect.bottom + 8
+      setPickerAnchor({ top, isMe })
+      setReactionTarget(msgId)
+    }, LONG_PRESS_MS)
   }
   function cancelLongPress() {
     if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
+  }
+
+  function closePicker() {
+    setReactionTarget(null)
+    setPickerAnchor(null)
   }
 
   // ── 디스플레이 아이템 (메모) ───────────────────────────────────────────────
@@ -288,10 +302,16 @@ export default function RoomChatPage() {
               isGroupFirst={isGroupFirst}
               isGroupLast={isGroupLast}
               myReactionEmojis={myReactions[rKey] ?? []}
-              onLongPressStart={() => startLongPress(msg.messageId)}
+              onLongPressStart={(e) => startLongPress(msg.messageId, e, msg.isMyMessage || msg.myMessage)}
               onLongPressEnd={cancelLongPress}
               onReactionTap={(emoji) => handleReactionToggle(msg.messageId, emoji)}
-              onOpenPicker={() => setReactionTarget(msg.messageId)}
+              onOpenPicker={(e) => {
+                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+                const pickerH = 72
+                const top = rect.top - pickerH > 8 ? rect.top - pickerH : rect.bottom + 8
+                setPickerAnchor({ top, isMe: msg.isMyMessage || msg.myMessage })
+                setReactionTarget(msg.messageId)
+              }}
             />
           )
         })}
@@ -323,23 +343,23 @@ export default function RoomChatPage() {
         </button>
       </div>
 
-      {/* ── 리액션 피커 바텀시트 ─────────────────────────────────────────── */}
-      {reactionTarget !== null && (
-        <div className={styles.pickerOverlay} onClick={() => setReactionTarget(null)}>
-          <div className={styles.pickerSheet} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.pickerHandle} />
-            <p className={styles.pickerHint}>리액션 추가</p>
-            <div className={styles.pickerRow}>
-              {EMOJI_OPTIONS.map((emoji) => (
-                <button
-                  key={emoji}
-                  className={styles.pickerBtn}
-                  onClick={() => handleReactionToggle(reactionTarget, emoji)}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
+      {/* ── 리액션 floating 피커 ────────────────────────────────────────── */}
+      {reactionTarget !== null && pickerAnchor && (
+        <div className={styles.pickerOverlay} onClick={closePicker}>
+          <div
+            className={[styles.pickerFloat, pickerAnchor.isMe ? styles.pickerFloatMe : styles.pickerFloatOther].join(' ')}
+            style={{ top: pickerAnchor.top }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {EMOJI_OPTIONS.map((emoji) => (
+              <button
+                key={emoji}
+                className={styles.pickerBtn}
+                onClick={() => handleReactionToggle(reactionTarget, emoji)}
+              >
+                {emoji}
+              </button>
+            ))}
           </div>
         </div>
       )}
@@ -378,10 +398,10 @@ interface MsgBubbleProps {
   isGroupFirst: boolean
   isGroupLast: boolean
   myReactionEmojis: string[]
-  onLongPressStart: () => void
+  onLongPressStart: (e: React.TouchEvent | React.MouseEvent) => void
   onLongPressEnd: () => void
   onReactionTap: (emoji: string) => void
-  onOpenPicker: () => void
+  onOpenPicker: (e: React.MouseEvent) => void
 }
 
 function MsgBubble({
@@ -431,12 +451,12 @@ function MsgBubble({
               isMe ? styles.bubbleMe : styles.bubbleOther,
               isGroupLast ? (isMe ? styles.tailMe : styles.tailOther) : '',
             ].filter(Boolean).join(' ')}
-            onMouseDown={onLongPressStart}
+            onMouseDown={(e) => onLongPressStart(e)}
             onMouseUp={onLongPressEnd}
             onMouseLeave={onLongPressEnd}
-            onTouchStart={onLongPressStart}
+            onTouchStart={(e) => onLongPressStart(e)}
             onTouchEnd={onLongPressEnd}
-            onContextMenu={(e) => { e.preventDefault(); onOpenPicker() }}
+            onContextMenu={(e) => { e.preventDefault(); onOpenPicker(e) }}
           >
             <span className={styles.bubbleText}>{msg.content}</span>
           </div>
@@ -465,7 +485,7 @@ function MsgBubble({
                 {count > 1 && <span className={styles.reactionCount}>{count}</span>}
               </button>
             ))}
-            <button className={styles.addReactionChip} onClick={onOpenPicker} aria-label="리액션 추가">
+            <button className={styles.addReactionChip} onClick={(e) => onOpenPicker(e)} aria-label="리액션 추가">
               <AddReactionIcon />
             </button>
           </div>
