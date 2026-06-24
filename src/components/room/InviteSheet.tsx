@@ -9,7 +9,7 @@ interface InviteSheetProps {
 }
 
 /** 친구 초대 바텀시트 — 코드/링크 복사 + 공유 */
-export default function InviteSheet({ roomId, roomCode, open, onClose }: InviteSheetProps) {
+export default function InviteSheet({ roomId: _roomId, roomCode, open, onClose }: InviteSheetProps) {
   const [copied, setCopied] = useState(false)
 
   const baseUrl    = import.meta.env.VITE_APP_URL ?? 'https://synk-front.vercel.app'
