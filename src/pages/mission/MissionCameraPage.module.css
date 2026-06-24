@@ -238,3 +238,43 @@
 .submitBtn:active {
   opacity: 0.85;
 }
+
+/* ── 카메라 분할 오버레이 ─────────────────────────────────────────────────── */
+.gridOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+}
+
+.gridRow {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+}
+
+.gridCell {
+  flex: 1;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-sizing: border-box;
+}
+
+.gridCellMine {
+  border: 2px solid rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-bottom: 6px;
+}
+
+.gridCellLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 4px;
+  padding: 2px 6px;
+  letter-spacing: 0.02em;
+}
