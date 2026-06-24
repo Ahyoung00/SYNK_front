@@ -2,12 +2,10 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCamera, VIDEO_MIN_S, VIDEO_MAX_S, type CameraFacing } from '@/hooks/useCamera'
 import { useMissionStore } from '@/store/missionStore'
-import { useAuthStore } from '@/store/authStore'
 import { missionApi, uploadApi } from '@/services/api/endpoints'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import { ROUTES } from '@/constants'
 import { formatTime } from '@/hooks/useTimer'
-import { getLayout } from '@/utils/cameraLayout'
 import styles from './MissionCameraPage.module.css'
 
 export default function MissionCameraPage() {
@@ -17,8 +15,6 @@ export default function MissionCameraPage() {
   const setRecordedBlob = useMissionStore((s) => s.setRecordedBlob)
   const clearMission    = useMissionStore((s) => s.clearMission)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
-  const myUser = useAuthStore((s) => s.user)
 
   const camera = useCamera()
   const previewVideoRef = camera.previewRef as React.RefObject<HTMLVideoElement>
@@ -70,10 +66,6 @@ export default function MissionCameraPage() {
   const secondsLeft = active.seconds_left
 
   // 카메라 분할 레이아웃
-  const memberCount = active.participations.length || (room.current_members ?? 1)
-  const layout = getLayout(memberCount)
-  // 현재 유저의 셀 인덱스 (participations 순서 기준)
-  const myIndex = active.participations.findIndex((p) => p.user.userId === myUser?.userId)
 
   async function handleSubmit() {
     if (isSubmitting || !camera.recordedBlob) return
@@ -148,10 +140,6 @@ export default function MissionCameraPage() {
           </div>
         )}
 
-        {/* 분할 그리드 오버레이 (1인이면 표시 안 함) */}
-        {memberCount > 1 && camera.state !== 'done' && (
-          <CameraGridOverlay layout={layout} myIndex={myIndex} />
-        )}
       </div>
 
       {/* ── 상단 오버레이 ────────────────────────────────────────────────────── */}
@@ -239,32 +227,6 @@ export default function MissionCameraPage() {
           </div>
         )}
       </div>
-    </div>
-  )
-}
-
-// ── 카메라 분할 그리드 오버레이 ───────────────────────────────────────────────
-
-function CameraGridOverlay({ layout, myIndex }: { layout: number[]; myIndex: number }) {
-  let cellIndex = 0
-  return (
-    <div className={styles.gridOverlay}>
-      {layout.map((colCount, rowIdx) => (
-        <div key={rowIdx} className={styles.gridRow}>
-          {Array.from({ length: colCount }, (_, colIdx) => {
-            const idx = cellIndex++
-            const isMine = idx === myIndex
-            return (
-              <div
-                key={colIdx}
-                className={isMine ? `${styles.gridCell} ${styles.gridCellMine}` : styles.gridCell}
-              >
-                {isMine && <span className={styles.gridCellLabel}>나</span>}
-              </div>
-            )
-          })}
-        </div>
-      ))}
     </div>
   )
 }
