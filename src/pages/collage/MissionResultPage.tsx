@@ -96,8 +96,11 @@ export default function MissionResultPage() {
   }
 
   // ── 통계 계산 ──────────────────────────────────────────────────────────────
+  // 실제 제출 여부는 submittedAt/videoUrl 존재로 판단 (BE state가 미제출자도 done으로 주는 경우 대비)
+  const hasSubmitted = (p: { state?: string; submittedAt?: string | null; videoUrl?: string | null }) =>
+    p.submittedAt != null || !!p.videoUrl
   const participants    = collage?.participants ?? []
-  const submittedCount  = participants.filter((p) => p.state === 'done').length
+  const submittedCount  = participants.filter(hasSubmitted).length
   const totalCount      = participants.length
   const participationRate = totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0
 
@@ -105,9 +108,9 @@ export default function MissionResultPage() {
   const allSubmitted = submittedCount === totalCount && totalCount > 0
 
   const missionStartAt = collage?.missionStartAt ?? null
-  // 제출 완료(state === 'done')한 사람의 submittedAt만 사용
+  // 실제 제출한 사람의 submittedAt만 사용
   const lastSubmitAt = participants
-    .filter((p) => p.state === 'done' && p.submittedAt)
+    .filter((p) => hasSubmitted(p) && p.submittedAt)
     .map((p) => new Date(p.submittedAt!).getTime())
     .sort((a, b) => b - a)[0]
 
