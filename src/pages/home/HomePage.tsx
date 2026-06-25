@@ -453,11 +453,13 @@ export default function HomePage() {
   }, [])
 
   // 로컬에서 타이머가 만료된 미션 ID 집합 — 서버 poll이 지워도 카드를 유지하기 위해
-  const expiredIdsRef     = useRef<Set<number>>(new Set())
+  const expiredIdsRef      = useRef<Set<number>>(new Set())
   // 이미 알림을 띄운 미션 ID — 첫 로드 포함 (재알림 방지)
-  const seenMissionIdsRef = useRef<Set<number>>(new Set())
+  const seenMissionIdsRef  = useRef<Set<number>>(new Set())
   // 첫 폴링 완료 여부 — 초기 로드 시엔 알림 안 띄움
   const initialLoadDoneRef = useRef(false)
+  // 사용자가 "보러가기"를 눌러 dismiss한 미션 ID — 폴링 재세팅 방지
+  const dismissedMissionIdRef = useRef<number | null>(null)
 
   // 브라우저 알림 표시 (미션 알림 OFF면 건너뜀)
   function showBrowserNotification(title: string, body: string) {
@@ -490,8 +492,9 @@ export default function HomePage() {
     // 본 미션 ID 등록
     missions.forEach((m) => seenMissionIdsRef.current.add(m.id))
 
-    // 폴링에서 전원 완료 감지 → 완료 배너 세팅 (다른 멤버도 인지하도록)
+    // 폴링에서 전원 완료 감지 → 완료 배너 세팅 (이미 dismiss한 미션은 제외)
     for (const m of missions) {
+      if (dismissedMissionIdRef.current === m.id) continue
       const doneCount = (m.participants ?? []).filter((p) => p.status === '완료').length
       if (doneCount >= m.totalMembers && m.totalMembers > 0) {
         setCompletedMissionRaw((prev) => {
@@ -716,7 +719,10 @@ export default function HomePage() {
             missionTitle={completedMission.missionTitle}
             roomName={completedMission.roomName}
             onViewCollage={() => {
-              setCompletedMission(null)  // 배너 즉시 제거
+              if (!completedMission) return
+              // dismiss 처리 — 폴링이 다시 세팅하지 못하도록
+              dismissedMissionIdRef.current = completedMission.missionId
+              setCompletedMission(null)
               setShowTransition(true)
             }}
           />
@@ -725,13 +731,16 @@ export default function HomePage() {
         {/* ── 콜라주 생성중 전환 오버레이 ────────────────────────────────────── */}
         {showTransition && (
           <CollageTransitionOverlay
-            memberCount={transitionMemberCount || (completedMission ? 2 : 2)}
+            memberCount={transitionMemberCount || 2}
             participants={transitionParticipants}
             onDone={() => {
               setShowTransition(false)
-              if (completedMission) {
-                navigate(ROUTES.MISSION_RESULT(completedMission.missionId), {
-                  state: { roomId: completedMission.roomId, returnTo: 'home' },
+              const id = dismissedMissionIdRef.current
+              if (id != null) {
+                // dismissedMissionIdRef에서 navigate 대상 조회
+                // processingRoomId는 onExpire/onAllDone 시 이미 세팅됨
+                navigate(ROUTES.MISSION_RESULT(id), {
+                  state: { roomId: processingRoomId ?? undefined, returnTo: 'home' },
                 })
               }
             }}
