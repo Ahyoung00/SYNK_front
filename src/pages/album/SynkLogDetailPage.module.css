@@ -183,6 +183,16 @@
 .collageChip:active { opacity: 0.7; }
 
 /* 참여자 포토 그리드 */
+/* CollageGrid 래퍼 — 9:16 비율 고정, 내부 절대 포지셔닝 허용 */
+.collageGridWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  background: #000;
+}
+
 .photoGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;

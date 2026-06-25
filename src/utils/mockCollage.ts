@@ -1,4 +1,4 @@
-import type { MemberParticipation } from '@/types'
+import type { MemberParticipation, CollageItem } from '@/types'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 개발용 mock 콜라주 셀 데이터
@@ -32,6 +32,18 @@ export function buildCollageCells(
       : undefined,
     status:        p.state === 'done' ? 'submitted' : 'missed',
     gradient:      CELL_GRADIENTS[i % CELL_GRADIENTS.length],
+  }))
+}
+
+/** CollageItem(API 응답) → CollageCellData[] 변환 — 모든 화면에서 공유 */
+export function collageItemToCells(item: CollageItem): CollageCellData[] {
+  return item.participants.map((p, i) => ({
+    user: { id: p.userId, name: p.name, profile_image: p.profileImage ?? undefined },
+    videoUrl:       p.videoUrl ?? undefined,
+    missionStartAt: item.missionStartAt ?? new Date().toISOString(),
+    submittedAt:    p.submittedAt ?? undefined,
+    status:         p.state === 'done' ? 'submitted' : 'missed',
+    gradient:       CELL_GRADIENTS[i % CELL_GRADIENTS.length],
   }))
 }
 

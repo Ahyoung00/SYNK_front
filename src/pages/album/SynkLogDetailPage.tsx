@@ -6,6 +6,8 @@ import { useAuthStore } from '@/store/authStore'
 import { ROUTES } from '@/constants'
 import type { CollageItem, SynklogDetailResponse, RoomDetail } from '@/types'
 import { missionEmoji } from '@/utils/missionVisual'
+import { collageItemToCells } from '@/utils/mockCollage'
+import { CollageGrid } from '@/components/collage/CollageGrid'
 import styles from './SynkLogDetailPage.module.css'
 
 
@@ -207,17 +209,9 @@ export default function SynkLogDetailPage() {
               </button>
             </div>
 
-            {/* 참여자 포토 그리드 */}
-            <div className={styles.photoGrid}>
-              {item.participants.map((p) => (
-                <div key={p.userId} className={styles.photoCell}>
-                  {p.videoUrl
-                    ? <video src={p.videoUrl} className={styles.photo} muted playsInline />
-                    : <div className={styles.photoPlaceholder} />
-                  }
-                  <span className={styles.photoName}>{p.name}</span>
-                </div>
-              ))}
+            {/* 참여자 콜라주 그리드 — Lambda LAYOUTS 기준 균등 분할 */}
+            <div className={styles.collageGridWrap}>
+              <CollageGrid cells={collageItemToCells(item)} />
             </div>
 
           </div>

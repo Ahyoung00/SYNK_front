@@ -4,34 +4,11 @@ import { useMissionStore } from '@/store/missionStore'
 import { albumApi } from '@/services/api/endpoints'
 import { CollageGrid } from '@/components/collage/CollageGrid'
 import type { CollageCellData } from '@/utils/mockCollage'
+import { collageItemToCells } from '@/utils/mockCollage'
 import type { CollageItem } from '@/types'
 import { ROUTES } from '@/constants'
 import styles from './MissionResultPage.module.css'
 
-/** CollageItem → CollageCellData[] 변환 */
-function collageToCells(collage: CollageItem): CollageCellData[] {
-  return collage.participants.map((p, i) => ({
-    user: { id: p.userId, name: p.name, profile_image: p.profileImage ?? undefined },
-    videoUrl:      p.videoUrl ?? undefined,
-    missionStartAt: collage.missionStartAt ?? new Date().toISOString(),
-    submittedAt:   p.submittedAt ?? undefined,
-    status:        p.state === 'done' ? 'submitted' : 'missed',
-    gradient:      CELL_GRADIENTS[i % CELL_GRADIENTS.length],
-  }))
-}
-
-const CELL_GRADIENTS = [
-  'linear-gradient(160deg, #1a1a3e 0%, #0f3460 100%)',
-  'linear-gradient(160deg, #2d1b69 0%, #11998e 100%)',
-  'linear-gradient(160deg, #4a0942 0%, #b91c5c 100%)',
-  'linear-gradient(160deg, #0f2027 0%, #2c5364 100%)',
-  'linear-gradient(160deg, #1f1c2c 0%, #6c63ff 100%)',
-  'linear-gradient(160deg, #16213e 0%, #0f3460 50%, #533483 100%)',
-  'linear-gradient(160deg, #2c003e 0%, #8b0000 100%)',
-  'linear-gradient(160deg, #003b36 0%, #1a7a4a 100%)',
-  'linear-gradient(160deg, #1a0533 0%, #3a0ca3 100%)',
-  'linear-gradient(160deg, #1e3a5f 0%, #2e86ab 100%)',
-]
 
 function todayString(): string {
   const d = new Date()
@@ -86,7 +63,7 @@ export default function MissionResultPage() {
         if (target) {
           setCollageVideoUrl(target.collageVideoUrl)
           setMissionTitle(target.missionTitle)
-          setCells(collageToCells(target))
+          setCells(collageItemToCells(target))
         } else {
           setLoadError(true)
         }
