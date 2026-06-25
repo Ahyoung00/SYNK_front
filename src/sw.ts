@@ -43,9 +43,14 @@ self.addEventListener('push', (e: PushEvent) => {
   }
 
   e.waitUntil(
-    self.registration.showNotification(title, {
-      body,
-      icon: '/icon-192.png',
+    // 포커스(visible)된 앱 화면이 있으면 포그라운드 onMessage가 표시 담당 → SW는 건너뜀 (중복 방지)
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      const hasFocused = clients.some((c) => c.visibilityState === 'visible')
+      if (hasFocused) return
+      return self.registration.showNotification(title, {
+        body,
+        icon: '/icon-192.png',
+      })
     })
   )
 })
