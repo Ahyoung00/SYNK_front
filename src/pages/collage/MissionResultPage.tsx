@@ -1,14 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
 import { albumApi } from '@/services/api/endpoints'
-import { CollageGrid } from '@/components/collage/CollageGrid'
-import type { CollageCellData } from '@/utils/mockCollage'
-import { collageItemToCells } from '@/utils/mockCollage'
 import type { CollageItem } from '@/types'
 import { ROUTES } from '@/constants'
 import styles from './MissionResultPage.module.css'
-
 
 function todayString(): string {
   const d = new Date()
@@ -23,24 +19,18 @@ export default function MissionResultPage() {
   const { missionId: missionIdParam } = useParams<{ missionId: string }>()
   const active       = useMissionStore((s) => s.active)
   const clearMission = useMissionStore((s) => s.clearMission)
+  const videoRef     = useRef<HTMLVideoElement>(null)
 
-  const [cells, setCells]         = useState<CollageCellData[]>([])
-  const [_collageVideoUrl, setCollageVideoUrl] = useState<string | null>(null)
-  const [missionTitle, setMissionTitle]       = useState<string>('미션 결과')
-  const [showStats, setShowStats] = useState(false)
-  const [loadError, setLoadError] = useState(false)
+  const [collage, setCollage]       = useState<CollageItem | null>(null)
+  const [missionTitle, setMissionTitle] = useState<string>('미션 결과')
+  const [showStats, setShowStats]   = useState(false)
+  const [loadError, setLoadError]   = useState(false)
 
-  // 셀 데이터 초기화 — collage API로부터 실제 영상 URL 로드
   useEffect(() => {
-    const navState = location.state as { roomId?: number; date?: string } | null
-    const stateRoomId = navState?.roomId
-    // location.state.roomId 우선, 없으면 active store fallback
-    const roomId = stateRoomId ?? active?.room.id
+    const navState  = location.state as { roomId?: number; date?: string } | null
+    const roomId    = navState?.roomId ?? active?.room.id
     const missionId = Number(missionIdParam) || active?.mission.id
-    // 앨범에서 진입 시 해당 날짜로 조회 (없으면 오늘)
-    const date     = navState?.date ?? todayString()
-
-    console.log('[MissionResultPage] roomId:', roomId, 'missionId:', missionId, 'date:', date)
+    const date      = navState?.date ?? todayString()
 
     if (!roomId) {
       setLoadError(true)
@@ -51,8 +41,6 @@ export default function MissionResultPage() {
     albumApi.getCollages(roomId, date)
       .then((res) => {
         const collages: CollageItem[] = res.data ?? []
-        console.log('[MissionResultPage] collages:', collages)
-        // 특정 미션 미지정/미발견 시 최신(가장 늦게 시작된) 미션 결과로
         const latest = [...collages].sort(
           (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
         )[0]
@@ -61,52 +49,46 @@ export default function MissionResultPage() {
           : latest
 
         if (target) {
-          setCollageVideoUrl(target.collageVideoUrl)
+          setCollage(target)
           setMissionTitle(target.missionTitle)
-          setCells(collageItemToCells(target))
         } else {
           setLoadError(true)
         }
       })
-      .catch((e) => { console.error('[MissionResultPage] getCollages error:', e); setLoadError(true) })
+      .catch(() => setLoadError(true))
       .finally(() => setTimeout(() => setShowStats(true), 400))
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleBack() {
-    // 앨범에서 "SYNK 보기"로 진입한 경우 → 앨범으로 돌아가기
     if ((location.state as { returnTo?: string } | null)?.returnTo === 'album') {
       navigate(-1)
       return
     }
-    // 일반 미션 완료 후 진입한 경우 → 홈으로 (미션 히스토리 정리)
     navigate(ROUTES.HOME, { replace: true })
     clearMission()
   }
 
-// ── 통계 계산 ──────────────────────────────────────────────────────────────
-  const submittedCount = cells.filter((c) => c.status === 'submitted').length
-  const totalCount = cells.length
+  // ── 통계 계산 ──────────────────────────────────────────────────────────────
+  const participants    = collage?.participants ?? []
+  const submittedCount  = participants.filter((p) => p.state === 'done').length
+  const totalCount      = participants.length
   const participationRate = totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0
 
-  // 마지막 제출 시각 기준 걸린 시간
-  const missionStartAt = cells[0]?.missionStartAt
-  const lastSubmitAt = cells
-    .filter((c) => c.submittedAt)
-    .map((c) => new Date(c.submittedAt!).getTime())
+  const missionStartAt = collage?.missionStartAt ?? null
+  const lastSubmitAt   = participants
+    .filter((p) => p.submittedAt)
+    .map((p) => new Date(p.submittedAt!).getTime())
     .sort((a, b) => b - a)[0]
 
   const completionTime = missionStartAt && lastSubmitAt
     ? Math.floor((lastSubmitAt - new Date(missionStartAt).getTime()) / 1000)
     : null
 
-  function formatCompletionTime(seconds: number): string {
-    const m = Math.floor(seconds / 60)
-    const s = seconds % 60
-    return `${String(m).padStart(2, '0')}m ${String(s).padStart(2, '0')}s`
+  function formatCompletionTime(s: number) {
+    return `${String(Math.floor(s / 60)).padStart(2, '0')}m ${String(s % 60).padStart(2, '0')}s`
   }
 
-  // ── 미션 정보 ──────────────────────────────────────────────────────────────
-  const roomName = active?.room.name ?? ''
+  const roomName   = active?.room.name ?? ''
   const missionDate = missionStartAt
     ? new Date(missionStartAt).toLocaleDateString('ko-KR', {
         year: 'numeric', month: 'long', day: 'numeric',
@@ -124,55 +106,56 @@ export default function MissionResultPage() {
     </div>
   )
 
-  if (cells.length === 0) return null
+  if (!collage) return null
 
   return (
     <div className={styles.page}>
 
       {/* ── 헤더 ──────────────────────────────────────────────────────────── */}
       <div className={styles.header}>
-        <button className={styles.backBtn} onClick={handleBack} aria-label="뒤로">
-          ←
-        </button>
+        <button className={styles.backBtn} onClick={handleBack} aria-label="뒤로">←</button>
         <div className={styles.headerText}>
           <h2 className={styles.missionTitle}>{missionTitle}</h2>
           <p className={styles.meta}>{roomName} · {missionDate}</p>
         </div>
       </div>
 
-      {/* ── 콜라주 그리드 ─────────────────────────────────────────────────── */}
+      {/* ── 콜라주 영상 ───────────────────────────────────────────────────── */}
       <div className={styles.collageArea}>
-        <CollageGrid cells={cells} />
+        {collage.collageVideoUrl ? (
+          <video
+            ref={videoRef}
+            className={styles.collageVideo}
+            src={collage.collageVideoUrl}
+            controls
+            autoPlay
+            loop
+            muted
+            playsInline
+          />
+        ) : (
+          <div className={styles.processingState}>
+            <span className={styles.processingIcon}>🎬</span>
+            <p className={styles.processingText}>결과를 만드는 중…</p>
+            <p className={styles.processingSubText}>잠시 후 다시 확인해주세요</p>
+          </div>
+        )}
 
-        {/* 인원 수 배지 */}
         <div className={styles.countBadge}>
           {submittedCount}/{totalCount}명 참여
         </div>
       </div>
 
-      {/* ── 통계 + 버튼 ───────────────────────────────────────────────────── */}
+      {/* ── 통계 + 홈으로 ─────────────────────────────────────────────────── */}
       <div className={[styles.footer, showStats ? styles.footerVisible : ''].join(' ')}>
-
-        {/* 통계 행 */}
         <div className={styles.statsRow}>
-          <StatItem
-            label="참여율"
-            value={`${participationRate}%`}
-            highlight={participationRate === 100}
-          />
+          <StatItem label="참여율" value={`${participationRate}%`} highlight={participationRate === 100} />
           <div className={styles.statDivider} />
-          <StatItem
-            label="걸린 시간"
-            value={completionTime != null ? formatCompletionTime(completionTime) : '—'}
-          />
+          <StatItem label="걸린 시간" value={completionTime != null ? formatCompletionTime(completionTime) : '—'} />
           <div className={styles.statDivider} />
-          <StatItem
-            label="제출"
-            value={`${submittedCount}/${totalCount}명`}
-          />
+          <StatItem label="제출" value={`${submittedCount}/${totalCount}명`} />
         </div>
 
-        {/* 홈으로 */}
         <button className={styles.homeBtn} onClick={() => { clearMission(); navigate(ROUTES.HOME, { replace: true }) }}>
           홈으로 돌아가기
         </button>
@@ -182,24 +165,11 @@ export default function MissionResultPage() {
   )
 }
 
-// ── StatItem ──────────────────────────────────────────────────────────────────
-
-function StatItem({
-  label,
-  value,
-  highlight = false,
-}: {
-  label: string
-  value: string
-  highlight?: boolean
-}) {
+function StatItem({ label, value, highlight = false }: { label: string; value: string; highlight?: boolean }) {
   return (
     <div className={styles.statItem}>
       <span className={styles.statLabel}>{label}</span>
-      <span
-        className={styles.statValue}
-        style={highlight ? { color: 'var(--color-timer-safe)' } : undefined}
-      >
+      <span className={styles.statValue} style={highlight ? { color: 'var(--color-timer-safe)' } : undefined}>
         {value}
       </span>
     </div>
