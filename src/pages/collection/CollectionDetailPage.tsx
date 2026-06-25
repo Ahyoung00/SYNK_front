@@ -73,7 +73,7 @@ export default function CollectionDetailPage() {
                 <p className={styles.emptyRecords}>기록이 없어요</p>
               ) : (
                 <div className={styles.photoGrid}>
-                  {detail.records.map((r: CollectionRecordItem) => {
+                  {[...detail.records].sort((a, b) => b.date.localeCompare(a.date)).map((r: CollectionRecordItem) => {
                     const video = toHttps(r.videoUrl)
                     return (
                       <button
