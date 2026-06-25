@@ -38,8 +38,14 @@ export default function MissionResultPage() {
       return
     }
 
-    albumApi.getCollages(roomId, date)
-      .then((res) => {
+    let cancelled = false
+    let timer: number | undefined
+    const startedAt = Date.now()
+    const MAX_WAIT = 180_000 // 콜라주 영상 생성 대기 최대 3분
+
+    async function load() {
+      try {
+        const res = await albumApi.getCollages(roomId!, date)
         const collages: CollageItem[] = res.data ?? []
         const latest = [...collages].sort(
           (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
@@ -49,14 +55,35 @@ export default function MissionResultPage() {
           : latest
 
         if (target) {
+          if (cancelled) return
           setCollage(target)
           setMissionTitle(target.missionTitle)
+          setShowStats(true)
+          // 영상이 아직 없으면 생성될 때까지 폴링 (processingState 표시 유지)
+          if (!target.collageVideoUrl && Date.now() - startedAt < MAX_WAIT) {
+            timer = window.setTimeout(load, 3000)
+          }
+          return
+        }
+        // 콜라주 레코드 자체가 아직 없음 → 생성 대기 (최대 3분)
+        if (Date.now() - startedAt < MAX_WAIT) {
+          timer = window.setTimeout(load, 3000)
+        } else if (!cancelled) {
+          setLoadError(true)
+          setShowStats(true)
+        }
+      } catch {
+        if (cancelled) return
+        if (Date.now() - startedAt < MAX_WAIT) {
+          timer = window.setTimeout(load, 3000)
         } else {
           setLoadError(true)
+          setShowStats(true)
         }
-      })
-      .catch(() => setLoadError(true))
-      .finally(() => setTimeout(() => setShowStats(true), 400))
+      }
+    }
+    load()
+    return () => { cancelled = true; if (timer) window.clearTimeout(timer) }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleBack() {

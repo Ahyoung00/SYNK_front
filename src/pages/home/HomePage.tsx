@@ -18,6 +18,52 @@ function todayString(): string {
   return `${d.getFullYear()}-${mm}-${dd}`
 }
 
+// ── 완료 미션 배너 영속화 (미션별 독립, 완료 시점 기준 10분) ──────────────────────
+type CompletedMission = {
+  roomId: number; missionId: number; missionTitle: string; roomName: string
+  memberCount: number; savedAt: number
+}
+const COMPLETED_KEY = 'synk_completed_missions'
+const DISMISSED_KEY = 'synk_dismissed_mission_ids'
+const BANNER_TTL = 10 * 60 * 1000 // 완료 후 10분만 노출
+
+function loadDismissedIds(): number[] {
+  try {
+    const raw = localStorage.getItem(DISMISSED_KEY)
+    if (!raw) return []
+    const arr = JSON.parse(raw) as Array<{ id: number; at: number }>
+    const valid = arr.filter((d) => Date.now() - d.at <= BANNER_TTL)
+    if (valid.length !== arr.length) localStorage.setItem(DISMISSED_KEY, JSON.stringify(valid))
+    return valid.map((d) => d.id)
+  } catch { return [] }
+}
+
+function addDismissedId(id: number) {
+  try {
+    const raw = localStorage.getItem(DISMISSED_KEY)
+    const arr = raw ? (JSON.parse(raw) as Array<{ id: number; at: number }>) : []
+    const next = arr.filter((d) => d.id !== id && Date.now() - d.at <= BANNER_TTL)
+    next.push({ id, at: Date.now() })
+    localStorage.setItem(DISMISSED_KEY, JSON.stringify(next))
+  } catch {}
+}
+
+function loadCompletedMissions(): CompletedMission[] {
+  try {
+    const raw = localStorage.getItem(COMPLETED_KEY)
+    if (!raw) return []
+    const arr = JSON.parse(raw) as CompletedMission[]
+    const dismissed = new Set(loadDismissedIds())
+    const valid = arr.filter((m) => Date.now() - m.savedAt <= BANNER_TTL && !dismissed.has(m.missionId))
+    if (valid.length !== arr.length) localStorage.setItem(COMPLETED_KEY, JSON.stringify(valid))
+    return valid
+  } catch { return [] }
+}
+
+function saveCompletedMissions(arr: CompletedMission[]) {
+  localStorage.setItem(COMPLETED_KEY, JSON.stringify(arr))
+}
+
 // ActiveMissionItem(API) → ActiveMissionState(store) 변환
 function toMissionState(item: ActiveMissionItem): ActiveMissionState {
   const toState = (status: string): 'done' | 'recording' | 'waiting' => {
@@ -220,33 +266,75 @@ function HomeMissionCard({
   )
 }
 
-// ── 콜라주 생성중 전환 오버레이 (클릭 후 3초 표시 → navigate) ─────────────────
+// ── 콜라주 생성중 전환 오버레이 (영상 준비될 때까지 유지 → navigate) ───────────
 
 function CollageTransitionOverlay({
+  roomId,
+  missionId,
+  date,
   memberCount,
-  participants,
-  onDone,
+  onReady,
 }: {
+  roomId: number
+  missionId: number
+  date: string
   memberCount: number
-  participants: Array<{ userId: number; name: string; profileImage: string | null }>
-  onDone: () => void
+  onReady: () => void
 }) {
   const [progress, setProgress] = useState(0)
+  const [participants, setParticipants] = useState<Array<{
+    userId: number; name: string; profileImage: string | null
+  }>>([])
+  const onReadyRef = useRef(onReady)
+  onReadyRef.current = onReady
 
+  // 진행 바: 영상 준비 전까지 92%까지 천천히 차오름 (준비되면 100%)
   useEffect(() => {
     const start = Date.now()
-    const DURATION = 3000
     const id = setInterval(() => {
       const elapsed = Date.now() - start
-      const pct = Math.min((elapsed / DURATION) * 100, 100)
-      setProgress(pct)
-      if (pct >= 100) {
-        clearInterval(id)
-        onDone()
-      }
-    }, 30)
+      setProgress((prev) => (prev >= 100 ? 100 : Math.min((elapsed / 10000) * 92, 92)))
+    }, 80)
     return () => clearInterval(id)
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 콜라주 영상(collageVideoUrl)이 준비될 때까지 폴링 → 준비되면 onReady()
+  useEffect(() => {
+    let cancelled = false
+    let timer: number | undefined
+    const startedAt = Date.now()
+    const MAX_WAIT = 180_000 // 안전장치: 3분 초과 시 결과 페이지로 이동 (페이지가 생성중 상태 처리)
+
+    async function poll() {
+      try {
+        const res = await albumApi.getCollages(roomId, date)
+        const target = (res.data ?? []).find((c) => c.missionId === missionId)
+        if (target?.participants?.length && !cancelled) {
+          setParticipants(target.participants.map((p) => ({
+            userId: p.userId, name: p.name, profileImage: p.profileImage,
+          })))
+        }
+        if (target?.collageVideoUrl) {
+          if (!cancelled) {
+            setProgress(100)
+            timer = window.setTimeout(() => onReadyRef.current(), 400)
+          }
+          return
+        }
+      } catch { /* 일시적 오류 무시 — 다음 주기 재시도 */ }
+      if (cancelled) return
+      if (Date.now() - startedAt > MAX_WAIT) {
+        setProgress(100)
+        timer = window.setTimeout(() => onReadyRef.current(), 400)
+        return
+      }
+      timer = window.setTimeout(poll, 2500)
+    }
+    poll()
+    return () => { cancelled = true; if (timer) window.clearTimeout(timer) }
+  }, [roomId, missionId, date])
+
+  const count = memberCount || participants.length
 
   return (
     <div className={styles.processingOverlay}>
@@ -282,7 +370,7 @@ function CollageTransitionOverlay({
         <h2 className={styles.processingTitle}>콜라주 생성중</h2>
         <span className={styles.processingDots}><i /><i /><i /></span>
       </div>
-      <p className={styles.processingDesc}>{memberCount}명의 순간을 한 장으로 엮고 있어요</p>
+      <p className={styles.processingDesc}>{count}명의 순간을 한 장으로 엮고 있어요</p>
 
       {/* 진행 바 */}
       <div className={styles.processingTrack}>
@@ -389,61 +477,36 @@ export default function HomePage() {
 
   const [activeMissions, setActiveMissions]       = useState<ActiveMissionItem[]>([])
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null)
-  const [processingRoomId, setProcessingRoomId]   = useState<number | null>(null)
-  const [showTransition, setShowTransition]       = useState(false)
-  const [transitionParticipants, setTransitionParticipants] = useState<Array<{
-    userId: number; name: string; profileImage: string | null
-  }>>([])
-  const [transitionMemberCount, setTransitionMemberCount] = useState(0)
   const [myRooms, setMyRooms]                     = useState<ActiveRoom[]>([])
-  // dismiss된 missionId를 localStorage에 10분간 보존 (PWA 재시작·리마운트 후에도 유효)
-  function dismissMission(missionId: number) {
-    localStorage.setItem('synk_dismissed_mission_id', JSON.stringify({ id: missionId, at: Date.now() }))
-    dismissedMissionIdRef.current = missionId
-    sessionStorage.setItem('synk_dismissed_mission_id', String(missionId))
-  }
-  function getDismissedMissionId(): number | null {
-    try {
-      const s = localStorage.getItem('synk_dismissed_mission_id')
-      if (!s) return null
-      const { id, at } = JSON.parse(s) as { id: number; at: number }
-      if (Date.now() - at > 10 * 60 * 1000) {
-        localStorage.removeItem('synk_dismissed_mission_id')
-        return null
-      }
-      return id
-    } catch { return null }
+
+  // 완료 미션 배너 (미션별 독립, 완료 후 10분 노출)
+  const [completedMissions, setCompletedMissions] = useState<CompletedMission[]>(() => loadCompletedMissions())
+
+  // 콜라주 생성 대기 오버레이 (보러가기 클릭 시)
+  const [transition, setTransition] = useState<{
+    roomId: number; missionId: number; date: string; memberCount: number
+  } | null>(null)
+
+  // 완료 배너 추가 (dismiss됐거나 이미 있으면 무시) — savedAt 미지정 시 현재 시각
+  function addCompletedMission(m: Omit<CompletedMission, 'savedAt'>, savedAt = Date.now()) {
+    setCompletedMissions((prev) => {
+      const dismissed = new Set(loadDismissedIds())
+      if (dismissed.has(m.missionId)) return prev
+      if (prev.some((x) => x.missionId === m.missionId)) return prev
+      const next = [...prev, { ...m, savedAt }]
+      saveCompletedMissions(next)
+      return next
+    })
   }
 
-  const [completedMission, setCompletedMissionRaw]   = useState<{
-    roomId: number; missionId: number; missionTitle: string; roomName: string
-  } | null>(() => {
-    try {
-      const saved = localStorage.getItem('synk_completed_mission')
-      if (!saved) return null
-      const parsed = JSON.parse(saved) as { roomId: number; missionId: number; missionTitle: string; roomName: string; savedAt: number }
-      // 10분 이내 완료만 유효
-      if (Date.now() - parsed.savedAt > 10 * 60 * 1000) {
-        localStorage.removeItem('synk_completed_mission')
-        return null
-      }
-      // 이미 dismiss한 미션이면 표시하지 않음
-      const dismissedId = getDismissedMissionId()
-      if (dismissedId !== null && dismissedId === parsed.missionId) {
-        localStorage.removeItem('synk_completed_mission')
-        return null
-      }
-      return parsed
-    } catch { return null }
-  })
-
-  function setCompletedMission(v: { roomId: number; missionId: number; missionTitle: string; roomName: string } | null) {
-    setCompletedMissionRaw(v)
-    if (v) {
-      localStorage.setItem('synk_completed_mission', JSON.stringify({ ...v, savedAt: Date.now() }))
-    } else {
-      localStorage.removeItem('synk_completed_mission')
-    }
+  // 완료 배너 제거 + dismiss 등록 (폴링 재세팅 방지)
+  function dismissCompletedMission(missionId: number) {
+    addDismissedId(missionId)
+    setCompletedMissions((prev) => {
+      const next = prev.filter((x) => x.missionId !== missionId)
+      saveCompletedMissions(next)
+      return next
+    })
   }
 
   // 다중 미션 선택 화면용 실시간 카운트다운 (id → 남은 초)
@@ -483,8 +546,12 @@ export default function HomePage() {
   const seenMissionIdsRef  = useRef<Set<number>>(new Set())
   // 첫 폴링 완료 여부 — 초기 로드 시엔 알림 안 띄움
   const initialLoadDoneRef = useRef(false)
-  // 사용자가 "보러가기"를 눌러 dismiss한 미션 ID — 폴링 재세팅 방지
-  const dismissedMissionIdRef = useRef<number | null>(null)
+
+  // 30초마다 만료된(10분 경과) 완료 배너 정리
+  useEffect(() => {
+    const id = setInterval(() => setCompletedMissions(loadCompletedMissions()), 30_000)
+    return () => clearInterval(id)
+  }, [])
 
   // 브라우저 알림 표시 (미션 알림 OFF면 건너뜀)
   function showBrowserNotification(title: string, body: string) {
@@ -509,25 +576,19 @@ export default function HomePage() {
             `⚡ ${m.roomName}에서 미션이 울렸어요!`,
             m.title,
           )
-          // 새 미션 발동 → 이전 완료 배너 초기화 (최신 미션으로 갱신)
-          setCompletedMission(null)
         }
       }
     }
     // 본 미션 ID 등록
     missions.forEach((m) => seenMissionIdsRef.current.add(m.id))
 
-    // 폴링에서 전원 완료 감지 → 완료 배너 세팅 (이미 dismiss한 미션은 제외)
-    const dismissedId = dismissedMissionIdRef.current ?? getDismissedMissionId()
+    // 폴링에서 전원 완료 감지 → 미션별 완료 배너 추가 (dismiss/중복은 addCompletedMission이 처리)
     for (const m of missions) {
-      if (dismissedId !== null && dismissedId === m.id) continue
       const doneCount = (m.participants ?? []).filter((p) => p.status === '완료').length
       if (doneCount >= m.totalMembers && m.totalMembers > 0) {
-        setCompletedMissionRaw((prev) => {
-          if (prev) return prev
-          const next = { roomId: m.roomId, missionId: m.id, missionTitle: m.title, roomName: m.roomName }
-          localStorage.setItem('synk_completed_mission', JSON.stringify({ ...next, savedAt: Date.now() }))
-          return next
+        addCompletedMission({
+          roomId: m.roomId, missionId: m.id, missionTitle: m.title,
+          roomName: m.roomName, memberCount: m.totalMembers,
         })
       }
     }
@@ -561,33 +622,26 @@ export default function HomePage() {
     roomApi.getMyRooms()
       .then((res) => {
         setMyRooms(res.data.active)
-        // 이미 localStorage에 완료 정보가 있으면 재탐색 불필요
-        const saved = localStorage.getItem('synk_completed_mission')
-        if (saved) return
-        // 오늘 콜라주에서 전원 완료 + 30분 이내 미션 탐색
+        // 오늘 콜라주에서 전원 완료 + 완료 후 10분 이내 미션을 배너로 복원
+        // (다른 기기에서 완료됐거나 localStorage에 없는 경우 대비 — addCompletedMission이 중복/dismiss 처리)
         const today = todayString()
-        const THIRTY_MIN = 30 * 60 * 1000
         const now = Date.now()
         for (const room of res.data.active) {
           albumApi.getCollages(room.id, today)
             .then((colRes) => {
               const collages = colRes.data ?? []
-              // 가장 최근 미션부터 확인
-              const sorted = [...collages].sort(
-                (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
-              )
-              const dismissedCollageId = getDismissedMissionId()
-              for (const c of sorted) {
-                if (dismissedCollageId !== null && c.missionId === dismissedCollageId) continue
+              for (const c of collages) {
                 const allDone = c.participants.length > 0 && c.participants.every((p) => p.state === 'done')
                 if (!allDone) continue
-                // 마지막 제출 시각이 30분 이내인 경우만
+                // 마지막 제출 시각(실제 완료 시각) 기준 10분 이내만
                 const lastSubmitMs = c.participants
                   .map((p) => new Date(p.submittedAt ?? 0).getTime())
                   .reduce((a, b) => Math.max(a, b), 0)
-                if (now - lastSubmitMs > THIRTY_MIN) continue
-                setCompletedMission({ roomId: room.id, missionId: c.missionId, missionTitle: c.missionTitle, roomName: room.name })
-                break
+                if (lastSubmitMs <= 0 || now - lastSubmitMs > BANNER_TTL) continue
+                addCompletedMission(
+                  { roomId: room.id, missionId: c.missionId, missionTitle: c.missionTitle, roomName: room.name, memberCount: c.participants.length },
+                  lastSubmitMs,
+                )
               }
             })
             .catch(() => {})
@@ -606,30 +660,6 @@ export default function HomePage() {
     }, POLL_MS)
     return () => clearInterval(timer)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // 콜라주 완료 폴링 — processingRoomId 있을 때 3초마다 확인, 완료되면 제거
-  useEffect(() => {
-    if (!processingRoomId) return
-    const date = todayString()
-    const startedAt = Date.now()
-
-    async function checkCollage() {
-      try {
-        const res = await albumApi.getCollages(processingRoomId!, date)
-        const collages = res.data ?? []
-        // PROCESSING 상태가 없으면 완료
-        if (!collages.some((c) => c.status === 'PROCESSING')) {
-          setProcessingRoomId(null)
-          return
-        }
-      } catch {}
-      if (Date.now() - startedAt > 90_000) setProcessingRoomId(null)
-    }
-
-    checkCollage()
-    const id = setInterval(checkCollage, 3_000)
-    return () => clearInterval(id)
-  }, [processingRoomId])
 
   function handleEnterActiveMission() {
     if (!active) return
@@ -667,24 +697,20 @@ export default function HomePage() {
               }}
               onBack={activeMissions.length > 1 ? () => setSelectedMissionId(null) : undefined}
               onAllDone={() => {
-                setProcessingRoomId(m.roomId)
-                setTransitionMemberCount(m.totalMembers)
-                setTransitionParticipants((m.participants ?? []).map((p) => ({
-                  userId: p.userId, name: p.name, profileImage: p.profileImage ?? null,
-                })))
-                setCompletedMission({ roomId: m.roomId, missionId: m.id, missionTitle: m.title, roomName: m.roomName })
+                addCompletedMission({
+                  roomId: m.roomId, missionId: m.id, missionTitle: m.title,
+                  roomName: m.roomName, memberCount: m.totalMembers,
+                })
                 setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
                 setSelectedMissionId(null)
                 setActive(null)
               }}
               onExpire={() => {
                 expiredIdsRef.current.add(m.id)
-                setProcessingRoomId(m.roomId)
-                setTransitionMemberCount(m.totalMembers)
-                setTransitionParticipants((m.participants ?? []).map((p) => ({
-                  userId: p.userId, name: p.name, profileImage: p.profileImage ?? null,
-                })))
-                setCompletedMission({ roomId: m.roomId, missionId: m.id, missionTitle: m.title, roomName: m.roomName })
+                addCompletedMission({
+                  roomId: m.roomId, missionId: m.id, missionTitle: m.title,
+                  roomName: m.roomName, memberCount: m.totalMembers,
+                })
                 setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
                 setSelectedMissionId(null)
                 setActive(null)
@@ -741,41 +767,42 @@ export default function HomePage() {
           </div>
         )}
 
-        {/* ── 전원 완료 배너 ─────────────────────────────────────────────────── */}
-        {completedMission && (
+        {/* ── 전원 완료 배너 (미션별 독립) ───────────────────────────────────── */}
+        {completedMissions.map((cm) => (
           <MissionCompletedBanner
-            missionTitle={completedMission.missionTitle}
-            roomName={completedMission.roomName}
+            key={cm.missionId}
+            missionTitle={cm.missionTitle}
+            roomName={cm.roomName}
             onViewCollage={() => {
-              if (!completedMission) return
-              dismissMission(completedMission.missionId)
-              setCompletedMission(null)
-              setShowTransition(true)
+              // 해당 미션 배너 제거 + dismiss 등록, 콜라주 생성 대기 오버레이로 전환
+              dismissCompletedMission(cm.missionId)
+              setTransition({
+                roomId: cm.roomId, missionId: cm.missionId,
+                date: todayString(), memberCount: cm.memberCount,
+              })
             }}
           />
-        )}
+        ))}
 
-        {/* ── 콜라주 생성중 전환 오버레이 ────────────────────────────────────── */}
-        {showTransition && (
+        {/* ── 콜라주 생성중 전환 오버레이 — 영상 준비될 때까지 유지 ───────────── */}
+        {transition && (
           <CollageTransitionOverlay
-            memberCount={transitionMemberCount || 2}
-            participants={transitionParticipants}
-            onDone={() => {
-              setShowTransition(false)
-              const id = dismissedMissionIdRef.current
-              if (id != null) {
-                // dismissedMissionIdRef에서 navigate 대상 조회
-                // processingRoomId는 onExpire/onAllDone 시 이미 세팅됨
-                navigate(ROUTES.MISSION_RESULT(id), {
-                  state: { roomId: processingRoomId ?? undefined, returnTo: 'home' },
-                })
-              }
+            roomId={transition.roomId}
+            missionId={transition.missionId}
+            date={transition.date}
+            memberCount={transition.memberCount}
+            onReady={() => {
+              const t = transition
+              setTransition(null)
+              navigate(ROUTES.MISSION_RESULT(t.missionId), {
+                state: { roomId: t.roomId, date: t.date, returnTo: 'home' },
+              })
             }}
           />
         )}
 
         {/* ── 01_대기 화면 ──────────────────────────────────────────────────── */}
-        {activeMissions.length === 0 && !active && !completedMission && (
+        {activeMissions.length === 0 && !active && completedMissions.length === 0 && (
           <div className={styles.waitingCard}>
             <div className={styles.waitingIconWrap}>
               <span className={styles.waitingIconGlow} />
