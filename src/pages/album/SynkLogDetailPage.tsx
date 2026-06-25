@@ -31,7 +31,10 @@ export default function SynkLogDetailPage() {
       roomApi.getRoom(numRoomId),
     ])
       .then(([collageRes, roomRes]) => {
-        setCollages(collageRes.data)
+        const sorted = [...collageRes.data].sort(
+          (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
+        )
+        setCollages(sorted)
         setRoom(roomRes.data)
       })
       .catch(console.error)
