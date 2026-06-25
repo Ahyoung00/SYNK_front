@@ -216,10 +216,24 @@
   width: 100%;
   aspect-ratio: 1;
   background: linear-gradient(135deg, rgba(96,196,80,.16), rgba(140,220,150,.10)), #EDF0E8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photoPlaceholderDone {
+  background: linear-gradient(135deg, rgba(96,196,80,.28), rgba(140,220,150,.20)), #E8F0E0;
 }
 
 :global([data-theme="dark"]) .photoPlaceholder {
   background: linear-gradient(135deg, rgba(124,111,240,.18), rgba(70,215,255,.12)), #171c34;
+}
+
+.photoInitial {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--color-primary);
+  opacity: 0.7;
 }
 
 .photoName {
