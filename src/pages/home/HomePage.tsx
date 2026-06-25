@@ -493,8 +493,11 @@ export default function HomePage() {
     missions.forEach((m) => seenMissionIdsRef.current.add(m.id))
 
     // 폴링에서 전원 완료 감지 → 완료 배너 세팅 (이미 dismiss한 미션은 제외)
+    const dismissedIdStorage = sessionStorage.getItem('synk_dismissed_mission_id')
+    const dismissedIdFromStorage = dismissedIdStorage ? Number(dismissedIdStorage) : null
     for (const m of missions) {
       if (dismissedMissionIdRef.current === m.id) continue
+      if (dismissedIdFromStorage !== null && dismissedIdFromStorage === m.id) continue
       const doneCount = (m.participants ?? []).filter((p) => p.status === '완료').length
       if (doneCount >= m.totalMembers && m.totalMembers > 0) {
         setCompletedMissionRaw((prev) => {
@@ -550,7 +553,10 @@ export default function HomePage() {
               const sorted = [...collages].sort(
                 (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
               )
+              const dismissedIdStr = sessionStorage.getItem('synk_dismissed_mission_id')
+              const dismissedId = dismissedIdStr ? Number(dismissedIdStr) : null
               for (const c of sorted) {
+                if (dismissedId !== null && c.missionId === dismissedId) continue
                 const allDone = c.participants.length > 0 && c.participants.every((p) => p.state === 'done')
                 if (!allDone) continue
                 // 마지막 제출 시각이 30분 이내인 경우만
@@ -720,8 +726,9 @@ export default function HomePage() {
             roomName={completedMission.roomName}
             onViewCollage={() => {
               if (!completedMission) return
-              // dismiss 처리 — 폴링이 다시 세팅하지 못하도록
+              // dismiss 처리 — 폴링 및 리마운트 후 재세팅 방지
               dismissedMissionIdRef.current = completedMission.missionId
+              sessionStorage.setItem('synk_dismissed_mission_id', String(completedMission.missionId))
               setCompletedMission(null)
               setShowTransition(true)
             }}
