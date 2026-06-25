@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
-import { albumApi } from '@/services/api/endpoints'
+import { albumApi, roomApi } from '@/services/api/endpoints'
 import type { CollageItem } from '@/types'
 import { ROUTES } from '@/constants'
 import styles from './MissionResultPage.module.css'
@@ -25,6 +25,8 @@ export default function MissionResultPage() {
   const [missionTitle, setMissionTitle] = useState<string>('미션 결과')
   const [showStats, setShowStats]   = useState(false)
   const [loadError, setLoadError]   = useState(false)
+  // 방 전체 멤버 수 — 참여율/제출 분모 (콜라주 participants엔 미제출자가 빠질 수 있어 방 기준 사용)
+  const [roomMemberCount, setRoomMemberCount] = useState<number | null>(null)
 
   useEffect(() => {
     const navState  = location.state as { roomId?: number; date?: string } | null
@@ -37,6 +39,11 @@ export default function MissionResultPage() {
       setTimeout(() => setShowStats(true), 400)
       return
     }
+
+    // 방 멤버 수 조회 (참여율/제출 분모)
+    roomApi.getRoom(roomId)
+      .then((res) => setRoomMemberCount(res.data.currentMembers ?? res.data.members?.length ?? null))
+      .catch(() => {})
 
     let cancelled = false
     let timer: number | undefined
@@ -101,7 +108,8 @@ export default function MissionResultPage() {
     p.submittedAt != null || !!p.videoUrl
   const participants    = collage?.participants ?? []
   const submittedCount  = participants.filter(hasSubmitted).length
-  const totalCount      = participants.length
+  // 분모: 방 멤버 수 우선(미제출자 포함). 콜라주 participants가 더 많으면(이탈 등) 그 값 사용
+  const totalCount      = Math.max(roomMemberCount ?? 0, participants.length)
   const participationRate = totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0
 
   const MISSION_MAX_SEC = 5 * 60 // 미션 제한 시간 5분
