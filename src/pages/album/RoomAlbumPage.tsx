@@ -43,12 +43,19 @@ export default function RoomAlbumPage() {
 
     // 오늘의 콜라주 목록으로 오늘 콘텐츠 판단 + 미션별 칸 구성 (미션 없으면 404)
     albumApi.getCollages(numRoomId, todayDash)
-      .then((res) => setTodayCollages(res.data ?? []))
+      .then((res) => {
+        const sorted = [...(res.data ?? [])].sort(
+          (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
+        )
+        setTodayCollages(sorted)
+      })
       .catch(() => setTodayCollages([]))
   }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const todayHasContent = todayCollages.length > 0
-  const past       = albums.filter((a) => a.date !== todayDot)
+  const past       = albums
+    .filter((a) => a.date !== todayDot)
+    .sort((a, b) => b.date.localeCompare(a.date))
   const dayCount   = past.length + (todayHasContent ? 1 : 0)
 
   return (
