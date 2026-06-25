@@ -396,6 +396,25 @@ export default function HomePage() {
   }>>([])
   const [transitionMemberCount, setTransitionMemberCount] = useState(0)
   const [myRooms, setMyRooms]                     = useState<ActiveRoom[]>([])
+  // dismiss된 missionId를 localStorage에 10분간 보존 (PWA 재시작·리마운트 후에도 유효)
+  function dismissMission(missionId: number) {
+    localStorage.setItem('synk_dismissed_mission_id', JSON.stringify({ id: missionId, at: Date.now() }))
+    dismissedMissionIdRef.current = missionId
+    sessionStorage.setItem('synk_dismissed_mission_id', String(missionId))
+  }
+  function getDismissedMissionId(): number | null {
+    try {
+      const s = localStorage.getItem('synk_dismissed_mission_id')
+      if (!s) return null
+      const { id, at } = JSON.parse(s) as { id: number; at: number }
+      if (Date.now() - at > 10 * 60 * 1000) {
+        localStorage.removeItem('synk_dismissed_mission_id')
+        return null
+      }
+      return id
+    } catch { return null }
+  }
+
   const [completedMission, setCompletedMissionRaw]   = useState<{
     roomId: number; missionId: number; missionTitle: string; roomName: string
   } | null>(() => {
@@ -405,6 +424,12 @@ export default function HomePage() {
       const parsed = JSON.parse(saved) as { roomId: number; missionId: number; missionTitle: string; roomName: string; savedAt: number }
       // 10분 이내 완료만 유효
       if (Date.now() - parsed.savedAt > 10 * 60 * 1000) {
+        localStorage.removeItem('synk_completed_mission')
+        return null
+      }
+      // 이미 dismiss한 미션이면 표시하지 않음
+      const dismissedId = getDismissedMissionId()
+      if (dismissedId !== null && dismissedId === parsed.missionId) {
         localStorage.removeItem('synk_completed_mission')
         return null
       }
@@ -493,11 +518,9 @@ export default function HomePage() {
     missions.forEach((m) => seenMissionIdsRef.current.add(m.id))
 
     // 폴링에서 전원 완료 감지 → 완료 배너 세팅 (이미 dismiss한 미션은 제외)
-    const dismissedIdStorage = sessionStorage.getItem('synk_dismissed_mission_id')
-    const dismissedIdFromStorage = dismissedIdStorage ? Number(dismissedIdStorage) : null
+    const dismissedId = dismissedMissionIdRef.current ?? getDismissedMissionId()
     for (const m of missions) {
-      if (dismissedMissionIdRef.current === m.id) continue
-      if (dismissedIdFromStorage !== null && dismissedIdFromStorage === m.id) continue
+      if (dismissedId !== null && dismissedId === m.id) continue
       const doneCount = (m.participants ?? []).filter((p) => p.status === '완료').length
       if (doneCount >= m.totalMembers && m.totalMembers > 0) {
         setCompletedMissionRaw((prev) => {
@@ -553,10 +576,9 @@ export default function HomePage() {
               const sorted = [...collages].sort(
                 (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
               )
-              const dismissedIdStr = sessionStorage.getItem('synk_dismissed_mission_id')
-              const dismissedId = dismissedIdStr ? Number(dismissedIdStr) : null
+              const dismissedCollageId = getDismissedMissionId()
               for (const c of sorted) {
-                if (dismissedId !== null && c.missionId === dismissedId) continue
+                if (dismissedCollageId !== null && c.missionId === dismissedCollageId) continue
                 const allDone = c.participants.length > 0 && c.participants.every((p) => p.state === 'done')
                 if (!allDone) continue
                 // 마지막 제출 시각이 30분 이내인 경우만
@@ -726,9 +748,7 @@ export default function HomePage() {
             roomName={completedMission.roomName}
             onViewCollage={() => {
               if (!completedMission) return
-              // dismiss 처리 — 폴링 및 리마운트 후 재세팅 방지
-              dismissedMissionIdRef.current = completedMission.missionId
-              sessionStorage.setItem('synk_dismissed_mission_id', String(completedMission.missionId))
+              dismissMission(completedMission.missionId)
               setCompletedMission(null)
               setShowTransition(true)
             }}
