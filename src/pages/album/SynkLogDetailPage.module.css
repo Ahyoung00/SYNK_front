@@ -193,6 +193,22 @@
   background: #000;
 }
 
+/* 콜라주 정적 썸네일 */
+.collageThumbnailWrap {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  background: #000;
+}
+
+.collageThumbnailImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .photoGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;

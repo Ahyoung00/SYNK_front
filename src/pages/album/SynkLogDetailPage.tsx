@@ -210,17 +210,27 @@ export default function SynkLogDetailPage() {
               </button>
             </div>
 
-            {/* 참여자 그리드 — 정적(이니셜 아바타), 영상 로드 없음 */}
-            <div className={styles.photoGrid}>
-              {item.participants.map((p) => (
-                <div key={p.userId} className={styles.photoCell}>
-                  <div className={[styles.photoPlaceholder, p.state === 'done' ? styles.photoPlaceholderDone : ''].join(' ')}>
-                    <span className={styles.photoInitial}>{p.name.charAt(0)}</span>
+            {/* 콜라주 썸네일 — thumbnail 있으면 정적 이미지, 없으면 이니셜 폴백 */}
+            {item.thumbnail ? (
+              <div className={styles.collageThumbnailWrap}>
+                <img
+                  src={item.thumbnail}
+                  alt={item.missionTitle}
+                  className={styles.collageThumbnailImg}
+                />
+              </div>
+            ) : (
+              <div className={styles.photoGrid}>
+                {item.participants.map((p) => (
+                  <div key={p.userId} className={styles.photoCell}>
+                    <div className={[styles.photoPlaceholder, p.state === 'done' ? styles.photoPlaceholderDone : ''].join(' ')}>
+                      <span className={styles.photoInitial}>{p.name.charAt(0)}</span>
+                    </div>
+                    <span className={styles.photoName}>{p.name}</span>
                   </div>
-                  <span className={styles.photoName}>{p.name}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
           </div>
         ))}
