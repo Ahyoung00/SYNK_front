@@ -25,7 +25,7 @@ export default function MissionResultPage() {
   const clearMission = useMissionStore((s) => s.clearMission)
 
   const [cells, setCells]         = useState<CollageCellData[]>([])
-  const [collageVideoUrl, setCollageVideoUrl] = useState<string | null>(null)
+  const [_collageVideoUrl, setCollageVideoUrl] = useState<string | null>(null)
   const [missionTitle, setMissionTitle]       = useState<string>('미션 결과')
   const [showStats, setShowStats] = useState(false)
   const [loadError, setLoadError] = useState(false)
