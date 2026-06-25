@@ -74,15 +74,22 @@ export default function MissionResultPage() {
   const totalCount      = participants.length
   const participationRate = totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0
 
+  const MISSION_MAX_SEC = 5 * 60 // 미션 제한 시간 5분
+  const allSubmitted = submittedCount === totalCount && totalCount > 0
+
   const missionStartAt = collage?.missionStartAt ?? null
-  const lastSubmitAt   = participants
-    .filter((p) => p.submittedAt)
+  // 제출 완료(state === 'done')한 사람의 submittedAt만 사용
+  const lastSubmitAt = participants
+    .filter((p) => p.state === 'done' && p.submittedAt)
     .map((p) => new Date(p.submittedAt!).getTime())
     .sort((a, b) => b - a)[0]
 
-  const completionTime = missionStartAt && lastSubmitAt
-    ? Math.floor((lastSubmitAt - new Date(missionStartAt).getTime()) / 1000)
-    : null
+  const completionTime = allSubmitted && missionStartAt && lastSubmitAt
+    ? Math.min(
+        Math.floor((lastSubmitAt - new Date(missionStartAt).getTime()) / 1000),
+        MISSION_MAX_SEC,
+      )
+    : allSubmitted ? null : MISSION_MAX_SEC // 미제출자 있으면 5분 고정
 
   function formatCompletionTime(s: number) {
     return `${String(Math.floor(s / 60)).padStart(2, '0')}m ${String(s % 60).padStart(2, '0')}s`
