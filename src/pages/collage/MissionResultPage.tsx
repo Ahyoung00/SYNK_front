@@ -83,32 +83,7 @@ export default function MissionResultPage() {
     clearMission()
   }
 
-  async function handleSave() {
-    if (!collageVideoUrl) {
-      alert('아직 콜라주 영상이 준비되지 않았어요.')
-      return
-    }
-    const fileName = `synk_${new Date().toISOString().slice(0, 10)}.mp4`
-    try {
-      // S3 등 cross-origin URL은 a[download]가 무시되므로 Blob으로 받아 저장
-      const res = await fetch(collageVideoUrl)
-      if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const blob = await res.blob()
-      const objectUrl = URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = objectUrl
-      a.download = fileName
-      document.body.appendChild(a)
-      a.click()
-      a.remove()
-      URL.revokeObjectURL(objectUrl)
-    } catch {
-      // 다운로드 실패 시 새 탭으로 열어 사용자가 직접 저장하도록 폴백
-      window.open(collageVideoUrl, '_blank')
-    }
-  }
-
-  // ── 통계 계산 ──────────────────────────────────────────────────────────────
+// ── 통계 계산 ──────────────────────────────────────────────────────────────
   const submittedCount = cells.filter((c) => c.status === 'submitted').length
   const totalCount = cells.length
   const participationRate = totalCount > 0 ? Math.round((submittedCount / totalCount) * 100) : 0
