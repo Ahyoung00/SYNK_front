@@ -126,8 +126,9 @@ async function request<T>(
   // 서버가 응답함(에러 응답 포함) → 온라인
   setOnlineStatus(true)
 
-  // HTTP 401: Refresh Token으로 재발급 후 한 번만 재시도
-  if (res.status === 401) {
+  // HTTP 401 / 403: Refresh Token으로 재발급 후 한 번만 재시도
+  // 403은 토큰 만료로 서버가 Forbidden을 반환하는 경우를 포함
+  if (res.status === 401 || res.status === 403) {
     if (isRetry) forceLogout()
     let newToken: string
     try {
