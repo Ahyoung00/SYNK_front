@@ -482,6 +482,8 @@ export default function HomePage() {
             `⚡ ${m.roomName}에서 미션이 울렸어요!`,
             m.title,
           )
+          // 새 미션 발동 → 이전 완료 배너 초기화 (최신 미션으로 갱신)
+          setCompletedMission(null)
         }
       }
     }
@@ -647,6 +649,11 @@ export default function HomePage() {
               onExpire={() => {
                 expiredIdsRef.current.add(m.id)
                 setProcessingRoomId(m.roomId)
+                setTransitionMemberCount(m.totalMembers)
+                setTransitionParticipants((m.participants ?? []).map((p) => ({
+                  userId: p.userId, name: p.name, profileImage: p.profileImage ?? null,
+                })))
+                setCompletedMission({ roomId: m.roomId, missionId: m.id, missionTitle: m.title, roomName: m.roomName })
                 setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
                 setSelectedMissionId(null)
                 setActive(null)
@@ -708,7 +715,10 @@ export default function HomePage() {
           <MissionCompletedBanner
             missionTitle={completedMission.missionTitle}
             roomName={completedMission.roomName}
-            onViewCollage={() => setShowTransition(true)}
+            onViewCollage={() => {
+              setCompletedMission(null)  // 배너 즉시 제거
+              setShowTransition(true)
+            }}
           />
         )}
 
