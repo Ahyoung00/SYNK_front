@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import { useNotificationStore } from '@/store/notificationStore'
+import { useMissionStore } from '@/store/missionStore'
 import { notificationApi, missionApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import { getReadIds, addReadIds } from '@/utils/notifRead'
-import type { AppNotification, NotificationsResponse } from '@/types'
+import { toMissionState } from '@/utils/activeMission'
+import type { AppNotification, NotificationsResponse, ActiveMissionItem } from '@/types'
 import NavHeader from '@/components/layout/NavHeader'
 import styles from './NotificationsPage.module.css'
 
@@ -66,19 +68,21 @@ function NotifItem({
   item,
   onRead,
   navigate,
-  activeIds,
+  activeMissions,
+  onStartMission,
 }: {
   item: AppNotification
   onRead: (id: number) => void
   navigate: NavigateFunction
-  activeIds: Set<number>
+  activeMissions: ActiveMissionItem[]
+  onStartMission: (m: ActiveMissionItem) => void
 }) {
   const tone = toneFor(item.type)
   const unread = !item.isRead
   // 진행 중인 미션일 때만 '지금 하기' 액션 노출 (끝난 미션은 일반 항목으로)
-  const missionActive = item.type === 'MISSION_START'
-    && item.relatedId != null
-    && activeIds.has(item.relatedId)
+  const targetMission = item.type === 'MISSION_START' && item.relatedId != null
+    ? activeMissions.find((m) => m.id === item.relatedId)
+    : undefined
 
   function go(e: React.MouseEvent, to?: string) {
     e.stopPropagation()
@@ -87,16 +91,22 @@ function NotifItem({
   }
 
   let actions: React.ReactNode = null
-  if (item.type === 'MISSION_START' && missionActive) {
+  if (item.type === 'MISSION_START' && targetMission) {
     actions = (
       <div className={styles.ntActions}>
-        <button className={[styles.ntBtn, styles.solid].join(' ')} onClick={(e) => go(e, ROUTES.HOME)}>
+        <button
+          className={[styles.ntBtn, styles.solid].join(' ')}
+          onClick={(e) => {
+            e.stopPropagation()
+            if (unread) onRead(item.id)
+            onStartMission(targetMission)
+          }}
+        >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" /><circle cx="12" cy="13" r="4" />
           </svg>
           지금 하기
         </button>
-        <button className={[styles.ntBtn, styles.ghost].join(' ')} onClick={(e) => go(e)}>나중에</button>
       </div>
     )
   } else if (item.type === 'MISSION_COMPLETE' || item.type === 'SYNKLOG_CREATED') {
@@ -130,13 +140,15 @@ function NotifGroup({
   items,
   onRead,
   navigate,
-  activeIds,
+  activeMissions,
+  onStartMission,
 }: {
   label: string
   items: AppNotification[]
   onRead: (id: number) => void
   navigate: NavigateFunction
-  activeIds: Set<number>
+  activeMissions: ActiveMissionItem[]
+  onStartMission: (m: ActiveMissionItem) => void
 }) {
   if (items.length === 0) return null
   return (
@@ -144,7 +156,7 @@ function NotifGroup({
       <p className={styles.groupLabel}>{label}</p>
       <div className={styles.ntCard}>
         {items.map((item) => (
-          <NotifItem key={item.id} item={item} onRead={onRead} navigate={navigate} activeIds={activeIds} />
+          <NotifItem key={item.id} item={item} onRead={onRead} navigate={navigate} activeMissions={activeMissions} onStartMission={onStartMission} />
         ))}
       </div>
     </div>
@@ -154,15 +166,22 @@ function NotifGroup({
 export default function NotificationsPage() {
   const navigate = useNavigate()
   const { setNotifications, markAllRead: storeMarkAllRead } = useNotificationStore()
+  const setActive = useMissionStore((s) => s.setActive)
   const [data, setData] = useState<NotificationsResponse | null>(null)
-  const [activeIds, setActiveIds] = useState<Set<number>>(new Set())
+  const [activeMissions, setActiveMissions] = useState<ActiveMissionItem[]>([])
+
+  // '지금 하기' → 해당 미션 store에 세팅 후 촬영 화면으로 직접 이동
+  function handleStartMission(m: ActiveMissionItem) {
+    setActive(toMissionState(m))
+    navigate(ROUTES.MISSION_CAMERA(m.roomId))
+  }
 
   useEffect(() => {
     function refresh() {
-      // 진행 중인 미션 id 집합 — MISSION_START 알림의 액션 노출 판단용
+      // 진행 중인 미션 목록 — MISSION_START 알림 액션 노출/이동 대상 판단용
       missionApi.getActiveMission()
-        .then((res) => setActiveIds(new Set(res.data.map((m) => m.id))))
-        .catch(() => setActiveIds(new Set()))
+        .then((res) => setActiveMissions(res.data))
+        .catch(() => setActiveMissions([]))
 
       notificationApi
         .getNotifications()
@@ -258,8 +277,8 @@ export default function NotificationsPage() {
           </div>
         ) : (
           <>
-            <NotifGroup label="오늘"    items={data?.today    ?? []} onRead={handleRead} navigate={navigate} activeIds={activeIds} />
-            <NotifGroup label="이번 주" items={data?.thisWeek ?? []} onRead={handleRead} navigate={navigate} activeIds={activeIds} />
+            <NotifGroup label="오늘"    items={data?.today    ?? []} onRead={handleRead} navigate={navigate} activeMissions={activeMissions} onStartMission={handleStartMission} />
+            <NotifGroup label="이번 주" items={data?.thisWeek ?? []} onRead={handleRead} navigate={navigate} activeMissions={activeMissions} onStartMission={handleStartMission} />
           </>
         )}
       </div>

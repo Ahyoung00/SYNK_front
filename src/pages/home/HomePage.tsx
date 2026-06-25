@@ -4,8 +4,9 @@ import { useAuthStore } from '@/store/authStore'
 import { useMissionStore } from '@/store/missionStore'
 import { useSettingsStore } from '@/store/settingsStore'
 import { missionApi, albumApi, roomApi } from '@/services/api/endpoints'
-import type { ActiveMissionItem, ActiveMissionParticipant, ActiveMissionState, ActiveRoom } from '@/types'
+import type { ActiveMissionItem, ActiveMissionParticipant, ActiveRoom } from '@/types'
 import { ROUTES } from '@/constants'
+import { toMissionState } from '@/utils/activeMission'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import AppHeader from '@/components/layout/AppHeader'
 import { missionEmoji } from '@/utils/missionVisual'
@@ -62,51 +63,6 @@ function loadCompletedMissions(): CompletedMission[] {
 
 function saveCompletedMissions(arr: CompletedMission[]) {
   localStorage.setItem(COMPLETED_KEY, JSON.stringify(arr))
-}
-
-// ActiveMissionItem(API) → ActiveMissionState(store) 변환
-function toMissionState(item: ActiveMissionItem): ActiveMissionState {
-  const toState = (status: string): 'done' | 'recording' | 'waiting' => {
-    if (status === '완료')   return 'done'
-    if (status === '찍는중') return 'recording'
-    return 'waiting'
-  }
-  return {
-    mission: {
-      id:                  item.id,
-      room_id:             item.roomId,
-      mission_template_id: 0,
-      type:                'VIDEO',
-      status:              'ACTIVE',
-      // remainingSeconds로부터 실제 발동 시각 역산
-      targeted_at:         new Date(Date.now() - (300 - item.remainingSeconds) * 1000).toISOString(),
-      deadline:            new Date(Date.now() + item.remainingSeconds * 1000).toISOString(),
-      created_at:          new Date(Date.now() - (300 - item.remainingSeconds) * 1000).toISOString(),
-      template: {
-        id:          0,
-        title:       item.title,
-        description: item.description || undefined,
-      },
-    },
-    room: {
-      id:                  item.roomId,
-      name:                item.roomName,
-      code:                '',
-      thumbnail:           item.roomThumbnail,
-      owner_id:            0,
-      max_members:         item.totalMembers,
-      current_members:     item.totalMembers,
-      daily_mission_count: 1,
-      mission_start_time:  '',
-      mission_end_time:    '',
-      created_at:          null,
-    },
-    seconds_left:   item.remainingSeconds,
-    participations: (item.participants ?? []).map((p) => ({
-      user:  { userId: p.userId, name: p.name, profileImage: p.profileImage },
-      state: toState(p.status),
-    })),
-  }
 }
 
 // ── 방 선택 화면용 헬퍼 ───────────────────────────────────────────────────────
