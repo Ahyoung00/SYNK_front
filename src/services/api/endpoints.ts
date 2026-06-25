@@ -210,6 +210,10 @@ export const albumApi = {
   getAlbums: (roomId: number) =>
     api.get<AlbumItem[]>(`/rooms/${roomId}/albums`),
 
+  /** 최근 콜라주 썸네일 최대 limit개 — GET /rooms/{roomId}/albums/recent?limit=N */
+  getRecentAlbums: (roomId: number, limit = 4) =>
+    api.get<AlbumItem[]>(`/rooms/${roomId}/albums/recent?limit=${limit}`),
+
   /**
    * 날짜별 미션 콜라주 + 참여자 조회 — GET /rooms/{roomId}/albums/{date}/collages
    * Response: CollageItem[] (missionId, missionTitle, status, collageVideoUrl, participants[])

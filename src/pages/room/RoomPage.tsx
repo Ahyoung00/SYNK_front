@@ -32,16 +32,11 @@ export default function RoomPage() {
     if (!id) return
     Promise.all([
       roomApi.getRoom(id),
-      albumApi.getAlbums(id),
+      albumApi.getRecentAlbums(id, 4),
     ])
       .then(([roomRes, albumsRes]) => {
         setRoom(roomRes.data)
-        // 오늘은 '콘텐츠가 없을 때만' 제외 (제출/썸네일 있으면 앨범 페이지처럼 표시)
-        const now = new Date()
-        const todayDot = `${now.getFullYear()}.${String(now.getMonth() + 1).padStart(2, '0')}.${String(now.getDate()).padStart(2, '0')}`
-        setAlbums(albumsRes.data.filter((a) =>
-          a.date !== todayDot || (a.memberProfiles?.length ?? 0) > 0 || !!a.thumbnail
-        ))
+        setAlbums(albumsRes.data)
       })
       .catch(() => {
         setNotMember(true)
@@ -248,7 +243,7 @@ export default function RoomPage() {
           <div className={styles.albumEmpty}>아직 앨범이 없어요</div>
         ) : (
           <div className={styles.albumGrid}>
-            {albums.slice(0, 4).map((log) => (
+            {albums.map((log) => (
               <button
                 key={log.date}
                 className={styles.albumThumbBtn}
