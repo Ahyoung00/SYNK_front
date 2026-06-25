@@ -281,6 +281,8 @@ export interface CollageItem {
   status: 'PROCESSING' | 'COMPLETED'
   /** 생성된 콜라주 영상 URL (생성 전 null) */
   collageVideoUrl: string | null
+  /** Lambda가 생성한 정적 썸네일 이미지 URL (앨범 목록 전용) */
+  thumbnail?: string | null
   participants: CollageParticipant[]
 }
 
