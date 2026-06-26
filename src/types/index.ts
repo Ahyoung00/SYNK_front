@@ -308,24 +308,6 @@ export interface SynklogDetailResponse {
 
 export type MessageType = 'TEXT' | 'IMAGE' | 'EMOJI'
 
-/** WS CHAT_REACTION 이벤트 페이로드 (개별 리액션 레코드) */
-export interface ChatReaction {
-  id: number
-  chat_id: number
-  user_id: number
-  emoji: string
-  created_at: string
-}
-
-/**
- * GET /rooms/{roomId}/chats — reactions 배열 내 집계 리액션
- * emoji: Nullable (spec: O)
- */
-export interface ChatReactionSummary {
-  emoji: string | null
-  count: number
-}
-
 /**
  * GET /rooms/{roomId}/chats — messages 배열 내 메시지 항목
  */
@@ -339,7 +321,6 @@ export interface RoomChatMessage {
   createdAt: string
   myMessage: boolean
   isMyMessage: boolean
-  reactions: ChatReactionSummary[]
 }
 
 /**
@@ -587,7 +568,6 @@ export type WsEventType =
   | 'MEMBER_SUBMITTED'
   | 'MISSION_COMPLETED'
   | 'CHAT_MESSAGE'
-  | 'CHAT_REACTION'
   | 'MEMBER_JOINED'
   | 'MEMBER_LEFT'
 

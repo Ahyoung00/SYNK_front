@@ -242,7 +242,6 @@ export const albumApi = {
 // ── Chat ──────────────────────────────────────────────────────────────────────
 // GET  /rooms/{roomId}/chats                             — 채팅 메시지 목록
 // POST /rooms/{roomId}/chats                             — 채팅 메시지 전송
-// POST /rooms/{roomId}/chats/{messageId}/reactions       — 리액션 추가
 
 export const chatApi = {
   /**
@@ -259,14 +258,6 @@ export const chatApi = {
    */
   sendMessage: (roomId: number, content: string) =>
     api.post<ChatSentResponse>(`/rooms/${roomId}/chats`, { content }),
-
-  /**
-   * 리액션 추가
-   * Request: { emoji }
-   * Response: data 없음 — { success, message: "리액션 추가 완료" }
-   */
-  addReaction: (roomId: number, messageId: number, emoji: string) =>
-    api.post<void>(`/rooms/${roomId}/chats/${messageId}/reactions`, { emoji }),
 }
 
 // ── Collection (도감) ─────────────────────────────────────────────────────────

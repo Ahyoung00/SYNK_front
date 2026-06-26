@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useChatStore } from '@/store/chatStore'
@@ -7,7 +7,7 @@ import { connectStomp, publishChat } from '@/services/websocket/client'
 import { ROUTES } from '@/constants'
 import { MOCK_CHAT_MESSAGES, formatDateLabel, formatTime, localNaiveNow } from '@/utils/mockChat'
 import { setLastReadMessageId } from '@/utils/chatRead'
-import type { RoomChatMessage, ChatReactionSummary } from '@/types'
+import type { RoomChatMessage } from '@/types'
 import styles from './RoomChatPage.module.css'
 
 function toHttps(url: string | null | undefined): string | null {
@@ -16,9 +16,7 @@ function toHttps(url: string | null | undefined): string | null {
 }
 
 // ── Constants ────────────────────────────────────────────────────────────────
-const EMOJI_OPTIONS = ['😂', '❤️', '😮', '🔥', '👍', '🎉'] as const
 const GROUP_THRESHOLD_MS = 5 * 60_000     // 5분 이내 연속 = 같은 그룹
-const LONG_PRESS_MS = 500
 const EMPTY_MSGS: RoomChatMessage[] = []  // 안정적인 빈 배열 참조 (매 렌더 새 [] 방지)
 
 // ── Display item types ────────────────────────────────────────────────────────
@@ -75,27 +73,19 @@ export default function RoomChatPage() {
   const myUserId = myUser?.userId ?? 1
 
   const messages       = useChatStore((s) => s.messages[String(numRoomId)] ?? EMPTY_MSGS)
-  const myReactions    = useChatStore((s) => s.myReactions)
-  const reactionTarget = useChatStore((s) => s.reactionTarget)
   const setMessages       = useChatStore((s) => s.setMessages)
   const appendMessage     = useChatStore((s) => s.appendMessage)
-  const addReaction       = useChatStore((s) => s.addReaction)
-  const removeReaction    = useChatStore((s) => s.removeReaction)
-  const setReactionTarget = useChatStore((s) => s.setReactionTarget)
 
   const [text, setText]       = useState('')
   const [roomName, setRoomName]     = useState('')
   const [memberCount, setMemberCount] = useState(0)
   const [missionDone, setMissionDone] = useState(false)
-  // 리액션 피커 앵커 위치 { top, isMe }
-  const [pickerAnchor, setPickerAnchor] = useState<{ top: number; isMe: boolean } | null>(null)
   // userId → profileImage 맵 (STOMP 메시지에 profileImage 없을 때 보완용)
   const memberProfileMap = useRef<Map<number, string | null>>(new Map())
 
   const listRef        = useRef<HTMLDivElement>(null)
   const inputRef       = useRef<HTMLTextAreaElement>(null)
   const isAtBottomRef  = useRef(true)
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const loaded         = useRef(false)
 
   // ── 메시지 목록 API 조회 + WebSocket 연결 ────────────────────────────────
@@ -209,7 +199,6 @@ export default function RoomChatPage() {
       createdAt:    localNaiveNow(),
       isMyMessage:  true,
       myMessage:    true,
-      reactions:    [],
     }
     appendMessage(numRoomId, tempMsg)
     setText('')
@@ -221,51 +210,6 @@ export default function RoomChatPage() {
 
   function handleKey(e: React.KeyboardEvent<HTMLTextAreaElement>) {
     if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) { e.preventDefault(); handleSend() }
-  }
-
-  // ── 리액션 토글 ───────────────────────────────────────────────────────────
-  const handleReactionToggle = useCallback((msgId: number, emoji: string) => {
-    const rKey = `${numRoomId}:${msgId}`
-    const myEmojis = myReactions[rKey] ?? []
-
-    if (myEmojis.includes(emoji)) {
-      // 같은 이모지 → 토글 해제
-      removeReaction(numRoomId, msgId, emoji)
-    } else if (myEmojis.length === 0) {
-      // 아직 리액션 없을 때만 추가 허용
-      addReaction(numRoomId, msgId, emoji)
-      chatApi.addReaction(numRoomId, msgId, emoji).catch((err) => {
-        const status = err?.response?.status
-        if (status === 500 || status === 409) {
-          // 서버에 이미 리액션 존재 — UI는 그대로, 이후 중복 시도 차단됨(myReactions 이미 등록)
-        } else {
-          // 다른 에러 → optimistic 롤백
-          removeReaction(numRoomId, msgId, emoji)
-        }
-      })
-    }
-    // 이미 다른 이모지로 반응한 경우 → 무시 (서버 500 방지)
-    closePicker()
-  }, [myReactions, numRoomId, addReaction, removeReaction, setReactionTarget]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // ── 롱프레스 ─────────────────────────────────────────────────────────────
-  function startLongPress(msgId: number, e: React.TouchEvent | React.MouseEvent, isMe: boolean) {
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    longPressTimer.current = setTimeout(() => {
-      // 피커를 버블 위쪽에 띄움 (공간 부족하면 아래)
-      const pickerH = 72
-      const top = rect.top - pickerH > 8 ? rect.top - pickerH : rect.bottom + 8
-      setPickerAnchor({ top, isMe })
-      setReactionTarget(msgId)
-    }, LONG_PRESS_MS)
-  }
-  function cancelLongPress() {
-    if (longPressTimer.current) { clearTimeout(longPressTimer.current); longPressTimer.current = null }
-  }
-
-  function closePicker() {
-    setReactionTarget(null)
-    setPickerAnchor(null)
   }
 
   // ── 디스플레이 아이템 (메모) ───────────────────────────────────────────────
@@ -305,7 +249,6 @@ export default function RoomChatPage() {
             return <DateSep key={item.key} label={item.label} />
           }
           const { msg, isGroupFirst, isGroupLast } = item
-          const rKey = `${numRoomId}:${msg.messageId}`
           return (
             <MsgBubble
               key={msg.messageId}
@@ -313,17 +256,6 @@ export default function RoomChatPage() {
               isMe={msg.isMyMessage || msg.myMessage}
               isGroupFirst={isGroupFirst}
               isGroupLast={isGroupLast}
-              myReactionEmojis={myReactions[rKey] ?? []}
-              onLongPressStart={(e) => startLongPress(msg.messageId, e, msg.isMyMessage || msg.myMessage)}
-              onLongPressEnd={cancelLongPress}
-              onReactionTap={(emoji) => handleReactionToggle(msg.messageId, emoji)}
-              onOpenPicker={(e) => {
-                const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-                const pickerH = 72
-                const top = rect.top - pickerH > 8 ? rect.top - pickerH : rect.bottom + 8
-                setPickerAnchor({ top, isMe: msg.isMyMessage || msg.myMessage })
-                setReactionTarget(msg.messageId)
-              }}
             />
           )
         })}
@@ -354,27 +286,6 @@ export default function RoomChatPage() {
           <SendIcon />
         </button>
       </div>
-
-      {/* ── 리액션 floating 피커 ────────────────────────────────────────── */}
-      {reactionTarget !== null && pickerAnchor && (
-        <div className={styles.pickerOverlay} onClick={closePicker}>
-          <div
-            className={[styles.pickerFloat, pickerAnchor.isMe ? styles.pickerFloatMe : styles.pickerFloatOther].join(' ')}
-            style={{ top: pickerAnchor.top }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {EMOJI_OPTIONS.map((emoji) => (
-              <button
-                key={emoji}
-                className={styles.pickerBtn}
-                onClick={() => handleReactionToggle(reactionTarget, emoji)}
-              >
-                {emoji}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   )
 }
@@ -409,20 +320,11 @@ interface MsgBubbleProps {
   isMe: boolean
   isGroupFirst: boolean
   isGroupLast: boolean
-  myReactionEmojis: string[]
-  onLongPressStart: (e: React.TouchEvent | React.MouseEvent) => void
-  onLongPressEnd: () => void
-  onReactionTap: (emoji: string) => void
-  onOpenPicker: (e: React.MouseEvent) => void
 }
 
 function MsgBubble({
-  msg, isMe, isGroupFirst, isGroupLast, myReactionEmojis,
-  onLongPressStart, onLongPressEnd, onReactionTap, onOpenPicker,
+  msg, isMe, isGroupFirst, isGroupLast,
 }: MsgBubbleProps) {
-  const reactions = (msg.reactions ?? []).filter((r): r is ChatReactionSummary & { emoji: string } =>
-    r.emoji !== null,
-  )
   const initial = msg.userName.charAt(0) || '?'
 
   return (
@@ -463,12 +365,6 @@ function MsgBubble({
               isMe ? styles.bubbleMe : styles.bubbleOther,
               isGroupLast ? (isMe ? styles.tailMe : styles.tailOther) : '',
             ].filter(Boolean).join(' ')}
-            onMouseDown={(e) => onLongPressStart(e)}
-            onMouseUp={onLongPressEnd}
-            onMouseLeave={onLongPressEnd}
-            onTouchStart={(e) => onLongPressStart(e)}
-            onTouchEnd={onLongPressEnd}
-            onContextMenu={(e) => { e.preventDefault(); onOpenPicker(e) }}
           >
             <span className={styles.bubbleText}>{msg.content}</span>
           </div>
@@ -480,28 +376,6 @@ function MsgBubble({
             </span>
           )}
         </div>
-
-        {/* 리액션 — 버블 바로 아래 */}
-        {reactions.length > 0 && (
-          <div className={[styles.reactions, isMe ? styles.reactionsMe : ''].filter(Boolean).join(' ')}>
-            {reactions.map(({ emoji, count }) => (
-              <button
-                key={emoji}
-                className={[
-                  styles.reactionChip,
-                  myReactionEmojis.includes(emoji) ? styles.reactionChipMine : '',
-                ].filter(Boolean).join(' ')}
-                onClick={() => onReactionTap(emoji)}
-              >
-                <span>{emoji}</span>
-                {count > 1 && <span className={styles.reactionCount}>{count}</span>}
-              </button>
-            ))}
-            <button className={styles.addReactionChip} onClick={(e) => onOpenPicker(e)} aria-label="리액션 추가">
-              <AddReactionIcon />
-            </button>
-          </div>
-        )}
       </div>
     </div>
   )
@@ -533,17 +407,6 @@ function SendIcon() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
       <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
-    </svg>
-  )
-}
-
-function AddReactionIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10" />
-      <path d="M8 13s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01" />
-      <path d="M12 2v4M12 18v4M2 12h4M18 12h4" />
     </svg>
   )
 }
