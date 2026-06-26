@@ -465,6 +465,32 @@ export default function HomePage() {
     })
   }
 
+  // 특정 방의 오늘 콜라주를 스캔해 전원 완료(10분 이내) 미션을 배너로 추가
+  function scanRoomCollages(roomId: number, roomName: string) {
+    const today = todayString()
+    const now = Date.now()
+    albumApi.getCollages(roomId, today)
+      .then((colRes) => {
+        for (const c of colRes.data ?? []) {
+          const allDone = c.participants.length > 0 && c.participants.every((p) => p.state === 'done')
+          if (!allDone) continue
+          const lastSubmitMs = c.participants
+            .map((p) => new Date(p.submittedAt ?? 0).getTime())
+            .reduce((a, b) => Math.max(a, b), 0)
+          if (lastSubmitMs <= 0 || now - lastSubmitMs > BANNER_TTL) continue
+          addCompletedMission(
+            { roomId, missionId: c.missionId, missionTitle: c.missionTitle, roomName, memberCount: c.participants.length },
+            lastSubmitMs,
+          )
+        }
+      })
+      .catch(() => {})
+  }
+
+  function scanCompletedCollages(rooms: ActiveRoom[]) {
+    for (const room of rooms) scanRoomCollages(room.id, room.name)
+  }
+
   // 다중 미션 선택 화면용 실시간 카운트다운 (id → 남은 초)
   const [localSeconds, setLocalSeconds] = useState<Record<number, number>>({})
 
@@ -502,12 +528,24 @@ export default function HomePage() {
   const seenMissionIdsRef  = useRef<Set<number>>(new Set())
   // 첫 폴링 완료 여부 — 초기 로드 시엔 알림 안 띄움
   const initialLoadDoneRef = useRef(false)
+  // 최신 myRooms 참조 (인터벌 스캔용)
+  const myRoomsRef = useRef<ActiveRoom[]>([])
+  // 직전 폴링의 active 미션 목록 (사라진 미션 감지용)
+  const prevActiveRef = useRef<ActiveMissionItem[]>([])
+
+  useEffect(() => { myRoomsRef.current = myRooms }, [myRooms])
 
   // 30초마다 만료된(10분 경과) 완료 배너 정리
   useEffect(() => {
     const id = setInterval(() => setCompletedMissions(loadCompletedMissions()), 30_000)
     return () => clearInterval(id)
   }, [])
+
+  // 주기적으로 완료 콜라주 스캔 — 리마운트 없이도 완료 배너 실시간 반영
+  useEffect(() => {
+    const id = setInterval(() => scanCompletedCollages(myRoomsRef.current), 20_000)
+    return () => clearInterval(id)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // 브라우저 알림 표시 (미션 알림 OFF면 건너뜀)
   function showBrowserNotification(title: string, body: string) {
@@ -549,6 +587,16 @@ export default function HomePage() {
       }
     }
 
+    // 직전 폴링엔 있었는데 이번엔 사라진 미션 → 종료됐을 가능성 → 해당 방 콜라주 즉시 스캔
+    const currentIds = new Set(missions.map((m) => m.id))
+    const dismissed = new Set(loadDismissedIds())
+    for (const pm of prevActiveRef.current) {
+      if (!currentIds.has(pm.id) && !expiredIdsRef.current.has(pm.id) && !dismissed.has(pm.id)) {
+        scanRoomCollages(pm.roomId, pm.roomName)
+      }
+    }
+    prevActiveRef.current = missions
+
     setActiveMissions((prev) => {
       const serverIds = new Set(missions.map((m) => m.id))
       // 로컬 만료 미션은 서버에서 CLOSED 됐어도 유지 (사용자가 결과 보기 전까지)
@@ -578,30 +626,10 @@ export default function HomePage() {
     roomApi.getMyRooms()
       .then((res) => {
         setMyRooms(res.data.active)
+        myRoomsRef.current = res.data.active
         // 오늘 콜라주에서 전원 완료 + 완료 후 10분 이내 미션을 배너로 복원
         // (다른 기기에서 완료됐거나 localStorage에 없는 경우 대비 — addCompletedMission이 중복/dismiss 처리)
-        const today = todayString()
-        const now = Date.now()
-        for (const room of res.data.active) {
-          albumApi.getCollages(room.id, today)
-            .then((colRes) => {
-              const collages = colRes.data ?? []
-              for (const c of collages) {
-                const allDone = c.participants.length > 0 && c.participants.every((p) => p.state === 'done')
-                if (!allDone) continue
-                // 마지막 제출 시각(실제 완료 시각) 기준 10분 이내만
-                const lastSubmitMs = c.participants
-                  .map((p) => new Date(p.submittedAt ?? 0).getTime())
-                  .reduce((a, b) => Math.max(a, b), 0)
-                if (lastSubmitMs <= 0 || now - lastSubmitMs > BANNER_TTL) continue
-                addCompletedMission(
-                  { roomId: room.id, missionId: c.missionId, missionTitle: c.missionTitle, roomName: room.name, memberCount: c.participants.length },
-                  lastSubmitMs,
-                )
-              }
-            })
-            .catch(() => {})
-        }
+        scanCompletedCollages(res.data.active)
       })
       .catch(console.error)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
