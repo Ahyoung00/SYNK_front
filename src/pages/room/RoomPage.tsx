@@ -5,6 +5,7 @@ import { roomApi, albumApi, chatApi } from '@/services/api/endpoints'
 import type { RoomDetail, AlbumItem } from '@/types'
 import { useAuthStore } from '@/store/authStore'
 import { hasUnread } from '@/utils/chatRead'
+import { useRoomEvents } from '@/hooks/useRoomEvents'
 import NavHeader from '@/components/layout/NavHeader'
 import Loading from '@/components/ui/Loading'
 import InviteSheet from '@/components/room/InviteSheet'
@@ -69,6 +70,26 @@ export default function RoomPage() {
     setCodeCopied(true)
     setTimeout(() => setCodeCopied(false), 2000)
   }
+
+  useRoomEvents(id || undefined, {
+    onMemberKicked: (e) => {
+      const kickedUserId = (e.payload as { userId?: number } | undefined)?.userId
+      if (kickedUserId === myUserId) {
+        alert('방에서 강퇴되었습니다.')
+        navigate(ROUTES.ROOMS, { replace: true })
+      } else if (kickedUserId != null) {
+        setRoom((prev) =>
+          prev
+            ? {
+                ...prev,
+                members: prev.members.filter((m) => m.userId !== kickedUserId),
+                currentMembers: prev.currentMembers - 1,
+              }
+            : prev,
+        )
+      }
+    },
+  })
 
   function handleLeave() {
     if (!window.confirm('방에서 나가시겠어요?')) return

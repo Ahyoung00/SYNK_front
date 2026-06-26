@@ -15,6 +15,8 @@ export interface RoomEventHandlers {
   onMissionFired?: (e: RoomEvent) => void
   /** 멤버 제출 — 대기 화면 참여 현황 갱신 */
   onMemberSubmitted?: (e: RoomEvent) => void
+  /** 멤버 강퇴 — payload.userId가 본인이면 퇴장 처리 */
+  onMemberKicked?: (e: RoomEvent) => void
   /** 그 외(채팅 등) 메시지 */
   onOther?: (e: RoomEvent) => void
 }
@@ -41,6 +43,9 @@ export function useRoomEvents(
           break
         case 'MEMBER_SUBMITTED':
           handlersRef.current.onMemberSubmitted?.(e)
+          break
+        case 'MEMBER_KICKED':
+          handlersRef.current.onMemberKicked?.(e)
           break
         default:
           handlersRef.current.onOther?.(e)
