@@ -547,6 +547,23 @@ export default function HomePage() {
     return () => clearInterval(id)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 전역 active 정리 ① — 전원 제출 완료(=completedMissions에 포함) 시 stale active 제거
+  // (fallback 배너가 끝난 미션을 다시 노출하는 것 방지)
+  useEffect(() => {
+    if (active && completedMissions.some((c) => c.missionId === active.mission.id)) {
+      setActive(null)
+    }
+  }, [active, completedMissions, setActive])
+
+  // 전역 active 정리 ② — deadline 만료 시 stale active 제거 (즉시 + 예약 타이머)
+  useEffect(() => {
+    if (!active?.mission.deadline) return
+    const msLeft = new Date(active.mission.deadline).getTime() - Date.now()
+    if (msLeft <= 0) { setActive(null); return }
+    const t = setTimeout(() => setActive(null), msLeft + 500)
+    return () => clearTimeout(t)
+  }, [active, setActive])
+
   // 브라우저 알림 표시 (미션 알림 OFF면 건너뜀)
   function showBrowserNotification(title: string, body: string) {
     if (!missionAlert) return
