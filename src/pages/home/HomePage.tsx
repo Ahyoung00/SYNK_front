@@ -309,28 +309,6 @@ function CollageTransitionOverlay({
 
   return (
     <div className={styles.processingOverlay}>
-      {/* 멤버 타일 모자이크 */}
-      <div className={styles.tileGrid}>
-        {tiles.slice(0, 5).map((p, i) => (
-          <div
-            key={p.userId}
-            className={[styles.tile, i === 0 ? styles.tileBig : ''].join(' ')}
-            style={{ background: TILE_COLORS[i % TILE_COLORS.length] }}
-          >
-            {p.profileImage
-              ? <img src={p.profileImage} alt={p.name} className={styles.tileImg} />
-              : <span className={styles.tileInitial}>{i === 0 ? '나' : p.name.charAt(0)}</span>
-            }
-          </div>
-        ))}
-        {/* 번개 뱃지 */}
-        <div className={styles.tileBadge}>
-          <svg viewBox="0 0 24 24" fill="white" width="18" height="18">
-            <path d="M13 2L4.5 13.5H12L11 22L19.5 10.5H12L13 2Z" />
-          </svg>
-        </div>
-      </div>
-
       {/* 텍스트 */}
       <div className={styles.processingTextRow}>
         <h2 className={styles.processingTitle}>콜라주 생성중</h2>
