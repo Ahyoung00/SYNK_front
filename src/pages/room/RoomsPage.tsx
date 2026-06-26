@@ -6,7 +6,6 @@ import { roomApi } from '@/services/api/endpoints'
 import type { ActiveRoom, WaitingRoom } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
 import Loading from '@/components/ui/Loading'
-import { getLastReadMessageId } from '@/utils/chatRead'
 import styles from './RoomsPage.module.css'
 
 export default function RoomsPage() {
@@ -28,7 +27,7 @@ export default function RoomsPage() {
         .finally(() => setIsLoading(false))
     }
     refresh()
-    // 15초마다 재조회 — lastMessageId 갱신으로 새 채팅 dot 실시간 반영
+    // 15초마다 재조회 — hasUnreadChat 갱신으로 새 채팅 dot 실시간 반영
     const id = window.setInterval(refresh, 15_000)
     return () => window.clearInterval(id)
   }, [])
@@ -164,7 +163,7 @@ function RoomThumbnail({ src }: { src: string | null }) {
 
 function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
   const allDone = room.isAllCompleted
-  const hasNewChat = (room.lastMessageId ?? 0) > getLastReadMessageId(room.id)
+  const hasNewChat = room.hasUnreadChat
 
   return (
     <button className={styles.roomCard} onClick={onClick}>

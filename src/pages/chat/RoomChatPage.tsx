@@ -6,7 +6,6 @@ import { chatApi, roomApi, albumApi } from '@/services/api/endpoints'
 import { connectStomp, publishChat } from '@/services/websocket/client'
 import { ROUTES } from '@/constants'
 import { MOCK_CHAT_MESSAGES, formatDateLabel, formatTime, localNaiveNow } from '@/utils/mockChat'
-import { setLastReadMessageId } from '@/utils/chatRead'
 import type { RoomChatMessage } from '@/types'
 import styles from './RoomChatPage.module.css'
 
@@ -170,13 +169,7 @@ export default function RoomChatPage() {
     }
   }, [messages.length])
 
-  // ── 채팅을 보고 있으므로 최신 메시지를 읽음 처리 ──────────────────────────
-  useEffect(() => {
-    const latestId = messages.reduce((max, m) => (m.messageId > max ? m.messageId : max), 0)
-    setLastReadMessageId(numRoomId, latestId)
-  }, [numRoomId, messages])
-
-  // ── 스크롤 위치 추적 ──────────────────────────────────────────────────────
+// ── 스크롤 위치 추적 ──────────────────────────────────────────────────────
   function handleScroll() {
     const el = listRef.current
     if (!el) return
