@@ -5,7 +5,7 @@ import { useChatStore } from '@/store/chatStore'
 import { chatApi, roomApi, albumApi } from '@/services/api/endpoints'
 import { connectStomp, publishChat } from '@/services/websocket/client'
 import { ROUTES } from '@/constants'
-import { MOCK_CHAT_MESSAGES, formatDateLabel, formatTime } from '@/utils/mockChat'
+import { MOCK_CHAT_MESSAGES, formatDateLabel, formatTime, localNaiveNow } from '@/utils/mockChat'
 import { setLastReadMessageId } from '@/utils/chatRead'
 import type { RoomChatMessage, ChatReactionSummary } from '@/types'
 import styles from './RoomChatPage.module.css'
@@ -206,7 +206,7 @@ export default function RoomChatPage() {
       userName:     myUser?.name ?? '나',
       profileImage: myUser?.profileImage ?? null,
       content,
-      createdAt:    new Date().toISOString(),
+      createdAt:    localNaiveNow(),
       isMyMessage:  true,
       myMessage:    true,
       reactions:    [],

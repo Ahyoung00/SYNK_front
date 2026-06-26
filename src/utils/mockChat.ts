@@ -15,12 +15,18 @@ export function formatDateLabel(isoStr: string): string {
 
 /** ISO → "오전/오후 H:MM" */
 export function formatTime(isoStr: string): string {
-  // 백엔드가 Z 없이 UTC 시간을 보내므로 강제로 UTC로 파싱
-  const normalized = isoStr.endsWith('Z') ? isoStr : isoStr + 'Z'
-  const d = new Date(normalized)
+  // 백엔드 createdAt은 KST naive 값 → 받은 문자열을 그대로 로컬(KST)로 파싱
+  const d = new Date(isoStr)
   const h = d.getHours()
   const m = d.getMinutes()
   const ampm = h < 12 ? '오전' : '오후'
   const hour = h % 12 || 12
   return `${ampm} ${hour}:${String(m).padStart(2, '0')}`
+}
+
+/** 현재 시각을 서버와 동일한 KST naive 문자열로 (YYYY-MM-DDTHH:mm:ss) — optimistic update용 */
+export function localNaiveNow(): string {
+  const d = new Date()
+  const p = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`
 }
