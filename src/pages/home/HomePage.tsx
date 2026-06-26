@@ -290,22 +290,7 @@ function CollageTransitionOverlay({
     return () => { cancelled = true; if (timer) window.clearTimeout(timer) }
   }, [roomId, missionId, date])
 
-  const myUser = useAuthStore((s) => s.user)
   const count = memberCount || participants.length
-
-  // 타일 색상 팔레트 (멤버별 고정)
-  const TILE_COLORS = ['#8B6FE8', '#46C3E8', '#3DB87A', '#F5A847', '#E842A8', '#FF7058', '#4ECDC4']
-
-  // 나 + 참여자 목록 구성 (나를 첫 번째 큰 타일로)
-  const myEntry = { userId: myUser?.userId ?? -1, name: '나', profileImage: myUser?.profileImage ?? null }
-  const others = participants.filter((p) => p.userId !== myUser?.userId)
-  // 참여자 정보가 아직 없으면 memberCount 기준 빈 슬롯으로 채움
-  const othersSlots = others.length > 0
-    ? others
-    : Array.from({ length: Math.max(0, count - 1) }, (_, i) => ({
-        userId: -(i + 2), name: '', profileImage: null,
-      }))
-  const tiles = [myEntry, ...othersSlots]
 
   return (
     <div className={styles.processingOverlay}>
@@ -323,11 +308,11 @@ function CollageTransitionOverlay({
 
       {/* 참여자 아바타 */}
       <div className={styles.processingAvatars}>
-        {tiles.map((p) => (
+        {participants.map((p) => (
           <div key={p.userId} className={styles.processingAvatar}>
             {p.profileImage
               ? <img src={p.profileImage} alt={p.name} className={styles.processingAvatarImg} />
-              : <span className={styles.processingAvatarInitial}>{p.name ? p.name.charAt(0) : '?'}</span>
+              : <span className={styles.processingAvatarInitial}>{p.name.charAt(0)}</span>
             }
           </div>
         ))}
