@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate, type NavigateFunction } from 'react-router-dom'
 import { useNotificationStore } from '@/store/notificationStore'
 import { useMissionStore } from '@/store/missionStore'
@@ -166,9 +166,11 @@ function NotifGroup({
 export default function NotificationsPage() {
   const navigate = useNavigate()
   const { setNotifications, markAllRead: storeMarkAllRead } = useNotificationStore()
+  const storeLen = useNotificationStore((s) => s.notifications.length)
   const setActive = useMissionStore((s) => s.setActive)
   const [data, setData] = useState<NotificationsResponse | null>(null)
   const [activeMissions, setActiveMissions] = useState<ActiveMissionItem[]>([])
+  const prevStoreLenRef = useRef(storeLen)
 
   // '지금 하기' → 해당 미션 store에 세팅 후 촬영 화면으로 직접 이동
   function handleStartMission(m: ActiveMissionItem) {
@@ -176,37 +178,45 @@ export default function NotificationsPage() {
     navigate(ROUTES.MISSION_CAMERA(m.roomId))
   }
 
+  const refresh = useCallback(() => {
+    // 진행 중인 미션 목록 — MISSION_START 알림 액션 노출/이동 대상 판단용
+    missionApi.getActiveMission()
+      .then((res) => setActiveMissions(res.data))
+      .catch(() => setActiveMissions([]))
+
+    notificationApi
+      .getNotifications()
+      .then((res) => {
+        // 로컬에 저장된 읽음 상태 병합 (서버 read API 미확정 보완)
+        const readSet = getReadIds()
+        const applyRead = (list: AppNotification[]) =>
+          list.map((n) => (readSet.has(n.id) ? { ...n, isRead: true } : n))
+        const merged: NotificationsResponse = {
+          ...res.data,
+          today: applyRead(res.data.today),
+          thisWeek: applyRead(res.data.thisWeek),
+        }
+        setData(merged)
+        // 스토어엔 flat 배열로 저장 (unreadCount 계산용)
+        setNotifications([...merged.today, ...merged.thisWeek])
+      })
+      .catch(console.error)
+  }, [setNotifications])
+
   useEffect(() => {
-    function refresh() {
-      // 진행 중인 미션 목록 — MISSION_START 알림 액션 노출/이동 대상 판단용
-      missionApi.getActiveMission()
-        .then((res) => setActiveMissions(res.data))
-        .catch(() => setActiveMissions([]))
-
-      notificationApi
-        .getNotifications()
-        .then((res) => {
-          // 로컬에 저장된 읽음 상태 병합 (서버 read API 미확정 보완)
-          const readSet = getReadIds()
-          const applyRead = (list: AppNotification[]) =>
-            list.map((n) => (readSet.has(n.id) ? { ...n, isRead: true } : n))
-          const merged: NotificationsResponse = {
-            ...res.data,
-            today: applyRead(res.data.today),
-            thisWeek: applyRead(res.data.thisWeek),
-          }
-          setData(merged)
-          // 스토어엔 flat 배열로 저장 (unreadCount 계산용)
-          setNotifications([...merged.today, ...merged.thisWeek])
-        })
-        .catch(console.error)
-    }
-
     refresh()
     // 30초마다 실시간 갱신 (열어둔 채 미션 종료/새 알림 반영)
     const id = window.setInterval(refresh, 30_000)
     return () => window.clearInterval(id)
-  }, [setNotifications])
+  }, [refresh])
+
+  // FCM으로 새 알림이 store에 추가되면 즉시 재조회
+  useEffect(() => {
+    if (storeLen > prevStoreLenRef.current) {
+      prevStoreLenRef.current = storeLen
+      refresh()
+    }
+  }, [storeLen, refresh])
 
   /** 단건 읽음 처리 */
   function handleRead(id: number) {
