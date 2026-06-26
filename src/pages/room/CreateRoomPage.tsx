@@ -3,8 +3,24 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { roomApi, uploadApi } from '@/services/api/endpoints'
 import NavHeader from '@/components/layout/NavHeader'
-import TimePicker from '@/components/ui/TimePicker'
+import DualRangeSlider from '@/components/ui/DualRangeSlider'
 import styles from './CreateRoomPage.module.css'
+
+const TIME_MIN  = 0
+const TIME_MAX  = 1440
+const TIME_STEP = 5
+
+function toMinutes(time: string) {
+  const [h, m] = time.split(':').map(Number)
+  return h * 60 + m
+}
+
+function toTimeStr(min: number) {
+  const c = Math.round(min / TIME_STEP) * TIME_STEP
+  const h = Math.floor(c / 60)
+  const m = c % 60
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+}
 
 export default function CreateRoomPage() {
   const navigate = useNavigate()
@@ -12,8 +28,8 @@ export default function CreateRoomPage() {
   const [name, setName]                   = useState('')
   const [maxMembers, setMaxMembers]       = useState(5)
   const [missionCount, setMissionCount]   = useState(3)
-  const [missionStartTime, setMissionStartTime] = useState('10:00')
-  const [missionEndTime,   setMissionEndTime]   = useState('22:00')
+  const [startMin, setStartMin] = useState(toMinutes('10:00'))
+  const [endMin,   setEndMin]   = useState(toMinutes('22:00'))
   const [isLoading, setIsLoading]         = useState(false)
   const [error, setError]                 = useState<string | null>(null)
   const [thumbUrl, setThumbUrl]           = useState<string | null>(null)
@@ -43,8 +59,8 @@ export default function CreateRoomPage() {
         name: name.trim(),
         maxMembers,
         dailyMissionCount: missionCount,
-        missionStartTime,
-        missionEndTime,
+        missionStartTime: toTimeStr(startMin),
+        missionEndTime:   toTimeStr(endMin),
       })
       const roomId = res.data.roomId
 
@@ -165,18 +181,19 @@ export default function CreateRoomPage() {
 
             {/* 미션 알림 시간대 */}
             <div className={styles.settingRowTime}>
-              <span className={styles.settingLabel}>미션 알림 시간대</span>
-              <div className={styles.timeInputRow}>
-                <TimePicker
-                  value={missionStartTime}
-                  onChange={setMissionStartTime}
-                />
-                <span className={styles.timeDash}>–</span>
-                <TimePicker
-                  value={missionEndTime}
-                  onChange={setMissionEndTime}
-                />
+              <div className={styles.timeRowTop}>
+                <span className={styles.settingLabel}>미션 알림 시간대</span>
+                <span className={styles.timeValue}>{toTimeStr(startMin)} – {toTimeStr(endMin)}</span>
               </div>
+              <DualRangeSlider
+                min={TIME_MIN}
+                max={TIME_MAX}
+                step={TIME_STEP}
+                start={startMin}
+                end={endMin}
+                onStartChange={setStartMin}
+                onEndChange={setEndMin}
+              />
             </div>
           </div>
         </div>

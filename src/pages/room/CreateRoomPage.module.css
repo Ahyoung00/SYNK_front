@@ -240,6 +240,18 @@
   padding: var(--sp-4) var(--sp-5);
 }
 
+.timeRowTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.timeValue {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-primary, #9B6BFF);
+}
+
 .timeInputRow {
   display: flex;
   align-items: center;
