@@ -1054,77 +1054,56 @@
   background: var(--page-bg, #0E1430);
 }
 
-/* 썸네일 그리드 */
-.processingGrid {
+/* 멤버 타일 모자이크 */
+.tileGrid {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  grid-template-columns: 108px 108px;
+  grid-template-rows: 100px 100px 100px;
+  gap: 8px;
+}
+.tile {
+  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.tileBig {
+  grid-row: span 2;
+  border-radius: 22px;
+}
+.tileImg {
   width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
-.processingCell {
-  aspect-ratio: 1;
-  border-radius: 16px;
-  background: rgba(122,162,255,.08);
-  border: 1px solid rgba(150,180,255,.10);
+.tileInitial {
+  font-size: 32px;
+  font-weight: 900;
+  color: rgba(255,255,255,.9);
+  letter-spacing: -1px;
 }
-:global([data-theme="light"]) .processingCell {
-  background: rgba(96,196,80,.10);
-  border-color: rgba(80,170,55,.12);
+.tileBig .tileInitial {
+  font-size: 44px;
 }
-
-/* Charge Ring 로더 */
-.processingLoader {
-  position: relative;
-  width: 96px;
-  height: 96px;
-}
-.ldA {
-  position: relative;
-  width: 96px;
-  height: 96px;
-}
-.ldARing {
+.tileBadge {
   position: absolute;
-  inset: 0;
-  width: 96px;
-  height: 96px;
-  transform: rotate(-90deg);
+  bottom: -10px;
+  right: -10px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #3DB87A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(61,184,122,.45);
+  animation: badgePulse 1.8s ease-in-out infinite;
 }
-.ldATrack {
-  fill: none;
-  stroke: rgba(150,180,255,.14);
-  stroke-width: 5;
-}
-:global([data-theme="light"]) .ldATrack {
-  stroke: rgba(40,55,25,.12);
-}
-.ldAArc {
-  fill: none;
-  stroke-width: 5;
-  stroke-linecap: round;
-  stroke-dasharray: 264;
-  stroke-dashoffset: 264;
-  animation: ldAFill 1.25s cubic-bezier(.5,.05,.3,1) infinite;
-}
-@keyframes ldAFill {
-  0%   { stroke-dashoffset: 264; }
-  60%  { stroke-dashoffset: 40; }
-  100% { stroke-dashoffset: 40; opacity: 0; }
-}
-.ldACore {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  animation: ldAPulse 1.25s ease-in-out infinite;
-}
-.ldACore svg {
-  width: 32px;
-  height: 44px;
-}
-@keyframes ldAPulse {
-  0%,100% { transform: scale(.92); filter: drop-shadow(0 0 0 transparent); }
-  55%     { transform: scale(1.06); filter: drop-shadow(0 0 14px rgba(110,139,255,.55)); }
+@keyframes badgePulse {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.08); }
 }
 
 /* 텍스트 */
@@ -1169,7 +1148,7 @@
 
 /* 진행 바 */
 .processingTrack {
-  width: 100%;
+  width: 224px;
   height: 6px;
   border-radius: 4px;
   background: rgba(150,180,255,.14);

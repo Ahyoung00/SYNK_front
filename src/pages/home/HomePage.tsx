@@ -290,33 +290,43 @@ function CollageTransitionOverlay({
     return () => { cancelled = true; if (timer) window.clearTimeout(timer) }
   }, [roomId, missionId, date])
 
+  const myUser = useAuthStore((s) => s.user)
   const count = memberCount || participants.length
+
+  // 타일 색상 팔레트 (멤버별 고정)
+  const TILE_COLORS = ['#8B6FE8', '#46C3E8', '#3DB87A', '#F5A847', '#E842A8', '#FF7058', '#4ECDC4']
+
+  // 나 + 참여자 목록 구성 (나를 첫 번째 큰 타일로)
+  const myEntry = { userId: myUser?.userId ?? -1, name: '나', profileImage: myUser?.profileImage ?? null }
+  const others = participants.filter((p) => p.userId !== myUser?.userId)
+  // 참여자 정보가 아직 없으면 memberCount 기준 빈 슬롯으로 채움
+  const othersSlots = others.length > 0
+    ? others
+    : Array.from({ length: Math.max(0, count - 1) }, (_, i) => ({
+        userId: -(i + 2), name: '', profileImage: null,
+      }))
+  const tiles = [myEntry, ...othersSlots]
 
   return (
     <div className={styles.processingOverlay}>
-      {/* 썸네일 그리드 플레이스홀더 */}
-      <div className={styles.processingGrid}>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className={styles.processingCell} />
+      {/* 멤버 타일 모자이크 */}
+      <div className={styles.tileGrid}>
+        {tiles.slice(0, 5).map((p, i) => (
+          <div
+            key={p.userId}
+            className={[styles.tile, i === 0 ? styles.tileBig : ''].join(' ')}
+            style={{ background: TILE_COLORS[i % TILE_COLORS.length] }}
+          >
+            {p.profileImage
+              ? <img src={p.profileImage} alt={p.name} className={styles.tileImg} />
+              : <span className={styles.tileInitial}>{i === 0 ? '나' : p.name.charAt(0)}</span>
+            }
+          </div>
         ))}
-      </div>
-
-      {/* Charge Ring 로더 */}
-      <div className={styles.ldA}>
-        <svg className={styles.ldARing} viewBox="0 0 96 96">
-          <defs>
-            <linearGradient id="ld-grad-proc" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="var(--color-primary-cyan, #46D7FF)" />
-              <stop offset="48%" stopColor="#6E8BFF" />
-              <stop offset="100%" stopColor="var(--color-primary, #9B6BFF)" />
-            </linearGradient>
-          </defs>
-          <circle cx="48" cy="48" r="42" className={styles.ldATrack} />
-          <circle cx="48" cy="48" r="42" className={styles.ldAArc} stroke="url(#ld-grad-proc)" />
-        </svg>
-        <div className={styles.ldACore}>
-          <svg viewBox="0 0 24 33" fill="none">
-            <path d="M13.5 2L3 17.5H12.5L11 31L21 15.5H12L13.5 2Z" fill="url(#ld-grad-proc)" />
+        {/* 번개 뱃지 */}
+        <div className={styles.tileBadge}>
+          <svg viewBox="0 0 24 24" fill="white" width="18" height="18">
+            <path d="M13 2L4.5 13.5H12L11 22L19.5 10.5H12L13 2Z" />
           </svg>
         </div>
       </div>
@@ -335,11 +345,11 @@ function CollageTransitionOverlay({
 
       {/* 참여자 아바타 */}
       <div className={styles.processingAvatars}>
-        {participants.map((p) => (
+        {tiles.map((p) => (
           <div key={p.userId} className={styles.processingAvatar}>
             {p.profileImage
               ? <img src={p.profileImage} alt={p.name} className={styles.processingAvatarImg} />
-              : <span className={styles.processingAvatarInitial}>{p.name.charAt(0)}</span>
+              : <span className={styles.processingAvatarInitial}>{p.name ? p.name.charAt(0) : '?'}</span>
             }
           </div>
         ))}
