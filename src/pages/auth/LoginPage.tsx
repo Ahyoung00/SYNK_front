@@ -397,7 +397,7 @@ export default function LoginPage() {
       }
       setAuth(user, token, refreshToken)
       useChatStore.getState().clearAll()
-      navigate(redirectTo, { replace: true })
+      navigate(loginRes.data.isNewUser ? ROUTES.ONBOARDING : redirectTo, { replace: true })
       userApi.getMe().then((r) => setAuth(r.data, token, refreshToken)).catch(() => {})
     } catch (e) {
       console.error(e)
@@ -438,7 +438,7 @@ export default function LoginPage() {
       }
       setAuth(user, token, refreshToken)
       useChatStore.getState().clearAll()
-      navigate(redirectTo, { replace: true })
+      navigate(loginRes.data.isNewUser ? ROUTES.ONBOARDING : redirectTo, { replace: true })
       userApi.getMe().then((r) => setAuth(r.data, token, refreshToken)).catch(() => {})
     } catch (e) {
       console.error(e)
