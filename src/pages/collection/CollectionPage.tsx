@@ -103,7 +103,7 @@ export default function CollectionPage() {
                     onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
                   >
                     <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }}>
-                      <img src="/icon-light.png" alt="" className={styles.thumbnailLogo} />
+                      <img src="/synk-bolt.png" alt="" className={styles.thumbnailLogo} />
                     </div>
                     <div className={styles.missionInfo}>
                       <span className={styles.missionTitle}>{mission.title}</span>
