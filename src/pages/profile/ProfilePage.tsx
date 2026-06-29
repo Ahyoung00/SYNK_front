@@ -23,13 +23,11 @@ export default function ProfilePage() {
   const setHighlightAlert = useSettingsStore((s) => s.setHighlightAlert)
 
   const [completionRate, setCompletionRate] = useState<number | null>(null)
-  const [completedCount, setCompletedCount] = useState<number | null>(null)
   const [joinDays, setJoinDays] = useState<number | null>(null)
 
   useEffect(() => {
     collectionApi.getMyCollection().then((res) => {
       setCompletionRate(res.data.completionRate)
-      setCompletedCount(res.data.completedCount)
     }).catch(() => {})
 
     userApi.getMe().then((res) => {
@@ -80,12 +78,6 @@ export default function ProfilePage() {
               {completionRate != null ? `${Math.round(completionRate)}%` : '-'}
             </span>
             <span className={styles.statLabel}>수집률</span>
-          </div>
-<div className={styles.statCard}>
-            <span className={styles.statValue}>
-              {completedCount != null ? completedCount : '-'}
-            </span>
-            <span className={styles.statLabel}>내 컷</span>
           </div>
         </div>
 
