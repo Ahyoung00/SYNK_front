@@ -71,7 +71,7 @@ export interface ActiveRoom {
   completedMissions: number
   isAllCompleted: boolean
   roomThumbnail: string | null
-  memberProfiles: Array<{ userId: number; profileImage: string | null }>
+  memberProfiles: Array<{ userId: number; name: string; profileImage: string | null }>
   /** BE가 멤버별 읽음 상태 기반으로 계산한 새 채팅 여부 */
   hasUnreadChat: boolean
 }
@@ -86,7 +86,7 @@ export interface WaitingRoom {
   maxMembers: number
   waitingCount: number
   roomThumbnail: string | null
-  memberProfiles: Array<{ userId: number; profileImage: string | null }>
+  memberProfiles: Array<{ userId: number; name: string; profileImage: string | null }>
 }
 
 /**
