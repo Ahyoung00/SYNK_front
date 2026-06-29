@@ -230,19 +230,24 @@ function CollageTransitionOverlay({
   date,
   memberCount,
   onReady,
+  onFailed,
 }: {
   roomId: number
   missionId: number
   date: string
   memberCount: number
   onReady: () => void
+  onFailed: () => void
 }) {
   const [progress, setProgress] = useState(0)
+  const [failed, setFailed] = useState(false)
   const [participants, setParticipants] = useState<Array<{
     userId: number; name: string; profileImage: string | null
   }>>([])
   const onReadyRef = useRef(onReady)
   onReadyRef.current = onReady
+  const onFailedRef = useRef(onFailed)
+  onFailedRef.current = onFailed
 
   // 진행 바: 영상 준비 전까지 92%까지 천천히 차오름 (준비되면 100%)
   useEffect(() => {
@@ -270,6 +275,10 @@ function CollageTransitionOverlay({
             userId: p.userId, name: p.name, profileImage: p.profileImage,
           })))
         }
+        if (target?.status === 'FAILED') {
+          if (!cancelled) setFailed(true)
+          return
+        }
         if (target?.collageVideoUrl) {
           if (!cancelled) {
             setProgress(100)
@@ -291,6 +300,28 @@ function CollageTransitionOverlay({
   }, [roomId, missionId, date])
 
   const count = memberCount || participants.length
+
+  if (failed) {
+    return (
+      <div className={styles.processingOverlay}>
+        <h2 className={styles.processingTitle} style={{ fontSize: '2rem' }}>😔</h2>
+        <h2 className={styles.processingTitle}>콜라주를 만들 수 없어요</h2>
+        <p className={styles.processingDesc} style={{ marginTop: 8 }}>
+          아무도 미션에 참여하지 않아서<br />콜라주를 생성할 수 없었어요.
+        </p>
+        <button
+          onClick={() => onFailedRef.current()}
+          style={{
+            marginTop: 32, padding: '12px 28px',
+            background: 'var(--grad-action)', color: '#fff',
+            borderRadius: 14, fontWeight: 700, fontSize: 15, border: 'none', cursor: 'pointer',
+          }}
+        >
+          홈으로 돌아가기
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.processingOverlay}>
@@ -782,6 +813,7 @@ export default function HomePage() {
                 state: { roomId: t.roomId, date: t.date, returnTo: 'home' },
               })
             }}
+            onFailed={() => setTransition(null)}
           />
         )}
 
