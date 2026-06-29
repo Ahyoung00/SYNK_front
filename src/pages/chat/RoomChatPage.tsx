@@ -232,7 +232,20 @@ export default function RoomChatPage() {
 
       {/* ── 오늘 미션 결과 배너 ──────────────────────────────────────────── */}
       {missionDone && (
-        <MissionResultBanner onPress={() => navigate(ROUTES.MISSION_RESULT('today'), { state: { roomId: numRoomId, returnTo: 'album' } })} />
+        <MissionResultBanner onPress={() => {
+          const today = new Date()
+          const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`
+          albumApi.getCollages(numRoomId, todayStr)
+            .then((res) => {
+              const collages = res.data ?? []
+              const latest = [...collages].sort(
+                (a, b) => new Date(b.missionStartAt ?? 0).getTime() - new Date(a.missionStartAt ?? 0).getTime()
+              )[0]
+              const missionId = latest?.missionId ?? 'today'
+              navigate(ROUTES.MISSION_RESULT(missionId), { state: { roomId: numRoomId, date: todayStr, returnTo: 'album' } })
+            })
+            .catch(() => navigate(ROUTES.MISSION_RESULT('today'), { state: { roomId: numRoomId, returnTo: 'album' } }))
+        }} />
       )}
 
       {/* ── 메시지 목록 ──────────────────────────────────────────────────── */}
