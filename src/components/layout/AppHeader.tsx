@@ -19,10 +19,9 @@ export default function AppHeader({ subtitle }: AppHeaderProps) {
   const unread          = useNotificationStore((s) => s.unreadCount)
   const setNotifications = useNotificationStore((s) => s.setNotifications)
 
-  // 앱이 포그라운드로 돌아올 때(백그라운드 알림 수신 후 포함) 뱃지 즉시 갱신
+  // 마운트 시 초기 fetch + 포그라운드 복귀 시 재fetch → 뱃지 즉시 반영
   useEffect(() => {
-    function onVisible() {
-      if (document.visibilityState !== 'visible') return
+    function fetchNotifications() {
       notificationApi.getNotifications()
         .then((res) => {
           const data = res.data
@@ -30,6 +29,13 @@ export default function AppHeader({ subtitle }: AppHeaderProps) {
           setNotifications(all)
         })
         .catch(() => {})
+    }
+
+    fetchNotifications()
+
+    function onVisible() {
+      if (document.visibilityState !== 'visible') return
+      fetchNotifications()
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => document.removeEventListener('visibilitychange', onVisible)
