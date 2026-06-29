@@ -189,7 +189,7 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
                 >
                   {m.profileImage
                     ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-                    : <img src="/SYNK.jpeg" alt="" className={styles.avatarBubbleImg} />
+                    : <span className={styles.avatarBubbleInitial}>{m.name?.[0] ?? '?'}</span>
                   }
                 </div>
               ))}
@@ -230,7 +230,7 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
                 >
                   {m.profileImage
                     ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-                    : <img src="/SYNK.jpeg" alt="" className={styles.avatarBubbleImg} />
+                    : <span className={styles.avatarBubbleInitial}>{m.name?.[0] ?? '?'}</span>
                   }
                 </div>
               ))}
