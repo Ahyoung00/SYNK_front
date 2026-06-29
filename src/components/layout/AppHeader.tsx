@@ -1,6 +1,7 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useNotificationStore } from '@/store/notificationStore'
+import { notificationApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
 import styles from './AppHeader.module.css'
 
@@ -15,7 +16,24 @@ interface AppHeaderProps {
  */
 export default function AppHeader({ subtitle }: AppHeaderProps) {
   const navigate = useNavigate()
-  const unread   = useNotificationStore((s) => s.unreadCount)
+  const unread          = useNotificationStore((s) => s.unreadCount)
+  const setNotifications = useNotificationStore((s) => s.setNotifications)
+
+  // 앱이 포그라운드로 돌아올 때(백그라운드 알림 수신 후 포함) 뱃지 즉시 갱신
+  useEffect(() => {
+    function onVisible() {
+      if (document.visibilityState !== 'visible') return
+      notificationApi.getNotifications()
+        .then((res) => {
+          const data = res.data
+          const all = [...(data.today ?? []), ...(data.thisWeek ?? [])]
+          setNotifications(all)
+        })
+        .catch(() => {})
+    }
+    document.addEventListener('visibilitychange', onVisible)
+    return () => document.removeEventListener('visibilitychange', onVisible)
+  }, [setNotifications])
 
   return (
     <div className={styles.header}>
