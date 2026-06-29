@@ -61,7 +61,7 @@
   --grad-action-2:      linear-gradient(135deg, #7ED36F 0%, #3C9D5F 100%);
   --grad-soft:          linear-gradient(135deg, rgba(93,184,90,.12), rgba(149,201,109,.08));
   --toggle-off-bg:      rgba(0, 0, 0, 0.10);
-  --nav-bg:             #eef5e0;
+  --nav-bg:             #fffdf5;
   --nav-border:         rgba(0, 0, 0, 0.07);
   --nav-inactive:       rgba(38, 58, 26, 0.35);
   --nav-active:         #2D8A45;
