@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useNotificationStore } from '@/store/notificationStore'
 import { notificationApi } from '@/services/api/endpoints'
+import { getReadIds } from '@/utils/notifRead'
 import { ROUTES } from '@/constants'
 import styles from './AppHeader.module.css'
 
@@ -25,7 +26,10 @@ export default function AppHeader({ subtitle }: AppHeaderProps) {
       notificationApi.getNotifications()
         .then((res) => {
           const data = res.data
-          const all = [...(data.today ?? []), ...(data.thisWeek ?? [])]
+          const readSet = getReadIds()
+          const applyRead = (list: typeof data.today) =>
+            list.map((n) => readSet.has(n.id) ? { ...n, isRead: true } : n)
+          const all = [...applyRead(data.today ?? []), ...applyRead(data.thisWeek ?? [])]
           setNotifications(all)
         })
         .catch(() => {})
