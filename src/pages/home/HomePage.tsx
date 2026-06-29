@@ -22,7 +22,7 @@ function todayString(): string {
 // ── 완료 미션 배너 영속화 (미션별 독립, 완료 시점 기준 10분) ──────────────────────
 type CompletedMission = {
   roomId: number; missionId: number; missionTitle: string; roomName: string
-  memberCount: number; savedAt: number
+  memberCount: number; doneCount: number; savedAt: number
 }
 const COMPLETED_KEY = 'synk_completed_missions'
 const DISMISSED_KEY = 'synk_dismissed_mission_ids'
@@ -326,30 +326,37 @@ function CollageTransitionOverlay({
 function MissionCompletedBanner({
   missionTitle,
   roomName,
+  doneCount,
+  memberCount,
   onViewCollage,
 }: {
   missionTitle: string
   roomName: string
+  doneCount: number
+  memberCount: number
   onViewCollage: () => void
 }) {
   const emoji = missionEmoji(missionTitle)
+  const allDone = doneCount >= memberCount
   return (
     <div className={styles.completedBanner}>
       <div className={styles.completedGlow} />
 
-      {/* 전원 참여 완료 칩 */}
+      {/* 참여 상태 칩 */}
       <div className={styles.completedChipRow}>
         <span className={styles.completedChip}>
           <span className={styles.completedChipDot} />
-          전원 참여 완료
+          {allDone ? '전원 참여 완료' : '미션 종료'}
         </span>
       </div>
 
       {/* 타이틀 */}
       <h2 className={styles.completedTitle}>오늘의 미션 종료 🎉</h2>
       <p className={styles.completedDesc}>
-        마지막 멤버까지 참여를 마쳤어요.<br />
-        다 같이 만든 콜라주가 도착했어요.
+        {allDone
+          ? <>마지막 멤버까지 참여를 마쳤어요.<br />다 같이 만든 콜라주가 도착했어요.</>
+          : <>{doneCount}명의 멤버가 참여했어요.<br />콜라주가 도착했어요.</>
+        }
       </p>
 
       {/* 미션 정보 카드 */}
@@ -452,7 +459,7 @@ export default function HomePage() {
             .reduce((a, b) => Math.max(a, b), 0)
           if (lastSubmitMs <= 0 || now - lastSubmitMs > BANNER_TTL) continue
           addCompletedMission(
-            { roomId, missionId: c.missionId, missionTitle: c.missionTitle, roomName, memberCount: c.participants.length },
+            { roomId, missionId: c.missionId, missionTitle: c.missionTitle, roomName, memberCount: c.participants.length, doneCount: c.participants.length },
             lastSubmitMs,
           )
         }
@@ -572,7 +579,7 @@ export default function HomePage() {
       if (doneCount >= m.totalMembers && m.totalMembers > 0) {
         addCompletedMission({
           roomId: m.roomId, missionId: m.id, missionTitle: m.title,
-          roomName: m.roomName, memberCount: m.totalMembers,
+          roomName: m.roomName, memberCount: m.totalMembers, doneCount,
         })
       }
     }
@@ -673,7 +680,7 @@ export default function HomePage() {
               onAllDone={() => {
                 addCompletedMission({
                   roomId: m.roomId, missionId: m.id, missionTitle: m.title,
-                  roomName: m.roomName, memberCount: m.totalMembers,
+                  roomName: m.roomName, memberCount: m.totalMembers, doneCount: m.totalMembers,
                 })
                 setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
                 setSelectedMissionId(null)
@@ -681,9 +688,10 @@ export default function HomePage() {
               }}
               onExpire={() => {
                 expiredIdsRef.current.add(m.id)
+                const expireDoneCount = (m.participants ?? []).filter((p) => p.status === '완료').length
                 addCompletedMission({
                   roomId: m.roomId, missionId: m.id, missionTitle: m.title,
-                  roomName: m.roomName, memberCount: m.totalMembers,
+                  roomName: m.roomName, memberCount: m.totalMembers, doneCount: expireDoneCount,
                 })
                 setActiveMissions((prev) => prev.filter((x) => x.id !== m.id))
                 setSelectedMissionId(null)
@@ -747,6 +755,8 @@ export default function HomePage() {
             key={cm.missionId}
             missionTitle={cm.missionTitle}
             roomName={cm.roomName}
+            doneCount={cm.doneCount}
+            memberCount={cm.memberCount}
             onViewCollage={() => {
               // 해당 미션 배너 제거 + dismiss 등록, 콜라주 생성 대기 오버레이로 전환
               dismissCompletedMission(cm.missionId)
