@@ -88,6 +88,33 @@ export function publishChat(roomId: number, content: string) {
   }
 }
 
+/** 홈탭용: 여러 방 토픽을 하나의 STOMP 연결로 구독. 반환값은 cleanup 함수. */
+export function subscribeRooms(
+  roomIds: number[],
+  onEvent: (event: unknown) => void,
+): () => void {
+  if (roomIds.length === 0) return () => {}
+
+  const token = getToken()
+  const client = new Client({
+    brokerURL: 'wss://api.synk.ai.kr/ws',
+    connectHeaders: { Authorization: `Bearer ${token}` },
+    reconnectDelay: 3000,
+    onConnect: () => {
+      console.info('[STOMP:home] connected, subscribing rooms:', roomIds)
+      roomIds.forEach((id) => {
+        client.subscribe(`/topic/rooms/${id}`, (frame) => {
+          try { onEvent(JSON.parse(frame.body)) }
+          catch { console.warn('[STOMP:home] parse error', frame.body) }
+        })
+      })
+    },
+    onStompError: (frame) => console.error('[STOMP:home] error', frame.body),
+  })
+  client.activate()
+  return () => client.deactivate()
+}
+
 export const wsClient = {
   connect: () => {},
   disconnect: () => {},

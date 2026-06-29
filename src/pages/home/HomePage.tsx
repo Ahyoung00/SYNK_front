@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/authStore'
 import { useMissionStore } from '@/store/missionStore'
 import { useSettingsStore } from '@/store/settingsStore'
 import { missionApi, albumApi, roomApi } from '@/services/api/endpoints'
+import { subscribeRooms } from '@/services/websocket/client'
 import type { ActiveMissionItem, ActiveMissionParticipant, ActiveRoom } from '@/types'
 import { ROUTES } from '@/constants'
 import { toMissionState } from '@/utils/activeMission'
@@ -662,7 +663,7 @@ export default function HomePage() {
       .catch(console.error)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // 30초마다 폴링 — 서버가 랜덤 발동한 새 미션을 감지
+  // 30초마다 폴링 — WebSocket 누락 대비 fallback
   useEffect(() => {
     const POLL_MS = 30_000
     const timer = setInterval(() => {
@@ -672,6 +673,21 @@ export default function HomePage() {
     }, POLL_MS)
     return () => clearInterval(timer)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // WebSocket: 내 방 토픽 구독 → MISSION_FIRED 즉시 반영
+  useEffect(() => {
+    if (myRooms.length === 0) return
+    const roomIds = myRooms.map((r) => r.id)
+    const cleanup = subscribeRooms(roomIds, (event) => {
+      const e = event as { type?: string }
+      if (e.type === 'MISSION_FIRED') {
+        missionApi.getActiveMission()
+          .then((res) => { applyMissions(res.data) })
+          .catch(console.error)
+      }
+    })
+    return cleanup
+  }, [myRooms]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function handleEnterActiveMission() {
     if (!active) return
