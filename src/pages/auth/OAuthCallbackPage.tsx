@@ -42,7 +42,7 @@ export default function OAuthCallbackPage({ provider }: Props) {
           ? await authApi.kakaoLogin(code!, redirectUri)
           : await authApi.googleLogin(code!, redirectUri)
 
-        const { token, refreshToken = '' } = loginRes.data
+        const { token, refreshToken } = loginRes.data
         const user: User = {
           userId:                loginRes.data.userId,
           name:                  loginRes.data.name,

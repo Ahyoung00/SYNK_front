@@ -386,7 +386,7 @@ export default function LoginPage() {
   async function handleKakaoCodeSuccess(code: string, redirectUri: string) {
     try {
       const loginRes = await authApi.kakaoLogin(code, redirectUri)
-      const { token, refreshToken = '' } = loginRes.data
+      const { token, refreshToken } = loginRes.data
       const user: User = {
         userId: loginRes.data.userId,
         name: loginRes.data.name,
@@ -427,7 +427,7 @@ export default function LoginPage() {
   async function handleGoogleCodeSuccess(code: string, redirectUri: string) {
     try {
       const loginRes = await authApi.googleLogin(code, redirectUri)
-      const { token, refreshToken = '' } = loginRes.data
+      const { token, refreshToken } = loginRes.data
       const user: User = {
         userId: loginRes.data.userId,
         name: loginRes.data.name,
