@@ -81,11 +81,7 @@ export default function ProfilePage() {
             </span>
             <span className={styles.statLabel}>수집률</span>
           </div>
-          <div className={styles.statCard}>
-            <span className={styles.statValue}>-</span>
-            <span className={styles.statLabel}>연속</span>
-          </div>
-          <div className={styles.statCard}>
+<div className={styles.statCard}>
             <span className={styles.statValue}>
               {completedCount != null ? completedCount : '-'}
             </span>
