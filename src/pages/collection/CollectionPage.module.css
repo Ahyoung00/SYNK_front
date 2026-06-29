@@ -139,9 +139,10 @@
   justify-content: center;
 }
 
-.thumbnailEmoji {
-  font-size: 26px;
-  line-height: 1;
+.thumbnailLogo {
+  width: 34px;
+  height: 34px;
+  object-fit: contain;
 }
 
 .missionInfo {
