@@ -328,7 +328,7 @@ img, video {
   --grad-action-2:      linear-gradient(135deg, #6E8BFF 0%, #9B6BFF 100%);
   --grad-soft:          linear-gradient(135deg, rgba(70,215,255,.08), rgba(155,107,255,.06));
   --toggle-off-bg:      rgba(255, 255, 255, 0.10);
-  --nav-bg:             #070912;
+  --nav-bg:             #000000;
   --nav-border:         rgba(255, 255, 255, 0.085);
   --nav-inactive:       #5C6488;
   --nav-active:         #9B8BFF;
