@@ -280,6 +280,14 @@
   flex-shrink: 0;
 }
 
+:global(:root:not([data-theme="dark"])) .inputBar {
+  background: #fff;
+}
+
+:global(:root:not([data-theme="dark"])) .input {
+  background: #fff;
+}
+
 .input {
   flex: 1;
   min-height: 40px;
