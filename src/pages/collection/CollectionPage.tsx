@@ -7,7 +7,7 @@ import AppHeader from '@/components/layout/AppHeader'
 import Loading from '@/components/ui/Loading'
 import styles from './CollectionPage.module.css'
 
-// thumbnail 없을 때 미션 ID 기반 그라디언트 폴백
+// thumbnail 없을 때 미션명 기반 그라디언트 폴백 — 같은 미션명은 항상 같은 색
 const GRADIENTS = [
   'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
   'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
@@ -18,7 +18,11 @@ const GRADIENTS = [
   'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
   'linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%)',
 ]
-const gradient = (id: number) => GRADIENTS[(id - 1) % GRADIENTS.length]
+function gradient(title: string) {
+  let hash = 0
+  for (let i = 0; i < title.length; i++) hash = (hash * 31 + title.charCodeAt(i)) | 0
+  return GRADIENTS[Math.abs(hash) % GRADIENTS.length]
+}
 
 function RingChart({ rate }: { rate: number }) {
   const r = 38
@@ -102,7 +106,7 @@ export default function CollectionPage() {
                     className={styles.missionCard}
                     onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
                   >
-                    <div className={styles.thumbnail} style={{ background: gradient(mission.missionId) }}>
+                    <div className={styles.thumbnail} style={{ background: gradient(mission.title) }}>
                       <img src="/synk-bolt.png" alt="" className={styles.thumbnailLogo} />
                     </div>
                     <div className={styles.missionInfo}>
