@@ -5,7 +5,7 @@
 /* ── Design tokens ────────────────────────────────────────────────────────── */
 :root {
   /* Brand colors */
-  --color-bg:          #fffdf5;
+  --color-bg:          #FCFDFB;
   --color-login-bg:    #e8e8e8;
   --color-surface:     #fcf6e8;
   --color-surface-2:   #daec93;
@@ -49,7 +49,7 @@
   --color-fab-shadow:   rgba(149, 201, 109, 0.45);
 
   /* ── Page / card / ink / nav tokens (light) ─────────────────────────────── */
-  --page-bg:            #fffdf5;
+  --page-bg:            radial-gradient(120% 55% at 50% 0%, #FFFFFF 0%, #FCFDFB 50%, #F8FAF5 86%);
   --card-bg:            rgba(255, 255, 255, 0.80);
   --card-bg-soft:       rgba(255, 255, 255, 0.55);
   --card-border:        rgba(0, 0, 0, 0.07);
@@ -185,7 +185,7 @@ body {
   line-height: 1.5;
   color: var(--color-text);
   /* 데스크톱에서 앱 바깥 배경 */
-  background-color: var(--color-bg);
+  background: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   user-select: none;         /* Feels native */
@@ -202,7 +202,7 @@ body {
   height: var(--app-height, 100%);
   display: flex;
   flex-direction: column;
-  background-color: var(--color-bg);
+  background: var(--page-bg);
   position: relative;
 }
 
