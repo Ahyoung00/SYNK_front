@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { albumApi, roomApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
-import type { AlbumItem, RoomDetail, CollageItem } from '@/types'
+import type { AlbumItem, AlbumMemberProfile, RoomDetail, CollageItem } from '@/types'
 import Loading from '@/components/ui/Loading'
 import styles from './RoomAlbumPage.module.css'
 
@@ -13,6 +13,16 @@ function toUrlDate(dotDate: string): string {
 function toHttps(url: string | null | undefined): string | null {
   if (!url) return null
   return url.replace(/^http:\/\//, 'https://')
+}
+
+function dedupeMemberProfiles(collages: CollageItem[]): AlbumMemberProfile[] {
+  const seen = new Map<number, AlbumMemberProfile>()
+  for (const c of collages) {
+    for (const p of c.participants) {
+      if (!seen.has(p.userId)) seen.set(p.userId, { userId: p.userId, profileImage: p.profileImage })
+    }
+  }
+  return [...seen.values()]
 }
 
 export default function RoomAlbumPage() {
@@ -82,34 +92,15 @@ export default function RoomAlbumPage() {
           {/* ── 오늘 ──────────────────────────────────────────────────────── */}
           <p className={styles.sectionLabel}>오늘 · {todayDash}</p>
           {todayHasContent ? (
-            <button
-              className={styles.hero}
-              onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, todayDash))}
-            >
-              <div className={styles.todayGrid}>
-                {todayCollages.map((c, i) => {
-                  const thumbUrl = toHttps(c.thumbnail ?? null)
-                  return (
-                    <div key={c.missionId} className={styles.todayCell}>
-                      {thumbUrl ? (
-                        <img
-                          src={thumbUrl}
-                          className={styles.heroCellImg}
-                          alt={c.missionTitle}
-                        />
-                      ) : (
-                        <div className={styles.todayCellPending}>처리 중</div>
-                      )}
-                      {i === 0 && (
-                        <div className={styles.heroCellScrim}>
-                          <span className={styles.synklogBadge}>콜라주</span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </button>
+            <div className={styles.list}>
+              <AlbumEntryRow
+                date={todayDot}
+                thumbnail={todayCollages.find((c) => c.thumbnail)?.thumbnail ?? null}
+                memberProfiles={dedupeMemberProfiles(todayCollages)}
+                roomName={room?.name ?? ''}
+                onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, todayDash))}
+              />
+            </div>
           ) : (
             <div className={styles.todayEmpty}>
               <div className={styles.todayEmptyIcon}>
@@ -132,45 +123,14 @@ export default function RoomAlbumPage() {
               <p className={styles.sectionLabel}>지난 날들</p>
               <div className={styles.list}>
                 {past.map((entry) => (
-                  <button
+                  <AlbumEntryRow
                     key={entry.date}
-                    className={styles.entry}
+                    date={entry.date}
+                    thumbnail={entry.thumbnail}
+                    memberProfiles={entry.memberProfiles}
+                    roomName={room?.name ?? ''}
                     onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, toUrlDate(entry.date)))}
-                  >
-                    {/* 썸네일 */}
-                    <div className={styles.mosaic}>
-                      {entry.thumbnail ? (
-                        <img src={toHttps(entry.thumbnail)!} alt={entry.date} className={styles.mosaicThumb} />
-                      ) : (
-                        <>
-                          {[0,1,2,3].map((i) => (
-                            <div key={i} className={styles.mosaicCell}>
-                              {entry.memberProfiles[i]?.profileImage && (
-                                <img src={entry.memberProfiles[i].profileImage!} alt="" className={styles.mosaicCellImg} />
-                              )}
-                            </div>
-                          ))}
-                        </>
-                      )}
-                    </div>
-
-                    {/* 정보 */}
-                    <div className={styles.entryInfo}>
-                      <span className={styles.entryDate}>{entry.date}</span>
-                      <div className={styles.entryMeta}>
-                        <div className={styles.avatarStack}>
-                          {entry.memberProfiles.slice(0, 3).map((p) => (
-                            p.profileImage
-                              ? <img key={p.userId} src={p.profileImage} alt="" className={styles.avatarBubble} />
-                              : <div key={p.userId} className={styles.avatarBubble} />
-                          ))}
-                        </div>
-                        <span className={styles.entryRoomName}>{room?.name ?? ''}</span>
-                      </div>
-                    </div>
-
-                    <span className={styles.arrow}>›</span>
-                  </button>
+                  />
                 ))}
               </div>
             </>
@@ -197,5 +157,53 @@ function CameraIcon() {
       <path d="M3 7h3l2-2h8l2 2h3v12H3z" />
       <circle cx="12" cy="13" r="3.5" />
     </svg>
+  )
+}
+
+function AlbumEntryRow({
+  date, thumbnail, memberProfiles, roomName, onClick,
+}: {
+  date: string
+  thumbnail: string | null
+  memberProfiles: AlbumMemberProfile[]
+  roomName: string
+  onClick: () => void
+}) {
+  return (
+    <button className={styles.entry} onClick={onClick}>
+      {/* 썸네일 */}
+      <div className={styles.mosaic}>
+        {thumbnail ? (
+          <img src={toHttps(thumbnail)!} alt={date} className={styles.mosaicThumb} />
+        ) : (
+          <>
+            {[0,1,2,3].map((i) => (
+              <div key={i} className={styles.mosaicCell}>
+                {memberProfiles[i]?.profileImage && (
+                  <img src={memberProfiles[i].profileImage!} alt="" className={styles.mosaicCellImg} />
+                )}
+              </div>
+            ))}
+          </>
+        )}
+      </div>
+
+      {/* 정보 */}
+      <div className={styles.entryInfo}>
+        <span className={styles.entryDate}>{date}</span>
+        <div className={styles.entryMeta}>
+          <div className={styles.avatarStack}>
+            {memberProfiles.slice(0, 3).map((p) => (
+              p.profileImage
+                ? <img key={p.userId} src={p.profileImage} alt="" className={styles.avatarBubble} />
+                : <div key={p.userId} className={styles.avatarBubble} />
+            ))}
+          </div>
+          <span className={styles.entryRoomName}>{roomName}</span>
+        </div>
+      </div>
+
+      <span className={styles.arrow}>›</span>
+    </button>
   )
 }
