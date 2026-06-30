@@ -147,6 +147,11 @@
   overflow: hidden;
 }
 
+:global(:root:not([data-theme="dark"])) .sectionCard {
+  background: linear-gradient(135deg, rgba(127,184,74,.09), rgba(166,216,95,.07));
+  border-color: rgba(120, 162, 58, 0.20);
+}
+
 .divider {
   height: 1px;
   background: var(--divider-color);
