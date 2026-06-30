@@ -71,9 +71,31 @@
   background: rgba(122, 181, 103, 0.18);
 }
 
+:global(:root[data-theme="dark"]) .missionBanner {
+  background: linear-gradient(135deg, #1c2452 0%, #181c3f 100%);
+  border-bottom: 1px solid rgba(150, 180, 255, 0.18);
+}
+
+:global(:root[data-theme="dark"]) .missionBanner:active {
+  background: linear-gradient(135deg, #222b60 0%, #1d2249 100%);
+}
+
 .missionBannerIcon {
-  font-size: 20px;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: linear-gradient(135deg, #BBD6FF 0%, #DCE9FF 100%);
+  color: #2F6FE0;
+}
+
+:global(:root[data-theme="dark"]) .missionBannerIcon {
+  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  color: #fff;
 }
 
 .missionBannerBody {
@@ -87,13 +109,18 @@
 
 .missionBannerTitle {
   font-size: var(--text-sm);
-  font-weight: 600;
+  font-weight: 800;
   color: var(--color-text);
 }
 
 .missionBannerSub {
   font-size: var(--text-xs);
-  color: var(--color-text-sub);
+  font-weight: 700;
+  color: #2F6FE0;
+}
+
+:global(:root[data-theme="dark"]) .missionBannerSub {
+  color: #9B8BFF;
 }
 
 .missionBannerArrow {

@@ -311,7 +311,7 @@ function DateSep({ label }: { label: string }) {
 function MissionResultBanner({ onPress }: { onPress: () => void }) {
   return (
     <button className={styles.missionBanner} onClick={onPress}>
-      <span className={styles.missionBannerIcon}>✨</span>
+      <span className={styles.missionBannerIcon}>⚡</span>
       <div className={styles.missionBannerBody}>
         <span className={styles.missionBannerTitle}>오늘의 미션 결과가 나왔어요!</span>
         <span className={styles.missionBannerSub}>콜라주 결과 보러가기</span>
