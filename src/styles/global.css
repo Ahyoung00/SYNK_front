@@ -314,7 +314,9 @@ img, video {
   --color-fab-shadow:   rgba(108, 99, 255, 0.45);
 
   /* ── Page / card / ink / nav tokens (dark) ──────────────────────────────── */
-  --page-bg:            #070912;
+  --page-bg:            radial-gradient(70% 38% at 88% 4%, rgba(70,215,255,.10), transparent 70%),
+                        radial-gradient(80% 45% at 4% 78%, rgba(155,107,255,.14), transparent 72%),
+                        radial-gradient(125% 70% at 50% -8%, #243168 0%, #1a2356 28%, #141d44 52%, #101736 100%);
   --card-bg:            rgba(255, 255, 255, 0.045);
   --card-bg-soft:       rgba(255, 255, 255, 0.03);
   --card-border:        rgba(255, 255, 255, 0.085);
