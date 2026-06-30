@@ -143,7 +143,7 @@
   flex-shrink: 0;
 }
 
-.missionEmoji { font-size: 18px; }
+.missionEmoji { width: 24px; height: 24px; object-fit: contain; }
 
 .missionInfo {
   flex: 1;

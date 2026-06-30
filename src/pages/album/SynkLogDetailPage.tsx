@@ -5,7 +5,6 @@ import { useMissionStore } from '@/store/missionStore'
 import { useAuthStore } from '@/store/authStore'
 import { ROUTES } from '@/constants'
 import type { CollageItem, SynklogDetailResponse, RoomDetail } from '@/types'
-import { missionEmoji } from '@/utils/missionVisual'
 import styles from './SynkLogDetailPage.module.css'
 
 
@@ -194,7 +193,7 @@ export default function SynkLogDetailPage() {
             {/* 미션 헤더 */}
             <div className={styles.missionHeader}>
               <div className={styles.missionIconWrap}>
-                <span className={styles.missionEmoji}>{missionEmoji(item.missionTitle)}</span>
+                <img src="/synk-bolt.png" alt="" className={styles.missionEmoji} />
               </div>
               <div className={styles.missionInfo}>
                 <span className={styles.missionTitle}>{item.missionTitle}</span>
