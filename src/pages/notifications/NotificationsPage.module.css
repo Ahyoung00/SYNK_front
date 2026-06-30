@@ -86,9 +86,9 @@
   --na-ink: #1F2A18;
   --na-muted: #7E867A;
   --na-faint: #ABB1A6;
-  --na-surface: #FFFFFF;
-  --na-border: rgba(40, 55, 25, 0.10);
-  --nt-mission: #3C9D5F;
+  --na-surface: linear-gradient(135deg, rgba(127,184,74,.09), rgba(166,216,95,.07));
+  --na-border: rgba(120, 162, 58, 0.20);
+  --nt-mission: #2FA8C8;
   --nt-result: #7B4FD8;
   --nt-member: #3FA23A;
   --nt-system: #D69E28;
