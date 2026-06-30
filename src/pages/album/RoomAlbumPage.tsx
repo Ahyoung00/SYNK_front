@@ -102,8 +102,7 @@ export default function RoomAlbumPage() {
                       )}
                       {i === 0 && (
                         <div className={styles.heroCellScrim}>
-                          <span className={styles.heroDate}>{todayDot}</span>
-                          <span className={styles.synklogBadge}>SYNKLOG</span>
+                          <span className={styles.synklogBadge}>콜라주</span>
                         </div>
                       )}
                     </div>
