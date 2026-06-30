@@ -65,7 +65,7 @@
   --nav-border:         rgba(0, 0, 0, 0.07);
   --nav-inactive:       rgba(38, 58, 26, 0.35);
   --nav-active:         #2D8A45;
-  --brand-grad:         linear-gradient(135deg, #5DB85A 0%, #2D8A45 100%);
+  --brand-grad:         linear-gradient(135deg, #A6D85F 0%, #7FB84A 35%, #5DB85A 65%, #2D8A45 100%);
   --header-subtitle:    rgba(38, 58, 26, 0.55);
   --devbtn-bg:          rgba(0, 0, 0, 0.04);
   --devbtn-border:      rgba(0, 0, 0, 0.15);
