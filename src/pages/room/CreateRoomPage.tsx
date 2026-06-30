@@ -105,11 +105,11 @@ export default function CreateRoomPage() {
             {thumbUrl ? (
               <img src={thumbUrl} alt="썸네일" className={styles.thumbImg} />
             ) : (
-              <span className={styles.thumbPlus}>+</span>
+              <CameraIcon />
             )}
           </button>
           <span className={styles.thumbHint}>
-            {thumbUrl ? '사진 변경' : '사진 추가'}
+            {thumbUrl ? '사진 변경' : '방 커버 추가'}
           </span>
           <input
             ref={fileInputRef}
@@ -139,7 +139,7 @@ export default function CreateRoomPage() {
           <div className={styles.settingCard}>
             {/* 최대 인원수 (2~10) */}
             <div className={styles.settingRow}>
-              <div className={styles.settingIcon}><span>👥</span></div>
+              <div className={[styles.settingIcon, styles.settingIconBlue].join(' ')}><span>👥</span></div>
               <span className={styles.settingLabel}>최대 인원수</span>
               <div className={styles.stepper}>
                 <button
@@ -160,7 +160,7 @@ export default function CreateRoomPage() {
 
             {/* 일일 미션 횟수 (1~10) */}
             <div className={styles.settingRow}>
-              <div className={styles.settingIcon}><span>⚡</span></div>
+              <div className={[styles.settingIcon, styles.settingIconPurple].join(' ')}><span>⚡</span></div>
               <span className={styles.settingLabel}>일일 미션 횟수</span>
               <div className={styles.stepper}>
                 <button
@@ -206,5 +206,15 @@ export default function CreateRoomPage() {
         )}
       </div>
     </div>
+  )
+}
+
+function CameraIcon() {
+  return (
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 7h3l2-2h8l2 2h3v12H3z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
   )
 }
