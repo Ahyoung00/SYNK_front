@@ -189,7 +189,7 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
                 >
                   {m.profileImage
                     ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-                    : <PersonIcon />
+                    : <span className={styles.avatarBubbleInitial}>{m.name?.charAt(0) ?? '?'}</span>
                   }
                 </div>
               ))}
@@ -230,7 +230,7 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
                 >
                   {m.profileImage
                     ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-                    : <PersonIcon />
+                    : <span className={styles.avatarBubbleInitial}>{m.name?.charAt(0) ?? '?'}</span>
                   }
                 </div>
               ))}
@@ -241,14 +241,5 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
         <span className={styles.enterArrow}>›</span>
       </div>
     </button>
-  )
-}
-
-function PersonIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="8" r="4" fill="rgba(255,255,255,0.6)" />
-      <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="rgba(255,255,255,0.6)" strokeWidth="2" strokeLinecap="round" fill="none" />
-    </svg>
   )
 }
