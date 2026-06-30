@@ -126,22 +126,23 @@ async function request<T>(
   // 서버가 응답함(에러 응답 포함) → 온라인
   setOnlineStatus(true)
 
-  // HTTP 401: Refresh Token으로 재발급 후 한 번만 재시도
-  // 403은 접근 거부(방 멤버 아님 등) — 로그아웃 없이 일반 에러로 처리
-  if (res.status === 401) {
-    if (isRetry) forceLogout()
-    let newToken: string
-    try {
-      newToken = await refreshAccessToken()
-    } catch {
+  // HTTP 401/403: Refresh Token으로 재발급 후 한 번만 재시도
+  // (백엔드가 토큰 무효 상태에서 401 대신 403을 내려주는 엔드포인트가 있어 403도 함께 처리)
+  // refresh 후에도 403이면 진짜 접근 거부(방 멤버 아님 등) — 로그아웃 없이 일반 에러로 처리
+  if (res.status === 401 || res.status === 403) {
+    if (!isRetry) {
+      try {
+        const newToken = await refreshAccessToken()
+        const retryHeaders: HeadersInit = { ...headers, Authorization: `Bearer ${newToken}` }
+        return request<T>(path, { ...options, headers: retryHeaders }, true)
+      } catch {
+        if (res.status === 401) forceLogout()
+        // 403은 refresh 실패해도 로그아웃하지 않고 아래 일반 에러 처리로 진행
+      }
+    } else if (res.status === 401) {
       forceLogout()
     }
-    // 새 토큰으로 원 요청 재시도
-    const retryHeaders: HeadersInit = {
-      ...headers,
-      Authorization: `Bearer ${newToken!}`,
-    }
-    return request<T>(path, { ...options, headers: retryHeaders }, true)
+    // 403 + 재시도 후에도 403 → 진짜 권한 문제, 아래 일반 에러 처리로 진행
   }
 
   if (!res.ok) {
