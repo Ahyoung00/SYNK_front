@@ -8,6 +8,16 @@ import Loading from '@/components/ui/Loading'
 import { missionGradient } from '@/utils/missionVisual'
 import styles from './CollectionPage.module.css'
 
+function LockIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="5" y="11" width="14" height="9" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </svg>
+  )
+}
+
 function RingChart({ rate }: { rate: number }) {
   const r = 38
   const circumference = 2 * Math.PI * r
@@ -80,29 +90,39 @@ export default function CollectionPage() {
               <span className={styles.sectionHeaderIcon}>⚡</span>
               <span className={styles.sectionHeaderTitle}>완료한 미션</span>
             </div>
-            <div className={styles.missionList}>
+            <div className={styles.missionGrid}>
               {!data || data.missions.length === 0 ? (
                 <p className={styles.emptyText}>아직 완료한 미션이 없어요</p>
               ) : (
-                data.missions.map((mission: CollectionMissionItem) => (
-                  <button
-                    key={mission.missionId}
-                    className={styles.missionCard}
-                    onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
-                  >
-                    <div className={styles.thumbnail} style={{ background: missionGradient(mission.title) }}>
-                      <img src="/synk-bolt.png" alt="" className={styles.thumbnailLogo} />
+                <>
+                  {data.missions.map((mission: CollectionMissionItem) => (
+                    <button
+                      key={mission.missionId}
+                      className={styles.missionTile}
+                      onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
+                    >
+                      <div className={styles.tileThumbWrap}>
+                        <div className={styles.tileThumb} style={{ background: missionGradient(mission.title) }}>
+                          <img src="/synk-bolt.png" alt="" className={styles.tileThumbLogo} />
+                        </div>
+                        <span className={styles.tileCheck}>✓</span>
+                      </div>
+                      <span className={styles.tileTitle}>{mission.title}</span>
+                      <span className={styles.tileMeta}>완료 {mission.completedTimes}회</span>
+                    </button>
+                  ))}
+                  {Array.from({ length: Math.max(0, (data.totalCount ?? 0) - data.missions.length) }).map((_, i) => (
+                    <div key={`locked-${i}`} className={[styles.missionTile, styles.missionTileLocked].join(' ')}>
+                      <div className={styles.tileThumbWrap}>
+                        <div className={[styles.tileThumb, styles.tileThumbLocked].join(' ')}>
+                          <LockIcon />
+                        </div>
+                      </div>
+                      <span className={styles.tileTitleLocked}>?</span>
+                      <span className={styles.tileMeta}>미수집</span>
                     </div>
-                    <div className={styles.missionInfo}>
-                      <span className={styles.missionTitle}>{mission.title}</span>
-                      <span className={styles.missionMeta}>최근 {mission.lastCompletedDate}</span>
-                    </div>
-                    <div className={styles.completeBadge}>
-                      <span className={styles.completeCount}>완료 {mission.completedTimes}회</span>
-                      <span className={styles.completeCheck}>✓</span>
-                    </div>
-                  </button>
-                ))
+                  ))}
+                </>
               )}
             </div>
           </>

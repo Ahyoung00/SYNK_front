@@ -32,9 +32,9 @@
   border-color: rgba(120, 162, 58, 0.32);
 }
 
-:global(:root:not([data-theme="dark"])) .missionList {
-  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
-  border-color: rgba(120, 162, 58, 0.32);
+:global(:root:not([data-theme="dark"])) .missionTile {
+  background: linear-gradient(135deg, rgba(127,184,74,.12), rgba(166,216,95,.10));
+  border-color: rgba(120, 162, 58, 0.28);
 }
 
 .statsInner {
@@ -97,90 +97,64 @@
   letter-spacing: 0.2px;
 }
 
-/* ── 미션 목록 ────────────────────────────────────────────────────────────── */
-.missionList {
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  background: var(--card-bg);
-  border-radius: 18px;
-  border: 1px solid var(--card-border);
-  overflow: hidden;
+/* ── 미션 그리드 ──────────────────────────────────────────────────────────── */
+.missionGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
-.missionCard {
-  width: 100%;
+.missionTile {
   display: flex;
-  align-items: center;
-  gap: 14px;
-  padding: 14px 18px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 16px;
   text-align: left;
-  border-bottom: 1px solid var(--divider-color);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
   transition: background 0.12s ease;
   -webkit-tap-highlight-color: transparent;
 }
 
-.missionCard:last-child {
-  border-bottom: none;
-}
-
-.missionCard:active {
+.missionTile:active {
   background: var(--card-bg-soft);
 }
 
-.thumbnail {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  flex-shrink: 0;
-  object-fit: cover;
+.missionTileLocked {
+  opacity: 0.55;
+}
+
+.tileThumbWrap {
+  position: relative;
+  margin-bottom: 8px;
+}
+
+.tileThumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.thumbnailLogo {
-  width: 34px;
-  height: 34px;
+.tileThumbLogo {
+  width: 32px;
+  height: 32px;
   object-fit: contain;
 }
 
-.missionInfo {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
+.tileThumbLocked {
+  background: var(--card-bg-soft);
+  color: var(--ink-muted);
 }
 
-.missionTitle {
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.missionMeta {
-  font-size: 12px;
-  color: var(--ink-sub);
-}
-
-.completeBadge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
-
-.completeCount {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-sub);
-}
-
-.completeCheck {
+.tileCheck {
+  position: absolute;
+  top: -4px;
+  right: -4px;
   width: 22px;
   height: 22px;
   border-radius: 50%;
@@ -191,7 +165,24 @@
   font-size: 11px;
   color: #fff;
   font-weight: 800;
-  flex-shrink: 0;
+  border: 2px solid var(--card-bg);
+}
+
+.tileTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.tileTitleLocked {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink-muted);
+}
+
+.tileMeta {
+  font-size: 12px;
+  color: var(--ink-sub);
 }
 
 .emptyText {
