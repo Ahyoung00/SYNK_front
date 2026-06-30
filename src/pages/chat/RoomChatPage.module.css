@@ -271,23 +271,41 @@
 /* ── 입력창 ───────────────────────────────────────────────────────────────── */
 .inputBar {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: var(--sp-2);
   padding: var(--sp-3) var(--sp-4);
   padding-bottom: max(var(--sp-3), env(safe-area-inset-bottom));
-  background: var(--color-surface);
+  background: #fff;
   border-top: 1px solid var(--color-border);
   flex-shrink: 0;
+}
+
+.cameraBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  transition: opacity var(--dur-fast);
+}
+
+.cameraBtn:active {
+  opacity: 0.6;
 }
 
 .input {
   flex: 1;
   min-height: 40px;
   max-height: 120px;
-  padding: 10px 14px;
-  background: var(--color-surface-2);
+  padding: 10px 16px;
+  background: transparent;
   border: 1px solid var(--color-border);
-  border-radius: 20px;
+  border-radius: 999px;
   color: var(--color-text);
   font-size: var(--text-sm);
   font-family: inherit;

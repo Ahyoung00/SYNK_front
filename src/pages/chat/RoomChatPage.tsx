@@ -270,6 +270,9 @@ export default function RoomChatPage() {
 
       {/* ── 입력창 ───────────────────────────────────────────────────────── */}
       <div className={styles.inputBar}>
+        <button className={styles.cameraBtn} type="button" aria-label="사진 전송">
+          <CameraIcon />
+        </button>
         <textarea
           ref={inputRef}
           className={styles.input}
@@ -411,8 +414,19 @@ function PeopleIcon() {
 
 function SendIcon() {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  )
+}
+
+function CameraIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M3 7h3l2-2h8l2 2h3v12H3z" />
+      <circle cx="12" cy="13" r="3.5" />
     </svg>
   )
 }
