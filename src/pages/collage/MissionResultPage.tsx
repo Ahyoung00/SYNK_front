@@ -194,11 +194,11 @@ export default function MissionResultPage() {
       {/* ── 통계 + 홈으로 ─────────────────────────────────────────────────── */}
       <div className={[styles.footer, showStats ? styles.footerVisible : ''].join(' ')}>
         <div className={styles.statsRow}>
-          <StatItem label="참여율" value={`${participationRate}%`} allDone={participationRate === 100} />
+          <StatItem label="참여율" value={`${participationRate}%`} rate={participationRate} />
           <div className={styles.statDivider} />
           <StatItem label="걸린 시간" value={completionTime != null ? formatCompletionTime(completionTime) : '—'} />
           <div className={styles.statDivider} />
-          <StatItem label="제출" value={`${submittedCount}/${totalCount}명`} allDone={participationRate === 100} />
+          <StatItem label="제출" value={`${submittedCount}/${totalCount}명`} rate={participationRate} />
         </div>
 
         <button className={styles.homeBtn} onClick={() => { clearMission(); navigate(ROUTES.HOME, { replace: true }) }}>
@@ -210,12 +210,12 @@ export default function MissionResultPage() {
   )
 }
 
-function StatItem({ label, value, allDone }: { label: string; value: string; allDone?: boolean }) {
-  const color = allDone === true
-    ? 'var(--color-timer-safe)'
-    : allDone === false
-    ? '#f97316'
-    : undefined
+function StatItem({ label, value, rate }: { label: string; value: string; rate?: number }) {
+  const color = rate == null ? undefined
+    : rate >= 100 ? '#4ADE80'
+    : rate >= 67  ? '#46D7FF'
+    : rate >= 34  ? '#FFA040'
+    : '#FF5C6E'
   return (
     <div className={styles.statItem}>
       <span className={styles.statLabel}>{label}</span>
