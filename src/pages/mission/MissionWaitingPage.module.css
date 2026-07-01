@@ -155,7 +155,6 @@
   background: #000;
   max-height: 60dvh;
   object-fit: cover;
-  transform: rotate(-90deg) scaleX(-1);
 }
 
 .videoCloseBtn {

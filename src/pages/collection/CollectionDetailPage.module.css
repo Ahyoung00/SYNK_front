@@ -163,10 +163,6 @@
   object-fit: cover;
 }
 
-.photoVideo {
-  transform: rotate(-90deg) scaleX(-1);
-}
-
 /* 재생 배지 */
 .playBadge {
   position: absolute;
