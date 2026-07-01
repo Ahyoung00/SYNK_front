@@ -25,23 +25,39 @@
 
 .bellBtn {
   position: relative;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--ink-sub);
   margin-top: 2px;
   flex-shrink: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background var(--dur-fast);
+}
+
+.bellBtn:active {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+:global(:root:not([data-theme="dark"])) .bellBtn {
+  background: rgba(255, 255, 255, 0.55);
+  border-color: rgba(0, 0, 0, 0.08);
 }
 
 .bellDot {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 8px;
-  height: 8px;
-  background: var(--color-primary);
+  top: 7px;
+  right: 7px;
+  width: 9px;
+  height: 9px;
+  background: #46D7FF;
   border-radius: 50%;
-  border: 2px solid var(--page-bg);
+  border: 2px solid transparent;
+  box-shadow: 0 0 6px rgba(70, 215, 255, 0.8);
 }
