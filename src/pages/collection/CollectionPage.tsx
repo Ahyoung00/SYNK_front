@@ -8,15 +8,6 @@ import Loading from '@/components/ui/Loading'
 import { missionGradient } from '@/utils/missionVisual'
 import styles from './CollectionPage.module.css'
 
-function LockIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="5" y="11" width="14" height="9" rx="2" />
-      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
-    </svg>
-  )
-}
 
 function RingChart({ rate }: { rate: number }) {
   const r = 38
@@ -110,17 +101,6 @@ export default function CollectionPage() {
                       <span className={styles.tileTitle}>{mission.title}</span>
                       <span className={styles.tileMeta}>완료 {mission.completedTimes}회</span>
                     </button>
-                  ))}
-                  {Array.from({ length: Math.max(0, (data.totalCount ?? 0) - data.missions.length) }).map((_, i) => (
-                    <div key={`locked-${i}`} className={[styles.missionTile, styles.missionTileLocked].join(' ')}>
-                      <div className={styles.tileThumbWrap}>
-                        <div className={[styles.tileThumb, styles.tileThumbLocked].join(' ')}>
-                          <LockIcon />
-                        </div>
-                      </div>
-                      <span className={styles.tileTitleLocked}>?</span>
-                      <span className={styles.tileMeta}>미수집</span>
-                    </div>
                   ))}
                 </>
               )}
