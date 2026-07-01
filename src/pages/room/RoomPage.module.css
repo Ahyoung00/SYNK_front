@@ -429,39 +429,29 @@
   align-items: center;
   gap: 6px;
   height: 36px;
-  padding: 0 14px;
+  padding: 0 16px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(70,215,255,.18), rgba(155,107,255,.18));
-  border: 1px solid rgba(124,111,240,.3);
-  color: #9B8BFF;
+  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 52%, #9B6BFF 100%);
+  border: none;
+  color: #fff;
   font-size: 13px;
   font-weight: 700;
   position: relative;
   transition: opacity 0.12s ease;
-}
-
-:global(:root:not([data-theme="dark"])) .chatBtn {
-  background: linear-gradient(135deg, rgba(124,111,240,.14), rgba(70,215,255,.10));
-  border-color: rgba(124,111,240,.22);
-  color: #9B8BFF;
+  box-shadow: 0 4px 14px rgba(110,139,255,.40);
 }
 
 .chatBtn:active { opacity: 0.65; }
 
 .chatDot {
   position: absolute;
-  top: 2px;
-  right: 6px;
+  top: 3px;
+  right: 8px;
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background: #9B8BFF;
-  box-shadow: 0 0 0 2px #141d44;
-}
-
-:global(:root:not([data-theme="dark"])) .chatDot {
-  background: #9B8BFF;
-  box-shadow: 0 0 0 2px #ffffff;
+  background: #fff;
+  box-shadow: 0 0 0 2px #6E8BFF;
 }
 
 /* ── 라이트 모드 그린 카드 ────────────────────────────────────────────────── */
