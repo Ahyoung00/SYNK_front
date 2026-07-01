@@ -317,9 +317,9 @@
 
 .input {
   flex: 1;
-  min-height: 40px;
+  min-height: 36px;
   max-height: 120px;
-  padding: 10px 16px;
+  padding: 7px 14px;
   background: transparent;
   border: 1px solid var(--color-border);
   border-radius: 999px;
