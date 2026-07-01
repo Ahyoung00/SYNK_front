@@ -87,11 +87,23 @@
   gap: var(--sp-2);
 }
 
+.fieldLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-left: var(--sp-1);
+}
+
 .fieldLabel {
   font-size: var(--text-sm);
   font-weight: 600;
   color: var(--color-text-sub);
-  padding-left: var(--sp-1);
+}
+
+.fieldCount {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .fieldInput {

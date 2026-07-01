@@ -97,7 +97,10 @@ export default function ProfileEditPage() {
 
         {/* ── 이름 필드 ────────────────────────────────────────────────────────── */}
         <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>이름</label>
+          <div className={styles.fieldLabelRow}>
+            <label className={styles.fieldLabel}>이름</label>
+            <span className={styles.fieldCount}>{name.length}/16</span>
+          </div>
           <input
             className={styles.fieldInput}
             value={name}
