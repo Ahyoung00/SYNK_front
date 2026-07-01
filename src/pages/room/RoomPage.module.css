@@ -427,18 +427,19 @@
 .chatBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 16px;
+  gap: 7px;
+  height: 44px;
+  padding: 0 20px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 52%, #9B6BFF 100%);
+  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
   border: none;
   color: #fff;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 15px;
+  font-weight: 800;
   position: relative;
   transition: opacity 0.12s ease;
-  box-shadow: 0 4px 14px rgba(110,139,255,.40);
+  box-shadow: 0 4px 20px rgba(110,139,255,.55), 0 0 0 1px rgba(255,255,255,.15) inset;
+  letter-spacing: -0.2px;
 }
 
 .chatBtn:active { opacity: 0.65; }
