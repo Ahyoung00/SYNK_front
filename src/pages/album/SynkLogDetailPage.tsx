@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/authStore'
 import { ROUTES } from '@/constants'
 import type { CollageItem, SynklogDetailResponse, RoomDetail } from '@/types'
 import { missionGradient } from '@/utils/missionVisual'
+import Loading from '@/components/ui/Loading'
 import styles from './SynkLogDetailPage.module.css'
 
 
@@ -145,9 +146,17 @@ export default function SynkLogDetailPage() {
   const isToday = date === todayStr
   const isEmpty = collages.length === 0
 
+  const isGenerating = creatingLog || synklog?.status === 'PROCESSING'
+
   return (
     <div className={styles.page}>
       <PageHeader date={date ?? ''} onBack={() => navigate(-1)} />
+
+      {isGenerating && (
+        <div className={styles.generatingOverlay}>
+          <Loading label="콜라주 생성 중" />
+        </div>
+      )}
 
       <div className={styles.scroll}>
 
