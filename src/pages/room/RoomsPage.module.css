@@ -129,14 +129,25 @@
   color: var(--ink);
 }
 
-.chatDot {
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--nav-active);
-  margin-left: 6px;
-  vertical-align: middle;
+.chatBanner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 2px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(70,215,255,.13), rgba(155,107,255,.10));
+  border: 1px solid rgba(155,107,255,.25);
+  font-size: 11px;
+  font-weight: 700;
+  color: #9B8BFF;
+  width: fit-content;
+  animation: chatBannerIn 0.22s ease;
+}
+
+@keyframes chatBannerIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 .missionBadge {
