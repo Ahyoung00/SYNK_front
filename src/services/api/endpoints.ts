@@ -171,6 +171,13 @@ export const missionApi = {
     api.get<ActiveMissionItem[]>('/missions/active'),
 
   /**
+   * 미션 콜라주 조회 — GET /missions/{missionId}/collage
+   * 알림 "결과 보기" 딥링크용
+   */
+  getMissionCollage: (missionId: number) =>
+    api.get<{ collageVideoUrl: string | null; thumbnailUrl: string | null; roomId: number }>(`/missions/${missionId}/collage`),
+
+  /**
    * 미션 영상 제출 — POST /submissions
    * 영상은 스토리지(S3 등)에 먼저 업로드 후 videoUrl을 body에 담아 전송
    * Request (camelCase): { missionId, videoUrl, roomId }

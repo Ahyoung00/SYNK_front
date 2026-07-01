@@ -110,9 +110,23 @@ function NotifItem({
       </div>
     )
   } else if (item.type === 'MISSION_COMPLETE' || item.type === 'SYNKLOG_CREATED') {
+    const missionId = item.relatedId
     actions = (
       <div className={styles.ntActions}>
-        <button className={[styles.ntBtn, styles.solid].join(' ')} onClick={(e) => go(e, ROUTES.HOME)}>결과 보기</button>
+        <button
+          className={[styles.ntBtn, styles.solid].join(' ')}
+          onClick={async (e) => {
+            e.stopPropagation()
+            if (unread) onRead(item.id)
+            if (missionId == null) { navigate(ROUTES.HOME); return }
+            try {
+              await missionApi.getMissionCollage(missionId)
+              navigate(ROUTES.MISSION_RESULT(missionId))
+            } catch {
+              navigate(ROUTES.HOME)
+            }
+          }}
+        >결과 보기</button>
       </div>
     )
   }
