@@ -29,10 +29,20 @@ export default function MissionResultPage() {
   const [roomMemberCount, setRoomMemberCount] = useState<number | null>(null)
 
   useEffect(() => {
-    const navState  = location.state as { roomId?: number; date?: string } | null
+    const navState  = location.state as { roomId?: number; date?: string; collageData?: CollageItem & { totalMembers?: number } } | null
     const roomId    = navState?.roomId ?? active?.room.id
     const missionId = Number(missionIdParam) || active?.mission.id
     const date      = navState?.date ?? todayString()
+
+    // 알림 딥링크: getMissionCollage 응답을 직접 받은 경우 API 재호출 없이 바로 사용
+    if (navState?.collageData) {
+      const cd = navState.collageData
+      setCollage(cd)
+      setMissionTitle(cd.missionTitle)
+      if (cd.totalMembers != null) setRoomMemberCount(cd.totalMembers)
+      setShowStats(true)
+      return
+    }
 
     if (!roomId) {
       setLoadError(true)

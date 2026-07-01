@@ -175,7 +175,17 @@ export const missionApi = {
    * 알림 "결과 보기" 딥링크용
    */
   getMissionCollage: (missionId: number) =>
-    api.get<{ collageVideoUrl: string | null; thumbnailUrl: string | null; roomId: number }>(`/missions/${missionId}/collage`),
+    api.get<{
+      missionId: number
+      missionTitle: string
+      missionStartAt: string | null
+      status: 'PROCESSING' | 'COMPLETED' | 'FAILED'
+      collageVideoUrl: string | null
+      thumbnail: string | null
+      participants: import('@/types').CollageParticipant[]
+      totalMembers: number
+      submittedCount: number
+    }>(`/missions/${missionId}/collage`),
 
   /**
    * 미션 영상 제출 — POST /submissions
