@@ -92,7 +92,7 @@ export default function RoomAlbumPage() {
           {/* ── 오늘 ──────────────────────────────────────────────────────── */}
           <p className={styles.sectionLabel}>오늘 · {todayDash}</p>
           <MissionStatusCard
-            total={room?.daily_mission_count ?? 0}
+            total={room?.dailyMissionCount ?? 0}
             completed={todayCollages.filter((c) => c.status === 'COMPLETED').length}
             fired={todayCollages.length}
           />
@@ -207,15 +207,6 @@ function BackIcon() {
   )
 }
 
-function CameraIcon() {
-  return (
-    <svg width="30" height="30" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 7h3l2-2h8l2 2h3v12H3z" />
-      <circle cx="12" cy="13" r="3.5" />
-    </svg>
-  )
-}
 
 function AlbumEntryRow({
   date, thumbnail, memberProfiles, roomName, onClick,
