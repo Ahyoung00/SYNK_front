@@ -88,7 +88,7 @@ export default function CollectionDetailPage() {
                           // 합쳐진 콜라주 썸네일 대신 본인 영상의 첫 프레임을 표시
                           <video
                             src={`${video}#t=0.1`}
-                            className={styles.photo}
+                            className={`${styles.photo} ${styles.photoVideo}`}
                             muted
                             playsInline
                             preload="metadata"
