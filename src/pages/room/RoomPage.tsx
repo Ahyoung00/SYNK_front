@@ -180,7 +180,7 @@ export default function RoomPage() {
             onClick={() => navigate(ROUTES.ROOM_CHAT(id))}
             aria-label="채팅"
           >
-            <ChatIcon />
+            <img src="/icon-chat.png" alt="채팅" className={styles.chatIcon} />
           </button>
         }
       />

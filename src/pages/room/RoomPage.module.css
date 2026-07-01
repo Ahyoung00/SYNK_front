@@ -428,8 +428,8 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
   background: #ffffff;
   border: none;
@@ -439,6 +439,12 @@
 }
 
 .chatBtn:active { opacity: 0.65; }
+
+.chatIcon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
 
 .chatDot {
   position: absolute;
