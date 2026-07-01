@@ -9,6 +9,7 @@ import { ROUTES } from '@/constants'
 import { toMissionState } from '@/utils/activeMission'
 import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import AppHeader from '@/components/layout/AppHeader'
+import Loading from '@/components/ui/Loading'
 import { missionEmoji } from '@/utils/missionVisual'
 import styles from './HomePage.module.css'
 
@@ -228,36 +229,21 @@ function CollageTransitionOverlay({
   roomId,
   missionId,
   date,
-  memberCount,
   onReady,
   onFailed,
 }: {
   roomId: number
   missionId: number
   date: string
-  memberCount: number
+  memberCount?: number
   onReady: () => void
   onFailed: () => void
 }) {
-  const [progress, setProgress] = useState(0)
   const [failed, setFailed] = useState(false)
-  const [participants, setParticipants] = useState<Array<{
-    userId: number; name: string; profileImage: string | null
-  }>>([])
   const onReadyRef = useRef(onReady)
   onReadyRef.current = onReady
   const onFailedRef = useRef(onFailed)
   onFailedRef.current = onFailed
-
-  // 진행 바: 영상 준비 전까지 92%까지 천천히 차오름 (준비되면 100%)
-  useEffect(() => {
-    const start = Date.now()
-    const id = setInterval(() => {
-      const elapsed = Date.now() - start
-      setProgress((prev) => (prev >= 100 ? 100 : Math.min((elapsed / 10000) * 92, 92)))
-    }, 80)
-    return () => clearInterval(id)
-  }, [])
 
   // 콜라주 영상(collageVideoUrl)이 준비될 때까지 폴링 → 준비되면 onReady()
   useEffect(() => {
@@ -270,18 +256,12 @@ function CollageTransitionOverlay({
       try {
         const res = await albumApi.getCollages(roomId, date)
         const target = (res.data ?? []).find((c) => c.missionId === missionId)
-        if (target?.participants?.length && !cancelled) {
-          setParticipants(target.participants.map((p) => ({
-            userId: p.userId, name: p.name, profileImage: p.profileImage,
-          })))
-        }
         if (target?.status === 'FAILED') {
           if (!cancelled) setFailed(true)
           return
         }
         if (target?.collageVideoUrl) {
           if (!cancelled) {
-            setProgress(100)
             timer = window.setTimeout(() => onReadyRef.current(), 400)
           }
           return
@@ -289,7 +269,6 @@ function CollageTransitionOverlay({
       } catch { /* 일시적 오류 무시 — 다음 주기 재시도 */ }
       if (cancelled) return
       if (Date.now() - startedAt > MAX_WAIT) {
-        setProgress(100)
         timer = window.setTimeout(() => onReadyRef.current(), 400)
         return
       }
@@ -299,7 +278,6 @@ function CollageTransitionOverlay({
     return () => { cancelled = true; if (timer) window.clearTimeout(timer) }
   }, [roomId, missionId, date])
 
-  const count = memberCount || participants.length
 
   if (failed) {
     return (
@@ -325,29 +303,7 @@ function CollageTransitionOverlay({
 
   return (
     <div className={styles.processingOverlay}>
-      {/* 텍스트 */}
-      <div className={styles.processingTextRow}>
-        <h2 className={styles.processingTitle}>콜라주 생성중</h2>
-        <span className={styles.processingDots}><i /><i /><i /></span>
-      </div>
-      <p className={styles.processingDesc}>{count}명의 순간을 한 장으로 엮고 있어요</p>
-
-      {/* 진행 바 */}
-      <div className={styles.processingTrack}>
-        <div className={styles.processingFill} style={{ width: `${progress}%` }} />
-      </div>
-
-      {/* 참여자 아바타 */}
-      <div className={styles.processingAvatars}>
-        {participants.map((p) => (
-          <div key={p.userId} className={styles.processingAvatar}>
-            {p.profileImage
-              ? <img src={p.profileImage} alt={p.name} className={styles.processingAvatarImg} />
-              : <span className={styles.processingAvatarInitial}>{p.name.charAt(0)}</span>
-            }
-          </div>
-        ))}
-      </div>
+      <Loading label="콜라주 생성 중" />
     </div>
   )
 }
