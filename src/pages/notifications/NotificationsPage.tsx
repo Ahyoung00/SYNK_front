@@ -84,12 +84,6 @@ function NotifItem({
     ? activeMissions.find((m) => m.id === item.relatedId)
     : undefined
 
-  function go(e: React.MouseEvent, to?: string) {
-    e.stopPropagation()
-    if (unread) onRead(item.id)
-    if (to) navigate(to)
-  }
-
   let actions: React.ReactNode = null
   if (item.type === 'MISSION_START' && targetMission) {
     actions = (
