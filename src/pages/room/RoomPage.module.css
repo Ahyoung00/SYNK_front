@@ -427,36 +427,24 @@
 .chatBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  height: 36px;
-  padding: 0 14px 0 11px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%);
-  color: #fff;
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: -0.01em;
+  justify-content: center;
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: none;
+  color: #1C1F2E;
   position: relative;
-  cursor: pointer;
-  box-shadow:
-    0 0 0 1.5px rgba(124, 58, 237, 0.4),
-    0 4px 22px rgba(109, 71, 255, 0.75);
   transition: opacity 0.12s ease;
 }
 
 .chatBtn:active { opacity: 0.65; }
 
-.chatBtn::after {
-  content: '';
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #F43F5E;
-  border: 1.5px solid var(--page-bg);
-  box-shadow: 0 0 7px rgba(244, 63, 94, 0.85);
+.chatIcon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
 }
 
 .chatDot {
