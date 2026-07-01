@@ -844,7 +844,10 @@ export default function HomePage() {
             <p className={styles.waitingDesc}>
               랜덤한 순간에 미션이 도착해요.<br />알림을 켜두면 놓치지 않아요.
             </p>
-            <div className={styles.waitingBadge}>대기 중</div>
+            <div className={styles.waitingBadge}>
+              <span className={styles.waitingDot} />
+              대기 중
+            </div>
           </div>
         )}
 

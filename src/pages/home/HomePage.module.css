@@ -688,6 +688,24 @@
   border: 1px solid rgba(70,215,255,.25);
   color: #46D7FF;
   letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.waitingDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #46D7FF;
+  box-shadow: 0 0 6px rgba(70,215,255,.7);
+  animation: waitingDotPulse 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes waitingDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.35; transform: scale(0.75); }
 }
 
 /* ── 내 방의 오늘 미션 섹션 ───────────────────────────────────────────────── */
