@@ -114,8 +114,8 @@ function NotifItem({
             if (unread) onRead(item.id)
             if (missionId == null) { navigate(ROUTES.HOME); return }
             try {
-              await missionApi.getMissionCollage(missionId)
-              navigate(ROUTES.MISSION_RESULT(missionId))
+              const res = await missionApi.getMissionCollage(missionId)
+              navigate(ROUTES.MISSION_RESULT(missionId), { state: { roomId: res.data.roomId } })
             } catch {
               navigate(ROUTES.HOME)
             }
