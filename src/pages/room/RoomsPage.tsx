@@ -173,6 +173,7 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
           <div className={styles.cardTop}>
             <div className={styles.roomNameRow}>
               <span className={styles.roomName}>{room.name}</span>
+              <span className={styles.memberCount}>멤버 {room.memberProfiles.length}명</span>
               {hasNewChat && (
                 <div className={styles.chatBanner}>
                   <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
@@ -207,7 +208,6 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
                 </div>
               )}
             </div>
-            <span className={styles.memberCount}>멤버 {room.memberProfiles.length}명</span>
           </div>
         </div>
         <span className={styles.enterArrow}>›</span>
@@ -223,7 +223,10 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
         <RoomThumbnail src={room.roomThumbnail} />
         <div className={styles.cardBody}>
           <div className={styles.cardTop}>
-            <span className={styles.roomName}>{room.name}</span>
+            <div className={styles.roomNameRow}>
+              <span className={styles.roomName}>{room.name}</span>
+              <span className={styles.memberCount}>멤버 {room.currentMembers}명</span>
+            </div>
             <span className={styles.missionBadge}>
               {room.waitingCount}명 더 기다리는 중
             </span>
@@ -243,7 +246,6 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
                 </div>
               ))}
             </div>
-            <span className={styles.memberCount}>멤버 {room.currentMembers}명</span>
           </div>
         </div>
         <span className={styles.enterArrow}>›</span>
