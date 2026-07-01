@@ -171,7 +171,18 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
         <RoomThumbnail src={room.roomThumbnail} />
         <div className={styles.cardBody}>
           <div className={styles.cardTop}>
-            <span className={styles.roomName}>{room.name}</span>
+            <div className={styles.roomNameRow}>
+              <span className={styles.roomName}>{room.name}</span>
+              {hasNewChat && (
+                <div className={styles.chatBanner}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                      fill="currentColor" opacity="0.9" />
+                  </svg>
+                  새 채팅
+                </div>
+              )}
+            </div>
             <span className={allDone ? styles.missionBadgeDone : styles.missionBadge}>
               오늘 미션 {room.completedMissions}/{room.totalMissions}{allDone ? ' ✓' : ''}
             </span>
@@ -198,15 +209,6 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
             </div>
             <span className={styles.memberCount}>멤버 {room.memberProfiles.length}명</span>
           </div>
-          {hasNewChat && (
-            <div className={styles.chatBanner}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                  fill="currentColor" opacity="0.9" />
-              </svg>
-              읽지 않은 채팅이 있어요
-            </div>
-          )}
         </div>
         <span className={styles.enterArrow}>›</span>
       </div>

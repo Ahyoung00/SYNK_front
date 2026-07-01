@@ -129,19 +129,24 @@
   color: var(--ink);
 }
 
+.roomNameRow {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
 .chatBanner {
   display: flex;
   align-items: center;
-  gap: 5px;
-  margin-top: 2px;
-  padding: 5px 10px;
+  gap: 4px;
+  padding: 3px 8px;
   border-radius: 999px;
   background: linear-gradient(135deg, rgba(70,215,255,.13), rgba(155,107,255,.10));
   border: 1px solid rgba(155,107,255,.25);
   font-size: 11px;
   font-weight: 700;
   color: #9B8BFF;
-  width: fit-content;
+  flex-shrink: 0;
   animation: chatBannerIn 0.22s ease;
 }
 
