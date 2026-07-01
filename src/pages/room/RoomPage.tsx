@@ -256,7 +256,7 @@ export default function RoomPage() {
               <button
                 key={log.date}
                 className={styles.albumThumbBtn}
-                onClick={() => navigate(ROUTES.ROOM_SYNKLOG(id, log.date.replace(/\./g, '-')))}
+                onClick={() => navigate(ROUTES.ROOM_SYNKLOG(id, log.date.replace(/\./g, '-')), { state: { scrollToThumbnail: log.thumbnail } })}
               >
                 {log.thumbnail
                   ? <img src={log.thumbnail} alt={log.date} className={styles.albumThumbImg} />

@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { useNavigate, useParams, useLocation } from 'react-router-dom'
 import { albumApi, roomApi } from '@/services/api/endpoints'
 import { useMissionStore } from '@/store/missionStore'
 import { useAuthStore } from '@/store/authStore'
@@ -12,10 +12,12 @@ import styles from './SynkLogDetailPage.module.css'
 export default function SynkLogDetailPage() {
   const { roomId, date } = useParams<{ roomId: string; date: string }>()
   const navigate    = useNavigate()
+  const location    = useLocation()
   const setActive   = useMissionStore((s) => s.setActive)
   const previewUrl  = useMissionStore((s) => s.previewUrl)
   const myUser      = useAuthStore((s) => s.user)
   const numRoomId   = Number(roomId)
+  const missionRefs = useRef<Record<number, HTMLDivElement | null>>({})
 
   const [collages, setCollages]         = useState<CollageItem[]>([])
   const [synklog, setSynklog]           = useState<SynklogDetailResponse | null>(null)
@@ -36,6 +38,17 @@ export default function SynkLogDetailPage() {
         )
         setCollages(sorted)
         setRoom(roomRes.data)
+
+        // 썸네일 URL로 해당 미션 카드 스크롤
+        const targetThumb = (location.state as { scrollToThumbnail?: string } | null)?.scrollToThumbnail
+        if (targetThumb) {
+          const target = sorted.find((c) => c.thumbnail === targetThumb) ?? sorted[0]
+          if (target) {
+            requestAnimationFrame(() => {
+              missionRefs.current[target.missionId]?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            })
+          }
+        }
       })
       .catch(console.error)
       .finally(() => setIsLoading(false))
@@ -190,7 +203,7 @@ export default function SynkLogDetailPage() {
 
         {/* ── 미션별 콜라주 카드 ─────────────────────────────────────────── */}
         {collages.map((item) => (
-          <div key={item.missionId} className={styles.missionCard}>
+          <div key={item.missionId} className={styles.missionCard} ref={(el) => { missionRefs.current[item.missionId] = el }}>
             {/* 미션 헤더 */}
             <div className={styles.missionHeader}>
               <div className={styles.missionIconWrap} style={{ background: missionGradient(item.missionTitle) }}>
