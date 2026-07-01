@@ -49,7 +49,9 @@
   --color-fab-shadow:   rgba(149, 201, 109, 0.45);
 
   /* ── Page / card / ink / nav tokens (light) ─────────────────────────────── */
-  --page-bg:            linear-gradient(180deg, #dde5ff 0%, #edf0ff 50%, #f5f6ff 100%);
+  --page-bg:            radial-gradient(ellipse 80% 40% at 50% 0%, rgba(205,240,220,.60) 0%, transparent 70%),
+                        radial-gradient(ellipse 60% 30% at 80% 70%, rgba(180,230,200,.40) 0%, transparent 65%),
+                        linear-gradient(180deg, #cdf0dc 0%, #dff5e8 50%, #eefbf3 100%);
   --card-bg:            rgba(255, 255, 255, 0.80);
   --card-bg-soft:       rgba(255, 255, 255, 0.55);
   --card-border:        rgba(0, 0, 0, 0.07);
