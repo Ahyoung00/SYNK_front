@@ -93,6 +93,13 @@
   border-bottom-color: var(--nav-active);
 }
 
+.roomNameCount {
+  font-size: 11px;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
+  margin-top: 2px;
+}
+
 .roomMeta {
   font-size: 13px;
   color: var(--ink-sub);

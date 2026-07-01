@@ -173,13 +173,16 @@ export default function RoomSettingsPage() {
           />
           <div className={styles.roomInfo}>
             {isOwner ? (
-              <input
-                className={styles.roomNameInput}
-                value={roomName}
-                onChange={(e) => { setRoomName(e.target.value); setDirty(true) }}
-                maxLength={12}
-                placeholder="방 이름"
-              />
+              <>
+                <input
+                  className={styles.roomNameInput}
+                  value={roomName}
+                  onChange={(e) => { setRoomName(e.target.value); setDirty(true) }}
+                  maxLength={12}
+                  placeholder="방 이름"
+                />
+                <span className={styles.roomNameCount}>{roomName.length}/12</span>
+              </>
             ) : (
               <span className={styles.roomName}>{roomName}</span>
             )}
