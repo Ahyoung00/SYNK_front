@@ -6,6 +6,19 @@
   padding: calc(var(--safe-top) + var(--sp-10)) var(--sp-6)
            max(var(--sp-8), env(safe-area-inset-bottom));
   gap: var(--sp-10);
+  position: relative;
+}
+
+.backBtn {
+  position: absolute;
+  top: calc(var(--safe-top) + var(--sp-3));
+  left: var(--sp-4);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
 }
 
 /* ── 원형 타이머 ──────────────────────────────────────────────────────────── */
