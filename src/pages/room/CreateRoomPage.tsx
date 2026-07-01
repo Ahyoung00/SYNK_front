@@ -128,7 +128,7 @@ export default function CreateRoomPage() {
             placeholder="방 이름을 입력해주세요"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            maxLength={20}
+            maxLength={12}
           />
         </div>
 

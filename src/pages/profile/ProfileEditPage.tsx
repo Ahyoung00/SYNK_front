@@ -103,6 +103,7 @@ export default function ProfileEditPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="이름을 입력하세요"
+            maxLength={16}
           />
         </div>
 

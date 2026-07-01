@@ -177,7 +177,7 @@ export default function RoomSettingsPage() {
                 className={styles.roomNameInput}
                 value={roomName}
                 onChange={(e) => { setRoomName(e.target.value); setDirty(true) }}
-                maxLength={20}
+                maxLength={12}
                 placeholder="방 이름"
               />
             ) : (
