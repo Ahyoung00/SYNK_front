@@ -431,13 +431,11 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.18);
+  background: #ffffff;
   border: none;
-  color: #fff;
+  color: #1C1F2E;
   position: relative;
   transition: opacity 0.12s ease;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
 }
 
 .chatBtn:active { opacity: 0.65; }
