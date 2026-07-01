@@ -446,18 +446,6 @@
 
 .chatBtn:active { opacity: 0.65; }
 
-.chatBtn::after {
-  content: '';
-  position: absolute;
-  top: -3px;
-  right: -3px;
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: #F43F5E;
-  border: 1.5px solid var(--page-bg);
-  box-shadow: 0 0 7px rgba(244, 63, 94, 0.85);
-}
 
 .chatDot {
   position: absolute;
