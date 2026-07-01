@@ -429,6 +429,7 @@
   align-items: center;
   justify-content: center;
   width: 52px;
+  min-width: 52px;
   height: 52px;
   border-radius: 50%;
   background: #ffffff;
