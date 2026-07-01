@@ -16,6 +16,8 @@ interface UseCameraReturn {
   error: string | null
   /** raw 스트림 width > height → 가로 녹화 → Lambda transpose 필요 */
   isHorizontal: boolean
+  /** 현재 사용 중인 카메라 — "user"(전면) | "environment"(후면) */
+  facingMode: 'user' | 'environment'
 
   startPreview: (facing?: CameraFacing) => Promise<void>
   stopPreview: () => void
@@ -31,6 +33,7 @@ export function useCamera(): UseCameraReturn {
   const [recordingElapsed, setRecordingElapsed] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [isHorizontal, setIsHorizontal] = useState(false)
+  const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
 
   const previewRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -52,6 +55,9 @@ export function useCamera(): UseCameraReturn {
       // raw 스트림 해상도로 가로 녹화 여부 판단 (width > height → 가로)
       const settings = stream.getVideoTracks()[0]?.getSettings()
       setIsHorizontal((settings?.width ?? 0) > (settings?.height ?? 0))
+      // 실제 스트림의 facingMode 우선, 없으면 요청한 facing 사용
+      const actualFacing = settings?.facingMode
+      setFacingMode(actualFacing === 'environment' ? 'environment' : actualFacing === 'user' ? 'user' : (facing === 'back' ? 'environment' : 'user'))
 
       if (previewRef.current) {
         previewRef.current.srcObject = stream
@@ -150,6 +156,7 @@ export function useCamera(): UseCameraReturn {
     canStop,
     error,
     isHorizontal,
+    facingMode,
     startPreview,
     stopPreview,
     startRecording,

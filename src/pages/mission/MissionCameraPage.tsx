@@ -86,6 +86,7 @@ export default function MissionCameraPage() {
         videoUrl:   fileUrl,
         roomId:     Number(roomId) || room.id,
         horizontal: camera.isHorizontal,
+        facingMode: camera.facingMode,
       })
     } catch (e) {
       console.error('제출 실패:', e)

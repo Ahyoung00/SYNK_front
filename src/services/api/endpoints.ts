@@ -200,6 +200,8 @@ export const missionApi = {
     roomId: number
     /** raw 스트림 width > height 인 경우 true — Lambda transpose 적용 여부 */
     horizontal: boolean
+    /** 사용한 카메라 — "user"(전면/셀카) | "environment"(후면). 회전 보정용 */
+    facingMode: 'user' | 'environment'
   }) => api.post<SubmissionCreatedResponse>('/submissions', data),
 
   /**
