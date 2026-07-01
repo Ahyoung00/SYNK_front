@@ -31,7 +31,7 @@ export default function ProfilePage() {
     }).catch(() => {})
 
     userApi.getMe().then((res) => {
-      setJoinDays(daysSinceJoin(res.data.created_at))
+      setJoinDays(res.data.daysSinceJoined ?? daysSinceJoin(res.data.created_at))
     }).catch(() => {})
   }, [])
 

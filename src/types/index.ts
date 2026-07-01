@@ -18,8 +18,10 @@ export interface User {
   missionNotification: boolean
   resultNotification: boolean
   highlightNotification: boolean
-  /** 가입일 (ISO) — "SYNK N일째" 계산용. 백엔드 /users/me 응답 기준 */
+  /** 가입일 (ISO) — 폴백용 */
   created_at?: string | null
+  /** 가입 후 경과 일수 — BE /users/me 직접 제공 */
+  daysSinceJoined?: number | null
 }
 
 // ── Room ──────────────────────────────────────────────────────────────────────
