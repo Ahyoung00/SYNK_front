@@ -97,7 +97,7 @@
   position: relative;
   aspect-ratio: 1;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(96,196,80,.16), rgba(140,220,150,.10)), var(--card-bg);
+  background: linear-gradient(135deg, rgba(124,111,240,.16), rgba(70,215,255,.10)), var(--card-bg);
 }
 
 :global([data-theme="dark"]) .todayCell {
@@ -118,7 +118,7 @@
 .heroCell {
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, rgba(96,196,80,.16), rgba(140,220,150,.10)), var(--card-bg);
+  background: linear-gradient(135deg, rgba(124,111,240,.16), rgba(70,215,255,.10)), var(--card-bg);
 }
 
 :global([data-theme="dark"]) .heroCell {
@@ -224,8 +224,8 @@
 .entry:active { opacity: 0.75; }
 
 :global(:root:not([data-theme="dark"])) .entry {
-  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
-  border-color: rgba(120, 162, 58, 0.32);
+  background: linear-gradient(135deg, rgba(124,111,240,.18), rgba(70,215,255,.12));
+  border-color: rgba(124,111,240,.25);
 }
 
 /* 모자이크 썸네일 */
@@ -250,7 +250,7 @@
 }
 
 .mosaicCell {
-  background: linear-gradient(135deg, rgba(96,196,80,.16), rgba(140,220,150,.10)), #EDF0E8;
+  background: linear-gradient(135deg, rgba(124,111,240,.16), rgba(70,215,255,.10)), rgba(124,111,240,.05);
   overflow: hidden;
 }
 
@@ -346,7 +346,7 @@
 
 :global(:root:not([data-theme="dark"])) .todayEmpty {
   background: rgba(255,255,255,.85);
-  border-color: rgba(120, 162, 58, 0.20);
+  border-color: rgba(124,111,240,.18);
 }
 
 .todayEmptyIcon {

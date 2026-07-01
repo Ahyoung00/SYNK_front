@@ -441,9 +441,9 @@
 }
 
 :global(:root:not([data-theme="dark"])) .chatBtn {
-  background: linear-gradient(135deg, rgba(96,196,80,.14), rgba(140,220,110,.12));
-  border-color: rgba(80,170,55,.28);
-  color: #3FA23A;
+  background: linear-gradient(135deg, rgba(124,111,240,.14), rgba(70,215,255,.10));
+  border-color: rgba(124,111,240,.22);
+  color: #9B8BFF;
 }
 
 .chatBtn:active { opacity: 0.65; }
@@ -460,38 +460,38 @@
 }
 
 :global(:root:not([data-theme="dark"])) .chatDot {
-  background: #3FA23A;
+  background: #9B8BFF;
   box-shadow: 0 0 0 2px #ffffff;
 }
 
 /* ── 라이트 모드 그린 카드 ────────────────────────────────────────────────── */
 :global(:root:not([data-theme="dark"])) .codeCard {
-  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
-  border-color: rgba(120, 162, 58, 0.32);
+  background: linear-gradient(135deg, rgba(124,111,240,.18), rgba(70,215,255,.12));
+  border-color: rgba(124,111,240,.25);
 }
 
 :global(:root:not([data-theme="dark"])) .memberCard {
-  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
-  border-color: rgba(120, 162, 58, 0.32);
+  background: linear-gradient(135deg, rgba(124,111,240,.18), rgba(70,215,255,.12));
+  border-color: rgba(124,111,240,.25);
 }
 
 :global(:root:not([data-theme="dark"])) .missionCard {
-  background: linear-gradient(135deg, rgba(96,196,80,.14), rgba(140,220,110,.12));
-  border-color: rgba(80, 170, 55, 0.28);
+  background: linear-gradient(135deg, rgba(124,111,240,.14), rgba(70,215,255,.10));
+  border-color: rgba(124,111,240,.22);
 }
 
 :global(:root:not([data-theme="dark"])) .albumThumbBtn {
-  background: linear-gradient(135deg, rgba(96,196,80,.16), rgba(140,220,150,.10)), #EDF0E8;
-  border-color: rgba(120, 162, 58, 0.20);
+  background: linear-gradient(135deg, rgba(124,111,240,.16), rgba(70,215,255,.10)), rgba(124,111,240,.05);
+  border-color: rgba(124,111,240,.18);
 }
 
 :global(:root:not([data-theme="dark"])) .albumDate {
-  color: rgba(30, 40, 20, 0.50);
+  color: rgba(28,31,46,0.45);
 }
 
 :global(:root:not([data-theme="dark"])) .actionCard {
-  background: linear-gradient(135deg, rgba(127,184,74,.18), rgba(166,216,95,.16));
-  border-color: rgba(120, 162, 58, 0.32);
+  background: linear-gradient(135deg, rgba(124,111,240,.18), rgba(70,215,255,.12));
+  border-color: rgba(124,111,240,.25);
 }
 
 /* ── 개발용 버튼 ──────────────────────────────────────────────────────────── */

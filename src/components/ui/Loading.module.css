@@ -14,9 +14,9 @@
 }
 
 :global(:root:not([data-theme="dark"])) .wrap {
-  --ld-cyan: #6FD05A;
-  --ld-violet: #3DA838;
-  --ld-mid: #54BF45;
+  --ld-cyan: #46D7FF;
+  --ld-violet: #9B6BFF;
+  --ld-mid: #6E8BFF;
   --ld-muted: #7E867A;
 }
 
@@ -35,7 +35,7 @@
 }
 
 :global(:root:not([data-theme="dark"])) .glyph svg {
-  filter: drop-shadow(0 0 14px rgba(84, 191, 69, 0.5));
+  filter: drop-shadow(0 0 14px rgba(70,215,255,0.5));
 }
 
 .orb {

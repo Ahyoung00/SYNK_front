@@ -120,8 +120,8 @@
 }
 
 :global(:root:not([data-theme="dark"])) .missionCard {
-  background: linear-gradient(135deg, rgba(96,196,80,.14), rgba(140,220,110,.12));
-  border-color: rgba(80, 170, 55, 0.28);
+  background: linear-gradient(135deg, rgba(124,111,240,.14), rgba(70,215,255,.10));
+  border-color: rgba(124,111,240,.22);
 }
 
 /* 미션 헤더 */
@@ -231,14 +231,14 @@
 .photoPlaceholder {
   width: 100%;
   aspect-ratio: 1;
-  background: linear-gradient(135deg, rgba(96,196,80,.16), rgba(140,220,150,.10)), #EDF0E8;
+  background: linear-gradient(135deg, rgba(124,111,240,.16), rgba(70,215,255,.10)), rgba(124,111,240,.05);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .photoPlaceholderDone {
-  background: linear-gradient(135deg, rgba(96,196,80,.28), rgba(140,220,150,.20)), #E8F0E0;
+  background: linear-gradient(135deg, rgba(124,111,240,.28), rgba(70,215,255,.18)), rgba(124,111,240,.06);
 }
 
 :global([data-theme="dark"]) .photoPlaceholder {
@@ -306,7 +306,7 @@
 
 :global(:root:not([data-theme="dark"])) .emptyCard {
   background: rgba(255,255,255,.85);
-  border-color: rgba(120, 162, 58, 0.20);
+  border-color: rgba(124,111,240,.18);
 }
 
 .emptyIconWrap {
@@ -374,7 +374,7 @@
 
 :global(:root:not([data-theme="dark"])) .synklogCard {
   background: rgba(255,255,255,.85);
-  border-color: rgba(120, 162, 58, 0.20);
+  border-color: rgba(124,111,240,.18);
 }
 
 .synklogEmpty {
