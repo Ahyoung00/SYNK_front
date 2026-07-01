@@ -198,6 +198,8 @@ export const missionApi = {
     /** 스토리지 업로드 완료 후 받은 URL (3~5초 영상) */
     videoUrl: string
     roomId: number
+    /** raw 스트림 width > height 인 경우 true — Lambda transpose 적용 여부 */
+    horizontal: boolean
   }) => api.post<SubmissionCreatedResponse>('/submissions', data),
 
   /**

@@ -14,6 +14,8 @@ interface UseCameraReturn {
   /** 최소 녹화 시간(3s) 충족 여부 */
   canStop: boolean
   error: string | null
+  /** raw 스트림 width > height → 가로 녹화 → Lambda transpose 필요 */
+  isHorizontal: boolean
 
   startPreview: (facing?: CameraFacing) => Promise<void>
   stopPreview: () => void
@@ -28,6 +30,7 @@ export function useCamera(): UseCameraReturn {
   const [recordedUrl, setRecordedUrl] = useState<string | null>(null)
   const [recordingElapsed, setRecordingElapsed] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [isHorizontal, setIsHorizontal] = useState(false)
 
   const previewRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -45,6 +48,10 @@ export function useCamera(): UseCameraReturn {
         audio: true,
       })
       streamRef.current = stream
+
+      // raw 스트림 해상도로 가로 녹화 여부 판단 (width > height → 가로)
+      const settings = stream.getVideoTracks()[0]?.getSettings()
+      setIsHorizontal((settings?.width ?? 0) > (settings?.height ?? 0))
 
       if (previewRef.current) {
         previewRef.current.srcObject = stream
@@ -142,6 +149,7 @@ export function useCamera(): UseCameraReturn {
     recordingElapsed: elapsed,
     canStop,
     error,
+    isHorizontal,
     startPreview,
     stopPreview,
     startRecording,

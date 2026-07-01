@@ -82,9 +82,10 @@ export default function MissionCameraPage() {
       })
 
       await missionApi.submitVideo({
-        missionId: mission.id,
-        videoUrl:  fileUrl,
-        roomId:    Number(roomId) || room.id,
+        missionId:  mission.id,
+        videoUrl:   fileUrl,
+        roomId:     Number(roomId) || room.id,
+        horizontal: camera.isHorizontal,
       })
     } catch (e) {
       console.error('제출 실패:', e)
