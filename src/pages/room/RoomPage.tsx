@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { roomApi, albumApi } from '@/services/api/endpoints'
-import type { RoomDetail, AlbumItem } from '@/types'
+import type { RoomDetail, AlbumItem, CollageItem } from '@/types'
 import { useAuthStore } from '@/store/authStore'
 import { useRoomEvents } from '@/hooks/useRoomEvents'
 import NavHeader from '@/components/layout/NavHeader'
@@ -20,8 +20,12 @@ export default function RoomPage() {
 
   const [room, setRoom]               = useState<RoomDetail | null>(null)
   const [albums, setAlbums]           = useState<AlbumItem[]>([])
+  const [todayCollages, setTodayCollages] = useState<CollageItem[]>([])
   const [codeCopied, setCodeCopied]   = useState(false)
   const [isLoading, setIsLoading]     = useState(true)
+
+  const now = new Date()
+  const todayDash = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`
 
   const [notMember, setNotMember]     = useState(false)
   const [joining, setJoining]         = useState(false)
@@ -32,10 +36,12 @@ export default function RoomPage() {
     Promise.all([
       roomApi.getRoom(id),
       albumApi.getRecentAlbums(id, 4),
+      albumApi.getCollages(id, todayDash).catch(() => ({ data: [] })),
     ])
-      .then(([roomRes, albumsRes]) => {
+      .then(([roomRes, albumsRes, collagesRes]) => {
         setRoom(roomRes.data)
         setAlbums(albumsRes.data)
+        setTodayCollages(collagesRes.data ?? [])
       })
       .catch(() => {
         setNotMember(true)
@@ -224,17 +230,11 @@ export default function RoomPage() {
         </div>
 
         {/* ── 오늘 미션 ────────────────────────────────────────────────────── */}
-        <div className={styles.missionCard}>
-          <div className={styles.missionRow}>
-            <div className={styles.missionIconWrap}>
-              <MissionIcon />
-            </div>
-            <div className={styles.missionLeft}>
-              <span className={styles.missionStatus}>오늘 미션 {room.dailyMissionCount}개 예정</span>
-              <span className={styles.missionDesc}>랜덤한 순간에 미션이 울려요</span>
-            </div>
-          </div>
-        </div>
+        <RoomMissionCard
+          total={room.dailyMissionCount}
+          completed={todayCollages.filter((c) => c.status === 'COMPLETED').length}
+          fired={todayCollages.length}
+        />
 
         {/* ── 앨범 ─────────────────────────────────────────────────────────── */}
         <div className={styles.sectionHeader}>
@@ -318,6 +318,63 @@ export default function RoomPage() {
 }
 
 /* ── 아이콘 ───────────────────────────────────────────────────────────────── */
+
+function RoomMissionCard({ total, completed, fired }: { total: number; completed: number; fired: number }) {
+  const allDone = total > 0 && completed >= total
+  const inProgress = fired > 0 && !allDone
+  const remaining = Math.max(0, total - completed)
+  const pct = total > 0 ? (completed / total) * 100 : 0
+
+  if (allDone) {
+    return (
+      <div className={[styles.missionCard, styles.missionCardDone].join(' ')}>
+        <div className={styles.missionRow}>
+          <div className={[styles.missionIconWrap, styles.missionIconDone].join(' ')}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 6L9 17l-5-5" />
+            </svg>
+          </div>
+          <div className={styles.missionLeft}>
+            <span className={styles.missionStatus}>오늘 미션 모두 완료! 🎉</span>
+            <span className={styles.missionDesc}>{completed} / {total} · 내일 또 만나요</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (inProgress) {
+    return (
+      <div className={[styles.missionCard, styles.missionCardProgress].join(' ')}>
+        <div className={styles.missionRow}>
+          <div className={styles.missionIconWrap}><MissionIcon /></div>
+          <div className={styles.missionLeft}>
+            <div className={styles.missionTitleRow}>
+              <span className={styles.missionStatus}>오늘 미션 {remaining}개 남았어요!</span>
+              <span className={styles.missionPulseDot} />
+            </div>
+            <span className={styles.missionDesc}>{completed} / {total} 완료 · 계속 도전해봐요</span>
+            <div className={styles.missionBar}>
+              <div className={styles.missionBarFill} style={{ width: `${pct}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.missionCard}>
+      <div className={styles.missionRow}>
+        <div className={styles.missionIconWrap}><MissionIcon /></div>
+        <div className={styles.missionLeft}>
+          <span className={styles.missionStatus}>오늘 미션 {total}개 예정</span>
+          <span className={styles.missionDesc}>랜덤한 순간에 미션이 울려요</span>
+        </div>
+      </div>
+    </div>
+  )
+}
 
 function MissionIcon() {
   return (

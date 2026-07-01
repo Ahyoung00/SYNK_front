@@ -235,6 +235,57 @@
   opacity: 0.85;
 }
 
+.missionCardDone {
+  background: rgba(45, 138, 69, 0.12);
+  border-color: rgba(45, 138, 69, 0.28);
+}
+
+.missionCardProgress {
+  background: rgba(70, 215, 255, 0.07);
+  border-color: rgba(70, 215, 255, 0.22);
+}
+
+.missionIconDone {
+  background: rgba(45, 138, 69, 0.25);
+  color: #4ADE80;
+}
+
+.missionTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.missionPulseDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #46D7FF;
+  box-shadow: 0 0 6px rgba(70,215,255,.7);
+  flex-shrink: 0;
+  animation: missionDotPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes missionDotPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.35; transform: scale(0.75); }
+}
+
+.missionBar {
+  margin-top: 6px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.1);
+  overflow: hidden;
+}
+
+.missionBarFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #46D7FF, #6E8BFF);
+  transition: width 0.4s ease;
+}
+
 /* ── 앨범 ─────────────────────────────────────────────────────────────────── */
 .albumEmpty {
   padding: 20px 18px;
