@@ -53,27 +53,27 @@
   --page-bg:            radial-gradient(70% 38% at 88% 4%, rgba(120,210,110,.30), transparent 70%),
                         radial-gradient(80% 45% at 4% 78%, rgba(155,107,255,.20), transparent 72%),
                         radial-gradient(120% 55% at 50% 0%, #FFFFFF 0%, #FCFDFB 50%, #F8FAF5 86%);
-  --card-bg:            rgba(255, 255, 255, 0.045);
-  --card-bg-soft:       rgba(255, 255, 255, 0.03);
-  --card-border:        rgba(255, 255, 255, 0.085);
-  --divider-color:      rgba(255, 255, 255, 0.07);
-  --ink:                #F3F5FF;
-  --ink-sub:            #9AA0BD;
-  --ink-muted:          #5C6488;
+  --card-bg:            rgba(255, 255, 255, 0.55);
+  --card-bg-soft:       rgba(255, 255, 255, 0.35);
+  --card-border:        rgba(0, 0, 0, 0.07);
+  --divider-color:      rgba(0, 0, 0, 0.06);
+  --ink:                #1C1F2E;
+  --ink-sub:            rgba(28, 31, 46, 0.62);
+  --ink-muted:          rgba(28, 31, 46, 0.38);
   --grad-action:        linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
   --grad-action-2:      linear-gradient(135deg, #6E8BFF 0%, #9B6BFF 100%);
-  --grad-soft:          linear-gradient(135deg, rgba(70,215,255,.08), rgba(155,107,255,.06));
-  --toggle-off-bg:      rgba(255, 255, 255, 0.10);
-  --nav-bg:             #000000;
-  --nav-border:         rgba(255, 255, 255, 0.085);
-  --nav-inactive:       #5C6488;
+  --grad-soft:          linear-gradient(135deg, rgba(70,215,255,.10), rgba(155,107,255,.08));
+  --toggle-off-bg:      rgba(0, 0, 0, 0.10);
+  --nav-bg:             #fffdf5;
+  --nav-border:         rgba(0, 0, 0, 0.07);
+  --nav-inactive:       rgba(28, 31, 46, 0.38);
   --nav-active:         #9B8BFF;
   --brand-grad:         linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
-  --header-subtitle:    #9AA0BD;
-  --devbtn-bg:          rgba(255, 255, 255, 0.04);
-  --devbtn-border:      rgba(255, 255, 255, 0.15);
-  --devbtn-color:       rgba(255, 255, 255, 0.5);
-  --ring-track:         rgba(255, 255, 255, 0.10);
+  --header-subtitle:    rgba(28, 31, 46, 0.55);
+  --devbtn-bg:          rgba(0, 0, 0, 0.04);
+  --devbtn-border:      rgba(0, 0, 0, 0.15);
+  --devbtn-color:       rgba(28, 31, 46, 0.55);
+  --ring-track:         rgba(0, 0, 0, 0.12);
 
   /* Mission card tokens (light → dark style) */
   --mission-bg-safe:           #0E1226;
