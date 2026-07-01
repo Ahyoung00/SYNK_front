@@ -181,7 +181,6 @@ export default function RoomPage() {
             aria-label="채팅"
           >
             <ChatIcon />
-            <span>채팅</span>
           </button>
         }
       />

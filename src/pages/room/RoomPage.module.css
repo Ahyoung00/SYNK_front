@@ -427,19 +427,17 @@
 .chatBtn {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  justify-content: center;
+  width: 44px;
   height: 44px;
-  padding: 0 20px;
-  border-radius: 999px;
-  background: linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
   border: none;
   color: #fff;
-  font-size: 15px;
-  font-weight: 800;
   position: relative;
   transition: opacity 0.12s ease;
-  box-shadow: 0 4px 20px rgba(110,139,255,.55), 0 0 0 1px rgba(255,255,255,.15) inset;
-  letter-spacing: -0.2px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
 }
 
 .chatBtn:active { opacity: 0.65; }
