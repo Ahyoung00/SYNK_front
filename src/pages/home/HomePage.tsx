@@ -441,7 +441,7 @@ export default function HomePage() {
   const user         = useAuthStore((s) => s.user)
   const active       = useMissionStore((s) => s.active)
   const setActive    = useMissionStore((s) => s.setActive)
-  const missionAlert = useSettingsStore((s) => s.missionAlert)
+
 
   const [activeMissions, setActiveMissions]       = useState<ActiveMissionItem[]>([])
   const [selectedMissionId, setSelectedMissionId] = useState<number | null>(null)
@@ -576,32 +576,8 @@ export default function HomePage() {
     return () => clearTimeout(t)
   }, [active, setActive])
 
-  // 브라우저 알림 표시 (미션 알림 OFF면 건너뜀)
-  function showBrowserNotification(title: string, body: string) {
-    if (!missionAlert) return
-    if (!('Notification' in window)) return
-    if (Notification.permission === 'granted') {
-      new Notification(title, { body, icon: '/favicon.ico' })
-    } else if (Notification.permission === 'default') {
-      Notification.requestPermission().then((perm) => {
-        if (perm === 'granted') new Notification(title, { body, icon: '/favicon.ico' })
-      })
-    }
-  }
-
   // 미션 목록 갱신 헬퍼
   function applyMissions(missions: ActiveMissionItem[]) {
-    // 초기 로드 이후 폴링에서 새 미션 감지 → 브라우저 알림
-    if (initialLoadDoneRef.current) {
-      for (const m of missions) {
-        if (!seenMissionIdsRef.current.has(m.id)) {
-          showBrowserNotification(
-            `⚡ ${m.roomName}에서 미션이 울렸어요!`,
-            m.title,
-          )
-        }
-      }
-    }
     // 본 미션 ID 등록
     missions.forEach((m) => seenMissionIdsRef.current.add(m.id))
 
