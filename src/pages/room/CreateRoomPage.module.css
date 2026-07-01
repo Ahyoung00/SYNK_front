@@ -94,10 +94,22 @@
   gap: var(--sp-2);
 }
 
+.fieldLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .fieldLabel {
   font-size: var(--text-sm);
   font-weight: 700;
   color: var(--color-text);
+}
+
+.fieldCount {
+  font-size: 11px;
+  color: var(--ink-muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .fieldInput {

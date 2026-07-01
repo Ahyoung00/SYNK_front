@@ -122,7 +122,10 @@ export default function CreateRoomPage() {
 
         {/* ── 방 이름 ─────────────────────────────────────────────────────────── */}
         <div className={styles.fieldGroup}>
-          <label className={styles.fieldLabel}>방 이름 (필수)</label>
+          <div className={styles.fieldLabelRow}>
+            <label className={styles.fieldLabel}>방 이름 (필수)</label>
+            <span className={styles.fieldCount}>{name.length}/12</span>
+          </div>
           <input
             className={styles.fieldInput}
             placeholder="방 이름을 입력해주세요"
