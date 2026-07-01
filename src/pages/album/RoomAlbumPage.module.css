@@ -401,6 +401,96 @@
   50%      { opacity: 0.4; transform: scale(0.75); }
 }
 
+/* ── 미션 상태 카드 ───────────────────────────────────────────────────────── */
+.missionCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  margin-bottom: 4px;
+}
+
+.missionCardDone {
+  background: rgba(45, 138, 69, 0.12);
+  border-color: rgba(45, 138, 69, 0.28);
+}
+
+.missionCardProgress {
+  background: rgba(70, 215, 255, 0.07);
+  border-color: rgba(70, 215, 255, 0.22);
+}
+
+.missionCardIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(255,255,255,.07);
+  border: 1px solid var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.missionCardIconDone {
+  background: rgba(45, 138, 69, 0.20);
+  border-color: rgba(45, 138, 69, 0.30);
+  color: #4ADE80;
+}
+
+.missionCardBody {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.missionCardTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.missionCardTitle {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.missionCardSub {
+  font-size: 12px;
+  color: var(--ink-sub);
+}
+
+.missionCardDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #46D7FF;
+  box-shadow: 0 0 6px rgba(70,215,255,.7);
+  flex-shrink: 0;
+  animation: dotPulse 1.2s ease-in-out infinite;
+}
+
+.missionCardBar {
+  margin-top: 6px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.1);
+  overflow: hidden;
+}
+
+.missionCardBarFill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #46D7FF, #6E8BFF);
+  transition: width 0.4s ease;
+}
+
 /* ── 빈 상태 ──────────────────────────────────────────────────────────────── */
 .empty {
   flex: 1;

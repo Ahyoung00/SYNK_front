@@ -91,7 +91,12 @@ export default function RoomAlbumPage() {
 
           {/* ── 오늘 ──────────────────────────────────────────────────────── */}
           <p className={styles.sectionLabel}>오늘 · {todayDash}</p>
-          {todayHasContent ? (
+          <MissionStatusCard
+            total={room?.daily_mission_count ?? 0}
+            completed={todayCollages.filter((c) => c.status === 'COMPLETED').length}
+            fired={todayCollages.length}
+          />
+          {todayHasContent && (
             <div className={styles.list}>
               <AlbumEntryRow
                 date={todayDot}
@@ -100,20 +105,6 @@ export default function RoomAlbumPage() {
                 roomName={room?.name ?? ''}
                 onClick={() => navigate(ROUTES.ROOM_SYNKLOG(numRoomId, todayDash))}
               />
-            </div>
-          ) : (
-            <div className={styles.todayEmpty}>
-              <div className={styles.todayEmptyIcon}>
-                <CameraIcon />
-              </div>
-              <p className={styles.todayEmptyTitle}>아직 담은 순간이 없어요</p>
-              <p className={styles.todayEmptyDesc}>
-                오늘 미션이 도착하면<br />여기에 콜라주가 모여요.
-              </p>
-              <span className={styles.todayEmptyBadge}>
-                <span className={styles.todayEmptyDot} />
-                미션 대기 중
-              </span>
             </div>
           )}
 
@@ -138,6 +129,72 @@ export default function RoomAlbumPage() {
         </div>
       )}
     </div>
+  )
+}
+
+function MissionStatusCard({ total, completed, fired }: { total: number; completed: number; fired: number }) {
+  const allDone = total > 0 && completed >= total
+  const inProgress = fired > 0 && !allDone
+  const remaining = Math.max(0, total - completed)
+
+  if (allDone) {
+    return (
+      <div className={[styles.missionCard, styles.missionCardDone].join(' ')}>
+        <div className={[styles.missionCardIcon, styles.missionCardIconDone].join(' ')}>
+          <CheckIcon />
+        </div>
+        <div className={styles.missionCardBody}>
+          <span className={styles.missionCardTitle}>오늘 미션 모두 완료! 🎉</span>
+          <span className={styles.missionCardSub}>{completed} / {total} · 내일 또 만나요</span>
+        </div>
+      </div>
+    )
+  }
+
+  if (inProgress) {
+    const pct = total > 0 ? (completed / total) * 100 : 0
+    return (
+      <div className={[styles.missionCard, styles.missionCardProgress].join(' ')}>
+        <div className={styles.missionCardIcon}>
+          <BoltIcon />
+        </div>
+        <div className={styles.missionCardBody}>
+          <div className={styles.missionCardTitleRow}>
+            <span className={styles.missionCardTitle}>오늘 미션 {remaining}개 남았어요!</span>
+            <span className={styles.missionCardDot} />
+          </div>
+          <span className={styles.missionCardSub}>{completed} / {total} 완료 · 계속 도전해봐요</span>
+          <div className={styles.missionCardBar}>
+            <div className={styles.missionCardBarFill} style={{ width: `${pct}%` }} />
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.missionCard}>
+      <div className={styles.missionCardIcon}>
+        <BoltIcon />
+      </div>
+      <div className={styles.missionCardBody}>
+        <span className={styles.missionCardTitle}>오늘 미션 {total}개 예정</span>
+        <span className={styles.missionCardSub}>랜덤한 순간에 미션이 올려요</span>
+      </div>
+    </div>
+  )
+}
+
+function BoltIcon() {
+  return <img src="/synk-bolt.png" alt="" style={{ width: 22, height: 22, objectFit: 'contain' }} />
+}
+
+function CheckIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 6L9 17l-5-5" />
+    </svg>
   )
 }
 
