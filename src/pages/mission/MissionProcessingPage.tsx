@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
 import { albumApi } from '@/services/api/endpoints'
 import { ROUTES } from '@/constants'
+import Loading from '@/components/ui/Loading'
 import styles from './MissionProcessingPage.module.css'
 
 /** 로컬(KST) 기준 오늘 날짜 YYYY-MM-DD */
@@ -71,22 +72,7 @@ export default function MissionProcessingPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.content}>
-        <div className={styles.emojiWrap}>
-          <span className={styles.emoji}>🙂</span>
-        </div>
-
-        <h2 className={styles.title}>모든 촬영이 완료됐어요!</h2>
-        <p className={styles.sub}>
-          결과를 만드는 중{'.'.repeat(dotCount)}
-        </p>
-        <p className={styles.hint}>잠시만 기다려주세요</p>
-
-        {/* 스피너 */}
-        <div className={styles.spinnerWrap}>
-          <div className={styles.spinner} />
-        </div>
-      </div>
+      <Loading label={`결과를 만드는 중${'.'.repeat(dotCount)}`} />
     </div>
   )
 }
