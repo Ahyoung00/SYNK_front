@@ -37,7 +37,7 @@ export default function MissionCameraPage() {
 
   // 페이지 진입 시 카메라 켜기
   useEffect(() => {
-    screen.orientation?.lock?.('landscape').catch(() => {})
+    ;(screen.orientation as any)?.lock?.('landscape').catch(() => {})
 
     camera.startPreview('front').then(() => {
       navigator.mediaDevices?.enumerateDevices?.()
