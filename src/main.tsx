@@ -14,12 +14,18 @@ function currentAngle(): number {
 }
 
 function applyOrientation() {
-  // 세로 고정용 뷰포트 변수: 항상 긴 변=높이, 짧은 변=너비
-  const longSide = Math.max(window.innerWidth, window.innerHeight)
-  const shortSide = Math.min(window.innerWidth, window.innerHeight)
-  document.documentElement.style.setProperty('--app-height', `${longSide}px`)
-  document.documentElement.style.setProperty('--app-width', `${shortSide}px`)
-  // 실제 회전 각도를 심어 CSS가 정확히 반대로 되돌리게 함 (iOS Safari 세로 고정)
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)
+    || window.matchMedia('(pointer: coarse)').matches
+
+  if (isMobile) {
+    // 모바일: 세로 고정용 — 항상 긴 변=높이, 짧은 변=너비
+    document.documentElement.style.setProperty('--app-height', `${Math.max(window.innerWidth, window.innerHeight)}px`)
+    document.documentElement.style.setProperty('--app-width',  `${Math.min(window.innerWidth, window.innerHeight)}px`)
+  } else {
+    // 데스크탑(맥 등): 실제 뷰포트 그대로 사용
+    document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`)
+    document.documentElement.style.setProperty('--app-width',  `${window.innerWidth}px`)
+  }
   document.documentElement.dataset.appAngle = String(currentAngle())
 }
 applyOrientation()
