@@ -432,16 +432,11 @@
   padding: 0 14px 0 11px;
   justify-content: center;
   border-radius: 999px;
-  background: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%);
+  background: #7B5CE0;
   color: #fff;
-  font-weight: 800;
-  font-size: 13px;
-  letter-spacing: -0.01em;
-  position: relative;
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
-  box-shadow:
-    0 0 0 1.5px rgba(124, 58, 237, 0.4),
-    0 4px 22px rgba(109, 71, 255, 0.75);
   transition: opacity 0.12s ease;
 }
 
