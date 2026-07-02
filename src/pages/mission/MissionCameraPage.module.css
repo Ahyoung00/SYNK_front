@@ -22,11 +22,17 @@
 /* ── 영상 (풀스크린 배경) ───────────────────────────────────────────────────── */
 .videoWrap {
   position: absolute;
-  inset: 0;
+  top: 62px;
+  left: 14px;
+  right: 118px;
+  bottom: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
   background: #000;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
 }
 
 .video {
@@ -53,10 +59,12 @@
 /* ── 격자 + 포커스 (프리뷰 영역: 상단바 아래 · 레일 왼쪽) ─────────────────────── */
 .stageOverlay {
   position: absolute;
-  top: 68px;
-  right: 116px;
-  bottom: 0;
-  left: 0;
+  top: 62px;
+  left: 14px;
+  right: 118px;
+  bottom: 14px;
+  border-radius: 20px;
+  overflow: hidden;
   pointer-events: none;
 }
 
