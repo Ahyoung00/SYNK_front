@@ -237,6 +237,16 @@ body {
   html[data-app-angle="270"] #root {
     transform: translate(-50%, -50%) rotate(-90deg);
   }
+  /* 카메라 페이지는 네이티브 가로를 그대로 사용 — counter-rotation 취소 */
+  html[data-camera] #root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    transform: none;
+  }
 }
 
 

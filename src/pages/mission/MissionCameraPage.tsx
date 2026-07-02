@@ -26,6 +26,12 @@ export default function MissionCameraPage() {
   const [torchOn, setTorchOn] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
 
+  // 카메라 페이지 마운트 시 global portrait lock 예외 처리
+  useEffect(() => {
+    document.documentElement.dataset.camera = 'true'
+    return () => { delete document.documentElement.dataset.camera }
+  }, [])
+
   // 페이지 진입 시 카메라 켜기
   useEffect(() => {
     camera.startPreview('front').then(() => {
@@ -148,7 +154,7 @@ export default function MissionCameraPage() {
       : `눌러서 촬영 (${VIDEO_MIN_S}~${VIDEO_MAX_S}초)`
 
   return (
-    <div className={[styles.page, styles.rotated].join(' ')}>
+    <div className={styles.page}>
 
       {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
       <div className={styles.videoWrap}>

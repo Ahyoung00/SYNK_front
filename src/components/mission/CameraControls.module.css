@@ -1,17 +1,15 @@
-/* 미션 촬영 우측 컨트롤 레일 — 독립 컴포넌트 스타일
-   (페이지가 .rotated로 회전되므로 safe-area는 페이지에서 처리, 여기선 고정 px) */
 .rail {
   position: absolute;
   top: 0;
   right: 0;
   bottom: 0;
-  width: 116px;
+  width: calc(116px + env(safe-area-inset-right));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 22px;
-  padding: 20px 0;
+  padding: max(20px, env(safe-area-inset-top)) env(safe-area-inset-right) max(20px, env(safe-area-inset-bottom)) 0;
   background: linear-gradient(270deg, rgba(6,10,24,0.9) 0%, rgba(6,10,24,0.35) 60%, transparent 100%);
   z-index: 10;
 }
