@@ -3,7 +3,6 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useCamera, VIDEO_MIN_S, VIDEO_MAX_S, type CameraFacing } from '@/hooks/useCamera'
 import { useMissionStore } from '@/store/missionStore'
 import { missionApi, uploadApi } from '@/services/api/endpoints'
-import { CountdownTimer } from '@/components/mission/CountdownTimer'
 import { ROUTES } from '@/constants'
 import { formatTime } from '@/hooks/useTimer'
 import styles from './MissionCameraPage.module.css'
@@ -22,6 +21,7 @@ export default function MissionCameraPage() {
   const reviewRef = useRef<HTMLVideoElement | null>(null)
   const [facing, setFacing] = useState<CameraFacing>('front')
   const [hasMultiCam, setHasMultiCam] = useState(false)
+  const [torchOn, setTorchOn] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
   const [isPortrait, setIsPortrait] = useState(
     () => window.matchMedia('(orientation: portrait)').matches
@@ -57,8 +57,22 @@ export default function MissionCameraPage() {
     if (camera.state !== 'previewing') return
     const next: CameraFacing = facing === 'front' ? 'back' : 'front'
     setFacing(next)
+    setTorchOn(false)
     camera.stopPreview()
     await camera.startPreview(next)
+  }
+
+  // 플래시(torch) 토글 — 지원 기기(주로 후면)에서만 동작, 미지원 시 무시
+  async function toggleTorch() {
+    const stream = previewVideoRef.current?.srcObject as MediaStream | null
+    const track = stream?.getVideoTracks?.()[0]
+    if (!track) return
+    try {
+      await track.applyConstraints({ advanced: [{ torch: !torchOn } as any] })
+      setTorchOn((v) => !v)
+    } catch {
+      /* 미지원 기기 */
+    }
   }
 
   // 녹화 완료되면 미리보기 재생
@@ -95,8 +109,6 @@ export default function MissionCameraPage() {
   const { mission, room } = active
   const title = mission.template?.title ?? '미션'
 
-  // 카메라 분할 레이아웃
-
   async function handleSubmit() {
     if (isSubmitting || !camera.recordedBlob) return
     setIsSubmitting(true)
@@ -127,9 +139,23 @@ export default function MissionCameraPage() {
     navigate(ROUTES.HOME, { replace: true })
   }
 
+  const isRecording = camera.state === 'recording'
+  const isDone      = camera.state === 'done'
+
+  // 셔터 활성 여부: 촬영 전엔 previewing일 때만, 녹화 중엔 최소시간 지난 뒤에만
+  const shutterDisabled = isRecording ? !camera.canStop : camera.state !== 'previewing'
+
+  const hintText = isRecording
+    ? camera.canStop
+      ? `${formatTime(camera.recordingElapsed)} · 눌러서 완료`
+      : `${VIDEO_MIN_S - camera.recordingElapsed}초 후 완료 가능`
+    : isDone
+      ? '확인 후 제출하세요'
+      : `눌러서 촬영 (${VIDEO_MIN_S}~${VIDEO_MAX_S}초)`
+
   return (
     <div className={[styles.page, isPortrait ? styles.rotated : ''].join(' ')}>
-      {/* ── 카메라 / 리뷰 영상 ──────────────────────────────────────────────── */}
+      {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
       <div className={styles.videoWrap}>
         {/* 라이브 프리뷰 */}
         <video
@@ -137,7 +163,7 @@ export default function MissionCameraPage() {
           className={[
             styles.video,
             facing === 'back' ? styles.noMirror : '',
-            camera.state === 'done' ? styles.hidden : '',
+            isDone ? styles.hidden : '',
           ].join(' ')}
           autoPlay
           playsInline
@@ -149,11 +175,9 @@ export default function MissionCameraPage() {
           ref={reviewRef}
           className={[
             styles.video,
-            camera.state !== 'done' ? styles.hidden : '',
-            // 폰 가로 촬영 시에만 회전 보정 (rawFacingMode가 실제 보고된 경우 = 폰)
+            !isDone ? styles.hidden : '',
             camera.isHorizontal && camera.rawFacingMode === 'user'        ? styles.reviewPhoneFront
               : camera.isHorizontal && camera.rawFacingMode === 'environment' ? styles.reviewPhoneBack
-              // 세로 or 노트북 가로: 후면만 미러 제거, 그 외 기존 미러 유지
               : facing === 'back'                                             ? styles.noMirror
               : '',
           ].join(' ')}
@@ -177,105 +201,97 @@ export default function MissionCameraPage() {
             <p>카메라를 불러오는 중...</p>
           </div>
         )}
-
       </div>
 
-      {/* ── 상단 오버레이 ────────────────────────────────────────────────────── */}
-      <div className={styles.overlayTop}>
-        {/* 뒤로가기 / 카메라 전환 */}
-        <div className={styles.topControls}>
-          <button className={styles.iconBtn} onClick={() => navigate(-1)} aria-label="뒤로">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M19 12H5M12 5l-7 7 7 7" />
-            </svg>
-          </button>
-          {hasMultiCam && (camera.state === 'previewing' || camera.state === 'idle') && (
-            <button className={styles.iconBtn} onClick={handleFlipCamera} aria-label="카메라 전환">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" />
-                <path d="M22 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" />
-              </svg>
-            </button>
-          )}
+      {/* ── 격자 + 포커스 (프리뷰 영역 위) ────────────────────────────────────── */}
+      {!isDone && (
+        <div className={styles.stageOverlay}>
+          <div className={styles.grid} />
+          <div className={styles.focus} />
+        </div>
+      )}
+
+      {/* ── 상단 인포바 ──────────────────────────────────────────────────────── */}
+      <div className={styles.topBar}>
+        <button className={styles.backBtn} onClick={() => navigate(-1)} aria-label="뒤로">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+
+        <div className={styles.titleGroup}>
+          <span className={styles.roomRow}>
+            <span className={styles.roomDot} />
+            {room.name}
+          </span>
+          <span className={styles.title}>{title}</span>
         </div>
 
-        <div className={styles.topRow}>
-          <span className={styles.roomName}>{room.name}</span>
-          <CountdownTimer secondsLeft={secondsLeft} size="sm" showLabel={false} />
+        <div className={styles.timerPill}>
+          <span className={styles.timerDot} />
+          {formatTime(secondsLeft)}
         </div>
-        <p className={styles.missionTitle}>{title}</p>
-        {mission.template?.description && (
-          <p className={styles.missionDesc}>{mission.template.description}</p>
-        )}
       </div>
 
-      {/* ── 하단 오버레이 ────────────────────────────────────────────────────── */}
-      <div className={styles.overlayBottom}>
+      {/* ── 우측 컨트롤 레일 ─────────────────────────────────────────────────── */}
+      <div className={styles.rail}>
+        {/* 플래시 */}
+        <button
+          className={[styles.railIcon, torchOn ? styles.railIconOn : ''].join(' ')}
+          onClick={toggleTorch}
+          aria-label="플래시"
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z" />
+          </svg>
+        </button>
 
-        {/* 녹화 전 / 미리보기 중 */}
-        {(camera.state === 'previewing' || camera.state === 'idle' || camera.state === 'error') && (
-          <div className={styles.controls}>
-            <button
-              className={styles.recordBtn}
-              onClick={() => camera.startRecording()}
-              disabled={camera.state !== 'previewing'}
-              aria-label="촬영 시작"
-            >
-              <span className={styles.recordDot} />
-            </button>
-            <p className={styles.hint}>버튼을 눌러 촬영하세요 ({VIDEO_MIN_S}~{VIDEO_MAX_S}초)</p>
-          </div>
-        )}
-
-        {/* 녹화 중 */}
-        {camera.state === 'recording' && (
-          <div className={styles.recordingControls}>
-            <RecordingProgressBar elapsed={camera.recordingElapsed} max={VIDEO_MAX_S} />
-            <div className={styles.recordingRow}>
-              <span className={styles.recLabel}>
-                🔴 {formatTime(camera.recordingElapsed)}
-              </span>
-              <button
-                className={styles.stopBtn}
-                onClick={() => camera.stopRecording()}
-                disabled={!camera.canStop}
-              >
-                {camera.canStop ? '완료' : `${VIDEO_MIN_S - camera.recordingElapsed}초 후 가능`}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {/* 녹화 완료 — 미리보기 */}
-        {camera.state === 'done' && (
-          <div className={styles.reviewControls}>
-            <button
-              className={styles.retakeBtn}
-              onClick={() => camera.clearRecording()}
-            >
+        {isDone ? (
+          /* 리뷰: 재촬영 / 제출 */
+          <div className={styles.reviewStack}>
+            <button className={styles.retakeBtn} onClick={() => camera.clearRecording()}>
               재촬영
             </button>
-            <button
-              className={styles.submitBtn}
-              onClick={handleSubmit}
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? '제출 중...' : '제출하기'}
+            <button className={styles.submitBtn} onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? '제출 중' : '제출'}
             </button>
           </div>
+        ) : (
+          <div className={styles.shutterArea}>
+            <div className={styles.shutterRow}>
+              <button
+                className={styles.shutterRing}
+                onClick={isRecording ? () => camera.stopRecording() : () => camera.startRecording()}
+                disabled={shutterDisabled}
+                aria-label={isRecording ? '촬영 완료' : '촬영 시작'}
+              >
+                <span className={styles.shutterCore}>
+                  {isRecording && <span className={styles.shutterStop} />}
+                </span>
+              </button>
+
+              <div className={styles.slider}>
+                <div
+                  className={styles.sliderFill}
+                  style={{ height: isRecording ? `${(camera.recordingElapsed / VIDEO_MAX_S) * 100}%` : '0%' }}
+                />
+              </div>
+            </div>
+
+            {hasMultiCam && !isRecording && (
+              <button className={styles.railFlip} onClick={handleFlipCamera} aria-label="카메라 전환">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" />
+                  <path d="M22 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" />
+                </svg>
+              </button>
+            )}
+          </div>
         )}
+
+        {/* 힌트 */}
+        <p className={styles.hint}>{hintText}</p>
       </div>
-    </div>
-  )
-}
-
-// ── 녹화 진행 바 ───────────────────────────────────────────────────────────────
-
-function RecordingProgressBar({ elapsed, max }: { elapsed: number; max: number }) {
-  const pct = Math.min(100, (elapsed / max) * 100)
-  return (
-    <div className={styles.progressTrack}>
-      <div className={styles.progressFill} style={{ width: `${pct}%` }} />
     </div>
   )
 }
