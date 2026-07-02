@@ -22,6 +22,9 @@ export default function MissionCameraPage() {
   const [facing, setFacing] = useState<CameraFacing>('front')
   const [hasMultiCam, setHasMultiCam] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
+  // 촬영 시작 시점의 물리 방향 스냅샷 — 회전 보정은 "세로로 들고 찍었을 때"만 필요
+  // (iOS 카메라는 세로/가로 상관없이 센서 가로 해상도를 보고해 isHorizontal만으론 구분 불가)
+  const [capturedPortrait, setCapturedPortrait] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
   const [isPortrait, setIsPortrait] = useState(
     () => window.matchMedia('(orientation: portrait)').matches
@@ -60,6 +63,12 @@ export default function MissionCameraPage() {
     setTorchOn(false)
     camera.stopPreview()
     await camera.startPreview(next)
+  }
+
+  function handleStartRecording() {
+    // 이 순간의 물리 방향을 기록 → 리뷰/제출 회전 판단에 사용
+    setCapturedPortrait(window.matchMedia('(orientation: portrait)').matches)
+    camera.startRecording()
   }
 
   // 플래시(torch) 토글 — 지원 기기(주로 후면)에서만 동작, 미지원 시 무시
@@ -127,7 +136,8 @@ export default function MissionCameraPage() {
         missionId:  mission.id,
         videoUrl:   fileUrl,
         roomId:     Number(roomId) || room.id,
-        horizontal: camera.isHorizontal,
+        // 회전 보정 필요 여부: 세로로 들고 찍었을 때만 true (Lambda/도감 재생이 이 값으로 회전 결정)
+        horizontal: capturedPortrait && camera.isHorizontal,
         facingMode: camera.facingMode,
       })
     } catch (e) {
@@ -176,8 +186,9 @@ export default function MissionCameraPage() {
           className={[
             styles.video,
             !isDone ? styles.hidden : '',
-            camera.isHorizontal && camera.rawFacingMode === 'user'        ? styles.reviewPhoneFront
-              : camera.isHorizontal && camera.rawFacingMode === 'environment' ? styles.reviewPhoneBack
+            // 세로로 들고 찍었을 때만 회전 보정 (가로 촬영은 이미 정방향이라 보정 불필요)
+            capturedPortrait && camera.isHorizontal && camera.rawFacingMode === 'user'        ? styles.reviewPhoneFront
+              : capturedPortrait && camera.isHorizontal && camera.rawFacingMode === 'environment' ? styles.reviewPhoneBack
               : facing === 'back'                                             ? styles.noMirror
               : '',
           ].join(' ')}
@@ -261,7 +272,7 @@ export default function MissionCameraPage() {
             <div className={styles.shutterRow}>
               <button
                 className={styles.shutterRing}
-                onClick={isRecording ? () => camera.stopRecording() : () => camera.startRecording()}
+                onClick={isRecording ? () => camera.stopRecording() : handleStartRecording}
                 disabled={shutterDisabled}
                 aria-label={isRecording ? '촬영 완료' : '촬영 시작'}
               >
