@@ -137,8 +137,9 @@ export function useCamera(): UseCameraReturn {
       const drawFrame = () => {
         ctx.save()
         ctx.translate(canvas.width / 2, canvas.height / 2)
-        if (needsRotate) ctx.rotate(Math.PI / 2)   // CSS rotate(90deg)와 동일 방향
-        if (needsMirror) ctx.scale(-1, 1)          // CSS scaleX(-1)와 동일
+        // 폰을 왼쪽(CCW)으로 눕혀 촬영: 버퍼 속 얼굴이 CW로 기울어 있음 → CCW(-90°)로 바로 세워 굽는다
+        if (needsRotate) ctx.rotate(-Math.PI / 2)
+        if (needsMirror) ctx.scale(-1, 1)          // 전면 미러 (CSS scaleX(-1)와 동일)
         ctx.drawImage(video, -vw / 2, -vh / 2, vw, vh)
         ctx.restore()
         rafRef.current = requestAnimationFrame(drawFrame)

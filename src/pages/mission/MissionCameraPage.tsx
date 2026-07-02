@@ -22,8 +22,8 @@ export default function MissionCameraPage() {
   // 녹화된 영상 미리보기용 별도 video ref
   const reviewRef = useRef<HTMLVideoElement | null>(null)
   const videoWrapRef = useRef<HTMLDivElement | null>(null)
-  // 파일에 90° 회전이 구워진 경우, 회전된 페이지 안에서는 -90° 카운터 회전해서 표시
-  const [reviewStyle, setReviewStyle] = useState<React.CSSProperties | undefined>(undefined)
+  // 회전된 페이지 안에서 라이브 프리뷰는 -90° 카운터 회전 → 순 회전 0 (비디오는 회전하면 안 됨)
+  const [previewStyle, setPreviewStyle] = useState<React.CSSProperties | undefined>(undefined)
   const [facing, setFacing] = useState<CameraFacing>('front')
   const [hasMultiCam, setHasMultiCam] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
@@ -94,24 +94,33 @@ export default function MissionCameraPage() {
       reviewRef.current.src = camera.recordedUrl
       reviewRef.current.loop = true
       reviewRef.current.play()
+    }
+  }, [camera.state, camera.recordedUrl])
 
-      // 회전이 구워진 파일: 회전된 페이지 안에서 그대로 틀면 이중 회전되므로 -90° 보정
-      const wrap = videoWrapRef.current
-      if (camera.recordedRotated && wrap) {
-        setReviewStyle({
+  // 라이브 프리뷰 카운터 회전:
+  // 카메라 센서는 폰과 함께 돌기 때문에 비디오는 회전하면 안 되고 UI만 회전해야 한다.
+  // 페이지가 CSS로 +90° 회전된 상태(뷰포트 세로)에서는 비디오만 -90° 되돌려 순 회전 0으로 만든다.
+  useEffect(() => {
+    const wrap = videoWrapRef.current
+    const apply = () => {
+      if (viewportPortrait && wrap) {
+        setPreviewStyle({
           position: 'absolute',
           top: '50%',
           left: '50%',
           width: wrap.offsetHeight,
           height: wrap.offsetWidth,
-          transform: 'translate(-50%, -50%) rotate(-90deg)',
+          transform: `translate(-50%, -50%) rotate(-90deg)${facing === 'front' ? ' scaleX(-1)' : ''}`,
           objectFit: 'cover',
         })
       } else {
-        setReviewStyle(undefined)
+        setPreviewStyle(undefined)
       }
     }
-  }, [camera.state, camera.recordedUrl, camera.recordedRotated])
+    apply()
+    window.addEventListener('resize', apply)
+    return () => window.removeEventListener('resize', apply)
+  }, [viewportPortrait, facing, camera.state])
 
   // 남은 시간 매초 재계산 — deadline 절대시간 기준 (촬영·업로드 지연에도 안 어긋남)
   useEffect(() => {
@@ -193,7 +202,7 @@ export default function MissionCameraPage() {
 
       {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
       <div className={styles.videoWrap} ref={videoWrapRef}>
-        {/* 라이브 프리뷰 */}
+        {/* 라이브 프리뷰 — 회전 페이지에서는 -90° 카운터 회전(previewStyle)로 순 회전 0 유지 */}
         <video
           ref={previewVideoRef}
           className={[
@@ -201,13 +210,14 @@ export default function MissionCameraPage() {
             facing === 'back' ? styles.noMirror : '',
             isDone ? styles.hidden : '',
           ].join(' ')}
+          style={!isDone ? previewStyle : undefined}
           autoPlay
           playsInline
           muted
         />
 
-        {/* 녹화 완료 리뷰 — 파일 자체가 WYSIWYG(회전·미러 구움).
-            회전 구운 파일은 회전된 페이지 안에서 -90° 카운터 회전(reviewStyle)로 표시 */}
+        {/* 녹화 완료 리뷰 — 파일이 바른 방향으로 구워져 있어(회전·미러 반영)
+            회전된 페이지의 +90°가 눕힌 폰 시점과 자연히 일치. 추가 변환 불필요 */}
         <video
           ref={reviewRef}
           className={[
@@ -215,7 +225,6 @@ export default function MissionCameraPage() {
             styles.noMirror,
             !isDone ? styles.hidden : '',
           ].join(' ')}
-          style={isDone ? reviewStyle : undefined}
           playsInline
           muted
         />
