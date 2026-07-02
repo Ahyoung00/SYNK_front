@@ -35,6 +35,61 @@
     <script src="https://t1.kakaocdn.net/kakao_js_sdk/2.7.2/kakao.min.js" integrity="sha384-TiCUE00h649CAMonG018J2ujOgDKW/kVWlChEuu4jK2vxfAAD0eZxzCKakxg55G4" crossorigin="anonymous"></script>
   </head>
   <body>
+    <!-- 인앱 브라우저 감지: React 로드 전에 실행하여 빈 화면 방지 -->
+    <script>
+      (function() {
+        var ua = navigator.userAgent || '';
+        var isInApp = /KAKAOTALK|KAKAO|Line\/|Instagram|FBAN|FBAV|Twitter|Snapchat|Musical/i.test(ua);
+        if (!isInApp) return;
+
+        // 현재 URL을 외부 브라우저로 유도
+        var url = location.href;
+
+        document.documentElement.style.cssText = [
+          'background:#0f0f14',
+          'color:#fff',
+          'font-family:-apple-system,BlinkMacSystemFont,sans-serif',
+          'display:flex',
+          'align-items:center',
+          'justify-content:center',
+          'height:100%',
+          'margin:0',
+        ].join(';');
+        document.body.style.cssText = [
+          'display:flex',
+          'flex-direction:column',
+          'align-items:center',
+          'justify-content:center',
+          'gap:20px',
+          'padding:32px 24px',
+          'text-align:center',
+          'height:100%',
+          'margin:0',
+          'box-sizing:border-box',
+        ].join(';');
+
+        document.body.innerHTML = [
+          '<img src="/icon-192.png" style="width:72px;height:72px;border-radius:18px;margin-bottom:8px">',
+          '<p style="font-size:20px;font-weight:800;margin:0">SYNK</p>',
+          '<p style="font-size:15px;color:rgba(255,255,255,.6);margin:0;line-height:1.6">',
+            '카카오톡 내 브라우저에서는<br>앱이 정상적으로 열리지 않아요.<br>Safari로 열어주세요.',
+          '</p>',
+          '<a href="' + url + '" style="',
+            'display:flex;align-items:center;justify-content:center;gap:8px;',
+            'width:100%;max-width:280px;height:52px;',
+            'border-radius:14px;',
+            'background:linear-gradient(135deg,#46D7FF,#9B6BFF);',
+            'color:#fff;font-size:16px;font-weight:700;',
+            'text-decoration:none;',
+          '" onclick="window.open(this.href,\'_blank\');return false;">',
+            'Safari로 열기',
+          '</a>',
+          '<p style="font-size:12px;color:rgba(255,255,255,.35);margin:0">',
+            '또는 우측 상단 ··· → Safari로 열기',
+          '</p>',
+        ].join('');
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
