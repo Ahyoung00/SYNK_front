@@ -154,8 +154,7 @@ export default function MissionCameraPage() {
       : `눌러서 촬영 (${VIDEO_MIN_S}~${VIDEO_MAX_S}초)`
 
   return (
-    <div className={styles.page}>
-    <div className={styles.safeInner}>
+    <div className={[styles.page, styles.rotated].join(' ')}>
 
       {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
       <div className={styles.videoWrap}>
@@ -236,7 +235,6 @@ export default function MissionCameraPage() {
         onRetake={() => camera.clearRecording()}
         onSubmit={handleSubmit}
       />
-    </div>
     </div>
   )
 }
