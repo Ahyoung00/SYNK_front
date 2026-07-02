@@ -7,32 +7,6 @@
 }
 
 /* 세로 모드일 때 전체 페이지를 90도 회전 → 가로 강제 (iOS 포함) */
-/* ── 세로 안내 오버레이 (가로 회전 유도) ────────────────────────────────────── */
-.rotatePrompt {
-  position: absolute;
-  inset: 0;
-  z-index: 100;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 14px;
-  background: #0B1020;
-  color: #fff;
-  text-align: center;
-  padding: 24px;
-}
-
-.rotateTitle {
-  font-size: 17px;
-  font-weight: 800;
-  color: #fff;
-}
-
-.rotateSub {
-  font-size: 13px;
-  color: rgba(255, 255, 255, 0.55);
-}
 
 /* ── 영상 (풀스크린 배경) ───────────────────────────────────────────────────── */
 .videoWrap {
@@ -60,16 +34,6 @@
 
 .hidden { display: none; }
 .noMirror { transform: none; }
-
-/* 폰 가로 촬영 raw 영상 회전 보정 (Lambda와 동일 각도) */
-.reviewPhoneFront,
-.reviewPhoneBack {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.reviewPhoneFront { transform: rotate(90deg) scaleX(-1); }
-.reviewPhoneBack  { transform: rotate(270deg); }
 
 /* ── 격자 + 포커스 (프리뷰 영역: 상단바 아래 · 레일 왼쪽) ─────────────────────── */
 .stageOverlay {
