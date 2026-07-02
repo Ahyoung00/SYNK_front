@@ -9,10 +9,10 @@
 /* 세로 모드일 때 전체 페이지를 90도 회전 → 가로 강제 (iOS 포함) */
 .rotated {
   position: fixed;
-  top: calc((100vh - 100vw) / 2);
-  left: calc((100vw - 100vh) / 2);
-  width: 100vh;
-  height: 100vw;
+  top: calc((var(--app-height, 100vh) - var(--app-width, 100vw)) / 2);
+  left: calc((var(--app-width, 100vw) - var(--app-height, 100vh)) / 2);
+  width: var(--app-height, 100vh);
+  height: var(--app-width, 100vw);
   transform: rotate(90deg);
   transform-origin: center center;
   overflow: hidden;

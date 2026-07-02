@@ -7,6 +7,7 @@ import '@/styles/global.css'
 // JS로 실제 보이는 높이(window.innerHeight)를 --app-height에 직접 주입
 function setAppHeight() {
   document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`)
+  document.documentElement.style.setProperty('--app-width', `${window.innerWidth}px`)
 }
 setAppHeight()
 window.addEventListener('resize', setAppHeight)
