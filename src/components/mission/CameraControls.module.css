@@ -1,0 +1,152 @@
+/* 미션 촬영 우측 컨트롤 레일 — 독립 컴포넌트 스타일
+   (페이지가 .rotated로 회전되므로 safe-area는 페이지에서 처리, 여기선 고정 px) */
+.rail {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 116px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 20px 0;
+  background: linear-gradient(270deg, rgba(6,10,24,0.9) 0%, rgba(6,10,24,0.35) 60%, transparent 100%);
+  z-index: 10;
+}
+
+.railIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s ease;
+}
+.railIcon:active { opacity: 0.6; }
+.railIconOn {
+  background: rgba(245, 197, 66, 0.25);
+  border-color: #F5C542;
+  color: #F5C542;
+}
+
+.shutterArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+}
+
+.shutterRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shutterRing {
+  width: 78px;
+  height: 78px;
+  border-radius: 50%;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: conic-gradient(from 180deg, #46D7FF, #7C5CE0, #46D7FF);
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.12s ease;
+}
+.shutterRing:disabled { opacity: 0.4; }
+.shutterRing:active:not(:disabled) { transform: scale(0.94); }
+
+.shutterCore {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #0B1020;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shutterStop {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: #FF4D4D;
+}
+
+.slider {
+  width: 4px;
+  height: 78px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sliderFill {
+  width: 100%;
+  background: linear-gradient(#46D7FF, #7C5CE0);
+  border-radius: 999px;
+  transition: height 0.1s linear;
+}
+
+.railFlip {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #fff;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s ease;
+}
+.railFlip:active { opacity: 0.6; }
+
+.reviewStack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 88px;
+}
+
+.retakeBtn {
+  padding: 12px 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.submitBtn {
+  padding: 12px 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #7C3AED, #2563EB);
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  transition: opacity 0.12s ease;
+}
+.submitBtn:disabled { opacity: 0.6; }
+
+.hint {
+  font-size: 11px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+  text-align: center;
+  line-height: 1.4;
+  white-space: nowrap;
+}

@@ -3,6 +3,8 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useCamera, VIDEO_MIN_S, VIDEO_MAX_S, type CameraFacing } from '@/hooks/useCamera'
 import { useMissionStore } from '@/store/missionStore'
 import { missionApi, uploadApi } from '@/services/api/endpoints'
+import MissionInfoBar from '@/components/mission/MissionInfoBar'
+import CameraControls from '@/components/mission/CameraControls'
 import { ROUTES } from '@/constants'
 import { formatTime } from '@/hooks/useTimer'
 import styles from './MissionCameraPage.module.css'
@@ -146,7 +148,7 @@ export default function MissionCameraPage() {
       : `눌러서 촬영 (${VIDEO_MIN_S}~${VIDEO_MAX_S}초)`
 
   return (
-    <div className={styles.page}>
+    <div className={[styles.page, styles.rotated].join(' ')}>
 
       {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
       <div className={styles.videoWrap}>
@@ -201,87 +203,32 @@ export default function MissionCameraPage() {
         </div>
       )}
 
-      {/* ── 상단 인포바 ──────────────────────────────────────────────────────── */}
-      <div className={styles.topBar}>
-        <button className={styles.backBtn} onClick={() => navigate(-1)} aria-label="뒤로">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
+      {/* ── 상단 인포바 (독립 컴포넌트) ──────────────────────────────────────── */}
+      <MissionInfoBar
+        roomName={room.name}
+        title={title}
+        timeLabel={formatTime(secondsLeft)}
+        onBack={() => navigate(-1)}
+      />
 
-        <div className={styles.titleGroup}>
-          <span className={styles.roomRow}>
-            <span className={styles.roomDot} />
-            {room.name}
-          </span>
-          <span className={styles.title}>{title}</span>
-        </div>
-
-        <div className={styles.timerPill}>
-          <span className={styles.timerDot} />
-          {formatTime(secondsLeft)}
-        </div>
-      </div>
-
-      {/* ── 우측 컨트롤 레일 ─────────────────────────────────────────────────── */}
-      <div className={styles.rail}>
-        {/* 플래시 */}
-        <button
-          className={[styles.railIcon, torchOn ? styles.railIconOn : ''].join(' ')}
-          onClick={toggleTorch}
-          aria-label="플래시"
-        >
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M13 2L4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5z" />
-          </svg>
-        </button>
-
-        {isDone ? (
-          /* 리뷰: 재촬영 / 제출 */
-          <div className={styles.reviewStack}>
-            <button className={styles.retakeBtn} onClick={() => camera.clearRecording()}>
-              재촬영
-            </button>
-            <button className={styles.submitBtn} onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? '제출 중' : '제출'}
-            </button>
-          </div>
-        ) : (
-          <div className={styles.shutterArea}>
-            <div className={styles.shutterRow}>
-              <button
-                className={styles.shutterRing}
-                onClick={isRecording ? () => camera.stopRecording() : () => camera.startRecording()}
-                disabled={shutterDisabled}
-                aria-label={isRecording ? '촬영 완료' : '촬영 시작'}
-              >
-                <span className={styles.shutterCore}>
-                  {isRecording && <span className={styles.shutterStop} />}
-                </span>
-              </button>
-
-              <div className={styles.slider}>
-                <div
-                  className={styles.sliderFill}
-                  style={{ height: isRecording ? `${(camera.recordingElapsed / VIDEO_MAX_S) * 100}%` : '0%' }}
-                />
-              </div>
-            </div>
-
-            {hasMultiCam && !isRecording && (
-              <button className={styles.railFlip} onClick={handleFlipCamera} aria-label="카메라 전환">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M2 12a9 9 0 0 1 15-6.7L21 8" /><path d="M21 3v5h-5" />
-                  <path d="M22 12a9 9 0 0 1-15 6.7L3 16" /><path d="M3 21v-5h5" />
-                </svg>
-              </button>
-            )}
-          </div>
-        )}
-
-        {/* 힌트 */}
-        <p className={styles.hint}>{hintText}</p>
-      </div>
+      {/* ── 우측 컨트롤 레일 (독립 컴포넌트) ─────────────────────────────────── */}
+      <CameraControls
+        isRecording={isRecording}
+        isDone={isDone}
+        shutterDisabled={shutterDisabled}
+        torchOn={torchOn}
+        hasMultiCam={hasMultiCam}
+        isSubmitting={isSubmitting}
+        recordingElapsed={camera.recordingElapsed}
+        maxSeconds={VIDEO_MAX_S}
+        hintText={hintText}
+        onToggleTorch={toggleTorch}
+        onShutter={() => camera.startRecording()}
+        onStop={() => camera.stopRecording()}
+        onFlip={handleFlipCamera}
+        onRetake={() => camera.clearRecording()}
+        onSubmit={handleSubmit}
+      />
     </div>
   )
 }

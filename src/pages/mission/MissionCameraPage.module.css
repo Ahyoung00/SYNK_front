@@ -6,15 +6,27 @@
   overflow: hidden;
 }
 
-/* 세로 모드일 때 전체 페이지를 90도 회전 → 가로 강제 (iOS 포함) */
+/* 촬영 화면은 항상 가로 디자인을 90° 회전한 형태로 고정 (미션명 세로, 버튼 하단).
+   회전 박스를 safe-area만큼 줄여 상태바/노치/홈인디케이터 침범 방지 */
+.rotated {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--app-height, 100vh) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  height: calc(var(--app-width, 100vw) - env(safe-area-inset-left) - env(safe-area-inset-right));
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: center center;
+  overflow: hidden;
+  z-index: 50;
+}
 
 /* ── 영상 (풀스크린 배경) ───────────────────────────────────────────────────── */
 .videoWrap {
   position: absolute;
-  top: calc(62px + env(safe-area-inset-top));
-  left: max(14px, env(safe-area-inset-left));
-  right: calc(118px + env(safe-area-inset-right));
-  bottom: max(14px, env(safe-area-inset-bottom));
+  top: 62px;
+  left: 14px;
+  right: 118px;
+  bottom: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,10 +50,10 @@
 /* ── 격자 + 포커스 (프리뷰 영역: 상단바 아래 · 레일 왼쪽) ─────────────────────── */
 .stageOverlay {
   position: absolute;
-  top: calc(62px + env(safe-area-inset-top));
-  left: max(14px, env(safe-area-inset-left));
-  right: calc(118px + env(safe-area-inset-right));
-  bottom: max(14px, env(safe-area-inset-bottom));
+  top: 62px;
+  left: 14px;
+  right: 118px;
+  bottom: 14px;
   border-radius: 20px;
   overflow: hidden;
   pointer-events: none;
