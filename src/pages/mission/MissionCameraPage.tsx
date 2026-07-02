@@ -114,12 +114,18 @@ export default function MissionCameraPage() {
           muted
         />
 
-        {/* 녹화 완료 리뷰 */}
+        {/* 녹화 완료 리뷰 — raw 영상이라 카메라별 회전 보정 필요 (Lambda와 동일) */}
         <video
           ref={reviewRef}
           className={[
             styles.video,
             camera.state !== 'done' ? styles.hidden : '',
+            // 폰 가로 촬영 시에만 회전 보정 (rawFacingMode가 실제 보고된 경우 = 폰)
+            camera.isHorizontal && camera.rawFacingMode === 'user'        ? styles.reviewPhoneFront
+              : camera.isHorizontal && camera.rawFacingMode === 'environment' ? styles.reviewPhoneBack
+              // 세로 or 노트북 가로: 후면만 미러 제거, 그 외 기존 미러 유지
+              : facing === 'back'                                             ? styles.noMirror
+              : '',
           ].join(' ')}
           playsInline
           muted

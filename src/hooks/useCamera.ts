@@ -18,6 +18,8 @@ interface UseCameraReturn {
   isHorizontal: boolean
   /** 현재 사용 중인 카메라 — "user"(전면) | "environment"(후면) */
   facingMode: 'user' | 'environment'
+  /** 스트림이 실제로 보고한 facingMode. 노트북 등 미보고 시 undefined — 리뷰 회전 분기용 */
+  rawFacingMode: 'user' | 'environment' | undefined
 
   startPreview: (facing?: CameraFacing) => Promise<void>
   stopPreview: () => void
@@ -34,6 +36,7 @@ export function useCamera(): UseCameraReturn {
   const [error, setError] = useState<string | null>(null)
   const [isHorizontal, setIsHorizontal] = useState(false)
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
+  const [rawFacingMode, setRawFacingMode] = useState<'user' | 'environment' | undefined>(undefined)
 
   const previewRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -57,7 +60,9 @@ export function useCamera(): UseCameraReturn {
       setIsHorizontal((settings?.width ?? 0) > (settings?.height ?? 0))
       // 실제 스트림의 facingMode 우선, 없으면 요청한 facing 사용
       const actualFacing = settings?.facingMode
-      setFacingMode(actualFacing === 'environment' ? 'environment' : actualFacing === 'user' ? 'user' : (facing === 'back' ? 'environment' : 'user'))
+      const rawFm = actualFacing === 'environment' ? 'environment' : actualFacing === 'user' ? 'user' : undefined
+      setRawFacingMode(rawFm)
+      setFacingMode(rawFm ?? (facing === 'back' ? 'environment' : 'user'))
 
       if (previewRef.current) {
         previewRef.current.srcObject = stream
@@ -157,6 +162,7 @@ export function useCamera(): UseCameraReturn {
     error,
     isHorizontal,
     facingMode,
+    rawFacingMode,
     startPreview,
     stopPreview,
     startRecording,

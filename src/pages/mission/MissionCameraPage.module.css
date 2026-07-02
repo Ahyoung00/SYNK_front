@@ -30,6 +30,28 @@
   transform: none;
 }
 
+/* ── 리뷰(제출 전) 전용 회전 보정 ──────────────────────────────────────────
+   라이브 프리뷰(previewRef)에는 적용 안 됨 — 리뷰 video에만 부여.
+   raw 녹화본은 회전 메타가 없어 Lambda와 동일한 각도로 직접 보정.
+   90/270 회전 시 가로·세로가 바뀌므로 컨테이너에 맞춰 swap 사이징. */
+.reviewPhoneFront,
+.reviewPhoneBack {
+  /* 회전 후 채우기: 요소를 컨테이너 기준 가로·세로 뒤바꿔 배치 */
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 폰 가로 + 전면(user): 시계방향 90도 + 좌우미러 */
+.reviewPhoneFront {
+  transform: rotate(90deg) scaleX(-1);
+}
+
+/* 폰 가로 + 후면(environment): 270도, 미러 없음 */
+.reviewPhoneBack {
+  transform: rotate(270deg);
+}
+
 /* ── 상단 컨트롤 (뒤로가기 / 카메라 전환) ─────────────────────────────────── */
 .topControls {
   display: flex;
