@@ -1,13 +1,14 @@
+/* 미션 촬영 상단 인포바 — 독립 컴포넌트 스타일 */
 .topBar {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: calc(68px + env(safe-area-inset-top));
+  height: 68px;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: env(safe-area-inset-top) max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+  padding: 0 16px;
   background: linear-gradient(180deg, rgba(6,10,24,0.9) 0%, rgba(6,10,24,0) 100%);
   z-index: 10;
 }

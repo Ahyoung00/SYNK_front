@@ -155,6 +155,7 @@ export default function MissionCameraPage() {
 
   return (
     <div className={styles.page}>
+    <div className={styles.safeInner}>
 
       {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
       <div className={styles.videoWrap}>
@@ -235,6 +236,7 @@ export default function MissionCameraPage() {
         onRetake={() => camera.clearRecording()}
         onSubmit={handleSubmit}
       />
+    </div>
     </div>
   )
 }
