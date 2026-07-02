@@ -429,7 +429,9 @@
   align-items: center;
   gap: 6px;
   height: 40px;
-  padding: 0 52px 0 42px;
+  width: 55px;
+  padding: 0;
+  justify-content: center;
   border-radius: 999px;
   background: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%);
   color: #fff !important;
