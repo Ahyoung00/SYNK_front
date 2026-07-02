@@ -219,22 +219,25 @@ body {
   }
 }
 
-/* 회전 고정: 폰을 어느 방향으로 돌려도 앱은 세로로 붙잡아 둠 (iOS Safari 포함).
-   JS가 실제 각도를 data-app-angle에 심고, 정확히 반대로 되돌린다.
-   90/270은 세로 박스를 화면 중앙에서 회전, 180은 제자리 180° */
-html[data-app-angle="90"] #root,
-html[data-app-angle="270"] #root {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: var(--app-width, 100vh);
-  height: var(--app-height, 100vw);
-  max-width: none;
-  overflow: hidden;
+/* 회전 고정: 모바일이 가로가 되면 미디어쿼리로 "확실히" 되돌림 트리거.
+   방향(좌/우 가로)만 JS가 감지한 data-app-angle로 보정한다.
+   (JS 각도 감지가 실패해도 미디어쿼리가 걸려 화면이 그냥 돌아가버리진 않음) */
+@media (orientation: landscape) and (max-height: 600px) {
+  #root {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: var(--app-width, 100vh);
+    height: var(--app-height, 100vw);
+    max-width: none;
+    overflow: hidden;
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  /* 반대 방향 가로일 때 뒤집기 */
+  html[data-app-angle="270"] #root {
+    transform: translate(-50%, -50%) rotate(-90deg);
+  }
 }
-html[data-app-angle="90"]  #root { transform: translate(-50%, -50%) rotate(-90deg); }
-html[data-app-angle="270"] #root { transform: translate(-50%, -50%) rotate(90deg); }
-html[data-app-angle="180"] #root { transform: rotate(180deg); }
 
 
 /* ── Typography helpers ───────────────────────────────────────────────────── */
