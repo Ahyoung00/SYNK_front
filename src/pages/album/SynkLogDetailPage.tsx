@@ -4,7 +4,7 @@ import { albumApi, roomApi } from '@/services/api/endpoints'
 import { useMissionStore } from '@/store/missionStore'
 import { useAuthStore } from '@/store/authStore'
 import { ROUTES } from '@/constants'
-import type { CollageItem, SynklogDetailResponse, RoomDetail } from '@/types'
+import type { CollageItem, RoomDetail } from '@/types'
 import { missionGradient } from '@/utils/missionVisual'
 import styles from './SynkLogDetailPage.module.css'
 
@@ -19,12 +19,9 @@ export default function SynkLogDetailPage() {
   const numRoomId   = Number(roomId)
   const missionRefs = useRef<Record<number, HTMLDivElement | null>>({})
 
-  const [collages, setCollages]         = useState<CollageItem[]>([])
-  const [synklog, setSynklog]           = useState<SynklogDetailResponse | null>(null)
-  const [synklogMissing, setSynklogMissing] = useState(false)
-  const [room, setRoom]                 = useState<RoomDetail | null>(null)
-  const [isLoading, setIsLoading]       = useState(true)
-  const [creatingLog, setCreatingLog]   = useState(false)
+  const [collages, setCollages] = useState<CollageItem[]>([])
+  const [room, setRoom]         = useState<RoomDetail | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (!date) return
@@ -52,45 +49,7 @@ export default function SynkLogDetailPage() {
       })
       .catch(console.error)
       .finally(() => setIsLoading(false))
-
-    albumApi.getSynklog(numRoomId, date)
-      .then((res) => setSynklog(res.data))
-      .catch(() => setSynklogMissing(true))
   }, [numRoomId, date]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  // SYNKLOG가 생성 중이면 완료될 때까지 폴링 (완료/최대시간 도달 시 중지)
-  useEffect(() => {
-    if (synklog?.status !== 'PROCESSING' || !date) return
-    const startedAt = Date.now()
-    const MAX_POLL_MS = 120_000
-    const id = window.setInterval(async () => {
-      try {
-        const res = await albumApi.getSynklog(numRoomId, date)
-        setSynklog(res.data)
-        if (res.data?.status === 'COMPLETED' || Date.now() - startedAt > MAX_POLL_MS) {
-          window.clearInterval(id)
-        }
-      } catch {
-        // 일시적 오류는 무시하고 다음 주기에 재시도
-      }
-    }, 5000)
-    return () => window.clearInterval(id)
-  }, [synklog?.status, numRoomId, date])
-
-  async function handleCreateSynklog() {
-    if (creatingLog) return
-    setCreatingLog(true)
-    try {
-      await albumApi.createSynklog(numRoomId, date!)
-      const res = await albumApi.getSynklog(numRoomId, date!)
-      setSynklog(res.data)
-      setSynklogMissing(false)
-    } catch (e) {
-      console.error(e)
-    } finally {
-      setCreatingLog(false)
-    }
-  }
 
   function handleViewCollage(item: CollageItem) {
     setActive({
@@ -248,61 +207,6 @@ export default function SynkLogDetailPage() {
           </div>
         ))}
 
-        {/* ── SYNKLOG 섹션 (미션이 있을 때만) ──────────────────────────── */}
-        {!isEmpty && <>
-        <p className={styles.sectionLabel}>오늘의 SYNKLOG</p>
-
-        <div className={styles.synklogCard}>
-          {synklogMissing && (
-            <div className={styles.synklogEmpty}>
-              <div className={styles.synklogIconWrap}>
-                <span className={styles.synklogIcon}>📹</span>
-              </div>
-              <p className={styles.synklogEmptyTitle}>아직 SYNKLOG가 없어요</p>
-              <p className={styles.synklogEmptyDesc}>
-                오늘의 콜라주를 짧은 영상으로<br />자동으로 만들어 드려요.
-              </p>
-              <button
-                className={styles.synklogBtn}
-                onClick={handleCreateSynklog}
-                disabled={creatingLog}
-              >
-                ⚡ {creatingLog ? '생성 중...' : 'SYNKLOG 생성하기'}
-              </button>
-            </div>
-          )}
-
-          {synklog?.status === 'PROCESSING' && (
-            <div className={styles.synklogEmpty}>
-              <div className={styles.synklogIconWrap}>
-                <span className={styles.synklogIcon}>⏳</span>
-              </div>
-              <p className={styles.synklogEmptyTitle}>SYNKLOG 생성 중...</p>
-              <p className={styles.synklogEmptyDesc}>잠시 후 완성돼요</p>
-            </div>
-          )}
-
-          {synklog?.status === 'COMPLETED' && (
-            <div className={styles.synklogComplete}>
-              {synklog.thumbnail && (
-                <img src={synklog.thumbnail} alt="SYNKLOG" className={styles.synklogThumb} />
-              )}
-              <div className={styles.synklogCompleteInfo}>
-                <p className={styles.synklogCompleteTitle}>SYNKLOG 완성!</p>
-                {synklog.missions?.map((m, i) => (
-                  <p key={i} className={styles.synklogMission}>· {m.missionTitle}</p>
-                ))}
-                <button
-                  className={styles.synklogBtn}
-                  onClick={() => synklog.synklogVideoUrl && window.open(synklog.synklogVideoUrl, '_blank')}
-                >
-                  SYNKLOG 보기
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-        </>}
 
       </div>
     </div>
