@@ -164,7 +164,20 @@ export default function MissionCameraPage() {
       : `눌러서 촬영 (${VIDEO_MIN_S}~${VIDEO_MAX_S}초)`
 
   return (
-    <div className={[styles.page, isPortrait ? styles.rotated : ''].join(' ')}>
+    <div className={styles.page}>
+      {/* 세로로 들고 있으면 가로 회전 안내 (실제 가로 촬영 유도) */}
+      {isPortrait && (
+        <div className={styles.rotatePrompt}>
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <rect x="3" y="6" width="18" height="12" rx="2" />
+            <path d="M7 21a5 5 0 0 1 0-10" />
+            <path d="M6.5 13 5 11.5 6.5 10" />
+          </svg>
+          <p className={styles.rotateTitle}>휴대폰을 가로로 돌려주세요</p>
+          <span className={styles.rotateSub}>가로 화면에서 촬영할 수 있어요</span>
+        </div>
+      )}
+
       {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
       <div className={styles.videoWrap}>
         {/* 라이브 프리뷰 */}

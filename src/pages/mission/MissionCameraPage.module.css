@@ -7,27 +7,40 @@
 }
 
 /* 세로 모드일 때 전체 페이지를 90도 회전 → 가로 강제 (iOS 포함) */
-.rotated {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  /* 회전 후 세로축(=페이지 width)은 상태바/홈인디케이터 safe-area만큼,
-     가로축(=페이지 height)은 좌우 safe-area만큼 줄여 노치·상태바 침범 방지 */
-  width: calc(var(--app-height, 100vh) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  height: calc(var(--app-width, 100vw) - env(safe-area-inset-left) - env(safe-area-inset-right));
-  transform: translate(-50%, -50%) rotate(90deg);
-  transform-origin: center center;
-  overflow: hidden;
-  z-index: 50;
+/* ── 세로 안내 오버레이 (가로 회전 유도) ────────────────────────────────────── */
+.rotatePrompt {
+  position: absolute;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  background: #0B1020;
+  color: #fff;
+  text-align: center;
+  padding: 24px;
+}
+
+.rotateTitle {
+  font-size: 17px;
+  font-weight: 800;
+  color: #fff;
+}
+
+.rotateSub {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 /* ── 영상 (풀스크린 배경) ───────────────────────────────────────────────────── */
 .videoWrap {
   position: absolute;
-  top: 62px;
-  left: 14px;
-  right: 118px;
-  bottom: 14px;
+  top: calc(62px + env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  right: calc(118px + env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -61,10 +74,10 @@
 /* ── 격자 + 포커스 (프리뷰 영역: 상단바 아래 · 레일 왼쪽) ─────────────────────── */
 .stageOverlay {
   position: absolute;
-  top: 62px;
-  left: 14px;
-  right: 118px;
-  bottom: 14px;
+  top: calc(62px + env(safe-area-inset-top));
+  left: max(14px, env(safe-area-inset-left));
+  right: calc(118px + env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
   border-radius: 20px;
   overflow: hidden;
   pointer-events: none;
@@ -103,11 +116,11 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 68px;
+  height: calc(68px + env(safe-area-inset-top));
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 0 16px;
+  padding: env(safe-area-inset-top) 16px 0 max(16px, env(safe-area-inset-left));
   background: linear-gradient(180deg, rgba(6,10,24,0.9) 0%, rgba(6,10,24,0) 100%);
   z-index: 10;
 }
@@ -194,13 +207,13 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: 116px;
+  width: calc(116px + env(safe-area-inset-right));
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 22px;
-  padding: 20px 0;
+  padding: max(20px, env(safe-area-inset-top)) env(safe-area-inset-right) max(20px, env(safe-area-inset-bottom)) 0;
   background: linear-gradient(270deg, rgba(6,10,24,0.9) 0%, rgba(6,10,24,0.35) 60%, transparent 100%);
   z-index: 10;
 }
