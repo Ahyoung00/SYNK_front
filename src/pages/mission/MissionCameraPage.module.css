@@ -9,11 +9,13 @@
 /* 세로 모드일 때 전체 페이지를 90도 회전 → 가로 강제 (iOS 포함) */
 .rotated {
   position: fixed;
-  top: calc((var(--app-height, 100vh) - var(--app-width, 100vw)) / 2);
-  left: calc((var(--app-width, 100vw) - var(--app-height, 100vh)) / 2);
-  width: var(--app-height, 100vh);
-  height: var(--app-width, 100vw);
-  transform: rotate(90deg);
+  top: 50%;
+  left: 50%;
+  /* 회전 후 세로축(=페이지 width)은 상태바/홈인디케이터 safe-area만큼,
+     가로축(=페이지 height)은 좌우 safe-area만큼 줄여 노치·상태바 침범 방지 */
+  width: calc(var(--app-height, 100vh) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  height: calc(var(--app-width, 100vw) - env(safe-area-inset-left) - env(safe-area-inset-right));
+  transform: translate(-50%, -50%) rotate(90deg);
   transform-origin: center center;
   overflow: hidden;
   z-index: 50;
@@ -332,13 +334,12 @@
 .submitBtn:disabled { opacity: 0.6; }
 
 .hint {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.55);
   text-align: center;
   line-height: 1.4;
-  padding: 0 8px;
-  max-width: 112px;
+  white-space: nowrap;
 }
 
 /* ── 에러 / 로딩 ────────────────────────────────────────────────────────────── */
