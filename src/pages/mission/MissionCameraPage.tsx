@@ -22,6 +22,7 @@ export default function MissionCameraPage() {
   const reviewRef = useRef<HTMLVideoElement | null>(null)
   const [facing, setFacing] = useState<CameraFacing>('front')
   const [hasMultiCam, setHasMultiCam] = useState(false)
+  const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
 
   // 페이지 진입 시 카메라 켜기
   useEffect(() => {
@@ -56,6 +57,23 @@ export default function MissionCameraPage() {
     }
   }, [camera.state, camera.recordedUrl])
 
+  // 남은 시간 매초 재계산 — deadline 절대시간 기준 (촬영·업로드 지연에도 안 어긋남)
+  useEffect(() => {
+    if (!active) return
+    const deadlineTs = new Date(active.mission.deadline).getTime()
+    const tick = () => {
+      if (Number.isNaN(deadlineTs)) {
+        // deadline이 없는 경로(앨범 등) 폴백: 로컬 감소
+        setSecondsLeft((s) => Math.max(0, s - 1))
+      } else {
+        setSecondsLeft(Math.max(0, Math.round((deadlineTs - Date.now()) / 1000)))
+      }
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [active?.mission.deadline]) // eslint-disable-line react-hooks/exhaustive-deps
+
   if (!active) {
     navigate(ROUTES.HOME, { replace: true })
     return null
@@ -63,7 +81,6 @@ export default function MissionCameraPage() {
 
   const { mission, room } = active
   const title = mission.template?.title ?? '미션'
-  const secondsLeft = active.seconds_left
 
   // 카메라 분할 레이아웃
 
