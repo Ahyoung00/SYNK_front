@@ -517,3 +517,52 @@
 .scroll > * {
   flex-shrink: 0;
 }
+
+/* ── Synklog 배너 ────────────────────────────────────────────────────────────── */
+.synklogBanner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(232,115,90,0.15) 0%, rgba(124,92,224,0.15) 100%);
+  border: 1px solid rgba(232,115,90,0.35);
+  color: #fff;
+  text-align: left;
+  width: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s ease;
+}
+.synklogBanner:active { opacity: 0.75; }
+
+.synklogBannerIcon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #E8735A 0%, #9B6BFF 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #fff;
+}
+
+.synklogBannerText {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.synklogBannerTitle {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.synklogBannerSub {
+  font-size: 12px;
+  color: rgba(255,255,255,0.55);
+}

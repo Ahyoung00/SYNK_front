@@ -49,6 +49,10 @@ export const ROUTES = {
   ROOM_JOIN: '/room/join',
   INVITE: (code: string) => `/invite/${code}`,
 
+  // Synklog 생성 플로우
+  SYNKLOG_CREATE: (roomId: number | string) => `/room/${roomId}/synklog/create`,
+  SYNKLOG_COMPLETE: (roomId: number | string) => `/room/${roomId}/synklog/complete`,
+
   // Bottom tabs
   COLLECTION: '/collection',
   COLLECTION_DETAIL: (missionId: number | string) => `/collection/${missionId}`,
