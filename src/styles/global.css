@@ -219,6 +219,22 @@ body {
   }
 }
 
+/* 모바일 가로 잠금: 폰을 가로로 돌려도 앱은 세로로 고정 (iOS 포함).
+   --app-height/width가 항상 세로 기준(긴 변/짧은 변)이라 내부 레이아웃 유지됨 */
+@media (orientation: landscape) and (max-height: 600px) {
+  #root {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: var(--app-width, 100vh);
+    height: var(--app-height, 100vw);
+    max-width: none;
+    overflow: hidden;
+    transform-origin: top left;
+    transform: rotate(90deg) translateY(-100%);
+  }
+}
+
 /* ── Typography helpers ───────────────────────────────────────────────────── */
 h1, h2, h3, h4, h5, h6 { font-weight: 700; line-height: 1.25; }
 
