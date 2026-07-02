@@ -23,8 +23,19 @@ export default function MissionCameraPage() {
   const [facing, setFacing] = useState<CameraFacing>('front')
   const [hasMultiCam, setHasMultiCam] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
+  const [isPortrait, setIsPortrait] = useState(
+    () => window.matchMedia('(orientation: portrait)').matches
+  )
 
-  // 페이지 진입 시 가로 화면 고정 + 카메라 켜기
+  // portrait일 때 CSS 회전으로 가로 강제 (iOS 포함 전 환경 대응)
+  useEffect(() => {
+    const mq = window.matchMedia('(orientation: portrait)')
+    const handler = (e: MediaQueryListEvent) => setIsPortrait(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  // 페이지 진입 시 카메라 켜기
   useEffect(() => {
     screen.orientation?.lock?.('landscape').catch(() => {})
 
@@ -117,7 +128,7 @@ export default function MissionCameraPage() {
   }
 
   return (
-    <div className={styles.page}>
+    <div className={[styles.page, isPortrait ? styles.rotated : ''].join(' ')}>
       {/* ── 카메라 / 리뷰 영상 ──────────────────────────────────────────────── */}
       <div className={styles.videoWrap}>
         {/* 라이브 프리뷰 */}
