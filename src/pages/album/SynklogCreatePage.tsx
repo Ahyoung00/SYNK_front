@@ -51,7 +51,12 @@ export default function SynklogCreatePage() {
           selectedCollages: collages.filter((c) => selected.has(c.missionId)),
         },
       })
-    } catch {
+    } catch (e: any) {
+      // 이미 생성된 경우 → 기존 Synklog 상세로 이동
+      if (e?.message?.includes('이미 생성된')) {
+        navigate(ROUTES.ROOM_SYNKLOG(id, date), { replace: true })
+        return
+      }
       setSubmitting(false)
     }
   }
