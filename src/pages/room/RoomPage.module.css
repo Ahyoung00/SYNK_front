@@ -427,9 +427,9 @@
 .chatBtn {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
   height: 36px;
-  padding: 0 14px 0 11px;
+  width: 36px;
+  padding: 0;
   border-radius: 999px;
   background: linear-gradient(135deg, #7C3AED 0%, #2563EB 100%);
   color: #fff;
