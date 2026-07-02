@@ -20,6 +20,8 @@ interface UseCameraReturn {
   facingMode: 'user' | 'environment'
   /** 스트림이 실제로 보고한 facingMode. 노트북 등 미보고 시 undefined — 리뷰 회전 분기용 */
   rawFacingMode: 'user' | 'environment' | undefined
+  /** 녹화 파일에 90° 회전이 구워졌는지 (세로 스트림 → 가로 파일). 리뷰 카운터 회전용 */
+  recordedRotated: boolean
 
   startPreview: (facing?: CameraFacing) => Promise<void>
   stopPreview: () => void
@@ -37,6 +39,7 @@ export function useCamera(): UseCameraReturn {
   const [isHorizontal, setIsHorizontal] = useState(false)
   const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user')
   const [rawFacingMode, setRawFacingMode] = useState<'user' | 'environment' | undefined>(undefined)
+  const [recordedRotated, setRecordedRotated] = useState(false)
 
   const previewRef = useRef<HTMLVideoElement | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
@@ -44,6 +47,8 @@ export function useCamera(): UseCameraReturn {
   const chunksRef = useRef<Blob[]>([])
   const elapsedIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const recordStartRef = useRef<number>(0)
+  const facingRef = useRef<'user' | 'environment'>('user')
+  const rafRef = useRef<number>(0)
 
   // ── Web: camera preview ───────────────────────────────────────────────────
 
@@ -62,7 +67,9 @@ export function useCamera(): UseCameraReturn {
       const actualFacing = settings?.facingMode
       const rawFm = actualFacing === 'environment' ? 'environment' : actualFacing === 'user' ? 'user' : undefined
       setRawFacingMode(rawFm)
-      setFacingMode(rawFm ?? (facing === 'back' ? 'environment' : 'user'))
+      const resolvedFacing = rawFm ?? (facing === 'back' ? 'environment' : 'user')
+      setFacingMode(resolvedFacing)
+      facingRef.current = resolvedFacing
 
       if (previewRef.current) {
         previewRef.current.srcObject = stream
@@ -90,7 +97,8 @@ export function useCamera(): UseCameraReturn {
 
   const startRecording = useCallback(() => {
     const stream = streamRef.current
-    if (!stream) return
+    const video = previewRef.current
+    if (!stream || !video) return
 
     chunksRef.current = []
     setRecordingElapsed(0)
@@ -98,9 +106,48 @@ export function useCamera(): UseCameraReturn {
 
     const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
       ? 'video/webm;codecs=vp9'
-      : 'video/webm'
+      : MediaRecorder.isTypeSupported('video/webm')
+        ? 'video/webm'
+        : 'video/mp4'
 
-    const recorder = new MediaRecorder(stream, { mimeType })
+    // ── WYSIWYG 굽기: 화면에 보이는 그대로(회전+미러) 캔버스에 그려서 녹화 ──
+    // 카메라 페이지는 CSS로 page 전체를 rotate(90deg) 하지만 스트림 픽셀은 안 돌아가므로,
+    // 세로 픽셀 스트림(vw<vh)은 캔버스에서 90° CW 회전해 굽는다.
+    // 전면 카메라는 프리뷰 미러(scaleX(-1))와 동일하게 좌우반전도 굽는다.
+    // → 녹화 파일 = 사용자가 본 화면. 리뷰/콜라주에서 회전·미러 보정 불필요.
+    const vw = video.videoWidth
+    const vh = video.videoHeight
+    const needsRotate = vw < vh
+    const needsMirror = facingRef.current === 'user'
+
+    let recordStream: MediaStream = stream
+    const canBake = vw > 0 && vh > 0
+      && typeof HTMLCanvasElement.prototype.captureStream === 'function'
+      && (needsRotate || needsMirror)
+    setRecordedRotated(canBake && needsRotate)
+
+    if (canBake) {
+      const canvas = document.createElement('canvas')
+      canvas.width = needsRotate ? vh : vw
+      canvas.height = needsRotate ? vw : vh
+      const ctx = canvas.getContext('2d')!
+
+      const drawFrame = () => {
+        ctx.save()
+        ctx.translate(canvas.width / 2, canvas.height / 2)
+        if (needsRotate) ctx.rotate(Math.PI / 2)   // CSS rotate(90deg)와 동일 방향
+        if (needsMirror) ctx.scale(-1, 1)          // CSS scaleX(-1)와 동일
+        ctx.drawImage(video, -vw / 2, -vh / 2, vw, vh)
+        ctx.restore()
+        rafRef.current = requestAnimationFrame(drawFrame)
+      }
+      drawFrame()
+
+      recordStream = canvas.captureStream(30)
+      stream.getAudioTracks().forEach((t) => recordStream.addTrack(t))
+    }
+
+    const recorder = new MediaRecorder(recordStream, { mimeType })
 
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) chunksRef.current.push(e.data)
@@ -108,6 +155,7 @@ export function useCamera(): UseCameraReturn {
 
     recorder.onstop = () => {
       clearInterval(elapsedIntervalRef.current!)
+      cancelAnimationFrame(rafRef.current)
       const blob = new Blob(chunksRef.current, { type: mimeType })
       setRecordedBlob(blob)
       setRecordedUrl(URL.createObjectURL(blob))
@@ -163,6 +211,7 @@ export function useCamera(): UseCameraReturn {
     isHorizontal,
     facingMode,
     rawFacingMode,
+    recordedRotated,
     startPreview,
     stopPreview,
     startRecording,

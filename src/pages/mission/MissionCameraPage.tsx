@@ -21,6 +21,9 @@ export default function MissionCameraPage() {
   const previewVideoRef = camera.previewRef as React.RefObject<HTMLVideoElement>
   // 녹화된 영상 미리보기용 별도 video ref
   const reviewRef = useRef<HTMLVideoElement | null>(null)
+  const videoWrapRef = useRef<HTMLDivElement | null>(null)
+  // 파일에 90° 회전이 구워진 경우, 회전된 페이지 안에서는 -90° 카운터 회전해서 표시
+  const [reviewStyle, setReviewStyle] = useState<React.CSSProperties | undefined>(undefined)
   const [facing, setFacing] = useState<CameraFacing>('front')
   const [hasMultiCam, setHasMultiCam] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
@@ -75,8 +78,24 @@ export default function MissionCameraPage() {
       reviewRef.current.src = camera.recordedUrl
       reviewRef.current.loop = true
       reviewRef.current.play()
+
+      // 회전이 구워진 파일: 회전된 페이지 안에서 그대로 틀면 이중 회전되므로 -90° 보정
+      const wrap = videoWrapRef.current
+      if (camera.recordedRotated && wrap) {
+        setReviewStyle({
+          position: 'absolute',
+          top: '50%',
+          left: '50%',
+          width: wrap.offsetHeight,
+          height: wrap.offsetWidth,
+          transform: 'translate(-50%, -50%) rotate(-90deg)',
+          objectFit: 'cover',
+        })
+      } else {
+        setReviewStyle(undefined)
+      }
     }
-  }, [camera.state, camera.recordedUrl])
+  }, [camera.state, camera.recordedUrl, camera.recordedRotated])
 
   // 남은 시간 매초 재계산 — deadline 절대시간 기준 (촬영·업로드 지연에도 안 어긋남)
   useEffect(() => {
@@ -157,7 +176,7 @@ export default function MissionCameraPage() {
     <div className={[styles.page, styles.rotated].join(' ')}>
 
       {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
-      <div className={styles.videoWrap}>
+      <div className={styles.videoWrap} ref={videoWrapRef}>
         {/* 라이브 프리뷰 */}
         <video
           ref={previewVideoRef}
@@ -171,14 +190,16 @@ export default function MissionCameraPage() {
           muted
         />
 
-        {/* 녹화 완료 리뷰 — 보이는 그대로 (전면만 좌우반전 유지, 후면 미러 제거) */}
+        {/* 녹화 완료 리뷰 — 파일 자체가 WYSIWYG(회전·미러 구움).
+            회전 구운 파일은 회전된 페이지 안에서 -90° 카운터 회전(reviewStyle)로 표시 */}
         <video
           ref={reviewRef}
           className={[
             styles.video,
+            styles.noMirror,
             !isDone ? styles.hidden : '',
-            facing === 'back' ? styles.noMirror : '',
           ].join(' ')}
+          style={isDone ? reviewStyle : undefined}
           playsInline
           muted
         />
