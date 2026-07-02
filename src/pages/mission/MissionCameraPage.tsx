@@ -23,9 +23,24 @@ export default function MissionCameraPage() {
   const [hasMultiCam, setHasMultiCam] = useState(false)
   const [torchOn, setTorchOn] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
+  // 화면을 항상 가로 디자인으로 고정: 세로면 CSS로 90° 회전, 가로면 네이티브
+  const [isPortrait, setIsPortrait] = useState(
+    () => window.matchMedia('(orientation: portrait)').matches
+  )
+  // 촬영 시작 시점의 물리 방향 스냅샷 → 리뷰/제출 회전을 정확히 한 번만 적용
+  const [capturedPortrait, setCapturedPortrait] = useState(false)
 
-  // 페이지 진입 시 카메라 켜기
   useEffect(() => {
+    const mq = window.matchMedia('(orientation: portrait)')
+    const handler = (e: MediaQueryListEvent) => setIsPortrait(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+
+  // 페이지 진입 시 카메라 켜기 (+ 가능하면 가로 잠금 — Android 등)
+  useEffect(() => {
+    ;(screen.orientation as any)?.lock?.('landscape').catch(() => {})
+
     camera.startPreview('front').then(() => {
       navigator.mediaDevices?.enumerateDevices?.()
         .then((devices) => {
@@ -35,6 +50,7 @@ export default function MissionCameraPage() {
         .catch(() => setHasMultiCam(false))
     })
     return () => {
+      screen.orientation?.unlock?.()
       camera.stopPreview()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -46,6 +62,12 @@ export default function MissionCameraPage() {
     setTorchOn(false)
     camera.stopPreview()
     await camera.startPreview(next)
+  }
+
+  function handleStartRecording() {
+    // 이 순간의 물리 방향 기록 → 세로로 찍었을 때만 회전 보정 적용
+    setCapturedPortrait(window.matchMedia('(orientation: portrait)').matches)
+    camera.startRecording()
   }
 
   // 플래시(torch) 토글 — 지원 기기(주로 후면)에서만 동작, 미지원 시 무시
@@ -113,8 +135,8 @@ export default function MissionCameraPage() {
         missionId:  mission.id,
         videoUrl:   fileUrl,
         roomId:     Number(roomId) || room.id,
-        // 회전 보정 없이 보이는 그대로 저장 (Lambda/도감 재생도 회전 안 함)
-        horizontal: false,
+        // 세로로 들고 찍었을 때만 회전 필요 (도감/Lambda가 이 값으로 딱 한 번 회전)
+        horizontal: capturedPortrait,
         facingMode: camera.facingMode,
       })
     } catch (e) {
@@ -141,7 +163,7 @@ export default function MissionCameraPage() {
       : `눌러서 촬영 (${VIDEO_MIN_S}~${VIDEO_MAX_S}초)`
 
   return (
-    <div className={styles.page}>
+    <div className={[styles.page, isPortrait ? styles.rotated : ''].join(' ')}>
 
       {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
       <div className={styles.videoWrap}>
@@ -246,7 +268,7 @@ export default function MissionCameraPage() {
             <div className={styles.shutterRow}>
               <button
                 className={styles.shutterRing}
-                onClick={isRecording ? () => camera.stopRecording() : () => camera.startRecording()}
+                onClick={isRecording ? () => camera.stopRecording() : handleStartRecording}
                 disabled={shutterDisabled}
                 aria-label={isRecording ? '촬영 완료' : '촬영 시작'}
               >

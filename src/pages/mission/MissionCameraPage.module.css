@@ -6,15 +6,27 @@
   overflow: hidden;
 }
 
-/* 세로 모드일 때 전체 페이지를 90도 회전 → 가로 강제 (iOS 포함) */
+/* 세로 모드일 때 전체 페이지를 90도 회전 → 항상 가로 디자인 고정 (iOS 포함).
+   회전 박스를 safe-area만큼 줄여 상태바/노치/홈인디케이터 침범 방지 */
+.rotated {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--app-height, 100vh) - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  height: calc(var(--app-width, 100vw) - env(safe-area-inset-left) - env(safe-area-inset-right));
+  transform: translate(-50%, -50%) rotate(90deg);
+  transform-origin: center center;
+  overflow: hidden;
+  z-index: 50;
+}
 
 /* ── 영상 (풀스크린 배경) ───────────────────────────────────────────────────── */
 .videoWrap {
   position: absolute;
-  top: calc(62px + env(safe-area-inset-top));
-  left: max(14px, env(safe-area-inset-left));
-  right: calc(118px + env(safe-area-inset-right));
-  bottom: max(14px, env(safe-area-inset-bottom));
+  top: 62px;
+  left: 14px;
+  right: 118px;
+  bottom: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,10 +50,10 @@
 /* ── 격자 + 포커스 (프리뷰 영역: 상단바 아래 · 레일 왼쪽) ─────────────────────── */
 .stageOverlay {
   position: absolute;
-  top: calc(62px + env(safe-area-inset-top));
-  left: max(14px, env(safe-area-inset-left));
-  right: calc(118px + env(safe-area-inset-right));
-  bottom: max(14px, env(safe-area-inset-bottom));
+  top: 62px;
+  left: 14px;
+  right: 118px;
+  bottom: 14px;
   border-radius: 20px;
   overflow: hidden;
   pointer-events: none;
@@ -80,11 +92,11 @@
   top: 0;
   left: 0;
   right: 0;
-  height: calc(68px + env(safe-area-inset-top));
+  height: 68px;
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: env(safe-area-inset-top) 16px 0 max(16px, env(safe-area-inset-left));
+  padding: 0 16px;
   background: linear-gradient(180deg, rgba(6,10,24,0.9) 0%, rgba(6,10,24,0) 100%);
   z-index: 10;
 }
@@ -171,13 +183,13 @@
   top: 0;
   right: 0;
   bottom: 0;
-  width: calc(116px + env(safe-area-inset-right));
+  width: 116px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 22px;
-  padding: max(20px, env(safe-area-inset-top)) env(safe-area-inset-right) max(20px, env(safe-area-inset-bottom)) 0;
+  padding: 20px 0;
   background: linear-gradient(270deg, rgba(6,10,24,0.9) 0%, rgba(6,10,24,0.35) 60%, transparent 100%);
   z-index: 10;
 }
@@ -329,4 +341,24 @@
   color: rgba(255, 255, 255, 0.6);
   text-align: center;
   padding: 24px;
+}
+
+/* 네이티브 가로(회전 안 함)일 때만 safe-area 반영 — 노치가 측면에 옴.
+   세로(.rotated)에서는 회전 박스가 이미 safe-area만큼 줄어 있어 중복 적용 안 함 */
+@media (orientation: landscape) {
+  .videoWrap,
+  .stageOverlay {
+    top: calc(62px + env(safe-area-inset-top));
+    left: max(14px, env(safe-area-inset-left));
+    right: calc(118px + env(safe-area-inset-right));
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+  .topBar {
+    height: calc(68px + env(safe-area-inset-top));
+    padding: env(safe-area-inset-top) 16px 0 max(16px, env(safe-area-inset-left));
+  }
+  .rail {
+    width: calc(116px + env(safe-area-inset-right));
+    padding: max(20px, env(safe-area-inset-top)) env(safe-area-inset-right) max(20px, env(safe-area-inset-bottom)) 0;
+  }
 }
