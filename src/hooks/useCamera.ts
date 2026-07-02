@@ -117,7 +117,9 @@ export function useCamera(): UseCameraReturn {
     // → 녹화 파일 = 사용자가 본 화면. 리뷰/콜라주에서 회전·미러 보정 불필요.
     const vw = video.videoWidth
     const vh = video.videoHeight
-    const needsRotate = vw < vh
+    // 회전 굽기는 "CSS 페이지 회전이 활성"일 때만 (뷰포트 세로 + 세로 픽셀 스트림).
+    // 브라우저가 이미 가로로 회전한 경우(자동회전)는 스트림이 바르게 들어오므로 굽지 않음
+    const needsRotate = vw < vh && window.innerHeight >= window.innerWidth
     const needsMirror = facingRef.current === 'user'
 
     let recordStream: MediaStream = stream

@@ -35,6 +35,22 @@ export default function MissionCameraPage() {
     return () => { delete document.documentElement.dataset.camera }
   }, [])
 
+  // 뷰포트가 실제 세로일 때만 CSS 90° 회전 적용.
+  // iOS Safari 등 자동회전 환경에서는 폰을 눕히면 브라우저 자체가 가로로 회전하므로
+  // CSS 회전까지 더하면 180° 이중 회전이 됨 → 뷰포트 방향을 보고 분기
+  const [viewportPortrait, setViewportPortrait] = useState(
+    window.innerHeight >= window.innerWidth
+  )
+  useEffect(() => {
+    const onResize = () => setViewportPortrait(window.innerHeight >= window.innerWidth)
+    window.addEventListener('resize', onResize)
+    window.addEventListener('orientationchange', onResize)
+    return () => {
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('orientationchange', onResize)
+    }
+  }, [])
+
   // 페이지 진입 시 카메라 켜기
   useEffect(() => {
     camera.startPreview('front').then(() => {
@@ -173,7 +189,7 @@ export default function MissionCameraPage() {
       : `눌러서 촬영 (${VIDEO_MIN_S}~${VIDEO_MAX_S}초)`
 
   return (
-    <div className={[styles.page, styles.rotated].join(' ')}>
+    <div className={[styles.page, viewportPortrait ? styles.rotated : ''].join(' ')}>
 
       {/* ── 카메라 / 리뷰 영상 (풀스크린 배경) ─────────────────────────────────── */}
       <div className={styles.videoWrap} ref={videoWrapRef}>
