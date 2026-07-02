@@ -383,6 +383,10 @@ export interface CollectionRecordItem {
   date: string
   thumbnail: string        // collection_records.thumbnail
   videoUrl: string         // submissions.video_url (joined via submission_id)
+  /** 폰 가로 촬영 여부 — 재생 시 회전 보정용 */
+  horizontal?: boolean
+  /** 촬영 카메라 — "user"(전면) | "environment"(후면). 회전 보정용 */
+  facingMode?: 'user' | 'environment'
 }
 
 /**

@@ -10,11 +10,19 @@ function toHttps(url: string | null | undefined): string | null {
   return url.replace(/^http:\/\//, 'https://')
 }
 
+/** 폰 가로 촬영 raw 영상 재생 시 카메라별 회전 보정 클래스 (제출 전 미리보기와 동일) */
+function rotationClass(r: CollectionRecordItem): string {
+  if (!r.horizontal) return ''
+  if (r.facingMode === 'user')        return styles.playerFront
+  if (r.facingMode === 'environment') return styles.playerBack
+  return ''
+}
+
 export default function CollectionDetailPage() {
   const { missionId }             = useParams<{ missionId: string }>()
   const [detail, setDetail]       = useState<CollectionDetailResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [playingUrl, setPlayingUrl] = useState<string | null>(null)
+  const [playing, setPlaying] = useState<CollectionRecordItem | null>(null)
 
   useEffect(() => {
     if (!missionId) return
@@ -81,7 +89,7 @@ export default function CollectionDetailPage() {
                       <button
                         key={r.recordId}
                         className={styles.photoCell}
-                        onClick={() => video && setPlayingUrl(video)}
+                        onClick={() => video && setPlaying(r)}
                         disabled={!video}
                       >
                         {video ? (
@@ -120,12 +128,12 @@ export default function CollectionDetailPage() {
         )}
       </div>
 
-      {playingUrl && (
-        <div className={styles.videoOverlay} onClick={() => setPlayingUrl(null)}>
-          <button className={styles.videoClose} onClick={() => setPlayingUrl(null)} aria-label="닫기">✕</button>
+      {playing && (
+        <div className={styles.videoOverlay} onClick={() => setPlaying(null)}>
+          <button className={styles.videoClose} onClick={() => setPlaying(null)} aria-label="닫기">✕</button>
           <video
-            src={playingUrl}
-            className={styles.videoPlayer}
+            src={toHttps(playing.videoUrl) ?? undefined}
+            className={[styles.videoPlayer, rotationClass(playing)].join(' ')}
             controls
             autoPlay
             playsInline
