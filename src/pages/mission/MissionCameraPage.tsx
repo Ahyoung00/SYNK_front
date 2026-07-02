@@ -24,9 +24,10 @@ export default function MissionCameraPage() {
   const [hasMultiCam, setHasMultiCam] = useState(false)
   const [secondsLeft, setSecondsLeft] = useState(active?.seconds_left ?? 0)
 
-  // 페이지 진입 시 카메라 켜기
+  // 페이지 진입 시 가로 화면 고정 + 카메라 켜기
   useEffect(() => {
-    // 권한 부여 후 enumerateDevices를 해야 카메라 개수가 정확히 잡힘
+    screen.orientation?.lock?.('landscape').catch(() => {})
+
     camera.startPreview('front').then(() => {
       navigator.mediaDevices?.enumerateDevices?.()
         .then((devices) => {
@@ -36,6 +37,7 @@ export default function MissionCameraPage() {
         .catch(() => setHasMultiCam(false))
     })
     return () => {
+      screen.orientation?.unlock?.()
       camera.stopPreview()
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
