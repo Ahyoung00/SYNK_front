@@ -109,12 +109,17 @@ export default function MissionCameraPage() {
         headers: { 'Content-Type': 'video/mp4' },
       })
 
+      // 녹화된 영상의 실제 픽셀 크기 (Lambda 콜라주 회전 판단 기준)
+      const vw = reviewRef.current?.videoWidth ?? 0
+      const vh = reviewRef.current?.videoHeight ?? 0
+
       await missionApi.submitVideo({
         missionId:  mission.id,
         videoUrl:   fileUrl,
         roomId:     Number(roomId) || room.id,
-        // 회전 보정 없이 보이는 그대로 저장 (Lambda/도감 재생도 회전 안 함)
-        horizontal: false,
+        width:      vw,
+        height:     vh,
+        horizontal: vw > vh,
         facingMode: camera.facingMode,
       })
     } catch (e) {

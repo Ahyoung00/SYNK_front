@@ -198,9 +198,13 @@ export const missionApi = {
     /** 스토리지 업로드 완료 후 받은 URL (3~5초 영상) */
     videoUrl: string
     roomId: number
-    /** raw 스트림 width > height 인 경우 true — Lambda transpose 적용 여부 */
+    /** 녹화된 영상의 실제 픽셀 width > height 인 경우 true — Lambda 회전 판단 기준 */
     horizontal: boolean
-    /** 사용한 카메라 — "user"(전면/셀카) | "environment"(후면). 회전 보정용 */
+    /** 녹화된 영상의 실제 픽셀 가로 크기 */
+    width: number
+    /** 녹화된 영상의 실제 픽셀 세로 크기 */
+    height: number
+    /** 사용한 카메라 — "user"(전면/셀카) | "environment"(후면). 회전 방향·미러 판단용 */
     facingMode: 'user' | 'environment'
   }) => api.post<SubmissionCreatedResponse>('/submissions', data),
 
