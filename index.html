@@ -42,21 +42,6 @@
         var isInApp = /KAKAOTALK|KAKAO|Line\/|Instagram|FBAN|FBAV|Twitter|Snapchat|Musical/i.test(ua);
         if (!isInApp) return;
 
-        var url = location.href;
-        var host = location.host;
-
-        /* Safari로 열기: KakaoTalk iOS는 safari-https:// 스킴으로 Safari 강제 실행 */
-        function openInSafari() {
-          var isKakao = /KAKAOTALK|KAKAO/i.test(ua);
-          var isIOS   = /iPhone|iPad|iPod/i.test(ua);
-          if (isKakao && isIOS) {
-            location.href = url.replace(/^https?:\/\//, 'safari-https://');
-          } else {
-            window.open(url, '_blank');
-          }
-          return false;
-        }
-
         var S = function(el, css) { el.style.cssText = css; };
         var E = function(tag, css, html) {
           var el = document.createElement(tag);
@@ -156,23 +141,9 @@
           '메뉴에서 <strong style="color:#fff">"홈 화면에 추가"</strong>를 탭하면 앱이 설치돼요.'
         ));
 
-        /* ── Safari로 열기 버튼 ── */
-        var btn = E('a', [
-          'display:flex;align-items:center;justify-content:center;gap:10px;',
-          'width:100%;max-width:360px;height:58px;margin-top:6px;',
-          'border-radius:16px;',
-          'background:linear-gradient(135deg,#3b82f6,#6366f1);',
-          'color:#fff;font-size:17px;font-weight:800;text-decoration:none;',
-          'box-shadow:0 8px 24px rgba(99,102,241,.4);',
-        ].join(''));
-        btn.href = url;
-        btn.innerHTML = compassSvg + 'Safari로 열기';
-        btn.onclick = openInSafari;
-        document.body.appendChild(btn);
-
         document.body.appendChild(E('p', [
-          'font-size:11px;color:rgba(255,255,255,.25);margin:14px 0 0;text-align:center;',
-        ].join(''), '설치 후에도 ' + host + ' 으로 접속할 수 있어요'));
+          'font-size:11px;color:rgba(255,255,255,.2);margin:16px 0 0;text-align:center;',
+        ].join(''), '설치 후에도 synk-front.vercel.app 으로 접속할 수 있어요'));
       })();
     </script>
     <div id="root"></div>
