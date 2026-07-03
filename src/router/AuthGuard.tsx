@@ -8,8 +8,6 @@ export function AuthGuard() {
   const location        = useLocation()
   useFcm()
   if (isAuthenticated) return <Outlet />
-  const onboarded   = localStorage.getItem('synk_onboarded')
-  const redirectTo  = location.pathname + location.search
-  const target      = onboarded ? '/login' : '/onboarding'
-  return <Navigate to={target} state={{ redirectTo }} replace />
+  const redirectTo = location.pathname + location.search
+  return <Navigate to="/onboarding" state={{ redirectTo }} replace />
 }
