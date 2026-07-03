@@ -98,6 +98,23 @@ export default function SynklogCompletePage() {
           /* ── 생성 중 상태 ── */
           <>
             <Loading label="SYNKLOG 생성 중" />
+
+            {/* 선택한 콜라주 썸네일 row */}
+            {selectedCollages.length > 0 && (
+              <div className={styles.thumbRow}>
+                {selectedCollages.slice(0, 4).map((c) => (
+                  <div key={c.missionId} className={styles.thumb}>
+                    {c.thumbnail
+                      ? <img src={c.thumbnail} alt={c.missionTitle} className={styles.thumbImg} />
+                      : <div className={styles.thumbEmpty} />
+                    }
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {dateLabel && <p className={styles.dateLabel}>{dateLabel}</p>}
+
             <p className={styles.processingHint}>
               콜라주 영상을 이어붙이고 있어요. 잠시만 기다려주세요 🎬
             </p>
