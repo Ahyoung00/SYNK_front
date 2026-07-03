@@ -55,7 +55,7 @@ export default function SynklogDateSelectPage() {
   type GridEntry = {
     isToday: boolean
     date: string
-    count: number
+    count: number | null
     thumb: string | null
   }
 
@@ -64,7 +64,7 @@ export default function SynklogDateSelectPage() {
     ...past.map((a) => ({
       isToday: false,
       date:    a.date,
-      count:   a.collageCount ?? 0,
+      count:   null,
       thumb:   toHttps(a.thumbnail),
     })),
   ]
@@ -118,16 +118,20 @@ export default function SynklogDateSelectPage() {
 
                       {entry.isToday && <span className={styles.todayBadge}>오늘</span>}
                       <span className={styles.checkCircle} />
-                      <span className={styles.countBadge}>
-                        <FilmIcon />
-                        {entry.count}
-                      </span>
+                      {entry.count !== null && (
+                        <span className={styles.countBadge}>
+                          <FilmIcon />
+                          {entry.count}
+                        </span>
+                      )}
                     </div>
 
                     {/* 날짜·개수 */}
                     <div className={styles.cardInfo}>
                       <span className={styles.cardDate}>{entry.date}</span>
-                      <span className={styles.cardCount}>콜라주 {entry.count}개</span>
+                      {entry.count !== null && (
+                        <span className={styles.cardCount}>콜라주 {entry.count}개</span>
+                      )}
                     </div>
                   </button>
                 )
