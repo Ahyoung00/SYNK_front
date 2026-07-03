@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { albumApi } from '@/services/api/endpoints'
 import type { CollageItem } from '@/types'
+import Loading from '@/components/ui/Loading'
 import styles from './SynklogCompletePage.module.css'
 
 interface LocationState {
@@ -93,63 +94,60 @@ export default function SynklogCompletePage() {
       </button>
 
       <div className={styles.inner}>
-        {/* 플레이 아이콘 */}
-        <div className={styles.playIconWrap}>
-          <div className={styles.playIconGlow} />
-          <div className={styles.playIcon}>
-            <svg width="44" height="44" viewBox="0 0 24 24" fill="#fff" aria-hidden>
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          </div>
-        </div>
-
-        {/* 완성 문구 */}
-        <h1 className={styles.title}>오늘의 SYNKLOG가<br />완성됐어요!</h1>
-        <p className={styles.sub}>
-          {selectedCollages.length}개의 콜라주가 하나의<br />추억 영상이 되었어요 ✨
-        </p>
-
-        {/* 선택한 콜라주 썸네일 row */}
-        {selectedCollages.length > 0 && (
-          <div className={styles.thumbRow}>
-            {selectedCollages.slice(0, 4).map((c) => (
-              <div key={c.missionId} className={styles.thumb}>
-                {c.thumbnail
-                  ? <img src={c.thumbnail} alt={c.missionTitle} className={styles.thumbImg} />
-                  : <div className={styles.thumbEmpty} />
-                }
+        {processing ? (
+          /* ── 생성 중 상태 ── */
+          <>
+            <Loading label="SYNKLOG 생성 중" />
+            <p className={styles.processingHint}>
+              콜라주 영상을 이어붙이고 있어요. 잠시만 기다려주세요 🎬
+            </p>
+          </>
+        ) : (
+          /* ── 완료 상태 ── */
+          <>
+            {/* 플레이 아이콘 */}
+            <div className={styles.playIconWrap}>
+              <div className={styles.playIconGlow} />
+              <div className={styles.playIcon}>
+                <svg width="44" height="44" viewBox="0 0 24 24" fill="#fff" aria-hidden>
+                  <path d="M8 5v14l11-7z" />
+                </svg>
               </div>
-            ))}
-          </div>
-        )}
+            </div>
 
-        {/* 날짜 */}
-        {dateLabel && <p className={styles.dateLabel}>{dateLabel}</p>}
+            {/* 완성 문구 */}
+            <h1 className={styles.title}>오늘의 SYNKLOG가<br />완성됐어요!</h1>
+            <p className={styles.sub}>
+              {selectedCollages.length}개의 콜라주가 하나의<br />추억 영상이 되었어요 ✨
+            </p>
 
-        {/* 버튼 */}
-        <div className={styles.btns}>
-          <button
-            className={styles.primaryBtn}
-            onClick={handleViewVideo}
-            disabled={processing}
-          >
-            {processing ? (
-              <span className={styles.processingLabel}>
-                <span className={styles.spinner} />
-                영상 생성 중…
-              </span>
-            ) : '영상 보기'}
-          </button>
-          <button className={styles.secondaryBtn} onClick={handleShare} disabled={processing}>
-            공유하기
-          </button>
-        </div>
+            {/* 선택한 콜라주 썸네일 row */}
+            {selectedCollages.length > 0 && (
+              <div className={styles.thumbRow}>
+                {selectedCollages.slice(0, 4).map((c) => (
+                  <div key={c.missionId} className={styles.thumb}>
+                    {c.thumbnail
+                      ? <img src={c.thumbnail} alt={c.missionTitle} className={styles.thumbImg} />
+                      : <div className={styles.thumbEmpty} />
+                    }
+                  </div>
+                ))}
+              </div>
+            )}
 
-        {/* 처리 중 안내 */}
-        {processing && (
-          <p className={styles.processingHint}>
-            콜라주 영상을 이어붙이고 있어요. 잠시만 기다려주세요 🎬
-          </p>
+            {/* 날짜 */}
+            {dateLabel && <p className={styles.dateLabel}>{dateLabel}</p>}
+
+            {/* 버튼 */}
+            <div className={styles.btns}>
+              <button className={styles.primaryBtn} onClick={handleViewVideo}>
+                영상 보기
+              </button>
+              <button className={styles.secondaryBtn} onClick={handleShare}>
+                공유하기
+              </button>
+            </div>
+          </>
         )}
       </div>
     </div>
