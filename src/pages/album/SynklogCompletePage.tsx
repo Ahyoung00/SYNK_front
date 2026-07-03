@@ -149,7 +149,6 @@ export default function SynklogCompletePage() {
           <>
             {/* 앱 로고 */}
             <div className={styles.playIconWrap}>
-              <div className={styles.playIconGlow} />
               <img src="/icon-192.png" alt="SYNK" className={styles.appLogo} />
             </div>
 
