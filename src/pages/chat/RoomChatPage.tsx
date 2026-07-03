@@ -86,6 +86,7 @@ export default function RoomChatPage() {
   const inputRef       = useRef<HTMLTextAreaElement>(null)
   const isAtBottomRef  = useRef(true)
   const loaded         = useRef(false)
+  const [kbOffset, setKbOffset] = useState(0)
 
   // ── 메시지 목록 API 조회 + WebSocket 연결 ────────────────────────────────
   useEffect(() => {
@@ -154,6 +155,28 @@ export default function RoomChatPage() {
       loaded.current = false
     }
   }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── iOS 키보드 대응: visualViewport 높이 변화로 offset 계산 ──────────────
+  useEffect(() => {
+    const vv = window.visualViewport
+    if (!vv) return
+    const update = () => {
+      const offset = window.innerHeight - vv.height - vv.offsetTop
+      setKbOffset(Math.max(0, offset))
+      if (isAtBottomRef.current) {
+        requestAnimationFrame(() => {
+          const el = listRef.current
+          if (el) el.scrollTop = el.scrollHeight
+        })
+      }
+    }
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+    }
+  }, [])
 
   // ── 초기 스크롤 (즉시) ────────────────────────────────────────────────────
   useEffect(() => {
@@ -269,7 +292,7 @@ export default function RoomChatPage() {
       </div>
 
       {/* ── 입력창 ───────────────────────────────────────────────────────── */}
-      <div className={styles.inputBar}>
+      <div className={styles.inputBar} style={kbOffset > 0 ? { marginBottom: kbOffset } : undefined}>
         <textarea
           ref={inputRef}
           className={styles.input}
