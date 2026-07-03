@@ -1,0 +1,198 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--page-bg);
+}
+
+/* ── 헤더 ─────────────────────────────────────────────────────────────────── */
+.header {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  align-items: center;
+  padding: calc(var(--safe-top) + var(--sp-3)) var(--sp-4) var(--sp-3);
+  flex-shrink: 0;
+}
+
+.backBtn {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+}
+
+.headerTitle {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+}
+
+.headerRight { width: 40px; }
+
+/* ── 스크롤 ───────────────────────────────────────────────────────────────── */
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.scroll > * { flex-shrink: 0; }
+
+/* ── 타이틀 블록 ──────────────────────────────────────────────────────────── */
+.titleBlock {
+  padding: 8px 2px 18px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--ink);
+  line-height: 1.3;
+  margin: 0 0 10px;
+}
+
+.hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--ink-sub);
+}
+
+.hintLine {
+  width: 24px;
+  height: 2px;
+  background: linear-gradient(90deg, #FF6B9D, #FF4757);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── 2열 그리드 ───────────────────────────────────────────────────────────── */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  padding-bottom: 8px;
+}
+
+/* ── 날짜 카드 ────────────────────────────────────────────────────────────── */
+.card {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255,255,255,.04);
+  border: 1.5px solid rgba(255,255,255,.08);
+  display: flex;
+  flex-direction: column;
+  -webkit-tap-highlight-color: transparent;
+  transition: opacity 0.12s;
+  text-align: left;
+}
+
+.card:active { opacity: 0.8; }
+
+.cardToday {
+  border-color: #FF8C42;
+}
+
+/* 썸네일 영역 */
+.thumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  background: rgba(124,111,240,.12);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbPlaceholder {
+  color: rgba(255,255,255,.2);
+}
+
+/* 카운트 뱃지 (우하단) */
+.countBadge {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: rgba(0,0,0,.55);
+  backdrop-filter: blur(4px);
+  border-radius: 6px;
+  padding: 3px 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+/* 오늘 뱃지 (좌상단) */
+.todayBadge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: linear-gradient(135deg, #FF8C42, #FF4757);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+}
+
+/* 선택 원 (우상단) */
+.checkCircle {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.45);
+  background: transparent;
+}
+
+/* ── 카드 하단 정보 ───────────────────────────────────────────────────────── */
+.cardInfo {
+  padding: 10px 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cardDate {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.cardCount {
+  font-size: 11px;
+  color: var(--ink-sub);
+  font-weight: 500;
+}
+
+/* ── 빈 상태 ──────────────────────────────────────────────────────────────── */
+.empty {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--ink-muted);
+  padding: 60px 0;
+}
