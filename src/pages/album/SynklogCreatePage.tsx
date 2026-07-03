@@ -64,12 +64,6 @@ export default function SynklogCreatePage() {
   const dateLabel = date.replace(/-/g, '.')
     .replace(/^(\d{4})\.(\d{2})\.(\d{2})$/, '$1년 $2월 $3일')
 
-  function formatTime(iso: string | null) {
-    if (!iso) return ''
-    const d = new Date(iso)
-    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`
-  }
-
   return (
     <div className={styles.page}>
       {/* 헤더 */}
@@ -119,11 +113,6 @@ export default function SynklogCreatePage() {
                         </svg>
                       </div>
                   }
-
-                  {/* 시간 (좌상단) */}
-                  {c.missionStartAt && (
-                    <span className={styles.cardTime}>{formatTime(c.missionStartAt)}</span>
-                  )}
 
                   {/* 체크박스 (우상단) */}
                   <span className={[styles.cardCheck, isOn ? styles.cardCheckOn : ''].join(' ')}>
