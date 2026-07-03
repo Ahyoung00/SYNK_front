@@ -50,6 +50,7 @@ export const ROUTES = {
   INVITE: (code: string) => `/invite/${code}`,
 
   // Synklog 생성 플로우
+  SYNKLOG_DATE_SELECT: (roomId: number | string) => `/room/${roomId}/synklog`,
   SYNKLOG_CREATE: (roomId: number | string) => `/room/${roomId}/synklog/create`,
   SYNKLOG_COMPLETE: (roomId: number | string) => `/room/${roomId}/synklog/complete`,
 

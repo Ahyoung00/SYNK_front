@@ -275,12 +275,10 @@ export default function RoomPage() {
         )}
 
         {/* ── Synklog 배너 ─────────────────────────────────────────────────── */}
-        {todayCollages.filter((c) => c.status === 'COMPLETED').length > 0 && (
+        {(
           <button
             className={styles.synklogBanner}
-            onClick={() => navigate(ROUTES.SYNKLOG_CREATE(id), {
-              state: { date: new Date().toISOString().slice(0, 10) },
-            })}
+            onClick={() => navigate(ROUTES.SYNKLOG_DATE_SELECT(id))}
           >
             <div className={styles.synklogBannerIcon}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -289,9 +287,7 @@ export default function RoomPage() {
             </div>
             <div className={styles.synklogBannerText}>
               <span className={styles.synklogBannerTitle}>오늘을 Synklog로 남기기</span>
-              <span className={styles.synklogBannerSub}>
-                콜라주 {todayCollages.filter((c) => c.status === 'COMPLETED').length}개 · 하나의 추억 영상으로
-              </span>
+              <span className={styles.synklogBannerSub}>날짜를 선택해 추억 영상으로 만들어요</span>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M9 6l6 6-6 6" />
