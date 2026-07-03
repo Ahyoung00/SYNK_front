@@ -7,6 +7,8 @@
            max(var(--sp-8), env(safe-area-inset-bottom));
   gap: var(--sp-10);
   position: relative;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .backBtn {
