@@ -286,7 +286,7 @@ export default function RoomPage() {
               </svg>
             </div>
             <div className={styles.synklogBannerText}>
-              <span className={styles.synklogBannerTitle}>오늘을 Synklog로 남기기</span>
+              <span className={styles.synklogBannerTitle}>Synklog 생성하기</span>
               <span className={styles.synklogBannerSub}>날짜를 선택해 추억 영상으로 만들어요</span>
             </div>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
