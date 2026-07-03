@@ -136,14 +136,10 @@ export default function SynklogCompletePage() {
         ) : (
           /* ── 완료 상태 ── */
           <>
-            {/* 플레이 아이콘 */}
+            {/* 앱 로고 */}
             <div className={styles.playIconWrap}>
               <div className={styles.playIconGlow} />
-              <div className={styles.playIcon}>
-                <svg width="44" height="44" viewBox="0 0 24 24" fill="#fff" aria-hidden>
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </div>
+              <img src="/icon-192.png" alt="SYNK" className={styles.appLogo} />
             </div>
 
             {/* 완성 문구 */}
