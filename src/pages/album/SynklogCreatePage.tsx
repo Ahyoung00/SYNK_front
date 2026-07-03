@@ -42,7 +42,7 @@ export default function SynklogCreatePage() {
     if (submitting || selected.size === 0) return
     setSubmitting(true)
     try {
-      const res = await albumApi.createSynklog(id, date)
+      const res = await albumApi.createSynklog(id, date, { missionIds: [...selected] })
       navigate(ROUTES.SYNKLOG_COMPLETE(id), {
         replace: true,
         state: {

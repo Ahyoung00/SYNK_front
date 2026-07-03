@@ -257,11 +257,11 @@ export const albumApi = {
 
   /**
    * SYNKLOG 생성 요청 — POST /rooms/{roomId}/albums/{date}/synklog
-   * Request: 없음
+   * Request: { missionIds: number[] }
    * Response: { synklogId, status: "PROCESSING" | "COMPLETED" }
    */
-  createSynklog: (roomId: number, date: string) =>
-    api.post<SynklogCreatedResponse>(`/rooms/${roomId}/albums/${date}/synklog`),
+  createSynklog: (roomId: number, date: string, body?: { missionIds: number[] }) =>
+    api.post<SynklogCreatedResponse>(`/rooms/${roomId}/albums/${date}/synklog`, body),
 }
 
 // ── Chat ──────────────────────────────────────────────────────────────────────
