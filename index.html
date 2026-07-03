@@ -45,6 +45,18 @@
         var url = location.href;
         var host = location.host;
 
+        /* Safari로 열기: KakaoTalk iOS는 safari-https:// 스킴으로 Safari 강제 실행 */
+        function openInSafari() {
+          var isKakao = /KAKAOTALK|KAKAO/i.test(ua);
+          var isIOS   = /iPhone|iPad|iPod/i.test(ua);
+          if (isKakao && isIOS) {
+            location.href = url.replace(/^https?:\/\//, 'safari-https://');
+          } else {
+            window.open(url, '_blank');
+          }
+          return false;
+        }
+
         var S = function(el, css) { el.style.cssText = css; };
         var E = function(tag, css, html) {
           var el = document.createElement(tag);
@@ -54,9 +66,9 @@
         };
 
         /* ── 전체 배경 ── */
-        S(document.documentElement, 'height:100%;margin:0;padding:0;');
+        S(document.documentElement, 'min-height:100%;margin:0;padding:0;');
         S(document.body, [
-          'min-height:100%;margin:0;padding:0;box-sizing:border-box;',
+          'min-height:100vh;margin:0;padding:0;box-sizing:border-box;overflow-y:auto;',
           'background:linear-gradient(160deg,#0f1a3a 0%,#0a1128 60%,#060c1e 100%);',
           'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;',
           'color:#fff;display:flex;flex-direction:column;align-items:center;',
@@ -155,7 +167,7 @@
         ].join(''));
         btn.href = url;
         btn.innerHTML = compassSvg + 'Safari로 열기';
-        btn.onclick = function() { window.open(url, '_blank'); return false; };
+        btn.onclick = openInSafari;
         document.body.appendChild(btn);
 
         document.body.appendChild(E('p', [
