@@ -134,6 +134,27 @@
   transition: opacity 0.15s;
 }
 .primaryBtn:active { opacity: 0.85; }
+.primaryBtn:disabled { opacity: 0.5; cursor: default; }
+
+.processingLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
 .secondaryBtn {
   width: 100%;
@@ -147,3 +168,4 @@
   transition: opacity 0.15s;
 }
 .secondaryBtn:active { opacity: 0.7; }
+.secondaryBtn:disabled { opacity: 0.35; cursor: default; }

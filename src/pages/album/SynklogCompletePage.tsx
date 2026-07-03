@@ -1,6 +1,8 @@
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import type { CollageItem } from '@/types'
 import { ROUTES } from '@/constants'
+import { albumApi } from '@/services/api/endpoints'
 import styles from './SynklogCompletePage.module.css'
 
 interface LocationState {
@@ -9,11 +11,43 @@ interface LocationState {
   selectedCollages: CollageItem[]
 }
 
+const POLL_INTERVAL = 3000
+const POLL_TIMEOUT  = 5 * 60 * 1000
+
 export default function SynklogCompletePage() {
   const navigate = useNavigate()
   const { roomId } = useParams<{ roomId: string }>()
   const { state } = useLocation()
   const { date, selectedCollages = [] } = (state ?? {}) as Partial<LocationState>
+
+  const [videoUrl, setVideoUrl]     = useState<string | null>(null)
+  const [processing, setProcessing] = useState(true)
+  const timerRef  = useRef<ReturnType<typeof setInterval> | null>(null)
+  const startedAt = useRef(Date.now())
+
+  useEffect(() => {
+    if (!roomId || !date) return
+
+    const poll = async () => {
+      if (Date.now() - startedAt.current > POLL_TIMEOUT) {
+        clearInterval(timerRef.current!)
+        setProcessing(false)
+        return
+      }
+      try {
+        const res = await albumApi.getSynklog(Number(roomId), date)
+        if (res.data.status === 'COMPLETED' && res.data.synklogVideoUrl) {
+          clearInterval(timerRef.current!)
+          setVideoUrl(res.data.synklogVideoUrl)
+          setProcessing(false)
+        }
+      } catch { /* 무시 */ }
+    }
+
+    poll()
+    timerRef.current = setInterval(poll, POLL_INTERVAL)
+    return () => clearInterval(timerRef.current!)
+  }, [roomId, date])
 
   const dateLabel = date
     ? date.replace(/^(\d{4})-(\d{2})-(\d{2})$/, '$1. $2. $3')
@@ -21,7 +55,11 @@ export default function SynklogCompletePage() {
 
   function handleViewVideo() {
     if (!date || !roomId) return
-    navigate(ROUTES.ROOM_SYNKLOG(roomId, date))
+    if (videoUrl) {
+      window.open(videoUrl, '_blank')
+    } else {
+      navigate(ROUTES.ROOM_SYNKLOG(roomId, date))
+    }
   }
 
   async function handleShare() {
@@ -76,10 +114,19 @@ export default function SynklogCompletePage() {
 
         {/* 버튼 */}
         <div className={styles.btns}>
-          <button className={styles.primaryBtn} onClick={handleViewVideo}>
-            영상 보기
+          <button
+            className={styles.primaryBtn}
+            onClick={handleViewVideo}
+            disabled={processing}
+          >
+            {processing ? (
+              <span className={styles.processingLabel}>
+                <span className={styles.spinner} />
+                영상 생성 중…
+              </span>
+            ) : '영상 보기'}
           </button>
-          <button className={styles.secondaryBtn} onClick={handleShare}>
+          <button className={styles.secondaryBtn} onClick={handleShare} disabled={processing}>
             공유하기
           </button>
         </div>
