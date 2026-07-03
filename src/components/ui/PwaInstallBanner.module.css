@@ -97,6 +97,48 @@
 }
 
 /* ── iOS 가이드 시트 ──────────────────────────────────────────────────────── */
+/* ── Android 인앱 브라우저 스텝 ──────────────────────────────────────────── */
+.inappSteps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.inappStep {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: 10px 14px;
+}
+
+.inappStepNum {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #46D7FF, #9B6BFF);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.inappStepText {
+  font-size: 13px;
+  color: var(--ink-sub, rgba(255,255,255,.65));
+  line-height: 1.4;
+}
+
+.inappStepText strong {
+  color: var(--ink, #fff);
+}
+
 .guideTitle {
   font-size: 17px;
   font-weight: 800;
