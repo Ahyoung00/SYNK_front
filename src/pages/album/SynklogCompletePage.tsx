@@ -1,8 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
-import type { CollageItem } from '@/types'
-import { ROUTES } from '@/constants'
 import { albumApi } from '@/services/api/endpoints'
+import type { CollageItem } from '@/types'
 import styles from './SynklogCompletePage.module.css'
 
 interface LocationState {
@@ -22,6 +21,8 @@ export default function SynklogCompletePage() {
 
   const [videoUrl, setVideoUrl]     = useState<string | null>(null)
   const [processing, setProcessing] = useState(true)
+  const [showPlayer, setShowPlayer] = useState(false)
+  const videoRef  = useRef<HTMLVideoElement | null>(null)
   const timerRef  = useRef<ReturnType<typeof setInterval> | null>(null)
   const startedAt = useRef(Date.now())
 
@@ -54,12 +55,9 @@ export default function SynklogCompletePage() {
     : ''
 
   function handleViewVideo() {
-    if (!date || !roomId) return
-    if (videoUrl) {
-      window.open(videoUrl, '_blank')
-    } else {
-      navigate(ROUTES.ROOM_SYNKLOG(roomId, date))
-    }
+    if (!videoUrl) return
+    setShowPlayer(true)
+    setTimeout(() => videoRef.current?.play(), 100)
   }
 
   async function handleShare() {
@@ -72,12 +70,28 @@ export default function SynklogCompletePage() {
 
   return (
     <div className={styles.page}>
+      {/* 인라인 비디오 플레이어 오버레이 */}
+      {showPlayer && videoUrl && (
+        <div className={styles.playerOverlay} onClick={() => setShowPlayer(false)}>
+          <video
+            ref={videoRef}
+            src={videoUrl}
+            className={styles.playerVideo}
+            controls
+            playsInline
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button className={styles.playerClose} onClick={() => setShowPlayer(false)}>✕</button>
+        </div>
+      )}
+
       <button className={styles.backBtn} onClick={() => navigate(-1)} aria-label="뒤로">
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M19 12H5M12 5l-7 7 7 7" />
         </svg>
       </button>
+
       <div className={styles.inner}>
         {/* 플레이 아이콘 */}
         <div className={styles.playIconWrap}>
@@ -130,6 +144,13 @@ export default function SynklogCompletePage() {
             공유하기
           </button>
         </div>
+
+        {/* 처리 중 안내 */}
+        {processing && (
+          <p className={styles.processingHint}>
+            콜라주 영상을 이어붙이고 있어요. 잠시만 기다려주세요 🎬
+          </p>
+        )}
       </div>
     </div>
   )

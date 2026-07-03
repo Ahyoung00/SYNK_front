@@ -21,6 +21,7 @@
   align-items: center;
   justify-content: center;
   color: rgba(255,255,255,0.7);
+  background: transparent;
 }
 
 .inner {
@@ -132,6 +133,10 @@
   font-size: 16px;
   font-weight: 800;
   transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .primaryBtn:active { opacity: 0.85; }
 .primaryBtn:disabled { opacity: 0.5; cursor: default; }
@@ -169,3 +174,44 @@
 }
 .secondaryBtn:active { opacity: 0.7; }
 .secondaryBtn:disabled { opacity: 0.35; cursor: default; }
+
+/* ── 처리 중 안내 ──────────────────────────────────────────────────────────────── */
+.processingHint {
+  margin-top: 16px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+  text-align: center;
+  line-height: 1.5;
+}
+
+/* ── 인라인 비디오 플레이어 오버레이 ─────────────────────────────────────────── */
+.playerOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.playerVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.playerClose {
+  position: absolute;
+  top: calc(var(--safe-top, env(safe-area-inset-top)) + 12px);
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
