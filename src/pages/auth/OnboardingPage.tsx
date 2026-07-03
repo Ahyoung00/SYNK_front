@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import styles from './OnboardingPage.module.css'
 
@@ -21,19 +21,21 @@ const SLIDES = [
   },
 ]
 
-function goLogin(navigate: ReturnType<typeof useNavigate>) {
-  localStorage.setItem('synk_onboarded', '1')
-  navigate(ROUTES.LOGIN, { replace: true })
-}
-
 export default function OnboardingPage() {
-  const navigate = useNavigate()
+  const navigate  = useNavigate()
+  const location  = useLocation()
+  const redirectTo = (location.state as { redirectTo?: string } | null)?.redirectTo
   const [idx, setIdx] = useState(0)
   const slide = SLIDES[idx]
 
+  function goLogin() {
+    localStorage.setItem('synk_onboarded', '1')
+    navigate(ROUTES.LOGIN, { replace: true, state: redirectTo ? { redirectTo } : undefined })
+  }
+
   function next() {
     if (idx < SLIDES.length - 1) setIdx(idx + 1)
-    else goLogin(navigate)
+    else goLogin()
   }
 
   return (
@@ -42,7 +44,7 @@ export default function OnboardingPage() {
       <div className={styles.glowB} />
       <div className={styles.grain} />
 
-      <button className={styles.skipBtn} onClick={() => goLogin(navigate)}>
+      <button className={styles.skipBtn} onClick={goLogin}>
         건너뛰기
       </button>
 
