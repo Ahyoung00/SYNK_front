@@ -65,6 +65,24 @@
   display: block;
 }
 
+/* 다운로드 버튼 (우상단 오버레이) */
+.downloadBtn {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(6px);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  z-index: 10;
+}
+
 /* collageVideoUrl 없을 때 처리중 상태 */
 .processingState {
   position: absolute;
