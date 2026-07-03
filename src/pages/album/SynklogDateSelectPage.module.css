@@ -154,17 +154,6 @@
   color: #fff;
 }
 
-/* 선택 원 (우상단) */
-.checkCircle {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  border: 2px solid rgba(255,255,255,.45);
-  background: transparent;
-}
 
 /* ── 카드 하단 정보 ───────────────────────────────────────────────────────── */
 .cardInfo {

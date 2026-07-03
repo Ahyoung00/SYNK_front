@@ -63,7 +63,7 @@ export default function SynklogCompletePage() {
   async function handleShare() {
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'SYNK', text: '오늘의 Synklog를 확인해보세요!' })
+        await navigator.share({ title: 'SYNK', text: '오늘의 SYNKLOG를 확인해보세요!' })
       } catch { /* 취소 */ }
     }
   }
@@ -104,7 +104,7 @@ export default function SynklogCompletePage() {
         </div>
 
         {/* 완성 문구 */}
-        <h1 className={styles.title}>오늘의 Synklog가<br />완성됐어요!</h1>
+        <h1 className={styles.title}>오늘의 SYNKLOG가<br />완성됐어요!</h1>
         <p className={styles.sub}>
           {selectedCollages.length}개의 콜라주가 하나의<br />추억 영상이 되었어요 ✨
         </p>

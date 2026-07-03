@@ -79,7 +79,7 @@ export default function SynklogCreatePage() {
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
-        <span className={styles.headerTitle}>Synklog 만들기</span>
+        <span className={styles.headerTitle}>SYNKLOG 만들기</span>
       </div>
 
       <div className={styles.content}>
@@ -153,7 +153,7 @@ export default function SynklogCreatePage() {
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
             <path d="M8 5v14l11-7z" />
           </svg>
-          {submitting ? '생성 중...' : `${selected.size}개 콜라주로 Synklog 생성`}
+          {submitting ? '생성 중...' : `${selected.size}개 콜라주로 SYNKLOG 생성`}
         </button>
       </div>
     </div>

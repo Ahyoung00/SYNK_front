@@ -86,10 +86,10 @@ export default function SynklogDateSelectPage() {
         <div className={styles.scroll}>
           {/* 타이틀 */}
           <div className={styles.titleBlock}>
-            <p className={styles.title}>Synklog로 남길<br />날짜를 골라주세요</p>
+            <p className={styles.title}>SYNKLOG로 남길<br />날짜를 골라주세요</p>
             <div className={styles.hint}>
               <span className={styles.hintLine} />
-              <span>Synklog가 없는 날만 표시돼요</span>
+              <span>SYNKLOG가 없는 날만 표시돼요</span>
             </div>
           </div>
 
@@ -117,7 +117,6 @@ export default function SynklogDateSelectPage() {
                       )}
 
                       {entry.isToday && <span className={styles.todayBadge}>오늘</span>}
-                      <span className={styles.checkCircle} />
                       {entry.count !== null && (
                         <span className={styles.countBadge}>
                           <FilmIcon />
