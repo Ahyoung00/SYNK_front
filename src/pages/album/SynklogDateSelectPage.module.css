@@ -98,7 +98,7 @@
 
 .card:active { opacity: 0.8; }
 
-.cardToday {
+.cardSelected {
   border-color: #FF8C42;
 }
 

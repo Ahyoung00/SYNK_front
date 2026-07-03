@@ -27,6 +27,7 @@ export default function SynklogDateSelectPage() {
   const [albums, setAlbums]               = useState<AlbumItem[]>([])
   const [todayCollages, setTodayCollages] = useState<CollageItem[]>([])
   const [isLoading, setIsLoading]         = useState(true)
+  const [selectedDate, setSelectedDate]   = useState<string>(todayDot)
 
   useEffect(() => {
     Promise.all([
@@ -41,8 +42,9 @@ export default function SynklogDateSelectPage() {
       .finally(() => setIsLoading(false))
   }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  function goCreate(date: string) {
-    navigate(ROUTES.SYNKLOG_CREATE(numRoomId), { state: { date } })
+  function selectDate(dotDate: string, urlDate: string) {
+    setSelectedDate(dotDate)
+    navigate(ROUTES.SYNKLOG_CREATE(numRoomId), { state: { date: urlDate } })
   }
 
   const todayCompleted = todayCollages.filter((c) => c.status === 'COMPLETED')
@@ -103,8 +105,8 @@ export default function SynklogDateSelectPage() {
                 return (
                   <button
                     key={entry.date}
-                    className={[styles.card, entry.isToday ? styles.cardToday : ''].join(' ')}
-                    onClick={() => goCreate(urlDate)}
+                    className={[styles.card, selectedDate === entry.date ? styles.cardSelected : ''].join(' ')}
+                    onClick={() => selectDate(entry.date, urlDate)}
                   >
                     {/* 썸네일 */}
                     <div className={styles.thumb}>
