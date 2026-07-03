@@ -63,10 +63,21 @@ export default function SynklogCompletePage() {
   }
 
   async function handleShare() {
+    const shareUrl = roomId && date
+      ? `${window.location.origin}/room/${roomId}/album/${date}`
+      : window.location.href
+
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'SYNK', text: '오늘의 SYNKLOG를 확인해보세요!' })
+        await navigator.share({
+          title: 'SYNK',
+          text: '오늘의 SYNKLOG를 확인해보세요!',
+          url: shareUrl,
+        })
       } catch { /* 취소 */ }
+    } else {
+      await navigator.clipboard.writeText(shareUrl)
+      alert('링크가 복사됐어요!')
     }
   }
 
