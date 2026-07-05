@@ -121,9 +121,9 @@
   color: var(--ink);
 }
 
-/* 라이트 모드: 활성 탭을 SYNK 로고의 진한 파랑으로 */
+/* 라이트 모드: 활성 탭을 토글 켜짐 색(그라데이션)과 동일하게 */
 :global(:root:not([data-theme="dark"])) .tabActive {
-  background: #3478F6;
+  background: var(--grad-action-2);
   color: #fff;
 }
 
