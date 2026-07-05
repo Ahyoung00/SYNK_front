@@ -200,9 +200,18 @@ export default function SynklogCompletePage() {
               <button className={styles.primaryBtn} onClick={handleViewVideo}>
                 영상 보기
               </button>
-              <button className={styles.secondaryBtn} onClick={handleShare}>
-                공유하기
-              </button>
+              <div className={styles.btnRow}>
+                <button className={styles.secondaryBtn} onClick={handleShare}>
+                  공유하기
+                </button>
+                <button
+                  className={styles.secondaryBtn}
+                  onClick={() => videoUrl && downloadVideo(videoUrl, `synklog-${date ?? 'video'}.mp4`)}
+                  disabled={!videoUrl}
+                >
+                  저장
+                </button>
+              </div>
             </div>
           </>
         )}
