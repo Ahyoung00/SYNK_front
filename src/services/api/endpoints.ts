@@ -11,6 +11,7 @@ import type {
   RoomChatListResponse,
   CollectionListResponse,
   CollectionDetailResponse,
+  MySynklogItem,
   LoginResponse,
   RefreshResponse,
   RoomCreatedResponse,
@@ -302,6 +303,8 @@ export const collectionApi = {
    */
   getMissionDetail: (missionId: number) =>
     api.get<CollectionDetailResponse>(`/collections/missions/${missionId}`),
+
+  getMySynklogs: () => api.get<MySynklogItem[]>('/collections/synklogs'),
 }
 
 // ── Debug (개발 전용) ──────────────────────────────────────────────────────────

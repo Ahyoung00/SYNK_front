@@ -1278,7 +1278,44 @@ app.post('/rooms/:id/chats', (req, res) => {
 // 도감 (Collections)
 // GET /collections                       — 내가 완료한 미션 목감 목록
 // GET /collections/missions/{missionId}  — 특정 미션 상세 + 내 기록
+// GET /collections/synklogs              — 내 Synklog 목록
 // =============================================================================
+
+// 내 Synklog 목록 — GET /collections/synklogs
+app.get('/collections/synklogs', (req, res) => {
+  const meId = getMeId(req)
+  // 내가 속한 방 목록
+  const myRoomIds = db().get('room_members').filter({ user_id: meId }).value().map((m) => m.room_id)
+  const rooms = db().get('rooms').value()
+
+  // 내 방들의 synklog만
+  const synklogs = db().get('synklogs')
+    .filter((s) => myRoomIds.includes(s.room_id))
+    .orderBy('date', 'desc')
+    .value()
+
+  const items = synklogs.map((s) => {
+    const room = rooms.find((r) => r.id === s.room_id)
+    // 같은 방·같은 날짜의 collages(=completed submissions) 썸네일 수집
+    const collages = db().get('collection_records')
+      .filter((r) => r.room_id === s.room_id && r.date === s.date)
+      .value()
+    const thumbnails = collages.map((c) => c.thumbnail).filter(Boolean).slice(0, 3)
+    const date = (s.date ?? '').replace(/-/g, '.')
+    return {
+      synklogId:    s.id,
+      roomId:       s.room_id,
+      roomName:     room?.name ?? '',
+      date,
+      collageCount: collages.length,
+      thumbnails,
+      videoUrl:     s.synklog_video_url ?? null,
+      status:       s.status ?? 'COMPLETED',
+    }
+  })
+
+  ok(res, items, 'Synklog 목록 조회 성공')
+})
 
 // 미션 상세 조회 — GET /collections/missions/{missionId}
 // ERD 기준: mission_templates + collection_records JOIN rooms + submissions

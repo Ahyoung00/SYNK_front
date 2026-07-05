@@ -2,12 +2,24 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { collectionApi } from '@/services/api/endpoints'
-import type { CollectionListResponse, CollectionMissionItem } from '@/types'
+import type { CollectionListResponse, CollectionMissionItem, MySynklogItem } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
 import Loading from '@/components/ui/Loading'
 import { missionGradient } from '@/utils/missionVisual'
 import styles from './CollectionPage.module.css'
 
+type TabType = 'mission' | 'synklog'
+
+// 카테고리 정의 (아직 백엔드 미지원 — 랜덤 배정)
+const CATEGORIES = [
+  { id: 'daily',  label: '일상',  color: '#46D7FF' },
+  { id: 'sense',  label: '감각',  color: '#9B6BFF' },
+  { id: 'place',  label: '장소',  color: '#2DDAB8' },
+] as const
+
+function getCategory(missionId: number) {
+  return CATEGORIES[missionId % CATEGORIES.length]
+}
 
 function RingChart({ rate }: { rate: number }) {
   const r = 38
@@ -15,31 +27,173 @@ function RingChart({ rate }: { rate: number }) {
   const offset = circumference * (1 - rate / 100)
   return (
     <svg width="92" height="92" viewBox="0 0 92 92" className={styles.ring}>
-        <defs>
-          <linearGradient id="ringGrad" x1="0" y1="0" x2="92" y2="92" gradientUnits="userSpaceOnUse">
-            <stop offset="0" stopColor="#46D7FF" />
-            <stop offset="1" stopColor="#9B6BFF" />
-          </linearGradient>
-        </defs>
-        <circle cx="46" cy="46" r={r} fill="none" stroke="var(--ring-track)" strokeWidth="9" />
-        <circle
-          cx="46" cy="46" r={r}
-          fill="none"
-          stroke="url(#ringGrad)"
-          strokeWidth="9"
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          transform="rotate(-90 46 46)"
-        />
-        <image href="/synk-bolt.png" x="20" y="20" width="52" height="52" />
-      </svg>
+      <defs>
+        <linearGradient id="ringGrad" x1="0" y1="0" x2="92" y2="92" gradientUnits="userSpaceOnUse">
+          <stop offset="0" stopColor="#46D7FF" />
+          <stop offset="1" stopColor="#9B6BFF" />
+        </linearGradient>
+      </defs>
+      <circle cx="46" cy="46" r={r} fill="none" stroke="var(--ring-track)" strokeWidth="9" />
+      <circle
+        cx="46" cy="46" r={r}
+        fill="none"
+        stroke="url(#ringGrad)"
+        strokeWidth="9"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={offset}
+        transform="rotate(-90 46 46)"
+      />
+      <image href="/synk-bolt.png" x="20" y="20" width="52" height="52" />
+    </svg>
+  )
+}
+
+// 카테고리별 미션 그룹
+function MissionTab({ data, isLoading }: { data: CollectionListResponse | null; isLoading: boolean }) {
+  const navigate = useNavigate()
+
+  if (isLoading) return <Loading />
+  if (!data || data.missions.length === 0) {
+    return <p className={styles.emptyText}>아직 완료한 미션이 없어요</p>
+  }
+
+  // 카테고리별 그룹핑
+  const groups = CATEGORIES.map((cat) => ({
+    cat,
+    missions: data.missions.filter((m) => getCategory(m.missionId).id === cat.id),
+  })).filter((g) => g.missions.length > 0)
+
+  return (
+    <>
+      {groups.map(({ cat, missions }) => (
+        <div key={cat.id} className={styles.categoryGroup}>
+          <div className={styles.categoryHeader}>
+            <span className={styles.categoryTag} style={{ background: cat.color + '26', color: cat.color }}>
+              {cat.label}
+            </span>
+            <span className={styles.categoryCount}>{missions.length} / {data.totalCount} 미션 완료</span>
+          </div>
+          <div className={styles.missionGrid}>
+            {missions.map((mission: CollectionMissionItem) => (
+              <button
+                key={mission.missionId}
+                className={styles.missionTile}
+                onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
+              >
+                <div className={styles.tileThumbWrap}>
+                  <div className={styles.tileThumb} style={{ background: missionGradient(mission.title) }}>
+                    <img src="/synk-bolt.png" alt="" className={styles.tileThumbLogo} />
+                  </div>
+                  <span className={styles.tileCheck}>✓</span>
+                </div>
+                <span className={styles.tileTitle}>{mission.title}</span>
+                <span className={styles.tileMeta}>완료 {mission.completedTimes}회</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ))}
+    </>
+  )
+}
+
+// Synklog 카드
+function SynklogCard({ item }: { item: MySynklogItem }) {
+  const hasVideo = !!item.videoUrl
+
+  return (
+    <div className={styles.synklogCard}>
+      <div className={styles.synklogAccent} />
+      <div className={styles.synklogBody}>
+        {/* 썸네일 스트립 */}
+        <div className={styles.thumbStrip}>
+          {[0, 1, 2].map((i) => (
+            <div key={i} className={styles.thumbSlot}>
+              {item.thumbnails[i] ? (
+                <img src={item.thumbnails[i]} alt="" className={styles.thumbImg} />
+              ) : (
+                <div className={styles.thumbPlaceholder}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.5" />
+                    <path d="M3 16l5-5 4 4 3-3 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+                  </svg>
+                  {i === 2 && item.collageCount > 3 && (
+                    <div className={styles.thumbMore}>+{item.collageCount - 3}</div>
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* 텍스트 + 버튼 */}
+        <div className={styles.synklogInfo}>
+          <div className={styles.synklogMeta}>
+            <span className={styles.synklogDate}>{item.date}</span>
+            <span className={styles.synklogBadge}>SYNKLOG</span>
+          </div>
+          <span className={styles.synklogRoomLine}>
+            {item.roomName} · 콜라주 {item.collageCount}개
+          </span>
+          {hasVideo ? (
+            <a
+              href={item.videoUrl!}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.videoBtn}
+            >
+              <span className={styles.videoBtnIcon}>▶</span>
+              영상 보기
+            </a>
+          ) : (
+            <span className={styles.videoBtnDisabled}>
+              <span className={styles.videoBtnIcon}>▶</span>
+              영상 보기
+            </span>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SynklogTab() {
+  const [items, setItems] = useState<MySynklogItem[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  useEffect(() => {
+    collectionApi
+      .getMySynklogs()
+      .then((res) => setItems(res.data))
+      .catch(console.error)
+      .finally(() => setIsLoading(false))
+  }, [])
+
+  if (isLoading) return <Loading />
+  if (items.length === 0) {
+    return <p className={styles.emptyText}>아직 생성된 Synklog가 없어요</p>
+  }
+
+  return (
+    <>
+      <div className={styles.synklogListHeader}>
+        <span className={styles.synklogListCount}>총 {items.length}개의 Synklog</span>
+        <span className={styles.synklogListSort}>최신순</span>
+      </div>
+      <div className={styles.synklogList}>
+        {items.map((item) => (
+          <SynklogCard key={item.synklogId} item={item} />
+        ))}
+      </div>
+    </>
   )
 }
 
 export default function CollectionPage() {
-  const navigate = useNavigate()
-  const [data, setData]         = useState<CollectionListResponse | null>(null)
+  const [tab, setTab] = useState<TabType>('mission')
+  const [data, setData] = useState<CollectionListResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
@@ -52,11 +206,10 @@ export default function CollectionPage() {
 
   return (
     <div className={styles.page}>
-      {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <AppHeader subtitle="내가 모은 미션 도감" />
 
       <div className={styles.scroll}>
-        {/* ── 수집률 카드 ──────────────────────────────────────────────────────── */}
+        {/* 수집률 히어로 카드 */}
         <div className={styles.statsCard}>
           <div className={styles.statsInner}>
             <div className={styles.statsLeft}>
@@ -70,43 +223,35 @@ export default function CollectionPage() {
             </div>
             <RingChart rate={isLoading ? 0 : (data?.completionRate ?? 0)} />
           </div>
+          {/* 프로그레스 바 */}
+          <div className={styles.progressBar}>
+            <div
+              className={styles.progressFill}
+              style={{ width: `${isLoading ? 0 : (data?.completionRate ?? 0)}%` }}
+            />
+          </div>
         </div>
 
-        {/* ── 미션 목록 ──────────────────────────────────────────────────────── */}
-        {isLoading ? (
-          <Loading />
-        ) : (
-          <>
-            <div className={styles.sectionHeader}>
-              <span className={styles.sectionHeaderIcon}>⚡</span>
-              <span className={styles.sectionHeaderTitle}>완료한 미션</span>
-            </div>
-            <div className={styles.missionGrid}>
-              {!data || data.missions.length === 0 ? (
-                <p className={styles.emptyText}>아직 완료한 미션이 없어요</p>
-              ) : (
-                <>
-                  {data.missions.map((mission: CollectionMissionItem) => (
-                    <button
-                      key={mission.missionId}
-                      className={styles.missionTile}
-                      onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
-                    >
-                      <div className={styles.tileThumbWrap}>
-                        <div className={styles.tileThumb} style={{ background: missionGradient(mission.title) }}>
-                          <img src="/synk-bolt.png" alt="" className={styles.tileThumbLogo} />
-                        </div>
-                        <span className={styles.tileCheck}>✓</span>
-                      </div>
-                      <span className={styles.tileTitle}>{mission.title}</span>
-                      <span className={styles.tileMeta}>완료 {mission.completedTimes}회</span>
-                    </button>
-                  ))}
-                </>
-              )}
-            </div>
-          </>
-        )}
+        {/* 탭 바 */}
+        <div className={styles.tabBar}>
+          <button
+            className={`${styles.tabBtn} ${tab === 'mission' ? styles.tabActive : ''}`}
+            onClick={() => setTab('mission')}
+          >
+            완료한 미션
+          </button>
+          <button
+            className={`${styles.tabBtn} ${tab === 'synklog' ? styles.tabActive : ''}`}
+            onClick={() => setTab('synklog')}
+          >
+            내 Synklog
+          </button>
+        </div>
+
+        {tab === 'mission'
+          ? <MissionTab data={data} isLoading={isLoading} />
+          : <SynklogTab />
+        }
       </div>
     </div>
   )

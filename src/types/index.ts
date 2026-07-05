@@ -403,6 +403,19 @@ export interface CollectionDetailResponse {
   records: CollectionRecordItem[]
 }
 
+/** GET /collections/synklogs — 내 Synklog 목록 아이템 */
+export interface MySynklogItem {
+  synklogId: number
+  roomId: number
+  roomName: string
+  /** "YYYY.MM.DD" */
+  date: string
+  collageCount: number
+  thumbnails: string[]
+  videoUrl: string | null
+  status: 'PROCESSING' | 'COMPLETED'
+}
+
 // ── Notification ──────────────────────────────────────────────────────────────
 
 export type NotificationType =
