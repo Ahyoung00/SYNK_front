@@ -121,9 +121,9 @@
   color: var(--ink);
 }
 
-/* 라이트 모드: 활성 탭을 SYNK 로고의 진한 보라로 */
+/* 라이트 모드: 활성 탭을 SYNK 로고의 진한 파랑으로 */
 :global(:root:not([data-theme="dark"])) .tabActive {
-  background: #9B6BFF;
+  background: #3478F6;
   color: #fff;
 }
 
