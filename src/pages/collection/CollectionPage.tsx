@@ -98,6 +98,25 @@ function MissionTab({ data, isLoading }: { data: CollectionListResponse | null; 
   )
 }
 
+function ThumbSlot({ thumbnail, large, extra = 0 }: { thumbnail?: string; large?: boolean; extra?: number }) {
+  return (
+    <div className={large ? styles.thumbSlotLarge : styles.thumbSlotSmall}>
+      {thumbnail ? (
+        <img src={thumbnail} alt="" className={styles.thumbImg} />
+      ) : (
+        <div className={styles.thumbPlaceholder}>
+          <svg width={large ? 20 : 12} height={large ? 20 : 12} viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.5" />
+            <path d="M3 16l5-5 4 4 3-3 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+            <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
+          </svg>
+          {extra > 0 && <div className={styles.thumbMore}>+{extra}</div>}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // Synklog 카드
 function SynklogCard({ item }: { item: MySynklogItem }) {
   const hasVideo = !!item.videoUrl
@@ -106,26 +125,15 @@ function SynklogCard({ item }: { item: MySynklogItem }) {
     <div className={styles.synklogCard}>
       <div className={styles.synklogAccent} />
       <div className={styles.synklogBody}>
-        {/* 썸네일 스트립 */}
+        {/* 썸네일 스트립 — 큰 1개 + 작은 2개 세로 스택 */}
         <div className={styles.thumbStrip}>
-          {[0, 1, 2].map((i) => (
-            <div key={i} className={styles.thumbSlot}>
-              {item.thumbnails[i] ? (
-                <img src={item.thumbnails[i]} alt="" className={styles.thumbImg} />
-              ) : (
-                <div className={styles.thumbPlaceholder}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.5" />
-                    <path d="M3 16l5-5 4 4 3-3 6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-                    <circle cx="8.5" cy="8.5" r="1.5" fill="currentColor" />
-                  </svg>
-                  {i === 2 && item.collageCount > 3 && (
-                    <div className={styles.thumbMore}>+{item.collageCount - 3}</div>
-                  )}
-                </div>
-              )}
-            </div>
-          ))}
+          {/* 큰 썸네일 */}
+          <ThumbSlot thumbnail={item.thumbnails[0]} large />
+          {/* 작은 썸네일 2개 세로 스택 */}
+          <div className={styles.thumbSmallCol}>
+            <ThumbSlot thumbnail={item.thumbnails[1]} />
+            <ThumbSlot thumbnail={item.thumbnails[2]} extra={item.collageCount > 3 ? item.collageCount - 3 : 0} />
+          </div>
         </div>
 
         {/* 텍스트 + 버튼 */}
