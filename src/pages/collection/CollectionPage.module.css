@@ -121,6 +121,12 @@
   color: var(--ink);
 }
 
+/* 라이트 모드: 활성 탭을 SYNK 로고의 진한 보라로 */
+:global(:root:not([data-theme="dark"])) .tabActive {
+  background: #9B6BFF;
+  color: #fff;
+}
+
 /* ── 카테고리 그룹 ───────────────────────────────────────────────────────── */
 .categoryGroup {
   display: flex;
