@@ -202,7 +202,7 @@ export default function SynklogCompletePage() {
               </button>
               <div className={styles.btnRow}>
                 <button className={styles.secondaryBtn} onClick={handleShare}>
-                  공유하기
+                  공유
                 </button>
                 <button
                   className={styles.secondaryBtn}
