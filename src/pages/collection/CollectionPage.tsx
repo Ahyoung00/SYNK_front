@@ -6,6 +6,7 @@ import type { CollectionListResponse, CollectionMissionItem, MySynklogItem } fro
 import AppHeader from '@/components/layout/AppHeader'
 import Loading from '@/components/ui/Loading'
 import { missionGradient } from '@/utils/missionVisual'
+import { downloadVideo } from '@/utils/downloadVideo'
 import styles from './CollectionPage.module.css'
 
 type TabType = 'mission' | 'synklog'
@@ -146,15 +147,29 @@ function SynklogCard({ item }: { item: MySynklogItem }) {
             {item.roomName} · 콜라주 {item.collageCount}개
           </span>
           {hasVideo ? (
-            <a
-              href={item.videoUrl!}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.videoBtn}
-            >
-              <span className={styles.videoBtnIcon}>▶</span>
-              영상 보기
-            </a>
+            <div className={styles.videoBtnRow}>
+              <a
+                href={item.videoUrl!}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.videoBtn}
+              >
+                <span className={styles.videoBtnIcon}>▶</span>
+                영상 보기
+              </a>
+              <button
+                type="button"
+                className={styles.saveBtn}
+                onClick={() => downloadVideo(item.videoUrl!, `synklog-${item.date}.mp4`)}
+              >
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                저장
+              </button>
+            </div>
           ) : (
             <span className={styles.videoBtnDisabled}>
               <span className={styles.videoBtnIcon}>▶</span>

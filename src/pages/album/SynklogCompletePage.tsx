@@ -67,6 +67,23 @@ export default function SynklogCompletePage() {
       ? `${window.location.origin}/room/${roomId}/album/${date}`
       : window.location.href
 
+    // 1) 영상 파일 자체 공유 시도 (카톡·인스타·저장 등)
+    if (videoUrl) {
+      try {
+        const res  = await fetch(videoUrl)
+        const blob = await res.blob()
+        const file = new File([blob], `synklog-${date ?? 'video'}.mp4`, { type: blob.type || 'video/mp4' })
+        if (typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: 'SYNK', text: '오늘의 SYNKLOG를 확인해보세요!' })
+          return
+        }
+      } catch (e: any) {
+        if (e?.name === 'AbortError') return // 사용자가 취소
+        // 그 외(CORS 등) 실패 → 링크 공유로 폴백
+      }
+    }
+
+    // 2) 링크 공유 폴백
     if (navigator.share) {
       try {
         await navigator.share({

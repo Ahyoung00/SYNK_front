@@ -383,11 +383,18 @@
   text-overflow: ellipsis;
 }
 
+.videoBtnRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+  flex-wrap: wrap;
+}
+
 .videoBtn {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  margin-top: 6px;
   font-size: 12px;
   font-weight: 700;
   color: #fff;
@@ -395,6 +402,20 @@
   border-radius: 8px;
   padding: 5px 10px;
   text-decoration: none;
+  width: fit-content;
+}
+
+.saveBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink);
+  background: var(--card-bg-soft, rgba(255,255,255,0.08));
+  border: 1px solid var(--color-border, rgba(255,255,255,0.12));
+  border-radius: 8px;
+  padding: 5px 10px;
   width: fit-content;
 }
 
