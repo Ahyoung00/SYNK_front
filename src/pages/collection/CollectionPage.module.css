@@ -331,13 +331,18 @@
 .synklogMeta {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  overflow: hidden;
 }
 
 .synklogDate {
   font-size: 14px;
   font-weight: 700;
   color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .synklogBadge {
@@ -348,6 +353,8 @@
   background: linear-gradient(90deg, #FF6B6B, #FF9A3C);
   padding: 2px 7px;
   border-radius: 99px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .synklogRoomLine {

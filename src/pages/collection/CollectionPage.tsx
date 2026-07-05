@@ -184,19 +184,32 @@ async function fetchMySynklogs(): Promise<MySynklogItem[]> {
     }
   }
 
-  // 4. 각 (방, 날짜)의 synklog 병렬 조회 — 없으면 404로 실패하므로 allSettled 사용
+  // 4. 각 (방, 날짜)의 synklog + collages 병렬 조회
   const synklogResults = await Promise.allSettled(
     pairs.map(async ({ roomId, roomName, date }) => {
-      const res = await albumApi.getSynklog(roomId, date)
-      const s = res.data
+      const [synklogRes, collagesRes] = await Promise.allSettled([
+        albumApi.getSynklog(roomId, date),
+        albumApi.getCollages(roomId, date),
+      ])
+      if (synklogRes.status !== 'fulfilled') return null
+      const s = synklogRes.data
       if (s.status !== 'COMPLETED') return null
+
+      const collages = collagesRes.status === 'fulfilled'
+        ? collagesRes.value.data.filter((c) => c.status === 'COMPLETED')
+        : []
+      const thumbnails = collages
+        .map((c) => c.thumbnail)
+        .filter((t): t is string => !!t)
+        .slice(0, 3)
+
       return {
         synklogId:    s.synklogId,
         roomId,
         roomName,
-        date:         s.date,          // "YYYY.MM.DD"
-        collageCount: s.missions?.length ?? 0,
-        thumbnails:   s.thumbnail ? [s.thumbnail] : [],
+        date:         s.date,
+        collageCount: collages.length,
+        thumbnails,
         videoUrl:     s.synklogVideoUrl ?? null,
         status:       s.status,
       } as MySynklogItem
