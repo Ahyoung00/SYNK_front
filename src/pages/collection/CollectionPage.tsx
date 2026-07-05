@@ -192,7 +192,7 @@ async function fetchMySynklogs(): Promise<MySynklogItem[]> {
         albumApi.getCollages(roomId, date),
       ])
       if (synklogRes.status !== 'fulfilled') return null
-      const s = synklogRes.data
+      const s = synklogRes.value.data
       if (s.status !== 'COMPLETED') return null
 
       const collages = collagesRes.status === 'fulfilled'
