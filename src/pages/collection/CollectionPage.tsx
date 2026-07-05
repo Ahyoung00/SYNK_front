@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
-import { collectionApi } from '@/services/api/endpoints'
+import { collectionApi, roomApi, albumApi } from '@/services/api/endpoints'
 import type { CollectionListResponse, CollectionMissionItem, MySynklogItem } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
 import Loading from '@/components/ui/Loading'
@@ -159,14 +159,65 @@ function SynklogCard({ item }: { item: MySynklogItem }) {
   )
 }
 
+async function fetchMySynklogs(): Promise<MySynklogItem[]> {
+  // 1. 내 방 목록
+  const roomsRes = await roomApi.getMyRooms()
+  const allRooms = roomsRes.data.active
+
+  // 2. 각 방의 앨범(날짜) 목록 병렬 조회
+  const albumResults = await Promise.allSettled(
+    allRooms.map(async (room) => ({
+      room,
+      albums: (await albumApi.getAlbums(room.id)).data,
+    }))
+  )
+
+  // 3. (방, 날짜) 쌍 수집
+  const pairs: Array<{ roomId: number; roomName: string; date: string }> = []
+  for (const result of albumResults) {
+    if (result.status === 'fulfilled') {
+      const { room, albums } = result.value
+      for (const album of albums) {
+        // AlbumItem.date = "YYYY.MM.DD" → API param = "YYYY-MM-DD"
+        pairs.push({ roomId: room.id, roomName: room.name, date: album.date.replace(/\./g, '-') })
+      }
+    }
+  }
+
+  // 4. 각 (방, 날짜)의 synklog 병렬 조회 — 없으면 404로 실패하므로 allSettled 사용
+  const synklogResults = await Promise.allSettled(
+    pairs.map(async ({ roomId, roomName, date }) => {
+      const res = await albumApi.getSynklog(roomId, date)
+      const s = res.data
+      if (s.status !== 'COMPLETED') return null
+      return {
+        synklogId:    s.synklogId,
+        roomId,
+        roomName,
+        date:         s.date,          // "YYYY.MM.DD"
+        collageCount: s.missions?.length ?? 0,
+        thumbnails:   s.thumbnail ? [s.thumbnail] : [],
+        videoUrl:     s.synklogVideoUrl ?? null,
+        status:       s.status,
+      } as MySynklogItem
+    })
+  )
+
+  return synklogResults
+    .filter((r): r is PromiseFulfilledResult<MySynklogItem> =>
+      r.status === 'fulfilled' && r.value !== null
+    )
+    .map((r) => r.value)
+    .sort((a, b) => b.date.localeCompare(a.date))
+}
+
 function SynklogTab() {
   const [items, setItems] = useState<MySynklogItem[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    collectionApi
-      .getMySynklogs()
-      .then((res) => setItems(res.data))
+    fetchMySynklogs()
+      .then(setItems)
       .catch(console.error)
       .finally(() => setIsLoading(false))
   }, [])
