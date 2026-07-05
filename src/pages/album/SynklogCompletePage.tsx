@@ -122,7 +122,14 @@ export default function SynklogCompletePage() {
         {processing ? (
           /* ── 생성 중 상태 ── */
           <>
-            <Loading label="SYNKLOG 생성 중" />
+            <Loading hideLabel />
+            <h2 className={styles.processingTitle}>
+              SYNKLOG 생성 중
+              <span className={styles.processingDots}><i /><i /><i /></span>
+            </h2>
+            <p className={styles.processingHint}>
+              콜라주 영상을 이어붙이고 있어요.<br />잠시만 기다려주세요 🎬
+            </p>
 
             {/* 선택한 콜라주 썸네일 row */}
             {selectedCollages.length > 0 && (
@@ -139,10 +146,6 @@ export default function SynklogCompletePage() {
             )}
 
             {dateLabel && <p className={styles.dateLabel}>{dateLabel}</p>}
-
-            <p className={styles.processingHint}>
-              콜라주 영상을 이어붙이고 있어요. 잠시만 기다려주세요 🎬
-            </p>
           </>
         ) : (
           /* ── 완료 상태 ── */

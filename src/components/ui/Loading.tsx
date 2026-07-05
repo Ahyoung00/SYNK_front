@@ -3,10 +3,12 @@ import styles from './Loading.module.css'
 interface LoadingProps {
   /** 안내 문구 (기본: "불러오는 중") */
   label?: string
+  /** true일 때 라벨 영역을 숨김 */
+  hideLabel?: boolean
 }
 
 /** SYNK 트랜지션 로더 — 회전하는 점 + 깜빡이는 번개 */
-export default function Loading({ label = '불러오는 중' }: LoadingProps) {
+export default function Loading({ label = '불러오는 중', hideLabel = false }: LoadingProps) {
   return (
     <div className={styles.wrap}>
       <div className={styles.ldB}>
@@ -24,10 +26,12 @@ export default function Loading({ label = '불러오는 중' }: LoadingProps) {
           </svg>
         </div>
       </div>
-      <div className={styles.label}>
-        {label}
-        <span className={styles.dots}><i /><i /><i /></span>
-      </div>
+      {!hideLabel && (
+        <div className={styles.label}>
+          {label}
+          <span className={styles.dots}><i /><i /><i /></span>
+        </div>
+      )}
     </div>
   )
 }

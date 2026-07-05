@@ -55,7 +55,7 @@
   width: 90px;
   height: 90px;
   border-radius: 26px;
-  box-shadow: 0 12px 40px rgba(232,115,90,0.35);
+  box-shadow: 0 8px 36px rgba(110,80,255,0.55), 0 0 60px rgba(70,180,255,0.2);
   object-fit: cover;
 }
 
@@ -172,13 +172,47 @@
 .secondaryBtn:active { opacity: 0.7; }
 .secondaryBtn:disabled { opacity: 0.35; cursor: default; }
 
-/* ── 처리 중 안내 ──────────────────────────────────────────────────────────────── */
-.processingHint {
-  margin-top: 16px;
-  font-size: 12px;
-  color: rgba(255,255,255,0.4);
+/* ── 처리 중 제목 + 안내 ───────────────────────────────────────────────────────── */
+.processingTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #fff;
   text-align: center;
-  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.processingDots {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.processingDots i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  display: block;
+  animation: ld-bounce 1s ease-in-out infinite;
+}
+
+.processingDots i:nth-child(2) { animation-delay: 0.15s; }
+.processingDots i:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes ld-bounce {
+  0%, 100% { opacity: 0.3; transform: translateY(0); }
+  50%       { opacity: 1;   transform: translateY(-3px); }
+}
+
+.processingHint {
+  font-size: 13px;
+  color: rgba(255,255,255,0.45);
+  text-align: center;
+  line-height: 1.6;
+  margin-bottom: 28px;
 }
 
 /* ── 인라인 비디오 플레이어 오버레이 ─────────────────────────────────────────── */
