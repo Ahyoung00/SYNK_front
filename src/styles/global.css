@@ -53,12 +53,10 @@
   --color-fab-shadow:   rgba(149, 201, 109, 0.45);
 
   /* ── Page / card / ink / nav tokens (light · Twilight Haze) ─────────────── */
-  --page-bg:            radial-gradient(ellipse 60% 40% at 90% 5%,  rgba(216,226,255,.55), transparent 65%),
-                        radial-gradient(ellipse 65% 45% at 5%  95%, rgba(167,183,231,.45), transparent 68%),
-                        linear-gradient(148deg, #D8E2FF 0%, #C4CFEE 50%, #A7B7E7 100%);
-  --card-bg:            rgba(255, 255, 255, 0.88);
-  --card-bg-soft:       rgba(255, 255, 255, 0.60);
-  --card-border:        rgba(167, 183, 231, 0.40);
+  --page-bg:            #ffffff;
+  --card-bg:            rgba(196, 207, 238, 0.38);
+  --card-bg-soft:       rgba(196, 207, 238, 0.22);
+  --card-border:        rgba(140, 158, 210, 0.30);
   --divider-color:      rgba(167, 183, 231, 0.25);
   --ink:                #1C1640;
   --ink-sub:            #4A4F7A;
@@ -415,7 +413,7 @@ img, video {
 }
 
 body {
-  background-color: #A7B7E7;
+  background-color: #ffffff;
 }
 
 [data-theme="dark"] body {
