@@ -19,10 +19,8 @@ export default function ProfilePage() {
 
   const missionAlert    = useSettingsStore((s) => s.missionAlert)
   const resultAlert     = useSettingsStore((s) => s.resultAlert)
-  const highlightAlert  = useSettingsStore((s) => s.highlightAlert)
   const setMissionAlert   = useSettingsStore((s) => s.setMissionAlert)
   const setResultAlert    = useSettingsStore((s) => s.setResultAlert)
-  const setHighlightAlert = useSettingsStore((s) => s.setHighlightAlert)
 
   const [completionRate, setCompletionRate] = useState<number | null>(null)
   const [joinDays, setJoinDays] = useState<number | null>(null)
@@ -99,13 +97,6 @@ export default function ProfilePage() {
               desc="결과가 생성되면 알려줘요"
               value={resultAlert}
               onChange={(v) => { setResultAlert(v); updateNotification({ resultNotification: v }) }}
-            />
-            <div className={styles.divider} />
-            <ToggleRow
-              label="하이라이트 알림"
-              desc="새 영상이 만들어지면 알려줘요"
-              value={highlightAlert}
-              onChange={(v) => { setHighlightAlert(v); updateNotification({ highlightNotification: v }) }}
             />
           </div>
         </div>
