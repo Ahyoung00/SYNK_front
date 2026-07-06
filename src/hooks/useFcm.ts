@@ -64,7 +64,7 @@ export function useFcm() {
       const body  = fmt?.body  ?? payload.notification?.body  ?? ''
       if (title || body) {
         navigator.serviceWorker.ready.then((registration) => {
-          registration.showNotification(title, { body, icon: '/icon-192.png' })
+          registration.showNotification(title, { body, icon: '/icon-192.png', data: payload.data ?? {} })
         })
       }
     })
