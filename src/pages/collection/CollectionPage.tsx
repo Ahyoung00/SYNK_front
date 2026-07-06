@@ -71,7 +71,7 @@ function MissionTile({ mission }: { mission: CollectionMissionItem }) {
             </svg>
           </div>
         </div>
-        <span className={styles.tileTitle}>{mission.title}</span>
+        <span className={styles.tileTitle} style={{ letterSpacing: '0.1em' }}>???</span>
         <span className={styles.tileMeta}>미수집</span>
       </div>
     )
