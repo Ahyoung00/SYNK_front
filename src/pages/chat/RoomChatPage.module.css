@@ -308,11 +308,12 @@
 }
 
 :global(:root:not([data-theme="dark"])) .inputBar {
-  background: #fff;
+  background: rgba(167, 183, 231, 0.97);
+  border-top-color: rgba(140, 158, 210, 0.30);
 }
 
 :global(:root:not([data-theme="dark"])) .input {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.80);
 }
 
 .input {
