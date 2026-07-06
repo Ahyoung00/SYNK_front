@@ -232,6 +232,12 @@ export default function RoomChatPage() {
     if (inputRef.current) inputRef.current.style.height = 'auto'
     isAtBottomRef.current = true
 
+    // textarea 높이 리셋 후 레이아웃이 확정되면 바닥으로 스크롤
+    requestAnimationFrame(() => {
+      const el = listRef.current
+      if (el) el.scrollTop = el.scrollHeight
+    })
+
     publishChat(numRoomId, content)
   }
 
