@@ -87,13 +87,16 @@ export default function RoomChatPage() {
   const isAtBottomRef  = useRef(true)
   const loaded         = useRef(false)
   const [vp, setVp] = useState({ height: window.innerHeight, offsetTop: 0 })
-  const notifKey = `chat_notif_${roomId}`
-  const [notifOn, setNotifOn] = useState(() => localStorage.getItem(notifKey) !== 'off')
+  const [notifOn, setNotifOn] = useState(true)
 
-  function toggleNotif() {
+  async function toggleNotif() {
     const next = !notifOn
     setNotifOn(next)
-    localStorage.setItem(notifKey, next ? 'on' : 'off')
+    try {
+      await chatApi.setChatAlert(numRoomId, next)
+    } catch {
+      setNotifOn(!next)
+    }
   }
 
   // ── 메시지 목록 API 조회 + WebSocket 연결 ────────────────────────────────
@@ -114,6 +117,7 @@ export default function RoomChatPage() {
       .then((res) => {
         setRoomName(res.data.roomName)
         setMemberCount(res.data.memberCount)
+        setNotifOn(res.data.chatAlertEnabled ?? true)
 
         // todayMissionCompleted=true여도 실제 제출된 콜라주가 있는지 추가 검증
         if (res.data.todayMissionCompleted) {
@@ -247,7 +251,7 @@ export default function RoomChatPage() {
 
       {/* ── 헤더 ─────────────────────────────────────────────────────────── */}
       <div className={styles.header}>
-        <button className={styles.iconBtn} onClick={() => navigate(-1)} aria-label="뒤로">
+        <button className={styles.iconBtn} onClick={() => navigate(ROUTES.ROOM(numRoomId))} aria-label="뒤로">
           <BackIcon />
         </button>
         <div className={styles.headerCenter}>

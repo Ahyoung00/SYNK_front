@@ -288,6 +288,10 @@ export const chatApi = {
    */
   sendMessage: (roomId: number, content: string) =>
     api.post<ChatSentResponse>(`/rooms/${roomId}/chats`, { content }),
+
+  /** PATCH /rooms/{roomId}/chat-alert — 채팅 알림 on/off */
+  setChatAlert: (roomId: number, enabled: boolean) =>
+    api.patch<void>(`/rooms/${roomId}/chat-alert`, { enabled }),
 }
 
 // ── Collection (도감) ─────────────────────────────────────────────────────────

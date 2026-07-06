@@ -335,6 +335,8 @@ export interface RoomChatListResponse {
   /** YYYY-MM-DD, Nullable */
   todayMissionDate: string | null
   messages: RoomChatMessage[]
+  /** 채팅 알림 활성 여부 */
+  chatAlertEnabled: boolean
 }
 
 // ── Collection (도감) ─────────────────────────────────────────────────────────

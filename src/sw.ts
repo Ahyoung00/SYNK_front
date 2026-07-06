@@ -121,8 +121,8 @@ self.addEventListener('notificationclick', (e: NotificationEvent) => {
   let target = '/'
   if (d.type === 'CHAT' && d.roomId) {
     target = `/room/${d.roomId}/chat`
-  } else if (d.type === 'MISSION_COMPLETE' && d.roomId) {
-    target = `/room/${d.roomId}/album`
+  } else if (d.type === 'MISSION_COMPLETE' && d.missionId) {
+    target = `/result/${d.missionId}`
   }
 
   e.waitUntil(

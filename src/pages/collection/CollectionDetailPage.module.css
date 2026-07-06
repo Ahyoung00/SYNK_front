@@ -200,23 +200,6 @@
   background: #000;
 }
 
-/* ── 폰 가로 촬영 raw 영상 회전 보정 (제출 전 미리보기와 동일 각도) ──────────
-   90/270 회전 시 가로·세로가 뒤바뀌므로 뷰포트 기준 max 치수를 swap해 오버플로 방지 */
-.playerFront,
-.playerBack {
-  max-width: 100dvh;
-  max-height: 100dvw;
-}
-
-/* 폰 가로 + 전면(user): 90도 + 좌우미러 */
-.playerFront {
-  transform: rotate(90deg) scaleX(-1);
-}
-
-/* 폰 가로 + 후면(environment): 270도, 미러 없음 */
-.playerBack {
-  transform: rotate(270deg);
-}
 
 .videoClose {
   position: absolute;

@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react'
+import { getToken } from 'firebase/messaging'
+import { messaging } from '@/lib/firebase'
 import { useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/store/authStore'
 import { useThemeStore, type Theme } from '@/store/themeStore'
@@ -122,6 +124,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
+        {/* ── FCM 디버그 ──────────────────────────────────────────────────────── */}
+        <FcmDebugButton />
+
         {/* ── 로그아웃 ─────────────────────────────────────────────────────────── */}
         <button className={styles.logoutBtn} onClick={handleLogout}>
           로그아웃
@@ -141,6 +146,74 @@ function daysSinceJoin(createdAt?: string | null): number | null {
   const nowDay = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const diff = Math.floor((nowDay.getTime() - startDay.getTime()) / 86400000)
   return diff >= 0 ? diff + 1 : null
+}
+
+/* ── FCM 디버그 버튼 ────────────────────────────────────────────────────────── */
+
+const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY as string
+
+function FcmDebugButton() {
+  const [info, setInfo] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+
+  async function handleCheck() {
+    setLoading(true)
+    setInfo(null)
+    try {
+      const permission = Notification.permission
+      let token = '(권한 없음)'
+      if (permission === 'granted') {
+        const reg = await navigator.serviceWorker.ready
+        token = await getToken(messaging, { vapidKey: VAPID_KEY, serviceWorkerRegistration: reg })
+      }
+      setInfo(`권한: ${permission}\n\nFCM 토큰:\n${token}`)
+    } catch (err) {
+      setInfo(`오류: ${err instanceof Error ? err.message : String(err)}`)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div style={{ padding: '0 20px 8px' }}>
+      <button
+        onClick={handleCheck}
+        disabled={loading}
+        style={{
+          width: '100%',
+          padding: '12px',
+          borderRadius: 12,
+          background: 'var(--card-bg, rgba(255,255,255,0.7))',
+          border: '1px solid var(--card-border, rgba(0,0,0,0.08))',
+          color: 'var(--ink, #1C1640)',
+          fontSize: 14,
+          fontWeight: 600,
+          cursor: loading ? 'default' : 'pointer',
+          opacity: loading ? 0.6 : 1,
+        }}
+      >
+        {loading ? '확인 중...' : '🔔 FCM 알림 상태 확인'}
+      </button>
+      {info && (
+        <pre
+          style={{
+            marginTop: 10,
+            padding: 12,
+            borderRadius: 10,
+            background: 'var(--card-bg, rgba(255,255,255,0.7))',
+            border: '1px solid var(--card-border, rgba(0,0,0,0.08))',
+            fontSize: 11,
+            color: 'var(--ink, #1C1640)',
+            wordBreak: 'break-all',
+            whiteSpace: 'pre-wrap',
+            lineHeight: 1.6,
+          }}
+        >
+          {info}
+        </pre>
+      )}
+    </div>
+  )
 }
 
 /* ── 서브 컴포넌트 ──────────────────────────────────────────────────────────── */

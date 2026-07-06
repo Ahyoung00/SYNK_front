@@ -10,13 +10,6 @@ function toHttps(url: string | null | undefined): string | null {
   return url.replace(/^http:\/\//, 'https://')
 }
 
-/** 폰 가로 촬영 raw 영상 재생 시 카메라별 회전 보정 클래스 (제출 전 미리보기와 동일) */
-function rotationClass(r: CollectionRecordItem): string {
-  if (!r.horizontal) return ''
-  if (r.facingMode === 'user')        return styles.playerFront
-  if (r.facingMode === 'environment') return styles.playerBack
-  return ''
-}
 
 export default function CollectionDetailPage() {
   const { missionId }             = useParams<{ missionId: string }>()
@@ -133,7 +126,7 @@ export default function CollectionDetailPage() {
           <button className={styles.videoClose} onClick={() => setPlaying(null)} aria-label="닫기">✕</button>
           <video
             src={toHttps(playing.videoUrl) ?? undefined}
-            className={[styles.videoPlayer, rotationClass(playing)].join(' ')}
+            className={styles.videoPlayer}
             controls
             autoPlay
             playsInline
