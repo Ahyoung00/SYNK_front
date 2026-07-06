@@ -154,7 +154,7 @@ export const roomApi = {
 
   /** GET /rooms/{roomId}/participation?period=month|lastMonth|all */
   getParticipation: (roomId: number, period: import('@/types').ParticipationPeriod) =>
-    api.get<import('@/types').ParticipationStatsResponse>(`/rooms/${roomId}/participation`, { params: { period } }),
+    api.get<import('@/types').ParticipationStatsResponse>(`/rooms/${roomId}/participation?period=${period}`),
 }
 
 // ── Mission ───────────────────────────────────────────────────────────────────

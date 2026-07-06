@@ -36,6 +36,7 @@ self.addEventListener('push', (e: PushEvent) => {
 
   let title = 'SYNK'
   let body = ''
+  let d: Record<string, string> = {}
 
   try {
     const raw = e.data.json()
@@ -46,7 +47,7 @@ self.addEventListener('push', (e: PushEvent) => {
     //   { notification: { title, body }, data: { ... } }   ← FCM notification + data
     //   { data: { title, body, type, ... } }               ← FCM data-only
     //   { title, body, type, ... }                         ← 평면 구조
-    const d: Record<string, string> = raw.data ?? raw
+    d = raw.data ?? raw
     console.log('[SW] 파싱된 data 필드:', JSON.stringify(d))
 
     const fmt = formatPush(d)
