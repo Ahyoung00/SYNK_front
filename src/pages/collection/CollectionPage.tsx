@@ -56,11 +56,11 @@ function RingChart({ rate }: { rate: number }) {
 }
 
 // 미션 타일 (완료 / 미수집 잠금)
-function MissionTile({ mission }: { mission: CollectionMissionItem }) {
+function MissionTile({ mission, color }: { mission: CollectionMissionItem; color: string }) {
   const navigate = useNavigate()
   const locked = mission.completedTimes <= 0
 
-  const tileStyle = { '--tile-color': missionGradient(mission.title) } as React.CSSProperties
+  const tileStyle = { '--tile-color': color } as React.CSSProperties
 
   if (locked) {
     return (
@@ -112,7 +112,7 @@ function CategorySection({ category, color, missions }: { category: string; colo
         <span className={styles.categoryCount}>{completed} / {missions.length}</span>
       </div>
       <div className={styles.missionGrid}>
-        {missions.map((m) => <MissionTile key={m.missionId} mission={m} />)}
+        {missions.map((m) => <MissionTile key={m.missionId} mission={m} color={color} />)}
       </div>
     </div>
   )
