@@ -117,13 +117,19 @@ self.addEventListener('push', (e: PushEvent) => {
 self.addEventListener('notificationclick', (e: NotificationEvent) => {
   e.notification.close()
   const d = (e.notification.data ?? {}) as Record<string, string>
-  let url = '/'
+
+  let target = '/'
   if (d.type === 'CHAT' && d.roomId) {
-    url = `/room/${d.roomId}/chat`
-  } else if (d.type === 'MISSION_START' && d.roomId) {
-    url = `/mission/${d.roomId}`
-  } else if (d.type === 'COLLAGE_COMPLETED' && d.roomId) {
-    url = `/room/${d.roomId}`
+    target = `/room/${d.roomId}/chat`
+  } else if (d.type === 'MISSION_COMPLETE' && d.roomId) {
+    target = `/room/${d.roomId}/album`
   }
-  e.waitUntil(self.clients.openWindow(url))
+
+  e.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((cls) => {
+      const c = cls.find((x) => 'focus' in x) as WindowClient | undefined
+      if (c) { c.navigate(target); return c.focus() }
+      return self.clients.openWindow(target)
+    })
+  )
 })
