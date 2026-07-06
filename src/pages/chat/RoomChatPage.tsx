@@ -86,7 +86,10 @@ export default function RoomChatPage() {
   const inputRef       = useRef<HTMLTextAreaElement>(null)
   const isAtBottomRef  = useRef(true)
   const loaded         = useRef(false)
-  const [vpHeight, setVpHeight] = useState<number>(() => window.visualViewport?.height ?? window.innerHeight)
+  const [vp, setVp] = useState<{ height: number; offsetTop: number }>(() => ({
+    height: window.visualViewport?.height ?? window.innerHeight,
+    offsetTop: window.visualViewport?.offsetTop ?? 0,
+  }))
   const [notifOn, setNotifOn] = useState(true)
 
   async function toggleNotif() {
@@ -175,7 +178,11 @@ export default function RoomChatPage() {
     const vv = window.visualViewport
     if (!vv) return
     const update = () => {
-      setVpHeight(vv.height)
+      setVp((prev) =>
+        prev.height === vv.height && prev.offsetTop === vv.offsetTop
+          ? prev
+          : { height: vv.height, offsetTop: vv.offsetTop }
+      )
       if (isAtBottomRef.current) {
         requestAnimationFrame(() => {
           const el = listRef.current
@@ -255,7 +262,7 @@ export default function RoomChatPage() {
   return (
     <div
       className={styles.page}
-      style={{ height: vpHeight }}
+      style={{ height: vp.height, transform: `translateY(${vp.offsetTop}px)` }}
     >
 
       {/* ── 헤더 ─────────────────────────────────────────────────────────── */}
