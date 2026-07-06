@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { collectionApi, roomApi, albumApi } from '@/services/api/endpoints'
@@ -60,9 +60,11 @@ function MissionTile({ mission }: { mission: CollectionMissionItem }) {
   const navigate = useNavigate()
   const locked = mission.completedTimes <= 0
 
+  const tileStyle = { '--tile-color': missionGradient(mission.title) } as React.CSSProperties
+
   if (locked) {
     return (
-      <div className={`${styles.missionTile} ${styles.missionTileLocked}`}>
+      <div className={`${styles.missionTile} ${styles.missionTileLocked}`} style={tileStyle}>
         <div className={styles.tileThumbWrap}>
           <div className={styles.tileThumbLockedBox}>
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
@@ -80,6 +82,7 @@ function MissionTile({ mission }: { mission: CollectionMissionItem }) {
   return (
     <button
       className={styles.missionTile}
+      style={tileStyle}
       onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
     >
       <div className={styles.tileThumbWrap}>
