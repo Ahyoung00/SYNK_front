@@ -82,14 +82,11 @@ export default function RoomChatPage() {
   // userId → profileImage 맵 (STOMP 메시지에 profileImage 없을 때 보완용)
   const memberProfileMap = useRef<Map<number, string | null>>(new Map())
 
+  const pageRef        = useRef<HTMLDivElement>(null)
   const listRef        = useRef<HTMLDivElement>(null)
   const inputRef       = useRef<HTMLTextAreaElement>(null)
   const isAtBottomRef  = useRef(true)
   const loaded         = useRef(false)
-  const [vp, setVp] = useState<{ height: number; offsetTop: number }>(() => ({
-    height: window.visualViewport?.height ?? window.innerHeight,
-    offsetTop: window.visualViewport?.offsetTop ?? 0,
-  }))
   const [notifOn, setNotifOn] = useState(true)
 
   async function toggleNotif() {
@@ -177,17 +174,16 @@ export default function RoomChatPage() {
   useEffect(() => {
     const vv = window.visualViewport
     if (!vv) return
+    // React 리렌더 없이 ref로 직접 스타일 조작 → 입력창 포커스 유지(키보드 깜빡임 방지)
     const update = () => {
-      setVp((prev) =>
-        prev.height === vv.height && prev.offsetTop === vv.offsetTop
-          ? prev
-          : { height: vv.height, offsetTop: vv.offsetTop }
-      )
+      const el = pageRef.current
+      if (el) {
+        el.style.height = `${vv.height}px`
+        el.style.transform = `translateY(${vv.offsetTop}px)`
+      }
       if (isAtBottomRef.current) {
-        requestAnimationFrame(() => {
-          const el = listRef.current
-          if (el) el.scrollTop = el.scrollHeight
-        })
+        const list = listRef.current
+        if (list) list.scrollTop = list.scrollHeight
       }
     }
     update()
@@ -261,8 +257,8 @@ export default function RoomChatPage() {
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <div
+      ref={pageRef}
       className={styles.page}
-      style={{ height: vp.height, transform: `translateY(${vp.offsetTop}px)` }}
     >
 
       {/* ── 헤더 ─────────────────────────────────────────────────────────── */}
