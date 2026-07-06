@@ -150,7 +150,7 @@ export default function RoomSettingsPage() {
           >
             {thumbUrl
               ? <img src={thumbUrl} alt="방 이미지" className={styles.roomThumbImg} />
-              : <span className={styles.roomThumbEmoji}>🌅</span>
+              : <img src="/SYNK.jpeg" alt="SYNK" className={styles.roomThumbImg} />
             }
             {isOwner && (
               <div className={styles.roomThumbOverlay}>
