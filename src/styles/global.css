@@ -5,20 +5,24 @@
 /* ── Design tokens ────────────────────────────────────────────────────────── */
 :root {
   /* Brand colors */
-  --color-bg:          #FCFDFB;
-  --color-login-bg:    #e8e8e8;
-  --color-surface:     #fcf6e8;
-  --color-surface-2:   #daec93;
-  --color-border:      rgba(100, 150, 50, 0.28);
+  --color-bg:          #F3F1FF;
+  --color-login-bg:    #EAE8FF;
+  --color-surface:     #EDF6FF;
+  --color-surface-2:   #E4E0FF;
+  --color-border:      rgba(100, 85, 220, 0.13);
 
-  --color-primary:     #95c96d;
-  --color-primary-dim: rgba(149, 201, 109, 0.18);
+  --color-primary:     #6E5FF0;
+  --color-primary-dim: rgba(110, 95, 240, 0.15);
 
-  --color-accent:      #E5704A;
+  --color-accent:      #7B6BFF;
 
-  --color-text:        #263A1A;
-  --color-text-sub:    rgba(38, 58, 26, 0.62);
-  --color-text-muted:  rgba(38, 58, 26, 0.38);
+  --color-text:        #1C1640;
+  --color-text-sub:    #6B6892;
+  --color-text-muted:  #A8A5C6;
+
+  /* Card shadows (light) */
+  --card-shadow:       0 2px 12px rgba(80,60,200,.10), 0 1px 3px rgba(80,60,200,.06);
+  --card-shadow-hover: 0 4px 20px rgba(80,60,200,.14), 0 2px 6px rgba(80,60,200,.08);
 
   /* Timer states */
   --color-timer-safe:   #2D8A45;
@@ -49,31 +53,30 @@
   --color-fab-shadow:   rgba(149, 201, 109, 0.45);
 
   /* ── Page / card / ink / nav tokens (light) ─────────────────────────────── */
-  /* 배경만 라이트 고유값 유지, 나머지는 다크모드와 동일한 느낌 */
-  --page-bg:            radial-gradient(70% 38% at 88% 4%, rgba(120,210,110,.30), transparent 70%),
-                        radial-gradient(80% 45% at 4% 78%, rgba(155,107,255,.20), transparent 72%),
-                        radial-gradient(120% 55% at 50% 0%, #FFFFFF 0%, #FCFDFB 50%, #F8FAF5 86%);
-  --card-bg:            rgba(255, 255, 255, 0.55);
-  --card-bg-soft:       rgba(255, 255, 255, 0.35);
-  --card-border:        rgba(0, 0, 0, 0.07);
-  --divider-color:      rgba(0, 0, 0, 0.06);
-  --ink:                #1C1F2E;
-  --ink-sub:            rgba(28, 31, 46, 0.62);
-  --ink-muted:          rgba(28, 31, 46, 0.38);
-  --grad-action:        linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
-  --grad-action-2:      linear-gradient(135deg, #6E8BFF 0%, #9B6BFF 100%);
-  --grad-soft:          linear-gradient(135deg, rgba(70,215,255,.10), rgba(155,107,255,.08));
-  --toggle-off-bg:      rgba(0, 0, 0, 0.10);
-  --nav-bg:             #fffdf5;
-  --nav-border:         rgba(0, 0, 0, 0.07);
-  --nav-inactive:       rgba(28, 31, 46, 0.38);
-  --nav-active:         #9B8BFF;
-  --brand-grad:         linear-gradient(135deg, #46D7FF 0%, #6E8BFF 48%, #9B6BFF 100%);
-  --header-subtitle:    rgba(28, 31, 46, 0.55);
-  --devbtn-bg:          rgba(0, 0, 0, 0.04);
-  --devbtn-border:      rgba(0, 0, 0, 0.15);
-  --devbtn-color:       rgba(28, 31, 46, 0.55);
-  --ring-track:         rgba(0, 0, 0, 0.12);
+  --page-bg:            radial-gradient(ellipse 55% 35% at 96% 2%,  rgba(80,195,255,.22), transparent 65%),
+                        radial-gradient(ellipse 60% 40% at 2%  98%, rgba(130,100,255,.18), transparent 68%),
+                        linear-gradient(148deg, #EDF6FF 0%, #F0EEFF 52%, #EAE7FF 100%);
+  --card-bg:            rgba(255, 255, 255, 0.95);
+  --card-bg-soft:       rgba(255, 255, 255, 0.70);
+  --card-border:        rgba(100, 85, 220, 0.13);
+  --divider-color:      rgba(100, 85, 220, 0.08);
+  --ink:                #1C1640;
+  --ink-sub:            #6B6892;
+  --ink-muted:          #A8A5C6;
+  --grad-action:        linear-gradient(135deg, #46D7FF 0%, #7B6BFF 48%, #9B4BFF 100%);
+  --grad-action-2:      linear-gradient(135deg, #6E5FF0 0%, #7B6BFF 100%);
+  --grad-soft:          linear-gradient(135deg, rgba(70,215,255,.12), rgba(123,107,255,.10));
+  --toggle-off-bg:      rgba(100, 85, 220, 0.10);
+  --nav-bg:             rgba(240, 238, 255, 0.96);
+  --nav-border:         rgba(100, 85, 220, 0.13);
+  --nav-inactive:       #A8A5C6;
+  --nav-active:         #6E5FF0;
+  --brand-grad:         linear-gradient(135deg, #46D7FF 0%, #7B6BFF 48%, #9B4BFF 100%);
+  --header-subtitle:    #6B6892;
+  --devbtn-bg:          rgba(100, 85, 220, 0.06);
+  --devbtn-border:      rgba(100, 85, 220, 0.20);
+  --devbtn-color:       #6B6892;
+  --ring-track:         rgba(100, 85, 220, 0.12);
 
   /* Mission card tokens (light → dark style) */
   --mission-bg-safe:           #0E1226;
@@ -409,6 +412,10 @@ img, video {
   --timer-label-safe:   rgba(255, 255, 255, 0.50);
   --timer-label-warn:   #FFC24B;
   --timer-label-danger: #FF6B6B;
+}
+
+body {
+  background-color: #EDF6FF;
 }
 
 [data-theme="dark"] body {
