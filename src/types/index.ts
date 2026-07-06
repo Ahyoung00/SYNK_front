@@ -601,6 +601,27 @@ export interface WsEvent<T = unknown> {
 
 // ── UI-only helpers ───────────────────────────────────────────────────────────
 
+// ── 참여율 ────────────────────────────────────────────────────────────────────
+
+export type ParticipationPeriod = 'month' | 'lastMonth' | 'all'
+
+export interface ParticipationMemberStat {
+  userId: number
+  name: string
+  profileImage: string | null
+  completed: number
+  total: number
+  rate: number
+  rank: number
+}
+
+export interface ParticipationStatsResponse {
+  averageRate: number
+  memberCount: number
+  missionCount: number
+  members: ParticipationMemberStat[]
+}
+
 /** Active mission state tracked in the mission store */
 export interface ActiveMissionState {
   mission: Mission

@@ -29,6 +29,7 @@ import SynklogCompletePage from '@/pages/album/SynklogCompletePage'
 import RoomChatPage from '@/pages/chat/RoomChatPage'
 import RoomSettingsPage from '@/pages/room/RoomSettingsPage'
 import RoomMembersPage from '@/pages/room/RoomMembersPage'
+import RoomParticipationPage from '@/pages/room/RoomParticipationPage'
 import CreateRoomPage from '@/pages/room/CreateRoomPage'
 import RoomCreatedPage from '@/pages/room/RoomCreatedPage'
 import JoinRoomPage from '@/pages/room/JoinRoomPage'
@@ -93,6 +94,7 @@ export const router = createBrowserRouter([
       { path: '/room/:roomId/chat',                 element: <RoomChatPage /> },
       { path: '/room/:roomId/settings',             element: <RoomSettingsPage /> },
       { path: '/room/:roomId/settings/members',     element: <RoomMembersPage /> },
+      { path: '/room/:roomId/participation',         element: <RoomParticipationPage /> },
 
       // Mission flow
       { path: '/mission/:roomId',            element: <MissionDetailPage /> },

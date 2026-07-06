@@ -304,6 +304,15 @@ export default function RoomPage() {
             >
               🔔 FCM 알림 테스트
             </button>
+            <button
+              className={styles.devBtn}
+              onClick={() => navigate(ROUTES.ROOM_PARTICIPATION(id))}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M18 20V10M12 20V4M6 20v-6" />
+              </svg>
+              이달의 참여율
+            </button>
           </div>
           <div className={styles.actionCard}>
             <button className={styles.settingsBtn} onClick={() => navigate(ROUTES.ROOM_SETTINGS(id))}>

@@ -507,6 +507,10 @@
   background: var(--devbtn-bg);
   border: 1px dashed var(--devbtn-border);
   color: var(--devbtn-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 
 .devBtn:disabled {

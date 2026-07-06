@@ -44,6 +44,7 @@ export const ROUTES = {
   ROOM_CHAT: (roomId: number | string) => `/room/${roomId}/chat`,
   ROOM_SETTINGS: (roomId: number | string) => `/room/${roomId}/settings`,
   ROOM_MEMBERS: (roomId: number | string) => `/room/${roomId}/settings/members`,
+  ROOM_PARTICIPATION: (roomId: number | string) => `/room/${roomId}/participation`,
   ROOM_CREATE: '/room/create',
   ROOM_CREATED: (roomId: number | string) => `/room/${roomId}/created`,
   ROOM_JOIN: '/room/join',

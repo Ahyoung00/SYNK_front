@@ -1,0 +1,264 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--page-bg);
+}
+
+.scroll {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: var(--sp-4) var(--sp-5) var(--sp-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+/* ── 기간 탭 ─────────────────────────────────────────────────────────────── */
+.tabBar {
+  display: flex;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 4px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.tabBtn {
+  flex: 1;
+  padding: 10px 0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.tabActive {
+  background: var(--card-bg-soft, rgba(255,255,255,0.1));
+  color: var(--ink);
+}
+
+:global(:root:not([data-theme="dark"])) .tabActive {
+  background: var(--grad-action-2);
+  color: #fff;
+}
+
+/* ── 히어로 카드 ─────────────────────────────────────────────────────────── */
+.heroCard {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 18px;
+  padding: 20px 22px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+:global(:root:not([data-theme="dark"])) .heroCard {
+  background: linear-gradient(135deg, rgba(124,111,240,.18), rgba(70,215,255,.12));
+  border-color: rgba(124,111,240,.25);
+}
+
+.heroTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.heroLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.heroLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-sub);
+}
+
+.heroRate {
+  font-size: 48px;
+  font-weight: 900;
+  letter-spacing: -2px;
+  line-height: 1;
+  background: var(--grad-action);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.heroMeta {
+  font-size: 13px;
+  color: var(--ink-sub);
+  font-weight: 500;
+}
+
+/* 멤버 색상 바 row */
+.memberBars {
+  display: flex;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.memberBar {
+  flex: 1;
+  border-radius: 6px;
+  min-height: 14px;
+  max-height: 38px;
+  transition: height 0.4s ease;
+}
+
+/* ── 멤버별 현황 섹션 ─────────────────────────────────────────────────────── */
+.sectionTitle {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-sub);
+  padding: 0 2px;
+}
+
+.memberList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.memberCard {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  padding: 14px 16px;
+}
+
+:global(:root:not([data-theme="dark"])) .memberCard {
+  background: linear-gradient(135deg, rgba(124,111,240,.08), rgba(70,215,255,.05));
+  border-color: rgba(124,111,240,.18);
+}
+
+/* 순위 배지 */
+.rankBadge {
+  width: 26px;
+  flex-shrink: 0;
+  text-align: center;
+  font-size: 18px;
+  line-height: 1;
+}
+
+.rankNum {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-muted);
+  line-height: 1;
+}
+
+/* 아바타 */
+.avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  color: #fff;
+  overflow: hidden;
+  position: relative;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* 이름 + 진행바 영역 */
+.memberInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+}
+
+.memberNameRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.memberName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meBadge {
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  background: var(--grad-action-2);
+  padding: 1px 6px;
+  border-radius: 99px;
+  flex-shrink: 0;
+}
+
+.memberSubRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.memberSubText {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+.progressBar {
+  flex: 1;
+  height: 5px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+
+:global(:root:not([data-theme="dark"])) .progressBar {
+  background: rgba(0,0,0,0.07);
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: 99px;
+  transition: width 0.5s ease;
+}
+
+/* 참여율 % */
+.rateText {
+  flex-shrink: 0;
+  font-size: 15px;
+  font-weight: 800;
+  min-width: 40px;
+  text-align: right;
+}
+
+.emptyText {
+  padding: 48px 20px;
+  text-align: center;
+  color: var(--ink-muted);
+  font-size: 14px;
+}

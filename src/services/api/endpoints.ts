@@ -151,6 +151,10 @@ export const roomApi = {
   /** [테스트용] POST /rooms/{roomId}/test-notification — 방 멤버 전원 FCM 알림 발송 */
   testNotification: (roomId: number) =>
     api.post<void>(`/rooms/${roomId}/test-notification`),
+
+  /** GET /rooms/{roomId}/participation?period=month|lastMonth|all */
+  getParticipation: (roomId: number, period: import('@/types').ParticipationPeriod) =>
+    api.get<import('@/types').ParticipationStatsResponse>(`/rooms/${roomId}/participation`, { params: { period } }),
 }
 
 // ── Mission ───────────────────────────────────────────────────────────────────

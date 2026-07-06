@@ -599,6 +599,36 @@ app.delete('/rooms/:id/members/:userId', (req, res) => {
   ok(res, null)
 })
 
+// GET /rooms/:id/participation?period=month|lastMonth|all
+app.get('/rooms/:id/participation', (req, res) => {
+  const roomId = Number(req.params.id)
+  const members = db().get('room_members').filter({ room_id: roomId }).value()
+  const total = 30
+  const mockStats = members.map((m, i) => {
+    const completed = Math.max(0, total - i * 3 - Math.floor(Math.random() * 4))
+    return {
+      userId: m.user_id,
+      name: pickUser(m.user_id)?.name ?? '알 수 없음',
+      profileImage: pickUser(m.user_id)?.profileImage ?? null,
+      completed,
+      total,
+      rate: Math.round((completed / total) * 100),
+      rank: i + 1,
+    }
+  })
+  mockStats.sort((a, b) => b.rate - a.rate)
+  mockStats.forEach((s, i) => { s.rank = i + 1 })
+  const avgRate = mockStats.length
+    ? Math.round(mockStats.reduce((sum, s) => sum + s.rate, 0) / mockStats.length)
+    : 0
+  ok(res, {
+    averageRate: avgRate,
+    memberCount: mockStats.length,
+    missionCount: total,
+    members: mockStats,
+  })
+})
+
 // =============================================================================
 // 미션 (Mission)
 // GET /missions/active?roomId={roomId}
