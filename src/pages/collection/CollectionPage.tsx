@@ -11,15 +11,20 @@ import styles from './CollectionPage.module.css'
 
 type TabType = 'mission' | 'synklog'
 
-// 카테고리 정의 (아직 백엔드 미지원 — 랜덤 배정)
-const CATEGORIES = [
-  { id: 'daily',  label: '일상',  color: '#46D7FF' },
-  { id: 'sense',  label: '감각',  color: '#9B6BFF' },
-  { id: 'place',  label: '장소',  color: '#2DDAB8' },
-] as const
+// 카테고리 칩 색상 — 등장 순서대로 순환 배정
+const CAT_COLORS = ['#46D7FF', '#9B6BFF', '#2DDAB8', '#FF8C42', '#FF6B9D', '#6E8BFF']
 
-function getCategory(missionId: number) {
-  return CATEGORIES[missionId % CATEGORIES.length]
+function colorForIndex(i: number) {
+  return CAT_COLORS[i % CAT_COLORS.length]
+}
+
+/** 미션 목록에서 카테고리 목록을 등장 순서대로 추출 */
+function extractCategories(missions: CollectionMissionItem[]): string[] {
+  const seen: string[] = []
+  for (const m of missions) {
+    if (m.category && !seen.includes(m.category)) seen.push(m.category)
+  }
+  return seen
 }
 
 function RingChart({ rate }: { rate: number }) {
@@ -50,50 +55,109 @@ function RingChart({ rate }: { rate: number }) {
   )
 }
 
-// 카테고리별 미션 그룹
-function MissionTab({ data, isLoading }: { data: CollectionListResponse | null; isLoading: boolean }) {
+// 미션 타일 (완료 / 미수집 잠금)
+function MissionTile({ mission }: { mission: CollectionMissionItem }) {
   const navigate = useNavigate()
+  const locked = mission.completedTimes <= 0
+
+  if (locked) {
+    return (
+      <div className={`${styles.missionTile} ${styles.missionTileLocked}`}>
+        <div className={styles.tileThumbWrap}>
+          <div className={styles.tileThumbLockedBox}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="4" y="11" width="16" height="9" rx="2" />
+              <path d="M8 11V8a4 4 0 118 0v3" />
+            </svg>
+          </div>
+        </div>
+        <span className={styles.tileTitle}>{mission.title}</span>
+        <span className={styles.tileMeta}>미수집</span>
+      </div>
+    )
+  }
+
+  return (
+    <button
+      className={styles.missionTile}
+      onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
+    >
+      <div className={styles.tileThumbWrap}>
+        <div className={styles.tileThumb} style={{ background: missionGradient(mission.title) }}>
+          {mission.thumbnail
+            ? <img src={mission.thumbnail} alt="" className={styles.tileThumbImg} />
+            : <img src="/synk-bolt.png" alt="" className={styles.tileThumbLogo} />
+          }
+        </div>
+        <span className={styles.tileCheck}>✓</span>
+      </div>
+      <span className={styles.tileTitle}>{mission.title}</span>
+      <span className={styles.tileMeta}>완료 {mission.completedTimes}회</span>
+    </button>
+  )
+}
+
+// 카테고리별 미션 그룹 (섹션)
+function CategorySection({ category, color, missions }: { category: string; color: string; missions: CollectionMissionItem[] }) {
+  const completed = missions.filter((m) => m.completedTimes > 0).length
+  return (
+    <div className={styles.categoryGroup}>
+      <div className={styles.categoryHeader}>
+        <span className={styles.categoryTag} style={{ background: color + '26', color }}>
+          {category}
+        </span>
+        <span className={styles.categoryCount}>{completed} / {missions.length}</span>
+      </div>
+      <div className={styles.missionGrid}>
+        {missions.map((m) => <MissionTile key={m.missionId} mission={m} />)}
+      </div>
+    </div>
+  )
+}
+
+// 완료한 미션 탭 — 카테고리 필터 + 잠금 미션 표시
+function MissionTab({ data, isLoading }: { data: CollectionListResponse | null; isLoading: boolean }) {
+  const [selected, setSelected] = useState<string>('전체')
 
   if (isLoading) return <Loading />
   if (!data || data.missions.length === 0) {
-    return <p className={styles.emptyText}>아직 완료한 미션이 없어요</p>
+    return <p className={styles.emptyText}>표시할 미션이 없어요</p>
   }
 
-  // 카테고리별 그룹핑
-  const groups = CATEGORIES.map((cat) => ({
-    cat,
-    missions: data.missions.filter((m) => getCategory(m.missionId).id === cat.id),
-  })).filter((g) => g.missions.length > 0)
+  const categories = extractCategories(data.missions)
+  const shownCategories = selected === '전체'
+    ? categories
+    : categories.filter((c) => c === selected)
 
   return (
     <>
-      {groups.map(({ cat, missions }) => (
-        <div key={cat.id} className={styles.categoryGroup}>
-          <div className={styles.categoryHeader}>
-            <span className={styles.categoryTag} style={{ background: cat.color + '26', color: cat.color }}>
-              {cat.label}
-            </span>
-            <span className={styles.categoryCount}>{missions.length} / {data.totalCount} 미션 완료</span>
-          </div>
-          <div className={styles.missionGrid}>
-            {missions.map((mission: CollectionMissionItem) => (
-              <button
-                key={mission.missionId}
-                className={styles.missionTile}
-                onClick={() => navigate(ROUTES.COLLECTION_DETAIL(mission.missionId))}
-              >
-                <div className={styles.tileThumbWrap}>
-                  <div className={styles.tileThumb} style={{ background: missionGradient(mission.title) }}>
-                    <img src="/synk-bolt.png" alt="" className={styles.tileThumbLogo} />
-                  </div>
-                  <span className={styles.tileCheck}>✓</span>
-                </div>
-                <span className={styles.tileTitle}>{mission.title}</span>
-                <span className={styles.tileMeta}>완료 {mission.completedTimes}회</span>
-              </button>
-            ))}
-          </div>
-        </div>
+      {/* 카테고리 필터 칩 */}
+      <div className={styles.catFilterRow}>
+        <button
+          className={`${styles.catChip} ${selected === '전체' ? styles.catChipActive : ''}`}
+          onClick={() => setSelected('전체')}
+        >
+          전체
+        </button>
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            className={`${styles.catChip} ${selected === cat ? styles.catChipActive : ''}`}
+            onClick={() => setSelected(cat)}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+      {/* 카테고리 섹션 */}
+      {shownCategories.map((cat) => (
+        <CategorySection
+          key={cat}
+          category={cat}
+          color={colorForIndex(categories.indexOf(cat))}
+          missions={data.missions.filter((m) => m.category === cat)}
+        />
       ))}
     </>
   )

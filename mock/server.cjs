@@ -1377,18 +1377,21 @@ app.get('/collections', (req, res) => {
   const completedCount = completedTemplateIds.length
   const completionRate = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0
 
-  const missions = completedTemplateIds.map((tid) => {
-    const tmpl    = db().get('mission_templates').find({ id: tid }).value()
-    const recs    = groupMap[tid].sort((a, b) => new Date(b.date) - new Date(a.date))
-    const latest  = recs[0]
-    // YYYY-MM-DD → YYYY.MM.DD
-    const lastDate = (latest.date ?? '').replace(/-/g, '.')
+  // 실제 BE 계약: 완료/미완료 전체 미션을 category와 함께 반환
+  const MOCK_CATEGORIES = [
+    '즉흥 일상', '즉흥 반응/감정', '집중 모드', '부캠 감성', '팀 미션',
+    '챌린지', '프로젝트 팀/반', '슬랙', '간식', '인터넷에서 찾기',
+  ]
+  const missions = templates.map((tmpl, i) => {
+    const recs = (groupMap[tmpl.id] ?? []).sort((a, b) => new Date(b.date) - new Date(a.date))
+    const latest = recs[0]
     return {
-      missionId:         tid,
-      title:             tmpl?.title ?? '',
-      thumbnail:         latest.thumbnail ?? '',
+      missionId:         tmpl.id,
+      title:             tmpl.title ?? '',
+      category:          MOCK_CATEGORIES[i % MOCK_CATEGORIES.length],
+      thumbnail:         latest?.thumbnail ?? null,
       completedTimes:    recs.length,
-      lastCompletedDate: lastDate,
+      lastCompletedDate: latest ? (latest.date ?? '').replace(/-/g, '.') : null,
     }
   })
 

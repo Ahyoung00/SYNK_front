@@ -357,10 +357,13 @@ export interface CollectionRecord {
 export interface CollectionMissionItem {
   missionId: number
   title: string
-  thumbnail: string         // collection_records.thumbnail
-  completedTimes: number    // 완료 횟수
-  /** "YYYY.MM.DD" */
-  lastCompletedDate: string
+  /** 카테고리명 (한글 그대로 — 예: "즉흥 일상") */
+  category: string
+  /** 미완료면 null */
+  thumbnail: string | null  // collection_records.thumbnail
+  completedTimes: number    // 완료 횟수 (0이면 미수집/잠금)
+  /** "YYYY.MM.DD" — 미완료면 null */
+  lastCompletedDate: string | null
 }
 
 /**

@@ -127,6 +127,38 @@
   color: #fff;
 }
 
+/* ── 카테고리 필터 칩 ───────────────────────────────────────────────────── */
+.catFilterRow {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 2px 2px 4px;
+  scrollbar-width: none;
+}
+.catFilterRow::-webkit-scrollbar { display: none; }
+
+.catChip {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-sub);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.catChipActive {
+  background: var(--grad-action-2);
+  color: #fff;
+  border-color: transparent;
+}
+
 /* ── 카테고리 그룹 ───────────────────────────────────────────────────────── */
 .categoryGroup {
   display: flex;
@@ -203,6 +235,34 @@
   width: 32px;
   height: 32px;
   object-fit: contain;
+}
+
+.tileThumbImg {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  object-fit: cover;
+}
+
+/* ── 미수집(잠금) 타일 ─────────────────────────────────────────────────── */
+.missionTileLocked {
+  opacity: 0.55;
+}
+
+:global(:root:not([data-theme="dark"])) .missionTileLocked {
+  background: var(--card-bg);
+  border-color: var(--card-border);
+}
+
+.tileThumbLockedBox {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg-soft, rgba(255,255,255,0.08));
+  color: var(--ink-muted);
 }
 
 .tileCheck {
