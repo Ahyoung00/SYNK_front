@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
-import { albumApi, roomApi } from '@/services/api/endpoints'
+import { albumApi, collageApi, roomApi } from '@/services/api/endpoints'
 import type { CollageItem } from '@/types'
 import { ROUTES } from '@/constants'
 import { downloadVideo } from '@/utils/downloadVideo'
@@ -42,6 +42,22 @@ export default function MissionResultPage() {
       setMissionTitle(cd.missionTitle)
       if (cd.totalMembers != null) setRoomMemberCount(cd.totalMembers)
       setShowStats(true)
+      return
+    }
+
+    // 알림 딥링크 콜드 스타트: navState 없고 missionId만 있을 때
+    if (!roomId && missionIdParam) {
+      collageApi.getMissionCollage(Number(missionIdParam))
+        .then((res) => {
+          const cd = res.data
+          setCollage(cd)
+          setMissionTitle(cd.missionTitle)
+          setShowStats(true)
+        })
+        .catch(() => {
+          setLoadError(true)
+          setShowStats(true)
+        })
       return
     }
 
