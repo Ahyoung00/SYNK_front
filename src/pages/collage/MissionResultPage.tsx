@@ -226,9 +226,6 @@ export default function MissionResultPage() {
           </div>
         )}
 
-        <div className={styles.countBadge}>
-          {submittedCount}/{totalCount}명 참여
-        </div>
       </div>
 
       {/* ── 통계 + 홈으로 ─────────────────────────────────────────────────── */}
