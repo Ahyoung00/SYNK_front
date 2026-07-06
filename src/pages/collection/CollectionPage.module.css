@@ -213,8 +213,8 @@
 }
 
 :global(:root:not([data-theme="dark"])) .missionTile {
-  background: linear-gradient(135deg, rgba(124,111,240,.12), rgba(70,215,255,.08));
-  border-color: rgba(124,111,240,.22);
+  background: linear-gradient(135deg, rgba(124,111,240,.18), rgba(70,215,255,.13));
+  border-color: rgba(124,111,240,.28);
 }
 
 .tileThumbWrap {
@@ -250,8 +250,8 @@
 }
 
 :global(:root:not([data-theme="dark"])) .missionTileLocked {
-  background: var(--card-bg);
-  border-color: var(--card-border);
+  background: linear-gradient(135deg, rgba(124,111,240,.08), rgba(70,215,255,.06));
+  border-color: rgba(124,111,240,.15);
 }
 
 .tileThumbLockedBox {
