@@ -18,13 +18,18 @@ function colorForIndex(i: number) {
   return CAT_COLORS[i % CAT_COLORS.length]
 }
 
-/** 미션 목록에서 카테고리 목록을 등장 순서대로 추출 */
+/** 미션 목록에서 카테고리 목록을 등장 순서대로 추출 (튜토리얼은 항상 맨 앞) */
 function extractCategories(missions: CollectionMissionItem[]): string[] {
   const seen: string[] = []
   for (const m of missions) {
     if (m.category && !seen.includes(m.category)) seen.push(m.category)
   }
-  return seen
+  // '튜토리얼'은 전체 바로 다음(맨 앞)에 오도록 우선 정렬
+  return seen.sort((a, b) => {
+    if (a === '튜토리얼') return -1
+    if (b === '튜토리얼') return 1
+    return 0
+  })
 }
 
 function RingChart({ rate }: { rate: number }) {
