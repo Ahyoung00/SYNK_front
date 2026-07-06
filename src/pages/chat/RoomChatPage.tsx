@@ -86,7 +86,6 @@ export default function RoomChatPage() {
   const inputRef       = useRef<HTMLTextAreaElement>(null)
   const isAtBottomRef  = useRef(true)
   const loaded         = useRef(false)
-  const [vp, setVp] = useState({ height: window.innerHeight, offsetTop: 0 })
   const [notifOn, setNotifOn] = useState(true)
 
   async function toggleNotif() {
@@ -168,12 +167,11 @@ export default function RoomChatPage() {
     }
   }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── iOS 키보드 대응: visualViewport로 페이지 height + translateY 제어 ─────
+  // ── iOS 키보드: visualViewport resize 시 바닥 스크롤 유지 ─────────────────
   useEffect(() => {
     const vv = window.visualViewport
     if (!vv) return
     const update = () => {
-      setVp({ height: vv.height, offsetTop: vv.offsetTop })
       if (isAtBottomRef.current) {
         requestAnimationFrame(() => {
           const el = listRef.current
@@ -182,11 +180,7 @@ export default function RoomChatPage() {
       }
     }
     vv.addEventListener('resize', update)
-    vv.addEventListener('scroll', update)
-    return () => {
-      vv.removeEventListener('resize', update)
-      vv.removeEventListener('scroll', update)
-    }
+    return () => vv.removeEventListener('resize', update)
   }, [])
 
   // ── 초기 스크롤 (즉시) ────────────────────────────────────────────────────
@@ -252,7 +246,6 @@ export default function RoomChatPage() {
   return (
     <div
       className={styles.page}
-      style={{ height: vp.height, transform: `translateY(${vp.offsetTop}px)` }}
     >
 
       {/* ── 헤더 ─────────────────────────────────────────────────────────── */}
