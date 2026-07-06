@@ -93,6 +93,7 @@ self.addEventListener('push', (e: PushEvent) => {
           .showNotification(title, {
             body,
             icon: '/icon-192.png',
+            data: d,
           })
           .then(() => {
             console.log('[SW] showNotification 성공')
@@ -106,7 +107,7 @@ self.addEventListener('push', (e: PushEvent) => {
         // matchAll 자체가 실패할 경우에도 알림은 표시
         console.error('[SW] clients.matchAll 실패, 직접 showNotification 시도:', err)
         return self.registration
-          .showNotification(title, { body, icon: '/icon-192.png' })
+          .showNotification(title, { body, icon: '/icon-192.png', data: d })
           .catch((e2) => console.error('[SW] showNotification 최종 실패:', e2))
       })
   )
@@ -114,5 +115,14 @@ self.addEventListener('push', (e: PushEvent) => {
 
 self.addEventListener('notificationclick', (e: NotificationEvent) => {
   e.notification.close()
-  e.waitUntil(self.clients.openWindow('/'))
+  const d = (e.notification.data ?? {}) as Record<string, string>
+  let url = '/'
+  if (d.type === 'CHAT' && d.roomId) {
+    url = `/room/${d.roomId}/chat`
+  } else if (d.type === 'MISSION_START' && d.roomId) {
+    url = `/mission/${d.roomId}`
+  } else if (d.type === 'COLLAGE_COMPLETED' && d.roomId) {
+    url = `/room/${d.roomId}`
+  }
+  e.waitUntil(self.clients.openWindow(url))
 })
