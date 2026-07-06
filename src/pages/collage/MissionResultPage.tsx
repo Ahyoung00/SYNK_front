@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useLocation, useParams } from 'react-router-dom'
 import { useMissionStore } from '@/store/missionStore'
-import { albumApi, collageApi, roomApi } from '@/services/api/endpoints'
+import { albumApi, missionApi, roomApi } from '@/services/api/endpoints'
 import type { CollageItem } from '@/types'
 import { ROUTES } from '@/constants'
 import { downloadVideo } from '@/utils/downloadVideo'
@@ -47,8 +47,8 @@ export default function MissionResultPage() {
 
     // 알림 딥링크 콜드 스타트: navState 없고 missionId만 있을 때
     if (!roomId && missionIdParam) {
-      collageApi.getMissionCollage(Number(missionIdParam))
-        .then((res) => {
+      missionApi.getMissionCollage(Number(missionIdParam))
+        .then((res: Awaited<ReturnType<typeof missionApi.getMissionCollage>>) => {
           const cd = res.data
           setCollage(cd)
           setMissionTitle(cd.missionTitle)
