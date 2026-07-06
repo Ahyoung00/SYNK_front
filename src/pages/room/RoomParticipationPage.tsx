@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { roomApi } from '@/services/api/endpoints'
+import type { RoomDetail } from '@/types'
 import type { ParticipationStatsResponse, ParticipationMemberStat } from '@/types'
 import { useAuthStore } from '@/store/authStore'
 import NavHeader from '@/components/layout/NavHeader'
@@ -16,6 +17,16 @@ function getWeekStart(offset: number): Date {
   d.setDate(d.getDate() + diff - offset * 7)
   d.setHours(0, 0, 0, 0)
   return d
+}
+
+// 방 생성일 기준 최대 weekOffset 계산
+function maxWeekOffset(createdAt: string | null | undefined): number {
+  if (!createdAt) return 52 // 알 수 없으면 1년
+  const created = new Date(createdAt)
+  created.setHours(0, 0, 0, 0)
+  const thisWeekStart = getWeekStart(0)
+  const diffMs = thisWeekStart.getTime() - created.getTime()
+  return Math.max(0, Math.floor(diffMs / (7 * 24 * 60 * 60 * 1000)))
 }
 
 function formatWeekLabel(offset: number): string {
@@ -112,6 +123,13 @@ export default function RoomParticipationPage() {
   const [data, setData] = useState<ParticipationStatsResponse | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [room, setRoom] = useState<RoomDetail | null>(null)
+
+  useEffect(() => {
+    roomApi.getRoom(id).then((res) => setRoom(res.data)).catch(() => {})
+  }, [id])
+
+  const maxOffset = maxWeekOffset(room?.createdAt ?? room?.created_at)
 
   useEffect(() => {
     setIsLoading(true)
@@ -145,7 +163,8 @@ export default function RoomParticipationPage() {
         <div className={styles.weekNav}>
           <button
             className={styles.weekArrow}
-            onClick={() => setWeekOffset((w) => w + 1)}
+            onClick={() => setWeekOffset((w) => Math.min(w + 1, maxOffset))}
+            disabled={weekOffset >= maxOffset}
             aria-label="이전 주"
           >
             <ChevronLeft />

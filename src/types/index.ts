@@ -61,6 +61,9 @@ export interface RoomDetail {
   missionEndTime: string
   members: Array<{ userId: number; name: string; profileImage: string | null }>
   recentAlbums: Array<{ date: string; thumbnail: string | null }>
+  /** 방 생성일 (ISO 8601) */
+  createdAt?: string | null
+  created_at?: string | null
 }
 
 /**
