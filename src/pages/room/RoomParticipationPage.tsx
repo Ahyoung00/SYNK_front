@@ -141,28 +141,6 @@ export default function RoomParticipationPage() {
 
       <div className={styles.scroll}>
 
-        {/* ── 백엔드 API 요청 배너 ──────────────────────────────────────────── */}
-        <div className={styles.apiBanner}>
-          <div className={styles.apiBannerHeader}>
-            <span className={styles.apiBannerIcon}>🛠</span>
-            <span className={styles.apiBannerTitle}>백엔드 API 연동 필요</span>
-          </div>
-          <div className={styles.apiBannerBody}>
-            <p className={styles.apiBannerEndpoint}>
-              <code>GET /rooms/&#123;roomId&#125;/participation?weekOffset=&#123;n&#125;</code>
-            </p>
-            <ul className={styles.apiBannerList}>
-              <li><b>weekOffset</b>: 0 = 이번 주, 1 = 지난 주, 2 = 2주 전 …</li>
-              <li><b>averageRate</b>: number — 방 평균 참여율 (%)</li>
-              <li><b>memberCount</b>: number — 방 멤버 수</li>
-              <li><b>missionCount</b>: number — 해당 주 발송된 미션 수</li>
-              <li><b>startDate</b>: string (YYYY-MM-DD) — 주 시작일(월요일)</li>
-              <li><b>endDate</b>: string (YYYY-MM-DD) — 주 종료일(일요일)</li>
-              <li><b>members[]</b>: userId, name, profileImage, completed, total, rate, rank</li>
-            </ul>
-          </div>
-        </div>
-
         {/* ── 주 네비게이터 ─────────────────────────────────────────────────── */}
         <div className={styles.weekNav}>
           <button
