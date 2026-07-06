@@ -15,39 +15,152 @@
   gap: var(--sp-4);
 }
 
-/* ── 기간 탭 ─────────────────────────────────────────────────────────────── */
-.tabBar {
-  display: flex;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+/* ── 백엔드 API 요청 배너 ─────────────────────────────────────────────────── */
+.apiBanner {
+  background: rgba(255, 165, 0, 0.10);
+  border: 1px solid rgba(255, 165, 0, 0.30);
   border-radius: 14px;
-  padding: 4px;
-  gap: 4px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   flex-shrink: 0;
 }
 
-.tabBtn {
-  flex: 1;
-  padding: 10px 0;
-  border-radius: 10px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--ink-muted);
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: background 0.15s, color 0.15s;
-  -webkit-tap-highlight-color: transparent;
+:global(:root[data-theme="dark"]) .apiBanner {
+  background: rgba(255, 200, 80, 0.07);
+  border-color: rgba(255, 200, 80, 0.22);
 }
 
-.tabActive {
-  background: var(--card-bg-soft, rgba(255,255,255,0.1));
+.apiBannerHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.apiBannerIcon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.apiBannerTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: #B45309;
+}
+
+:global(:root[data-theme="dark"]) .apiBannerTitle {
+  color: #FCD34D;
+}
+
+.apiBannerBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.apiBannerEndpoint {
+  margin: 0;
+}
+
+.apiBannerEndpoint code {
+  font-size: 11px;
+  font-family: 'Menlo', 'Consolas', monospace;
+  background: rgba(0,0,0,0.06);
+  border-radius: 6px;
+  padding: 4px 8px;
+  color: #1C1640;
+  display: inline-block;
+  word-break: break-all;
+}
+
+:global(:root[data-theme="dark"]) .apiBannerEndpoint code {
+  background: rgba(255,255,255,0.08);
+  color: #e2e8f0;
+}
+
+.apiBannerList {
+  margin: 0;
+  padding: 0 0 0 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.apiBannerList li {
+  font-size: 11.5px;
+  color: var(--ink-sub);
+  line-height: 1.6;
+}
+
+.apiBannerList b {
   color: var(--ink);
 }
 
-:global(:root:not([data-theme="dark"])) .tabActive {
-  background: var(--grad-action-2);
-  color: #fff;
+/* ── 주 네비게이터 ────────────────────────────────────────────────────────── */
+.weekNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 10px 8px;
+  flex-shrink: 0;
+}
+
+.weekArrow {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  color: var(--ink-sub);
+  transition: background 0.12s, opacity 0.12s;
+  flex-shrink: 0;
+}
+
+.weekArrow:active {
+  background: var(--card-bg-soft);
+}
+
+.weekArrow:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.weekLabel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.weekLabelMain {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.weekLabelSub {
+  font-size: 12px;
+  color: var(--ink-muted);
+}
+
+/* ── 에러 박스 ────────────────────────────────────────────────────────────── */
+.errorBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 32px 20px;
+}
+
+.errorSub {
+  font-size: 12px;
+  color: var(--ink-muted);
+  text-align: center;
 }
 
 /* ── 히어로 카드 ─────────────────────────────────────────────────────────── */

@@ -153,8 +153,8 @@ export const roomApi = {
     api.post<void>(`/rooms/${roomId}/test-notification`),
 
   /** GET /rooms/{roomId}/participation?period=month|lastMonth|all */
-  getParticipation: (roomId: number, period: import('@/types').ParticipationPeriod) =>
-    api.get<import('@/types').ParticipationStatsResponse>(`/rooms/${roomId}/participation?period=${period}`),
+  getParticipation: (roomId: number, weekOffset: number) =>
+    api.get<import('@/types').ParticipationStatsResponse>(`/rooms/${roomId}/participation?weekOffset=${weekOffset}`),
 }
 
 // ── Mission ───────────────────────────────────────────────────────────────────

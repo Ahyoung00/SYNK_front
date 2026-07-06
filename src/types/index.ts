@@ -605,8 +605,6 @@ export interface WsEvent<T = unknown> {
 
 // ── 참여율 ────────────────────────────────────────────────────────────────────
 
-export type ParticipationPeriod = 'month' | 'lastMonth' | 'all'
-
 export interface ParticipationMemberStat {
   userId: number
   name: string
@@ -617,10 +615,24 @@ export interface ParticipationMemberStat {
   rank: number
 }
 
+/**
+ * GET /rooms/{roomId}/participation?weekOffset={n}
+ *   weekOffset=0: 이번 주, 1: 지난 주, 2: 2주 전, ...
+ *
+ * 백엔드 응답 필드:
+ *   averageRate   number      — 방 평균 참여율 (%)
+ *   memberCount   number      — 방 멤버 수
+ *   missionCount  number      — 해당 주 발송된 미션 수
+ *   startDate     string      — 주 시작일 (YYYY-MM-DD, 월요일)
+ *   endDate       string      — 주 종료일 (YYYY-MM-DD, 일요일)
+ *   members       ParticipationMemberStat[]
+ */
 export interface ParticipationStatsResponse {
   averageRate: number
   memberCount: number
   missionCount: number
+  startDate: string
+  endDate: string
   members: ParticipationMemberStat[]
 }
 

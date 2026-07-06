@@ -2,25 +2,45 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import { roomApi } from '@/services/api/endpoints'
-import type { ParticipationPeriod, ParticipationStatsResponse, ParticipationMemberStat } from '@/types'
+import type { ParticipationStatsResponse, ParticipationMemberStat } from '@/types'
 import { useAuthStore } from '@/store/authStore'
 import NavHeader from '@/components/layout/NavHeader'
 import Loading from '@/components/ui/Loading'
 import styles from './RoomParticipationPage.module.css'
 
-const PERIODS: { key: ParticipationPeriod; label: string }[] = [
-  { key: 'month',     label: '이번 달' },
-  { key: 'lastMonth', label: '지난 달' },
-  { key: 'all',       label: '전체' },
-]
+// 주 시작일(월요일) 계산
+function getWeekStart(offset: number): Date {
+  const d = new Date()
+  const day = d.getDay()
+  const diff = day === 0 ? -6 : 1 - day // 월요일로
+  d.setDate(d.getDate() + diff - offset * 7)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
 
-// 순위별 색상
+function formatWeekLabel(offset: number): string {
+  if (offset === 0) return '이번 주'
+  if (offset === 1) return '지난 주'
+  const start = getWeekStart(offset)
+  return `${start.getMonth() + 1}월 ${Math.ceil(start.getDate() / 7)}주`
+}
+
+function formatDateRange(startDate?: string, endDate?: string): string {
+  if (!startDate || !endDate) {
+    const s = getWeekStart(0)
+    const e = new Date(s); e.setDate(s.getDate() + 6)
+    return `${s.getMonth()+1}/${s.getDate()} – ${e.getMonth()+1}/${e.getDate()}`
+  }
+  const s = new Date(startDate)
+  const e = new Date(endDate)
+  return `${s.getMonth()+1}/${s.getDate()} – ${e.getMonth()+1}/${e.getDate()}`
+}
+
 const RANK_COLORS = ['#4ade80', '#4ade80', '#4ade80', '#8B5CF6', '#6E8BFF', '#FF9A3C', '#FF9A3C']
 function rankColor(rank: number) {
   return RANK_COLORS[Math.min(rank - 1, RANK_COLORS.length - 1)]
 }
 
-// 순위 배지
 function RankBadge({ rank }: { rank: number }) {
   if (rank === 1) return <span className={styles.rankBadge}>🥇</span>
   if (rank === 2) return <span className={styles.rankBadge}>🥈</span>
@@ -28,7 +48,6 @@ function RankBadge({ rank }: { rank: number }) {
   return <span className={styles.rankNum}>{rank}</span>
 }
 
-// 아바타 배경색
 const AVATAR_COLORS = ['#6E8BFF', '#9B6BFF', '#FF8C42', '#2DDAB8', '#FF6B9D', '#46D7FF', '#8B5CF6']
 function avatarBg(userId: number) {
   return AVATAR_COLORS[userId % AVATAR_COLORS.length]
@@ -39,14 +58,12 @@ function MemberCard({ member, isMe }: { member: ParticipationMemberStat; isMe: b
   return (
     <div className={styles.memberCard}>
       <RankBadge rank={member.rank} />
-
       <div className={styles.avatar} style={{ background: avatarBg(member.userId) }}>
         {member.profileImage
           ? <img src={member.profileImage} alt={member.name} className={styles.avatarImg} />
           : (member.name?.charAt(0) ?? '?')
         }
       </div>
-
       <div className={styles.memberInfo}>
         <div className={styles.memberNameRow}>
           <span className={styles.memberName}>{member.name}</span>
@@ -55,108 +72,11 @@ function MemberCard({ member, isMe }: { member: ParticipationMemberStat; isMe: b
         <div className={styles.memberSubRow}>
           <span className={styles.memberSubText}>{member.completed} / {member.total}회 완료</span>
           <div className={styles.progressBar}>
-            <div
-              className={styles.progressFill}
-              style={{ width: `${member.rate}%`, background: color }}
-            />
+            <div className={styles.progressFill} style={{ width: `${member.rate}%`, background: color }} />
           </div>
         </div>
       </div>
-
       <span className={styles.rateText} style={{ color }}>{member.rate}%</span>
-    </div>
-  )
-}
-
-export default function RoomParticipationPage() {
-  const { roomId } = useParams<{ roomId: string }>()
-  const navigate = useNavigate()
-  const myUserId = useAuthStore((s) => s.user?.userId)
-  const id = Number(roomId)
-
-  const [period, setPeriod] = useState<ParticipationPeriod>('month')
-  const [data, setData] = useState<ParticipationStatsResponse | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-
-  useEffect(() => {
-    setIsLoading(true)
-    roomApi.getParticipation(id, period)
-      .then((res) => setData(res.data))
-      .catch(console.error)
-      .finally(() => setIsLoading(false))
-  }, [id, period])
-
-  // 히어로 카드 상단 색상 바 — 멤버별 참여율 높이로 표현
-  function HeroBars() {
-    if (!data || data.members.length === 0) return null
-    const max = Math.max(...data.members.map((m) => m.rate), 1)
-    return (
-      <div className={styles.memberBars}>
-        {data.members.map((m) => (
-          <div
-            key={m.userId}
-            className={styles.memberBar}
-            style={{
-              background: rankColor(m.rank),
-              height: `${Math.max(14, Math.round((m.rate / max) * 38))}px`,
-            }}
-          />
-        ))}
-      </div>
-    )
-  }
-
-  return (
-    <div className={styles.page}>
-      <NavHeader title="참여율" onBack={() => navigate(ROUTES.ROOM(id))} />
-
-      <div className={styles.scroll}>
-        {/* 기간 탭 */}
-        <div className={styles.tabBar}>
-          {PERIODS.map(({ key, label }) => (
-            <button
-              key={key}
-              className={`${styles.tabBtn} ${period === key ? styles.tabActive : ''}`}
-              onClick={() => setPeriod(key)}
-            >
-              {label}
-            </button>
-          ))}
-        </div>
-
-        {isLoading ? <Loading /> : !data ? (
-          <p className={styles.emptyText}>데이터를 불러올 수 없어요</p>
-        ) : (
-          <>
-            {/* 히어로 카드 */}
-            <div className={styles.heroCard}>
-              <div className={styles.heroTop}>
-                <div className={styles.heroLeft}>
-                  <span className={styles.heroLabel}>평균 참여율</span>
-                  <span className={styles.heroRate}>{data.averageRate}%</span>
-                  <span className={styles.heroMeta}>
-                    {data.memberCount}명 · {PERIODS.find((p) => p.key === period)?.label} {data.missionCount}회 미션
-                  </span>
-                </div>
-                <RingChart rate={data.averageRate} />
-              </div>
-              <HeroBars />
-            </div>
-
-            {/* 멤버별 현황 */}
-            <span className={styles.sectionTitle}>멤버별 현황</span>
-            {data.members.length === 0 ? (
-              <p className={styles.emptyText}>참여 기록이 없어요</p>
-            ) : (
-              <div className={styles.memberList}>
-                {data.members.map((m) => (
-                  <MemberCard key={m.userId} member={m} isMe={m.userId === myUserId} />
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </div>
     </div>
   )
 }
@@ -174,17 +94,152 @@ function RingChart({ rate }: { rate: number }) {
         </linearGradient>
       </defs>
       <circle cx="46" cy="46" r={r} fill="none" stroke="var(--ring-track, rgba(255,255,255,0.08))" strokeWidth="9" />
-      <circle
-        cx="46" cy="46" r={r}
-        fill="none"
-        stroke="url(#partRingGrad)"
-        strokeWidth="9"
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        strokeDashoffset={offset}
-        transform="rotate(-90 46 46)"
-      />
+      <circle cx="46" cy="46" r={r} fill="none" stroke="url(#partRingGrad)" strokeWidth="9"
+        strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset}
+        transform="rotate(-90 46 46)" />
       <image href="/synk-bolt.png" x="20" y="20" width="52" height="52" />
+    </svg>
+  )
+}
+
+export default function RoomParticipationPage() {
+  const { roomId } = useParams<{ roomId: string }>()
+  const navigate = useNavigate()
+  const myUserId = useAuthStore((s) => s.user?.userId)
+  const id = Number(roomId)
+
+  const [weekOffset, setWeekOffset] = useState(0)
+  const [data, setData] = useState<ParticipationStatsResponse | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState(false)
+
+  useEffect(() => {
+    setIsLoading(true)
+    setError(false)
+    roomApi.getParticipation(id, weekOffset)
+      .then((res) => setData(res.data))
+      .catch(() => setError(true))
+      .finally(() => setIsLoading(false))
+  }, [id, weekOffset])
+
+  function HeroBars() {
+    if (!data || data.members.length === 0) return null
+    const max = Math.max(...data.members.map((m) => m.rate), 1)
+    return (
+      <div className={styles.memberBars}>
+        {data.members.map((m) => (
+          <div key={m.userId} className={styles.memberBar}
+            style={{ background: rankColor(m.rank), height: `${Math.max(14, Math.round((m.rate / max) * 38))}px` }} />
+        ))}
+      </div>
+    )
+  }
+
+  return (
+    <div className={styles.page}>
+      <NavHeader title="주별 참여율" onBack={() => navigate(ROUTES.ROOM(id))} />
+
+      <div className={styles.scroll}>
+
+        {/* ── 백엔드 API 요청 배너 ──────────────────────────────────────────── */}
+        <div className={styles.apiBanner}>
+          <div className={styles.apiBannerHeader}>
+            <span className={styles.apiBannerIcon}>🛠</span>
+            <span className={styles.apiBannerTitle}>백엔드 API 연동 필요</span>
+          </div>
+          <div className={styles.apiBannerBody}>
+            <p className={styles.apiBannerEndpoint}>
+              <code>GET /rooms/&#123;roomId&#125;/participation?weekOffset=&#123;n&#125;</code>
+            </p>
+            <ul className={styles.apiBannerList}>
+              <li><b>weekOffset</b>: 0 = 이번 주, 1 = 지난 주, 2 = 2주 전 …</li>
+              <li><b>averageRate</b>: number — 방 평균 참여율 (%)</li>
+              <li><b>memberCount</b>: number — 방 멤버 수</li>
+              <li><b>missionCount</b>: number — 해당 주 발송된 미션 수</li>
+              <li><b>startDate</b>: string (YYYY-MM-DD) — 주 시작일(월요일)</li>
+              <li><b>endDate</b>: string (YYYY-MM-DD) — 주 종료일(일요일)</li>
+              <li><b>members[]</b>: userId, name, profileImage, completed, total, rate, rank</li>
+            </ul>
+          </div>
+        </div>
+
+        {/* ── 주 네비게이터 ─────────────────────────────────────────────────── */}
+        <div className={styles.weekNav}>
+          <button
+            className={styles.weekArrow}
+            onClick={() => setWeekOffset((w) => w + 1)}
+            aria-label="이전 주"
+          >
+            <ChevronLeft />
+          </button>
+          <div className={styles.weekLabel}>
+            <span className={styles.weekLabelMain}>{formatWeekLabel(weekOffset)}</span>
+            <span className={styles.weekLabelSub}>{formatDateRange(data?.startDate, data?.endDate)}</span>
+          </div>
+          <button
+            className={styles.weekArrow}
+            onClick={() => setWeekOffset((w) => Math.max(0, w - 1))}
+            disabled={weekOffset === 0}
+            aria-label="다음 주"
+          >
+            <ChevronRight />
+          </button>
+        </div>
+
+        {isLoading ? <Loading /> : error ? (
+          <div className={styles.errorBox}>
+            <p className={styles.emptyText}>데이터를 불러올 수 없어요</p>
+            <p className={styles.errorSub}>백엔드 API가 아직 준비되지 않았을 수 있어요</p>
+          </div>
+        ) : !data ? null : (
+          <>
+            {/* 히어로 카드 */}
+            <div className={styles.heroCard}>
+              <div className={styles.heroTop}>
+                <div className={styles.heroLeft}>
+                  <span className={styles.heroLabel}>평균 참여율</span>
+                  <span className={styles.heroRate}>{data.averageRate}%</span>
+                  <span className={styles.heroMeta}>
+                    {data.memberCount}명 · {data.missionCount}회 미션
+                  </span>
+                </div>
+                <RingChart rate={data.averageRate} />
+              </div>
+              <HeroBars />
+            </div>
+
+            {/* 멤버별 현황 */}
+            <span className={styles.sectionTitle}>멤버별 현황</span>
+            {data.members.length === 0 ? (
+              <p className={styles.emptyText}>이번 주 참여 기록이 없어요</p>
+            ) : (
+              <div className={styles.memberList}>
+                {data.members.map((m) => (
+                  <MemberCard key={m.userId} member={m} isMe={m.userId === myUserId} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function ChevronLeft() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  )
+}
+
+function ChevronRight() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 18l6-6-6-6" />
     </svg>
   )
 }
