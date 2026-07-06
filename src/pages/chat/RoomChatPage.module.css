@@ -2,7 +2,11 @@
 .page {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100dvh; /* JS(visualViewport)가 인라인 height로 덮어씀 — iOS 키보드 대응 */
   background: var(--page-bg);
   overflow: hidden;
 }

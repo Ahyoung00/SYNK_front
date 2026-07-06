@@ -86,6 +86,7 @@ export default function RoomChatPage() {
   const inputRef       = useRef<HTMLTextAreaElement>(null)
   const isAtBottomRef  = useRef(true)
   const loaded         = useRef(false)
+  const [vpHeight, setVpHeight] = useState<number>(() => window.visualViewport?.height ?? window.innerHeight)
   const [notifOn, setNotifOn] = useState(true)
 
   async function toggleNotif() {
@@ -167,11 +168,14 @@ export default function RoomChatPage() {
     }
   }, [numRoomId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── iOS 키보드: visualViewport resize 시 바닥 스크롤 유지 ─────────────────
+  // ── iOS 키보드 대응: 페이지 높이를 visualViewport에 맞춰 고정 ──────────────
+  // position:fixed + height=visualViewport.height 로 키보드가 열려도
+  // 페이지가 키보드 위 영역으로 줄어들어 입력창이 항상 바닥에 고정됨.
   useEffect(() => {
     const vv = window.visualViewport
     if (!vv) return
     const update = () => {
+      setVpHeight(vv.height)
       if (isAtBottomRef.current) {
         requestAnimationFrame(() => {
           const el = listRef.current
@@ -179,8 +183,13 @@ export default function RoomChatPage() {
         })
       }
     }
+    update()
     vv.addEventListener('resize', update)
-    return () => vv.removeEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+    }
   }, [])
 
   // ── 초기 스크롤 (즉시) ────────────────────────────────────────────────────
@@ -246,6 +255,7 @@ export default function RoomChatPage() {
   return (
     <div
       className={styles.page}
+      style={{ height: vpHeight }}
     >
 
       {/* ── 헤더 ─────────────────────────────────────────────────────────── */}
