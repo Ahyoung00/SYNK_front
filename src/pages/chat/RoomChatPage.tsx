@@ -174,6 +174,7 @@ export default function RoomChatPage() {
   useEffect(() => {
     const vv = window.visualViewport
     if (!vv) return
+    let prevHeight = vv.height
     // React 리렌더 없이 ref로 직접 스타일 조작 → 입력창 포커스 유지(키보드 깜빡임 방지)
     const update = () => {
       const el = pageRef.current
@@ -181,9 +182,16 @@ export default function RoomChatPage() {
         el.style.height = `${vv.height}px`
         el.style.transform = `translateY(${vv.offsetTop}px)`
       }
-      if (isAtBottomRef.current) {
-        const list = listRef.current
-        if (list) list.scrollTop = list.scrollHeight
+      // 키보드 닫힘(뷰포트 커짐) 또는 바닥에 있던 경우 → 항상 최신 메시지 하단 유지.
+      // 높이 변경 직후 레이아웃이 확정되도록 rAF 뒤에 스크롤.
+      const keyboardClosed = vv.height > prevHeight
+      const keepBottom = isAtBottomRef.current || keyboardClosed
+      prevHeight = vv.height
+      if (keepBottom) {
+        requestAnimationFrame(() => {
+          const list = listRef.current
+          if (list) list.scrollTop = list.scrollHeight
+        })
       }
     }
     update()
