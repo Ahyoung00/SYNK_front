@@ -265,11 +265,15 @@ function ActiveRoomCard({
   return (
     <div
       className={[styles.roomCard, overlayMode ? styles.roomCardOverlay : ''].filter(Boolean).join(' ')}
-      style={{ cursor: editMode ? 'grab' : 'pointer' }}
-      {...(editMode ? cardDragProps : undefined)}
+      style={{ cursor: editMode ? 'default' : 'pointer' }}
     >
       {editMode && (
-        <div className={styles.dragHandle} onClick={(e) => e.stopPropagation()}>
+        <div
+          className={styles.dragHandle}
+          style={{ cursor: 'grab', touchAction: 'none' }}
+          onClick={(e) => e.stopPropagation()}
+          {...cardDragProps}
+        >
           <DragIcon />
         </div>
       )}
