@@ -201,6 +201,25 @@ export default function RoomPage() {
           </button>
         </div>
 
+        {/* ── 이주의 참여율 카드 ───────────────────────────────────────────── */}
+        <button
+          className={styles.participationCard}
+          onClick={() => navigate(ROUTES.ROOM_PARTICIPATION(id))}
+        >
+          <div className={styles.participationIcon}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+              <path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+          <div className={styles.participationBody}>
+            <span className={styles.participationTitle}>이주의 참여율</span>
+            <span className={styles.participationSub}>멤버별 미션 달성 현황</span>
+          </div>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M9 6l6 6-6 6" />
+          </svg>
+        </button>
+
         {/* ── 멤버 ─────────────────────────────────────────────────────────── */}
         <div className={styles.sectionHeader}>
           <span className={styles.sectionTitle}>멤버 {room.currentMembers}/{room.maxMembers}</span>
@@ -303,21 +322,6 @@ export default function RoomPage() {
               className={styles.devBtn}
             >
               🔔 FCM 알림 테스트
-            </button>
-            <button
-              className={styles.participationCard}
-              onClick={() => navigate(ROUTES.ROOM_PARTICIPATION(id))}
-            >
-              <div className={styles.participationIcon}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
-                  <path d="M18 20V10M12 20V4M6 20v-6" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </div>
-              <div className={styles.participationBody}>
-                <span className={styles.participationTitle}>이주의 참여율</span>
-                <span className={styles.participationSub}>멤버별 미션 달성 현황</span>
-              </div>
-              <span className={styles.participationArrow}>›</span>
             </button>
           </div>
           <div className={styles.actionCard}>

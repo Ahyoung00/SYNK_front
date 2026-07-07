@@ -496,34 +496,31 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 16px 18px;
-  border-radius: 16px;
-  background: var(--card-bg, rgba(196, 207, 238, 0.18));
-  border: 1px solid var(--card-border, rgba(150, 180, 255, 0.18));
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(70, 215, 255, 0.12) 0%, rgba(155, 107, 255, 0.12) 100%);
+  border: 1px solid rgba(100, 180, 255, 0.40);
+  color: #fff;
   cursor: pointer;
-  transition: opacity 0.12s ease, background 0.12s ease;
+  transition: opacity 0.12s ease;
   text-align: left;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .participationCard:active {
-  opacity: 0.82;
+  opacity: 0.75;
 }
 
 .participationIcon {
-  width: 48px;
-  height: 48px;
-  border-radius: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #2a4a8a 0%, #1c2d6b 100%);
-  color: #6eb8ff;
-}
-
-:global(:root:not([data-theme="dark"])) .participationIcon {
-  background: linear-gradient(135deg, #5b8def 0%, #8b6be6 100%);
+  background: linear-gradient(135deg, #46D7FF 0%, #9B6BFF 100%);
   color: #fff;
 }
 
@@ -532,29 +529,19 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
 }
 
 .participationTitle {
-  font-size: 16px;
-  font-weight: 800;
-  background: linear-gradient(90deg, #46D7FF 0%, #9B6BFF 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
 }
 
 .participationSub {
-  font-size: 13px;
-  color: var(--color-text-muted);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.55);
   font-weight: 500;
-}
-
-.participationArrow {
-  font-size: 22px;
-  color: var(--color-text-muted);
-  flex-shrink: 0;
-  line-height: 1;
 }
 
 .devBtns {
