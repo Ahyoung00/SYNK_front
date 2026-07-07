@@ -48,7 +48,10 @@ export default function AppHeader({ subtitle }: AppHeaderProps) {
   return (
     <div className={styles.header}>
       <div>
-        <span className={styles.brand}>SYNK</span>
+        <div className={styles.brandRow}>
+          <span className={styles.brand}>SYNK</span>
+          <span className={styles.sparkle} aria-hidden>✦</span>
+        </div>
         {subtitle && <p className={styles.subtitle}>{subtitle}</p>}
       </div>
       <button

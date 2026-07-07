@@ -6,6 +6,28 @@
   flex-shrink: 0;
 }
 
+@keyframes sparklePop {
+  0%   { opacity: 0;   transform: scale(0.4) rotate(-20deg); }
+  30%  { opacity: 1;   transform: scale(1.2) rotate(10deg); }
+  60%  { opacity: 0.7; transform: scale(0.9) rotate(-5deg); }
+  100% { opacity: 0;   transform: scale(0.5) rotate(15deg); }
+}
+
+.brandRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.sparkle {
+  font-size: 13px;
+  color: #9b8fff;
+  animation: sparklePop 2.4s ease-in-out infinite;
+  display: inline-block;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
 .brand {
   font-size: var(--text-2xl);
   font-weight: 900;

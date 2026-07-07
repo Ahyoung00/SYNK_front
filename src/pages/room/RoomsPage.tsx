@@ -158,18 +158,31 @@ export default function RoomsPage() {
         {/* 빈 상태 */}
         {!isLoading && rooms.length === 0 && (
           <div className={styles.empty}>
-            <span className={styles.emptyIcon}>🚪</span>
+            <div className={styles.emptyOrb}>
+              <div className={styles.emptyOrbRing} />
+              <div className={styles.emptyOrbDot} style={{ '--angle': '30deg' } as React.CSSProperties} />
+              <div className={styles.emptyOrbDot} style={{ '--angle': '150deg' } as React.CSSProperties} />
+              <div className={styles.emptyOrbDot} style={{ '--angle': '270deg' } as React.CSSProperties} />
+              <div className={styles.emptyOrbCore}>
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none">
+                  <path d="M13 2L4.5 13.5H12L11 22L19.5 10.5H12L13 2Z" fill="currentColor" opacity="0.85" />
+                </svg>
+              </div>
+            </div>
             <p className={styles.emptyTitle}>아직 참여한 방이 없어요</p>
             <p className={styles.emptyDesc}>
               친구들과 새 방을 만들거나
               <br />
               초대 코드로 들어가보세요
             </p>
+            <button className={styles.emptyJoinBtn} onClick={() => navigate(ROUTES.ROOM_JOIN)}>
+              초대 코드로 입장
+            </button>
           </div>
         )}
 
         {/* 방 만들기 인라인 카드 */}
-        {!isLoading && (
+        {!isLoading && rooms.length > 0 && (
           <button className={styles.createCard} onClick={() => setSheet(true)}>
             <div className={styles.createIcon}>＋</div>
             <div className={styles.createText}>
