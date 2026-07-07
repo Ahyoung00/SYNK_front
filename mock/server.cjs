@@ -287,6 +287,8 @@ app.post('/auth/logout', (req, res) => ok(res, null))
 // GET /users/me — 프로필 조회 (camelCase 응답)
 app.get('/users/me', (req, res) => {
   const u = db().get('users').find({ id: getMeId(req) }).value()
+  const rawProvider = (u.auth_provider ?? '').toLowerCase()
+  const provider = rawProvider === 'kakao' ? 'kakao' : rawProvider === 'google' ? 'google' : null
   ok(res, {
     userId:                u.id,
     name:                  u.name,
@@ -294,6 +296,8 @@ app.get('/users/me', (req, res) => {
     missionNotification:   u.mission_alert  ?? true,
     resultNotification:    u.result_alert   ?? true,
     highlightNotification: u.highlight_alert ?? true,
+    provider,
+    email:                 u.email ?? null,
   }, '프로필 조회 성공')
 })
 

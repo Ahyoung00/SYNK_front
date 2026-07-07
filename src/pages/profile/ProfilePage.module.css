@@ -327,7 +327,7 @@
   color: var(--ink);
 }
 
-.accountSub {
+.accountEmail {
   font-size: 12px;
   color: var(--ink-sub);
   white-space: nowrap;
@@ -339,10 +339,11 @@
   font-size: 12px;
   font-weight: 700;
   color: #000;
-  background: rgba(45, 218, 184, 0.18);
-  border: 1px solid rgba(45, 218, 184, 0.4);
+  background: rgba(45, 218, 184, 0.2);
+  border: 1px solid rgba(45, 218, 184, 0.45);
   padding: 4px 10px;
   border-radius: 99px;
   flex-shrink: 0;
   white-space: nowrap;
 }
+

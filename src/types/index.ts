@@ -22,6 +22,10 @@ export interface User {
   created_at?: string | null
   /** 가입 후 경과 일수 — BE /users/me 직접 제공 */
   daysSinceJoined?: number | null
+  /** OAuth 제공자 */
+  provider?: 'kakao' | 'google' | null
+  /** 연동 계정 이메일 */
+  email?: string | null
 }
 
 // ── Room ──────────────────────────────────────────────────────────────────────
