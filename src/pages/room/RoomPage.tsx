@@ -255,6 +255,7 @@ export default function RoomPage() {
           total={room.dailyMissionCount}
           completed={todayCollages.filter((c) => c.status === 'COMPLETED').length}
           fired={todayCollages.length}
+          createdAt={room.createdAt ?? room.created_at ?? null}
         />
 
         {/* ── 앨범 ─────────────────────────────────────────────────────────── */}
@@ -361,11 +362,50 @@ export default function RoomPage() {
 
 /* ── 아이콘 ───────────────────────────────────────────────────────────────── */
 
-function RoomMissionCard({ total, completed, fired }: { total: number; completed: number; fired: number }) {
-  const allDone = total > 0 && completed >= total
-  const inProgress = fired > 0 && !allDone
-  const remaining = Math.max(0, total - completed)
-  const pct = total > 0 ? (completed / total) * 100 : 0
+function getRoomDayMode(createdAt: string | null): 'tutorial' | 'late-night' | 'normal' {
+  if (!createdAt) return 'normal'
+  const created = new Date(createdAt)
+  if (isNaN(created.getTime())) return 'normal'
+
+  const now = new Date()
+  const createdDay = new Date(created.getFullYear(), created.getMonth(), created.getDate())
+  const todayDay   = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const diffDays   = Math.round((todayDay.getTime() - createdDay.getTime()) / 86400000)
+
+  if (diffDays !== 0) return 'normal'
+  // 생성 당일
+  if (created.getHours() >= 23) return 'late-night'
+  return 'tutorial'
+}
+
+function RoomMissionCard({ total, completed, fired, createdAt }: {
+  total: number; completed: number; fired: number; createdAt: string | null
+}) {
+  const dayMode = getRoomDayMode(createdAt)
+
+  // 23시 이후 생성 — 안내 문구만 노출
+  if (dayMode === 'late-night') {
+    return (
+      <div className={styles.missionCard}>
+        <div className={styles.missionRow}>
+          <div className={styles.missionIconWrap}><MissionIcon /></div>
+          <div className={styles.missionLeft}>
+            <span className={styles.missionStatus}>미션은 다음날부터 발송이 돼요!</span>
+            <span className={styles.missionDesc}>조금만 기다려주세요~</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // 생성 당일(튜토리얼) — total을 2로 고정
+  const effectiveTotal     = dayMode === 'tutorial' ? 2 : total
+  const effectiveCompleted = dayMode === 'tutorial' ? Math.min(completed, 2) : completed
+
+  const allDone    = effectiveTotal > 0 && effectiveCompleted >= effectiveTotal
+  const inProgress = (dayMode === 'tutorial' ? effectiveCompleted > 0 : fired > 0) && !allDone
+  const remaining  = Math.max(0, effectiveTotal - effectiveCompleted)
+  const pct        = effectiveTotal > 0 ? (effectiveCompleted / effectiveTotal) * 100 : 0
 
   if (allDone) {
     return (
@@ -378,7 +418,7 @@ function RoomMissionCard({ total, completed, fired }: { total: number; completed
           </div>
           <div className={styles.missionLeft}>
             <span className={styles.missionStatus}>오늘 미션 모두 완료! 🎉</span>
-            <span className={styles.missionDesc}>{completed} / {total} · 내일 또 만나요</span>
+            <span className={styles.missionDesc}>{effectiveCompleted} / {effectiveTotal} · 내일 또 만나요</span>
           </div>
         </div>
       </div>
@@ -392,10 +432,13 @@ function RoomMissionCard({ total, completed, fired }: { total: number; completed
           <div className={styles.missionIconWrap}><MissionIcon /></div>
           <div className={styles.missionLeft}>
             <div className={styles.missionTitleRow}>
-              <span className={styles.missionStatus}>오늘 미션 {remaining}개 남았어요!</span>
+              {dayMode === 'tutorial'
+                ? <span className={styles.missionStatus}>첫날은 튜토리얼 미션으로! {effectiveCompleted}/2</span>
+                : <span className={styles.missionStatus}>오늘 미션 {remaining}개 남았어요!</span>
+              }
               <span className={styles.missionPulseDot} />
             </div>
-            <span className={styles.missionDesc}>{completed} / {total} 완료 · 계속 도전해봐요</span>
+            <span className={styles.missionDesc}>{effectiveCompleted} / {effectiveTotal} 완료 · 계속 도전해봐요</span>
             <div className={styles.missionBar}>
               <div className={styles.missionBarFill} style={{ width: `${pct}%` }} />
             </div>
@@ -410,8 +453,16 @@ function RoomMissionCard({ total, completed, fired }: { total: number; completed
       <div className={styles.missionRow}>
         <div className={styles.missionIconWrap}><MissionIcon /></div>
         <div className={styles.missionLeft}>
-          <span className={styles.missionStatus}>오늘 미션 {total}개 예정</span>
-          <span className={styles.missionDesc}>랜덤한 순간에 미션이 울려요</span>
+          {dayMode === 'tutorial'
+            ? <>
+                <span className={styles.missionStatus}>첫날은 튜토리얼 미션으로! 0/2</span>
+                <span className={styles.missionDesc}>랜덤한 순간에 미션이 울려요</span>
+              </>
+            : <>
+                <span className={styles.missionStatus}>오늘 미션 {effectiveTotal}개 예정</span>
+                <span className={styles.missionDesc}>랜덤한 순간에 미션이 울려요</span>
+              </>
+          }
         </div>
       </div>
     </div>
