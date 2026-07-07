@@ -804,10 +804,11 @@ export default function HomePage() {
                     onClick={() => navigate(ROUTES.ROOM(room.id))}
                   >
                     <div className={styles.todayRoomThumb}>
-                      {room.roomThumbnail
-                        ? <img src={room.roomThumbnail} alt={room.name} className={styles.todayRoomThumbImg} />
-                        : <span className={styles.todayRoomThumbInitial}>{room.name.charAt(0)}</span>
-                      }
+                      <img
+                        src={room.roomThumbnail ?? '/SYNK.jpeg'}
+                        alt={room.name}
+                        className={styles.todayRoomThumbImg}
+                      />
                     </div>
                     <div className={styles.todayRoomBody}>
                       <div className={styles.todayRoomTop}>
