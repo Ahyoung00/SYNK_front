@@ -70,8 +70,8 @@ export default function HelpPage() {
 
         <div className={styles.contactCard}>
           <p className={styles.contactTitle}>더 궁금한 점이 있나요?</p>
-          <a className={styles.contactLink} href="mailto:synk.team@gmail.com">
-            synk.team@gmail.com
+          <a className={styles.contactLink} href="mailto:synkk.team@gmail.com">
+            synkk.team@gmail.com
           </a>
         </div>
       </div>
