@@ -140,19 +140,6 @@ export default function RoomParticipationPage() {
       .finally(() => setIsLoading(false))
   }, [id, weekOffset])
 
-  function HeroBars() {
-    if (!data || data.members.length === 0) return null
-    const max = Math.max(...data.members.map((m) => m.rate), 1)
-    return (
-      <div className={styles.memberBars}>
-        {data.members.map((m) => (
-          <div key={m.userId} className={styles.memberBar}
-            style={{ background: rankColor(m.rank), height: `${Math.max(14, Math.round((m.rate / max) * 38))}px` }} />
-        ))}
-      </div>
-    )
-  }
-
   return (
     <div className={styles.page}>
       <NavHeader title="주별 참여율" onBack={() => navigate(ROUTES.ROOM(id))} />
