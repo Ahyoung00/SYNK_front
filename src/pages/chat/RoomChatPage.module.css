@@ -329,8 +329,8 @@
 }
 
 :global(:root:not([data-theme="dark"])) .inputBar {
-  background: rgba(167, 183, 231, 0.97);
-  border-top-color: rgba(140, 158, 210, 0.30);
+  background: var(--page-bg);
+  border-top-color: var(--color-border);
 }
 
 :global(:root:not([data-theme="dark"])) .input {
