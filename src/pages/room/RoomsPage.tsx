@@ -234,7 +234,6 @@ function SortableActiveRoomCard({ room, onClick, editMode }: { room: ActiveRoom;
         room={room}
         onClick={onClick}
         editMode={editMode}
-        dragHandleProps={editMode ? { ...attributes, ...listeners } : undefined}
         cardDragProps={editMode ? { ...attributes, ...listeners } : undefined}
       />
     </div>
@@ -252,13 +251,12 @@ function RoomThumbnail({ src }: { src: string | null }) {
 }
 
 function ActiveRoomCard({
-  room, onClick, editMode, overlayMode, dragHandleProps, cardDragProps,
+  room, onClick, editMode, overlayMode, cardDragProps,
 }: {
   room: ActiveRoom
   onClick: () => void
   editMode?: boolean
   overlayMode?: boolean
-  dragHandleProps?: React.HTMLAttributes<HTMLElement>
   cardDragProps?: React.HTMLAttributes<HTMLElement>
 }) {
   const allDone    = room.isAllCompleted
