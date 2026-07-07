@@ -1,12 +1,44 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
+import {
+  DndContext,
+  PointerSensor,
+  TouchSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core'
+import {
+  SortableContext,
+  arrayMove,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { ROUTES } from '@/constants'
 import { roomApi } from '@/services/api/endpoints'
 import type { ActiveRoom, WaitingRoom } from '@/types'
 import AppHeader from '@/components/layout/AppHeader'
 import Loading from '@/components/ui/Loading'
 import styles from './RoomsPage.module.css'
+
+const ORDER_KEY = 'synk_room_order'
+
+function savedOrder(): number[] {
+  try { return JSON.parse(localStorage.getItem(ORDER_KEY) ?? '[]') } catch { return [] }
+}
+function saveOrder(ids: number[]) {
+  localStorage.setItem(ORDER_KEY, JSON.stringify(ids))
+}
+function applyOrder<T extends { id: number }>(rooms: T[], order: number[]): T[] {
+  if (order.length === 0) return rooms
+  const map = new Map(rooms.map((r) => [r.id, r]))
+  const sorted = order.flatMap((id) => (map.has(id) ? [map.get(id)!] : []))
+  const rest = rooms.filter((r) => !order.includes(r.id))
+  return [...sorted, ...rest]
+}
 
 export default function RoomsPage() {
   const navigate = useNavigate()
@@ -20,26 +52,42 @@ export default function RoomsPage() {
       roomApi
         .getMyRooms()
         .then((res) => {
-          setActiveRooms(res.data.active ?? [])
-          setWaitingRooms(res.data.waiting ?? [])
+          const active  = res.data.active  ?? []
+          const waiting = res.data.waiting ?? []
+          setActiveRooms(applyOrder(active,  savedOrder()))
+          setWaitingRooms(waiting)
         })
         .catch(console.error)
         .finally(() => setIsLoading(false))
     }
     refresh()
-    // 15초마다 재조회 — hasUnreadChat 갱신으로 새 채팅 dot 실시간 반영
     const id = window.setInterval(refresh, 15_000)
     return () => window.clearInterval(id)
   }, [])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor,   { activationConstraint: { delay: 200, tolerance: 5 } }),
+  )
+
+  function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event
+    if (!over || active.id === over.id) return
+    setActiveRooms((prev) => {
+      const oldIndex = prev.findIndex((r) => r.id === active.id)
+      const newIndex = prev.findIndex((r) => r.id === over.id)
+      const next = arrayMove(prev, oldIndex, newIndex)
+      saveOrder(next.map((r) => r.id))
+      return next
+    })
+  }
 
   const rooms = [...activeRooms, ...waitingRooms]
 
   return (
     <div className={styles.page}>
-      {/* ── 헤더 ────────────────────────────────────────────────────────────── */}
       <AppHeader subtitle="방 목록" />
 
-      {/* ── 스크롤 ──────────────────────────────────────────────────────────── */}
       <div className={styles.scroll}>
 
         {isLoading && <Loading />}
@@ -51,15 +99,19 @@ export default function RoomsPage() {
               참여 중
               <span className={styles.sectionCount}>{activeRooms.length}</span>
             </div>
-            <div className={styles.roomList}>
-              {activeRooms.map((room) => (
-                <ActiveRoomCard
-                  key={room.id}
-                  room={room}
-                  onClick={() => navigate(ROUTES.ROOM(room.id))}
-                />
-              ))}
-            </div>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+              <SortableContext items={activeRooms.map((r) => r.id)} strategy={verticalListSortingStrategy}>
+                <div className={styles.roomList}>
+                  {activeRooms.map((room) => (
+                    <SortableActiveRoomCard
+                      key={room.id}
+                      room={room}
+                      onClick={() => navigate(ROUTES.ROOM(room.id))}
+                    />
+                  ))}
+                </div>
+              </SortableContext>
+            </DndContext>
           </div>
         )}
 
@@ -107,7 +159,6 @@ export default function RoomsPage() {
         )}
       </div>
 
-      {/* ── 방 추가 바텀시트 — #root 기준으로 Portal 렌더링 ──────────────────── */}
       {sheet && createPortal(
         <div className={styles.overlay} onClick={() => setSheet(false)}>
           <div className={styles.sheet} onClick={(e) => e.stopPropagation()}>
@@ -147,72 +198,95 @@ export default function RoomsPage() {
   )
 }
 
+// ── Sortable wrapper ──────────────────────────────────────────────────────────
+
+function SortableActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: room.id })
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+    zIndex: isDragging ? 10 : undefined,
+  }
+  return (
+    <div ref={setNodeRef} style={style}>
+      <ActiveRoomCard room={room} onClick={onClick} dragHandleProps={{ ...attributes, ...listeners }} />
+    </div>
+  )
+}
+
 // ── RoomCard ──────────────────────────────────────────────────────────────────
 
 function RoomThumbnail({ src }: { src: string | null }) {
   return (
     <div className={styles.thumbnail}>
-      <img
-        src={src ?? '/SYNK.jpeg'}
-        alt=""
-        className={styles.thumbnailImg}
-      />
+      <img src={src ?? '/SYNK.jpeg'} alt="" className={styles.thumbnailImg} />
     </div>
   )
 }
 
-function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
-  const allDone = room.isAllCompleted
+function ActiveRoomCard({
+  room,
+  onClick,
+  dragHandleProps,
+}: {
+  room: ActiveRoom
+  onClick: () => void
+  dragHandleProps?: React.HTMLAttributes<HTMLElement>
+}) {
+  const allDone    = room.isAllCompleted
   const hasNewChat = room.hasUnreadChat
 
   return (
-    <button className={styles.roomCard} onClick={onClick}>
-      <div className={styles.cardInner}>
-        <RoomThumbnail src={room.roomThumbnail} />
-        <div className={styles.cardBody}>
-          <div className={styles.cardTop}>
-            <div className={styles.roomNameRow}>
-              <span className={styles.roomName}>{room.name}</span>
-              <span className={styles.memberCount}>멤버 {room.memberProfiles.length}명</span>
-              {hasNewChat && (
-                <div className={styles.chatBanner}>
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
-                      fill="currentColor" opacity="0.9" />
-                  </svg>
-                  새 채팅
-                </div>
-              )}
-            </div>
-            <span className={allDone ? styles.missionBadgeDone : styles.missionBadge}>
-              오늘 미션 {room.completedMissions}/{room.totalMissions}{allDone ? ' ✓' : ''}
-            </span>
-          </div>
-          <div className={styles.cardBottom}>
-            <div className={styles.avatarStack}>
-              {room.memberProfiles.slice(0, 5).map((m, i) => (
-                <div
-                  key={m.userId}
-                  className={styles.avatarBubble}
-                  style={{ zIndex: room.memberProfiles.length - i }}
-                >
-                  {m.profileImage
-                    ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-                    : <span className={styles.avatarBubbleInitial}>{m.name ? m.name.charAt(0) : <PersonIcon />}</span>
-                  }
-                </div>
-              ))}
-              {room.memberProfiles.length > 5 && (
-                <div className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
-                  +{room.memberProfiles.length - 5}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        <span className={styles.enterArrow}>›</span>
+    <div className={styles.roomCard}>
+      {/* 드래그 핸들 */}
+      <div className={styles.dragHandle} {...dragHandleProps}>
+        <DragIcon />
       </div>
-    </button>
+      <button className={styles.cardClickArea} onClick={onClick}>
+        <div className={styles.cardInner}>
+          <RoomThumbnail src={room.roomThumbnail} />
+          <div className={styles.cardBody}>
+            <div className={styles.cardTop}>
+              <div className={styles.roomNameRow}>
+                <span className={styles.roomName}>{room.name}</span>
+                <span className={styles.memberCount}>멤버 {room.memberProfiles.length}명</span>
+                {hasNewChat && (
+                  <div className={styles.chatBanner}>
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"
+                        fill="currentColor" opacity="0.9" />
+                    </svg>
+                    새 채팅
+                  </div>
+                )}
+              </div>
+              <span className={allDone ? styles.missionBadgeDone : styles.missionBadge}>
+                오늘 미션 {room.completedMissions}/{room.totalMissions}{allDone ? ' ✓' : ''}
+              </span>
+            </div>
+            <div className={styles.cardBottom}>
+              <div className={styles.avatarStack}>
+                {room.memberProfiles.slice(0, 5).map((m, i) => (
+                  <div key={m.userId} className={styles.avatarBubble} style={{ zIndex: room.memberProfiles.length - i }}>
+                    {m.profileImage
+                      ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
+                      : <span className={styles.avatarBubbleInitial}>{m.name ? m.name.charAt(0) : <PersonIcon />}</span>
+                    }
+                  </div>
+                ))}
+                {room.memberProfiles.length > 5 && (
+                  <div className={[styles.avatarBubble, styles.avatarMore].join(' ')}>
+                    +{room.memberProfiles.length - 5}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <span className={styles.enterArrow}>›</span>
+        </div>
+      </button>
+    </div>
   )
 }
 
@@ -234,11 +308,7 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
           <div className={styles.cardBottom}>
             <div className={styles.avatarStack}>
               {room.memberProfiles.slice(0, 5).map((m, i) => (
-                <div
-                  key={m.userId}
-                  className={styles.avatarBubble}
-                  style={{ zIndex: room.memberProfiles.length - i }}
-                >
+                <div key={m.userId} className={styles.avatarBubble} style={{ zIndex: room.memberProfiles.length - i }}>
                   {m.profileImage
                     ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
                     : <span className={styles.avatarBubbleInitial}>{m.name ? m.name.charAt(0) : <PersonIcon />}</span>
@@ -251,6 +321,19 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
         <span className={styles.enterArrow}>›</span>
       </div>
     </button>
+  )
+}
+
+function DragIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <circle cx="9"  cy="6"  r="1.5" fill="currentColor" />
+      <circle cx="15" cy="6"  r="1.5" fill="currentColor" />
+      <circle cx="9"  cy="12" r="1.5" fill="currentColor" />
+      <circle cx="15" cy="12" r="1.5" fill="currentColor" />
+      <circle cx="9"  cy="18" r="1.5" fill="currentColor" />
+      <circle cx="15" cy="18" r="1.5" fill="currentColor" />
+    </svg>
   )
 }
 
