@@ -319,6 +319,8 @@ export default function RoomChatPage() {
       {/* ── 메시지 목록 ──────────────────────────────────────────────────── */}
       {/* 채팅 영역 탭 시에만 키보드 내림 (스크롤 제스처는 touchmove라 onClick 미발생) */}
       <div className={styles.msgList} ref={listRef} onScroll={handleScroll} onClick={() => inputRef.current?.blur()}>
+        {/* 상단 스페이서: 메시지가 적을 때 항상 하단 정렬 → 키보드 열고닫아도 최신 메시지 바닥 유지 */}
+        <div className={styles.msgTopSpacer} />
         {displayItems.map((item) => {
           if (item.kind === 'date') {
             return <DateSep key={item.key} label={item.label} />
