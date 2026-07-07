@@ -326,35 +326,37 @@ function ActiveRoomCard({
 
 function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => void }) {
   return (
-    <button className={styles.roomCard} onClick={onClick}>
-      <div className={styles.cardInner}>
-        <RoomThumbnail src={room.roomThumbnail} />
-        <div className={styles.cardBody}>
-          <div className={styles.cardTop}>
-            <div className={styles.roomNameRow}>
-              <span className={styles.roomName}>{room.name}</span>
-              <span className={styles.memberCount}>멤버 {room.currentMembers}명</span>
+    <div className={styles.roomCard}>
+      <button className={styles.cardClickArea} onClick={onClick}>
+        <div className={styles.cardInner}>
+          <RoomThumbnail src={room.roomThumbnail} />
+          <div className={styles.cardBody}>
+            <div className={styles.cardTop}>
+              <div className={styles.roomNameRow}>
+                <span className={styles.roomName}>{room.name}</span>
+                <span className={styles.memberCount}>멤버 {room.currentMembers}명</span>
+              </div>
+              <span className={styles.missionBadge}>
+                {room.waitingCount}명 더 기다리는 중
+              </span>
             </div>
-            <span className={styles.missionBadge}>
-              {room.waitingCount}명 더 기다리는 중
-            </span>
-          </div>
-          <div className={styles.cardBottom}>
-            <div className={styles.avatarStack}>
-              {room.memberProfiles.slice(0, 5).map((m, i) => (
-                <div key={m.userId} className={styles.avatarBubble} style={{ zIndex: room.memberProfiles.length - i }}>
-                  {m.profileImage
-                    ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
-                    : <span className={styles.avatarBubbleInitial}>{m.name ? m.name.charAt(0) : <PersonIcon />}</span>
-                  }
-                </div>
-              ))}
+            <div className={styles.cardBottom}>
+              <div className={styles.avatarStack}>
+                {room.memberProfiles.slice(0, 5).map((m, i) => (
+                  <div key={m.userId} className={styles.avatarBubble} style={{ zIndex: room.memberProfiles.length - i }}>
+                    {m.profileImage
+                      ? <img src={m.profileImage} alt="" className={styles.avatarBubbleImg} />
+                      : <span className={styles.avatarBubbleInitial}>{m.name ? m.name.charAt(0) : <PersonIcon />}</span>
+                    }
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
+          <span className={styles.enterArrow}>›</span>
         </div>
-        <span className={styles.enterArrow}>›</span>
-      </div>
-    </button>
+      </button>
+    </div>
   )
 }
 
