@@ -45,10 +45,11 @@ export default function RoomCreatedPage() {
       <div className={styles.content}>
         {/* 방 썸네일 */}
         <div className={styles.thumb}>
-          {thumbnail
-            ? <img src={thumbnail} alt={roomName} className={styles.thumbImg} />
-            : <span className={styles.thumbEmoji}>🌅</span>
-          }
+          <img
+            src={thumbnail ?? '/SYNK.jpeg'}
+            alt={roomName}
+            className={styles.thumbImg}
+          />
         </div>
 
         {/* 완료 메시지 */}
