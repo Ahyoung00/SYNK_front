@@ -38,6 +38,17 @@
   background: var(--color-surface-2);
 }
 
+.headerSide {
+  display: flex;
+  align-items: center;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.headerSide:last-child {
+  justify-content: flex-end;
+}
+
 .headerCenter {
   flex: 1;
   min-width: 0;

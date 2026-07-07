@@ -263,27 +263,31 @@ export default function RoomChatPage() {
 
       {/* ── 헤더 ─────────────────────────────────────────────────────────── */}
       <div className={styles.header}>
-        <button className={styles.iconBtn} onClick={() => navigate(ROUTES.ROOM(numRoomId))} aria-label="뒤로">
-          <BackIcon />
-        </button>
+        <div className={styles.headerSide}>
+          <button className={styles.iconBtn} onClick={() => navigate(ROUTES.ROOM(numRoomId))} aria-label="뒤로">
+            <BackIcon />
+          </button>
+        </div>
         <div className={styles.headerCenter}>
           <span className={styles.headerTitle}>{roomName || '채팅'}</span>
           {memberCount > 0 && <span className={styles.headerSub}>{memberCount}명</span>}
         </div>
-        <button
-          className={styles.iconBtn}
-          onClick={toggleNotif}
-          aria-label={notifOn ? '알림 끄기' : '알림 켜기'}
-        >
-          {notifOn ? <BellIcon /> : <BellOffIcon />}
-        </button>
-        <button
-          className={styles.iconBtn}
-          onClick={() => navigate(ROUTES.ROOM_MEMBERS(numRoomId))}
-          aria-label="멤버"
-        >
-          <PeopleIcon />
-        </button>
+        <div className={styles.headerSide}>
+          <button
+            className={styles.iconBtn}
+            onClick={toggleNotif}
+            aria-label={notifOn ? '알림 끄기' : '알림 켜기'}
+          >
+            {notifOn ? <BellIcon /> : <BellOffIcon />}
+          </button>
+          <button
+            className={styles.iconBtn}
+            onClick={() => navigate(ROUTES.ROOM_MEMBERS(numRoomId))}
+            aria-label="멤버"
+          >
+            <PeopleIcon />
+          </button>
+        </div>
       </div>
 
       {/* ── 오늘 미션 결과 배너 ──────────────────────────────────────────── */}
