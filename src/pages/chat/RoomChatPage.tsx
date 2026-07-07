@@ -195,11 +195,19 @@ export default function RoomChatPage() {
     }
   }, [])
 
-  // ── 초기 스크롤 (즉시) ────────────────────────────────────────────────────
+  // ── 초기 진입 스크롤 (메시지 로드 후 1회, 즉시 바닥으로) ────────────────────
+  // 메시지는 비동기로 로드되므로 mount 시점에는 목록이 비어 있음.
+  // 첫 메시지가 채워진 직후 rAF로 레이아웃 확정 후 바닥으로 이동.
+  const didInitialScroll = useRef(false)
   useEffect(() => {
-    const el = listRef.current
-    if (el) el.scrollTop = el.scrollHeight
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+    if (didInitialScroll.current) return
+    if (messages.length === 0) return
+    didInitialScroll.current = true
+    requestAnimationFrame(() => {
+      const el = listRef.current
+      if (el) el.scrollTop = el.scrollHeight
+    })
+  }, [messages.length])
 
   // ── 새 메시지 오면 스크롤 ─────────────────────────────────────────────────
   useEffect(() => {
@@ -309,7 +317,8 @@ export default function RoomChatPage() {
       )}
 
       {/* ── 메시지 목록 ──────────────────────────────────────────────────── */}
-      <div className={styles.msgList} ref={listRef} onScroll={handleScroll}>
+      {/* 채팅 영역 탭 시에만 키보드 내림 (스크롤 제스처는 touchmove라 onClick 미발생) */}
+      <div className={styles.msgList} ref={listRef} onScroll={handleScroll} onClick={() => inputRef.current?.blur()}>
         {displayItems.map((item) => {
           if (item.kind === 'date') {
             return <DateSep key={item.key} label={item.label} />
@@ -336,6 +345,11 @@ export default function RoomChatPage() {
           value={text}
           rows={1}
           placeholder="메시지를 입력하세요"
+          enterKeyHint="send"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="none"
+          spellCheck={false}
           onChange={(e) => {
             setText(e.target.value)
             e.target.style.height = 'auto'
@@ -345,6 +359,8 @@ export default function RoomChatPage() {
         />
         <button
           className={styles.sendBtn}
+          // pointerdown 기본동작 차단 → 전송 버튼 탭 시 textarea 포커스 유지(키보드 안 닫힘)
+          onPointerDown={(e) => e.preventDefault()}
           onClick={handleSend}
           disabled={!text.trim()}
           aria-label="전송"
