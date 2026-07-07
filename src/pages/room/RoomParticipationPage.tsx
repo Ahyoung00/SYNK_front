@@ -202,7 +202,6 @@ export default function RoomParticipationPage() {
                 </div>
                 <RingChart rate={data.averageRate} />
               </div>
-              <HeroBars />
             </div>
 
             {/* 멤버별 현황 */}
