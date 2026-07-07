@@ -433,7 +433,7 @@ function RoomMissionCard({ total, completed, fired, createdAt }: {
           <div className={styles.missionLeft}>
             <div className={styles.missionTitleRow}>
               {dayMode === 'tutorial'
-                ? <span className={styles.missionStatus}>첫날은 튜토리얼 미션으로! {effectiveCompleted}/2</span>
+                ? <span className={styles.missionStatus}>튜토리얼 미션 {remaining}개 남았어요!</span>
                 : <span className={styles.missionStatus}>오늘 미션 {remaining}개 남았어요!</span>
               }
               <span className={styles.missionPulseDot} />
@@ -455,8 +455,8 @@ function RoomMissionCard({ total, completed, fired, createdAt }: {
         <div className={styles.missionLeft}>
           {dayMode === 'tutorial'
             ? <>
-                <span className={styles.missionStatus}>첫날은 튜토리얼 미션으로! 0/2</span>
-                <span className={styles.missionDesc}>랜덤한 순간에 미션이 울려요</span>
+                <span className={styles.missionStatus}>첫날은 튜토리얼 미션으로 2개 예정</span>
+                <span className={styles.missionDesc}>오늘은 방 생성 후 15분, 1시간 뒤에 두 개의 미션이 울려요~</span>
               </>
             : <>
                 <span className={styles.missionStatus}>오늘 미션 {effectiveTotal}개 예정</span>
