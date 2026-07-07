@@ -3,12 +3,14 @@ import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import {
   DndContext,
+  DragOverlay,
   PointerSensor,
   TouchSensor,
   closestCenter,
   useSensor,
   useSensors,
   type DragEndEvent,
+  type DragStartEvent,
 } from '@dnd-kit/core'
 import {
   SortableContext,
@@ -66,13 +68,19 @@ export default function RoomsPage() {
   }, [])
 
   const [editMode, setEditMode] = useState(false)
+  const [draggingId, setDraggingId] = useState<number | null>(null)
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor,   { activationConstraint: { delay: 200, tolerance: 5 } }),
   )
 
+  function handleDragStart(event: DragStartEvent) {
+    setDraggingId(event.active.id as number)
+  }
+
   function handleDragEnd(event: DragEndEvent) {
+    setDraggingId(null)
     const { active, over } = event
     if (!over || active.id === over.id) return
     setActiveRooms((prev) => {
@@ -83,6 +91,8 @@ export default function RoomsPage() {
       return next
     })
   }
+
+  const draggingRoom = draggingId != null ? activeRooms.find((r) => r.id === draggingId) ?? null : null
 
   const rooms = [...activeRooms, ...waitingRooms]
 
@@ -104,7 +114,7 @@ export default function RoomsPage() {
                 {editMode ? '완료' : '편집'}
               </button>
             </div>
-            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <DndContext sensors={sensors} collisionDetection={closestCenter} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
               <SortableContext items={activeRooms.map((r) => r.id)} strategy={verticalListSortingStrategy}>
                 <div className={styles.roomList}>
                   {activeRooms.map((room) => (
@@ -117,6 +127,11 @@ export default function RoomsPage() {
                   ))}
                 </div>
               </SortableContext>
+              <DragOverlay dropAnimation={{ duration: 180, easing: 'cubic-bezier(0.18,0.67,0.6,1.22)' }}>
+                {draggingRoom && (
+                  <ActiveRoomCard room={draggingRoom} onClick={() => {}} editMode overlayMode />
+                )}
+              </DragOverlay>
             </DndContext>
           </div>
         )}
@@ -211,12 +226,17 @@ function SortableActiveRoomCard({ room, onClick, editMode }: { room: ActiveRoom;
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
-    zIndex: isDragging ? 10 : undefined,
+    opacity: isDragging ? 0 : 1,
   }
   return (
     <div ref={setNodeRef} style={style}>
-      <ActiveRoomCard room={room} onClick={onClick} editMode={editMode} dragHandleProps={editMode ? { ...attributes, ...listeners } : undefined} />
+      <ActiveRoomCard
+        room={room}
+        onClick={onClick}
+        editMode={editMode}
+        dragHandleProps={editMode ? { ...attributes, ...listeners } : undefined}
+        cardDragProps={editMode ? { ...attributes, ...listeners } : undefined}
+      />
     </div>
   )
 }
@@ -232,20 +252,26 @@ function RoomThumbnail({ src }: { src: string | null }) {
 }
 
 function ActiveRoomCard({
-  room, onClick, editMode, dragHandleProps,
+  room, onClick, editMode, overlayMode, dragHandleProps, cardDragProps,
 }: {
   room: ActiveRoom
   onClick: () => void
   editMode?: boolean
+  overlayMode?: boolean
   dragHandleProps?: React.HTMLAttributes<HTMLElement>
+  cardDragProps?: React.HTMLAttributes<HTMLElement>
 }) {
   const allDone    = room.isAllCompleted
   const hasNewChat = room.hasUnreadChat
 
   return (
-    <div className={styles.roomCard} style={{ cursor: editMode ? 'default' : 'pointer' }}>
+    <div
+      className={[styles.roomCard, overlayMode ? styles.roomCardOverlay : ''].filter(Boolean).join(' ')}
+      style={{ cursor: editMode ? 'grab' : 'pointer' }}
+      {...(editMode ? cardDragProps : undefined)}
+    >
       {editMode && (
-        <div className={styles.dragHandle} {...dragHandleProps}>
+        <div className={styles.dragHandle} onClick={(e) => e.stopPropagation()}>
           <DragIcon />
         </div>
       )}

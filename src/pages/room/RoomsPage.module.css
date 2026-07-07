@@ -81,6 +81,12 @@
   overflow: hidden;
 }
 
+.roomCardOverlay {
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  transform: scale(1.03);
+  border-color: var(--nav-active);
+}
+
 .dragHandle {
   display: flex;
   align-items: center;
