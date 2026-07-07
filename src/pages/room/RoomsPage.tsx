@@ -277,7 +277,7 @@ function ActiveRoomCard({
 
   return (
     <div
-      className={[styles.roomCard, overlayMode ? styles.roomCardOverlay : '', editMode && !overlayMode ? styles.roomCardEdit : ''].filter(Boolean).join(' ')}
+      className={[styles.roomCard, overlayMode ? styles.roomCardOverlay : ''].filter(Boolean).join(' ')}
       style={{ cursor: editMode ? 'default' : 'pointer' }}
     >
       {editMode && (

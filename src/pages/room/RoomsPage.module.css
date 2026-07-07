@@ -81,24 +81,6 @@
   overflow: hidden;
 }
 
-@keyframes jiggle {
-  0%   { transform: rotate(0deg); }
-  20%  { transform: rotate(-1.5deg); }
-  40%  { transform: rotate(1.5deg); }
-  60%  { transform: rotate(-1.2deg); }
-  80%  { transform: rotate(1.2deg); }
-  100% { transform: rotate(0deg); }
-}
-
-.roomCardEdit {
-  animation: jiggle 0.35s ease-in-out infinite;
-  transform-origin: center center;
-}
-
-.roomCardEdit:nth-child(even) {
-  animation-delay: 0.08s;
-}
-
 .roomCardOverlay {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
   transform: scale(1.03);
