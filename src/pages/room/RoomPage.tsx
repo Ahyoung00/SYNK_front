@@ -201,6 +201,14 @@ export default function RoomPage() {
           </button>
         </div>
 
+        {/* ── 오늘 미션 ────────────────────────────────────────────────────── */}
+        <RoomMissionCard
+          total={room.dailyMissionCount}
+          completed={todayCollages.filter((c) => c.status === 'COMPLETED').length}
+          fired={todayCollages.length}
+          createdAt={room.createdAt ?? room.created_at ?? null}
+        />
+
         {/* ── 이주의 참여율 카드 ───────────────────────────────────────────── */}
         <button
           className={styles.participationCard}
@@ -249,14 +257,6 @@ export default function RoomPage() {
               </button>
             )}
         </div>
-
-        {/* ── 오늘 미션 ────────────────────────────────────────────────────── */}
-        <RoomMissionCard
-          total={room.dailyMissionCount}
-          completed={todayCollages.filter((c) => c.status === 'COMPLETED').length}
-          fired={todayCollages.length}
-          createdAt={room.createdAt ?? room.created_at ?? null}
-        />
 
         {/* ── 앨범 ─────────────────────────────────────────────────────────── */}
         <div className={styles.sectionHeader}>
