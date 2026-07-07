@@ -65,6 +65,8 @@ export default function RoomsPage() {
     return () => window.clearInterval(id)
   }, [])
 
+  const [editMode, setEditMode] = useState(false)
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(TouchSensor,   { activationConstraint: { delay: 200, tolerance: 5 } }),
@@ -98,6 +100,9 @@ export default function RoomsPage() {
             <div className={styles.sectionLabel}>
               참여 중
               <span className={styles.sectionCount}>{activeRooms.length}</span>
+              <button className={styles.editBtn} onClick={() => setEditMode((v) => !v)}>
+                {editMode ? '완료' : '편집'}
+              </button>
             </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
               <SortableContext items={activeRooms.map((r) => r.id)} strategy={verticalListSortingStrategy}>
@@ -106,7 +111,8 @@ export default function RoomsPage() {
                     <SortableActiveRoomCard
                       key={room.id}
                       room={room}
-                      onClick={() => navigate(ROUTES.ROOM(room.id))}
+                      editMode={editMode}
+                      onClick={() => { if (!editMode) navigate(ROUTES.ROOM(room.id)) }}
                     />
                   ))}
                 </div>
@@ -200,7 +206,7 @@ export default function RoomsPage() {
 
 // ── Sortable wrapper ──────────────────────────────────────────────────────────
 
-function SortableActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
+function SortableActiveRoomCard({ room, onClick, editMode }: { room: ActiveRoom; onClick: () => void; editMode: boolean }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: room.id })
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -209,8 +215,8 @@ function SortableActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: 
     zIndex: isDragging ? 10 : undefined,
   }
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <ActiveRoomCard room={room} onClick={onClick} />
+    <div ref={setNodeRef} style={style}>
+      <ActiveRoomCard room={room} onClick={onClick} editMode={editMode} dragHandleProps={editMode ? { ...attributes, ...listeners } : undefined} />
     </div>
   )
 }
@@ -225,13 +231,26 @@ function RoomThumbnail({ src }: { src: string | null }) {
   )
 }
 
-function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
+function ActiveRoomCard({
+  room, onClick, editMode, dragHandleProps,
+}: {
+  room: ActiveRoom
+  onClick: () => void
+  editMode?: boolean
+  dragHandleProps?: React.HTMLAttributes<HTMLElement>
+}) {
   const allDone    = room.isAllCompleted
   const hasNewChat = room.hasUnreadChat
 
   return (
-    <button className={styles.roomCard} onClick={onClick}>
-      <div className={styles.cardInner}>
+    <div className={styles.roomCard} style={{ cursor: editMode ? 'default' : 'pointer' }}>
+      {editMode && (
+        <div className={styles.dragHandle} {...dragHandleProps}>
+          <DragIcon />
+        </div>
+      )}
+      <button className={styles.cardClickArea} onClick={onClick} disabled={editMode}>
+        <div className={styles.cardInner}>
           <RoomThumbnail src={room.roomThumbnail} />
           <div className={styles.cardBody}>
             <div className={styles.cardTop}>
@@ -272,7 +291,8 @@ function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => vo
           </div>
           <span className={styles.enterArrow}>›</span>
         </div>
-    </button>
+      </button>
+    </div>
   )
 }
 
@@ -307,6 +327,19 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
         <span className={styles.enterArrow}>›</span>
       </div>
     </button>
+  )
+}
+
+function DragIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <circle cx="9"  cy="6"  r="1.5" fill="currentColor" />
+      <circle cx="15" cy="6"  r="1.5" fill="currentColor" />
+      <circle cx="9"  cy="12" r="1.5" fill="currentColor" />
+      <circle cx="15" cy="12" r="1.5" fill="currentColor" />
+      <circle cx="9"  cy="18" r="1.5" fill="currentColor" />
+      <circle cx="15" cy="18" r="1.5" fill="currentColor" />
+    </svg>
   )
 }
 
