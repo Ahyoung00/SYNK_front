@@ -294,3 +294,55 @@
 .scroll > * {
   flex-shrink: 0;
 }
+
+/* ── 연결된 계정 ──────────────────────────────────────────────────────────── */
+.accountRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 18px;
+}
+
+.accountIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.accountInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.accountName {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.accountSub {
+  font-size: 12px;
+  color: var(--ink-sub);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.connectedBadge {
+  font-size: 12px;
+  font-weight: 700;
+  color: #000;
+  background: rgba(45, 218, 184, 0.18);
+  border: 1px solid rgba(45, 218, 184, 0.4);
+  padding: 4px 10px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
