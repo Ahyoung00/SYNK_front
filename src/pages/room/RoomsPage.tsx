@@ -209,8 +209,8 @@ function SortableActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: 
     zIndex: isDragging ? 10 : undefined,
   }
   return (
-    <div ref={setNodeRef} style={style}>
-      <ActiveRoomCard room={room} onClick={onClick} dragHandleProps={{ ...attributes, ...listeners }} />
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <ActiveRoomCard room={room} onClick={onClick} />
     </div>
   )
 }
@@ -225,26 +225,13 @@ function RoomThumbnail({ src }: { src: string | null }) {
   )
 }
 
-function ActiveRoomCard({
-  room,
-  onClick,
-  dragHandleProps,
-}: {
-  room: ActiveRoom
-  onClick: () => void
-  dragHandleProps?: React.HTMLAttributes<HTMLElement>
-}) {
+function ActiveRoomCard({ room, onClick }: { room: ActiveRoom; onClick: () => void }) {
   const allDone    = room.isAllCompleted
   const hasNewChat = room.hasUnreadChat
 
   return (
-    <div className={styles.roomCard}>
-      {/* 드래그 핸들 */}
-      <div className={styles.dragHandle} {...dragHandleProps}>
-        <DragIcon />
-      </div>
-      <button className={styles.cardClickArea} onClick={onClick}>
-        <div className={styles.cardInner}>
+    <button className={styles.roomCard} onClick={onClick}>
+      <div className={styles.cardInner}>
           <RoomThumbnail src={room.roomThumbnail} />
           <div className={styles.cardBody}>
             <div className={styles.cardTop}>
@@ -285,8 +272,7 @@ function ActiveRoomCard({
           </div>
           <span className={styles.enterArrow}>›</span>
         </div>
-      </button>
-    </div>
+    </button>
   )
 }
 
@@ -321,19 +307,6 @@ function WaitingRoomCard({ room, onClick }: { room: WaitingRoom; onClick: () => 
         <span className={styles.enterArrow}>›</span>
       </div>
     </button>
-  )
-}
-
-function DragIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <circle cx="9"  cy="6"  r="1.5" fill="currentColor" />
-      <circle cx="15" cy="6"  r="1.5" fill="currentColor" />
-      <circle cx="9"  cy="12" r="1.5" fill="currentColor" />
-      <circle cx="15" cy="12" r="1.5" fill="currentColor" />
-      <circle cx="9"  cy="18" r="1.5" fill="currentColor" />
-      <circle cx="15" cy="18" r="1.5" fill="currentColor" />
-    </svg>
   )
 }
 
