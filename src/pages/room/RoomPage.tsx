@@ -102,16 +102,7 @@ export default function RoomPage() {
   }
 
 
-  async function handleTestNotification() {
-    try {
-      await roomApi.testNotification(id)
-      alert('✅ FCM 알림 발송 완료!\n방 멤버 전원에게 알림이 전송됐어요.')
-    } catch {
-      alert('❌ 알림 발송 실패')
-    }
-  }
-
-  if (isLoading) {
+if (isLoading) {
     return (
       <div className={styles.page}>
         <NavHeader title="방" onBack={() => navigate(ROUTES.ROOMS)} />
@@ -317,15 +308,7 @@ export default function RoomPage() {
 
         {/* ── 방 설정 / 나가기 ──────────────────────────────────────────────── */}
         <div className={styles.footerBtns}>
-          <div className={styles.devBtns}>
-            <button
-              onClick={handleTestNotification}
-              className={styles.devBtn}
-            >
-              🔔 FCM 알림 테스트
-            </button>
-          </div>
-          <div className={styles.actionCard}>
+<div className={styles.actionCard}>
             <button className={styles.settingsBtn} onClick={() => navigate(ROUTES.ROOM_SETTINGS(id))}>
               <SettingsIcon />
               <span className={styles.settingsBtnLabel}>방 설정</span>

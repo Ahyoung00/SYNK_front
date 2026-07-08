@@ -552,31 +552,6 @@
   color: rgba(0, 0, 0, 0.5);
 }
 
-.devBtns {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.devBtn {
-  width: 100%;
-  padding: 10px;
-  border-radius: 10px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: opacity 0.12s ease;
-  background: var(--devbtn-bg);
-  border: 1px dashed var(--devbtn-border);
-  color: var(--devbtn-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.devBtn:disabled {
-  opacity: 0.5;
-}
 
 /* flex 컬럼 스크롤에서 자식 카드가 압착·잘리지 않도록 고정 */
 .scroll > * {
