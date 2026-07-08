@@ -9,6 +9,37 @@ import type { AppNotification, NotificationType } from '@/types'
 
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY as string
 
+const LAST_TOKEN_KEY = 'fcm_diag_last_token'
+
+/**
+ * FCM 진단 로그 — 푸시가 끊기는 원인 추적용 (동작 변경 없음, 관찰만).
+ * Mac Safari 웹 인스펙터 콘솔에서 `[FCM-DIAG]` 로 필터해서 확인.
+ */
+async function fcmDiag(phase: string, token?: string | null) {
+  try {
+    const reg = await navigator.serviceWorker.ready
+    const sub = await reg.pushManager.getSubscription()
+    const now = Date.now()
+    const expInfo = sub?.expirationTime != null
+      ? `${new Date(sub.expirationTime).toISOString()}(${sub.expirationTime <= now ? '만료됨' : '유효'})`
+      : sub ? '만료시각없음' : '구독없음'
+    const last = localStorage.getItem(LAST_TOKEN_KEY)
+    const short = (t?: string | null) => (t ? `${t.slice(0, 8)}…${t.slice(-6)}` : '없음')
+    const changed = token != null && last != null && token !== last
+    console.log(
+      `[FCM-DIAG] ${phase} @ ${new Date(now).toISOString()}`,
+      `\n  permission: ${Notification.permission}`,
+      `\n  구독: ${sub ? '있음' : '없음'} / 만료: ${expInfo}`,
+      `\n  endpoint: ${sub?.endpoint?.slice(-24) ?? '없음'}`,
+      `\n  token: ${short(token)}${changed ? ' ← 이전과 다름(로테이션!)' : ''}`,
+      `\n  직전토큰: ${short(last)}`,
+    )
+    if (token) localStorage.setItem(LAST_TOKEN_KEY, token)
+  } catch (err) {
+    console.warn('[FCM-DIAG] 상태 수집 실패:', err)
+  }
+}
+
 // 사용자 제스처(버튼 클릭)에서 호출 — iOS PWA는 자동 호출 무시
 export async function requestNotificationPermission(): Promise<boolean> {
   if (!('Notification' in window) || !('serviceWorker' in navigator)) return false
@@ -38,10 +69,12 @@ export async function requestNotificationPermission(): Promise<boolean> {
     })
     if (token) {
       console.log('[FCM] 토큰:', token)
+      await fcmDiag('토큰 발급/등록', token)
       await userApi.updateFcmToken(token)
       console.log('[FCM] 서버 등록 완료')
     } else {
       console.warn('[FCM] 토큰 발급 실패')
+      await fcmDiag('토큰 발급 실패', null)
     }
     return true
   } catch (err) {
@@ -64,6 +97,15 @@ export function useFcm() {
       requestNotificationPermission()
     }
 
+    // 진단: 앱이 포그라운드로 돌아올 때마다 구독/토큰 상태 기록
+    // (푸시가 끊긴 시점에 구독이 죽었는지·만료됐는지 확인용)
+    function onForeground() {
+      if (document.visibilityState === 'visible') {
+        fcmDiag('포그라운드 복귀')
+      }
+    }
+    document.addEventListener('visibilitychange', onForeground)
+
     const unsubscribe = onMessage(messaging, (payload) => {
       const data = payload.data ?? {}
 
@@ -83,7 +125,10 @@ export function useFcm() {
       }
     })
 
-    return unsubscribe
+    return () => {
+      unsubscribe()
+      document.removeEventListener('visibilitychange', onForeground)
+    }
   }, [token])
 }
 
