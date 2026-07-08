@@ -223,19 +223,19 @@
   width: 28px;
   height: 28px;
   border-radius: var(--radius-full);
-  background: var(--page-bg);
+  background: #000;
   border: 1px solid var(--color-border);
-  color: var(--color-text);
+  color: #fff;
   font-size: 18px;
   font-weight: 300;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background var(--dur-fast);
+  transition: opacity var(--dur-fast);
 }
 
 .stepBtn:active:not(:disabled) {
-  background: var(--color-primary-dim);
+  opacity: 0.7;
 }
 
 .stepBtn:disabled {
