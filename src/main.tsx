@@ -1,6 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App'
+import { router } from './router'
+import { initGA, trackPageview } from '@/lib/analytics'
 import '@/styles/global.css'
 
 // iOS PWA: CSS 뷰포트 단위(dvh/vh/%)가 실제 화면과 어긋나는 문제 →
@@ -37,6 +39,18 @@ window.visualViewport?.addEventListener('resize', applyOrientation)
 
 // Android/설치 PWA는 진짜 잠금 시도 (성공하면 위 각도는 0으로 유지됨)
 ;(screen as any).orientation?.lock?.('portrait').catch(() => {})
+
+// Google Analytics: 초기화 + SPA 라우터 이동마다 페이지뷰 전송
+initGA()
+let lastPath = window.location.pathname + window.location.search
+trackPageview(lastPath)
+router.subscribe((state) => {
+  if (state.navigation.state !== 'idle') return
+  const path = state.location.pathname + state.location.search
+  if (path === lastPath) return
+  lastPath = path
+  trackPageview(path)
+})
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
