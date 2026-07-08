@@ -175,9 +175,14 @@ export default function RoomsPage() {
               <br />
               초대 코드로 들어가보세요
             </p>
-            <button className={styles.emptyJoinBtn} onClick={() => navigate(ROUTES.ROOM_JOIN)}>
-              초대 코드로 입장
-            </button>
+            <div className={styles.emptyBtns}>
+              <button className={styles.emptyCreateBtn} onClick={() => navigate(ROUTES.ROOM_CREATE)}>
+                새 방 만들기
+              </button>
+              <button className={styles.emptyJoinBtn} onClick={() => navigate(ROUTES.ROOM_JOIN)}>
+                초대 코드로 입장
+              </button>
+            </div>
           </div>
         )}
 
