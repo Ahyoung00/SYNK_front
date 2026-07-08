@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { getToken, onMessage } from 'firebase/messaging'
+import { getToken, deleteToken, onMessage } from 'firebase/messaging'
 import { messaging } from '@/lib/firebase'
 import { useNotificationStore } from '@/store/notificationStore'
 import { useAuthStore } from '@/store/authStore'
@@ -18,6 +18,20 @@ export async function requestNotificationPermission(): Promise<boolean> {
 
   try {
     const registration = await navigator.serviceWorker.ready
+
+    // iOS PWA 유령 토큰 자가복구:
+    // 재설치/구독 만료 시 실제 push 구독은 죽었는데 SDK가 IndexedDB에 캐시된
+    // 옛 토큰을 계속 반환함 → 구독이 없으면 캐시 토큰을 폐기하고 새로 발급받는다.
+    const existingSub = await registration.pushManager.getSubscription()
+    if (!existingSub) {
+      try {
+        await deleteToken(messaging)
+        console.log('[FCM] 죽은 구독 감지 — 캐시 토큰 폐기 후 재발급')
+      } catch {
+        /* 캐시된 토큰이 없으면 무시 */
+      }
+    }
+
     const token = await getToken(messaging, {
       vapidKey: VAPID_KEY,
       serviceWorkerRegistration: registration,
