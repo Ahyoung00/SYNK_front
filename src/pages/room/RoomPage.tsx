@@ -87,20 +87,6 @@ export default function RoomPage() {
     },
   })
 
-  function handleLeave() {
-    if (!window.confirm('방에서 나가시겠어요?')) return
-    roomApi.leaveRoom(id)
-      .then(() => navigate(ROUTES.ROOMS, { replace: true }))
-      .catch(console.error)
-  }
-
-  function handleDeleteRoom() {
-    if (!window.confirm('방을 삭제하시겠어요?\n방의 모든 기록이 사라지며 되돌릴 수 없어요.')) return
-    roomApi.deleteRoom(id)
-      .then(() => navigate(ROUTES.ROOMS, { replace: true }))
-      .catch(console.error)
-  }
-
 
 if (isLoading) {
     return (
@@ -306,28 +292,14 @@ if (isLoading) {
           </button>
         )}
 
-        {/* ── 방 설정 / 나가기 ──────────────────────────────────────────────── */}
+        {/* ── 방 설정 ───────────────────────────────────────────────────────── */}
         <div className={styles.footerBtns}>
-<div className={styles.actionCard}>
+          <div className={styles.actionCard}>
             <button className={styles.settingsBtn} onClick={() => navigate(ROUTES.ROOM_SETTINGS(id))}>
               <SettingsIcon />
               <span className={styles.settingsBtnLabel}>방 설정</span>
               <ChevronIcon />
             </button>
-            <div className={styles.actionDivider} />
-            {room.ownerId === myUserId ? (
-              <button className={styles.leaveBtn} onClick={handleDeleteRoom}>
-                <LeaveIcon />
-                <span className={styles.leaveBtnLabel}>방 삭제하기</span>
-                <ChevronIcon />
-              </button>
-            ) : (
-              <button className={styles.leaveBtn} onClick={handleLeave}>
-                <LeaveIcon />
-                <span className={styles.leaveBtnLabel}>방 나가기</span>
-                <ChevronIcon />
-              </button>
-            )}
           </div>
         </div>
 
@@ -500,12 +472,3 @@ function SettingsIcon() {
   )
 }
 
-function LeaveIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none"
-      stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M14 8V5a1 1 0 00-1-1H5a1 1 0 00-1 1v14a1 1 0 001 1h8a1 1 0 001-1v-3" />
-      <path d="M10 12h10m0 0l-3-3m3 3l-3 3" />
-    </svg>
-  )
-}
