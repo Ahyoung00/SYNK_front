@@ -115,14 +115,8 @@ export function useFcm() {
       const appNotif = mapToAppNotification(data)
       if (appNotif) prependNotification(appNotif)
 
-      const fmt = formatPush(data)
-      const title = fmt?.title ?? payload.notification?.title ?? ''
-      const body  = fmt?.body  ?? payload.notification?.body  ?? ''
-      if (title || body) {
-        navigator.serviceWorker.ready.then((registration) => {
-          registration.showNotification(title, { body, icon: '/icon-192.png', data: payload.data ?? {} })
-        })
-      }
+      // 시스템 알림 표시는 SW push 핸들러가 항상 담당 (iOS 무음 푸시 예산 대응).
+      // 여기서 또 띄우면 중복이므로 인앱 알림 목록 갱신만 수행.
     })
 
     return () => {

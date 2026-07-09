@@ -29,8 +29,11 @@ self.addEventListener('push', (e: PushEvent) => {
   // ── 1. push 이벤트 수신 확인 로그
   console.log('[SW] push 이벤트 수신. e.data 존재:', !!e.data)
 
+  // iOS 웹푸시 규칙: push를 받으면 반드시 사용자에게 보이는 알림을 띄워야 함.
+  // 알림 없이 넘어가면 무음 푸시로 카운트되고, 누적 시 iOS가 푸시 전달을 차단함.
   if (!e.data) {
-    console.warn('[SW] push 이벤트에 data 없음 — 알림 표시 불가')
+    console.warn('[SW] push 이벤트에 data 없음 — 기본 알림 표시')
+    e.waitUntil(self.registration.showNotification('SYNK', { icon: '/icon-192.png' }))
     return
   }
 
@@ -74,42 +77,22 @@ self.addEventListener('push', (e: PushEvent) => {
 
   console.log('[SW] 표시할 알림 — title:', title, '/ body:', body)
 
+  // iOS 웹푸시 규칙: 포그라운드 여부와 무관하게 항상 알림을 표시해야 함.
+  // (예전에는 포그라운드 탭이 있으면 건너뛰었는데, 이게 무음 푸시로 누적되어
+  //  iOS가 이 PWA로의 푸시 전달을 아예 차단하는 원인이었음)
+  // 포그라운드 중복 표시는 useFcm onMessage 쪽의 수동 showNotification을 제거해서 방지.
   e.waitUntil(
-    self.clients
-      .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clients) => {
-        console.log('[SW] 현재 열린 클라이언트 수:', clients.length,
-          '/ visible 상태:', clients.map((c) => c.visibilityState))
-
-        // visible인 탭이 있으면 포그라운드 onMessage가 담당 → SW 중복 방지
-        // 단, 백그라운드(hidden) 탭만 있거나 클라이언트가 없으면 SW가 알림 표시
-        const hasFocused = clients.some((c) => c.visibilityState === 'visible')
-        if (hasFocused) {
-          console.log('[SW] 포그라운드 탭 감지 — SW 알림 표시 건너뜀 (포그라운드 핸들러가 처리)')
-          return
-        }
-
-        console.log('[SW] 백그라운드/종료 상태 — showNotification 호출')
-        return self.registration
-          .showNotification(title, {
-            body,
-            icon: '/icon-192.png',
-            data: d,
-          })
-          .then(() => {
-            console.log('[SW] showNotification 성공')
-          })
-          .catch((err) => {
-            // ── 3. showNotification 실패 로그
-            console.error('[SW] showNotification 실패:', err)
-          })
+    self.registration
+      .showNotification(title, {
+        body,
+        icon: '/icon-192.png',
+        data: d,
+      })
+      .then(() => {
+        console.log('[SW] showNotification 성공')
       })
       .catch((err) => {
-        // matchAll 자체가 실패할 경우에도 알림은 표시
-        console.error('[SW] clients.matchAll 실패, 직접 showNotification 시도:', err)
-        return self.registration
-          .showNotification(title, { body, icon: '/icon-192.png', data: d })
-          .catch((e2) => console.error('[SW] showNotification 최종 실패:', e2))
+        console.error('[SW] showNotification 실패:', err)
       })
   )
 })
