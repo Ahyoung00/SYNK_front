@@ -1,11 +1,17 @@
 .nav {
+  position: fixed;
+  left: 50%;
+  bottom: 0;
+  max-width: 390px;
   flex-shrink: 0;
   width: 100%;
   display: flex;
   align-items: stretch;
   background: var(--nav-bg);
   border-top: 1px solid var(--nav-border);
-  height: var(--bottom-nav-height);
+  height: calc(var(--bottom-nav-height) + var(--safe-bottom));
+  padding-bottom: var(--safe-bottom);
+  transform: translateX(-50%);
   z-index: 100;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
