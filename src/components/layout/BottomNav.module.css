@@ -1,7 +1,7 @@
 .nav {
   position: fixed;
   left: 50%;
-  bottom: 0;
+  bottom: var(--safe-bottom);
   max-width: 390px;
   flex-shrink: 0;
   width: 100%;
@@ -9,17 +9,30 @@
   align-items: stretch;
   background: var(--nav-bg);
   border-top: 1px solid var(--nav-border);
-  height: calc(var(--bottom-nav-height) + var(--safe-bottom));
-  padding-bottom: var(--safe-bottom);
+  height: var(--bottom-nav-height);
   transform: translateX(-50%);
   z-index: 100;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
+.nav::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  height: var(--safe-bottom);
+  background: var(--nav-bg);
+}
+
 :global(:root[data-theme="dark"]) .nav {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
+  background: #000000;
+}
+
+:global(:root[data-theme="dark"]) .nav::after {
   background: #000000;
 }
 
