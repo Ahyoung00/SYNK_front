@@ -5,6 +5,9 @@ import { router } from './router'
 import { initGA, trackPageview } from '@/lib/analytics'
 import '@/styles/global.css'
 
+const isStandalonePwa = window.matchMedia('(display-mode: standalone)').matches
+  || (navigator as Navigator & { standalone?: boolean }).standalone === true
+
 // iOS PWA: CSS 뷰포트 단위(dvh/vh/%)가 실제 화면과 어긋나는 문제 →
 // JS로 실제 보이는 높이(window.innerHeight)를 --app-height에 직접 주입
 function currentAngle(): number {
@@ -21,7 +24,12 @@ function applyOrientation() {
 
   if (isMobile) {
     // 모바일: 세로 고정용 — 항상 긴 변=높이, 짧은 변=너비
-    document.documentElement.style.setProperty('--app-height', `${Math.max(window.innerWidth, window.innerHeight)}px`)
+    // iOS 홈 화면 PWA에서는 innerHeight가 safe area만큼 짧게 보고될 수 있어
+    // WebKit의 standalone viewport 전체 높이를 나타내는 100vh를 사용한다.
+    const appHeight = isStandalonePwa
+      ? '100vh'
+      : `${Math.max(window.innerWidth, window.innerHeight)}px`
+    document.documentElement.style.setProperty('--app-height', appHeight)
     document.documentElement.style.setProperty('--app-width',  `${Math.min(window.innerWidth, window.innerHeight)}px`)
   } else {
     // 데스크탑(맥 등): 실제 뷰포트 그대로 사용
