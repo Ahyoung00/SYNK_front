@@ -24,13 +24,20 @@ function applyOrientation() {
 
   if (isMobile) {
     // 모바일: 세로 고정용 — 항상 긴 변=높이, 짧은 변=너비
-    // iOS 홈 화면 PWA에서는 innerHeight가 safe area만큼 짧게 보고될 수 있어
-    // WebKit의 standalone viewport 전체 높이를 나타내는 100vh를 사용한다.
+    // iOS 홈 화면 PWA에서는 innerHeight와 100vh가 화면 하단 safe area 앞에서
+    // 끝나는 경우가 있어, standalone 앱은 실제 기기 화면 크기를 기준으로 잡는다.
+    const screenWidth = window.screen.width || window.innerWidth
+    const screenHeight = window.screen.height || window.innerHeight
     const appHeight = isStandalonePwa
-      ? '100vh'
+      ? `${Math.max(screenWidth, screenHeight)}px`
       : `${Math.max(window.innerWidth, window.innerHeight)}px`
     document.documentElement.style.setProperty('--app-height', appHeight)
-    document.documentElement.style.setProperty('--app-width',  `${Math.min(window.innerWidth, window.innerHeight)}px`)
+    document.documentElement.style.setProperty(
+      '--app-width',
+      `${isStandalonePwa
+        ? Math.min(screenWidth, screenHeight)
+        : Math.min(window.innerWidth, window.innerHeight)}px`,
+    )
   } else {
     // 데스크탑(맥 등): 실제 뷰포트 그대로 사용
     document.documentElement.style.setProperty('--app-height', `${window.innerHeight}px`)

@@ -10,6 +10,5 @@
   display: flex;           /* 자식 .page를 flex item으로 만들어 height chain 완성 */
   flex-direction: column;
   overflow: clip;
-  padding-bottom: var(--bottom-nav-height);
   /* padding-top 제거 — 각 탭 페이지가 자체 헤더에서 safe-top 처리 */
 }

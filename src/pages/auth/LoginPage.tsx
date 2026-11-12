@@ -25,8 +25,7 @@ const css = `
 
   .login-page {
     position: relative;
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: var(--app-height, 100dvh);
     display: flex;
     flex-direction: column;
     overflow: hidden;
