@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import styles from './BottomNav.module.css'
 
@@ -13,75 +12,8 @@ const tabs = [
 ] as const
 
 export default function BottomNav() {
-  const location = useLocation()
-  const activeIndex = Math.max(0, tabs.findIndex(({ to }) =>
-    to === ROUTES.HOME
-      ? location.pathname === to
-      : location.pathname.startsWith(to),
-  ))
-  const [indicatorPosition, setIndicatorPosition] = useState(activeIndex)
-  const [indicatorIconIndex, setIndicatorIconIndex] = useState(activeIndex)
-  const positionRef = useRef(activeIndex)
-
-  useEffect(() => {
-    const from = positionRef.current
-    const distance = activeIndex - from
-    if (distance === 0) return
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      positionRef.current = activeIndex
-      setIndicatorPosition(activeIndex)
-      setIndicatorIconIndex(activeIndex)
-      return
-    }
-
-    const startedAt = performance.now()
-    let animationFrame = 0
-    let iconChanged = false
-    const animate = (now: number) => {
-      const progress = Math.min(1, (now - startedAt) / 560)
-      const eased = progress * progress * (3 - 2 * progress)
-      const position = from + distance * eased
-      positionRef.current = position
-      setIndicatorPosition(position)
-      if (!iconChanged && progress >= 0.46) {
-        setIndicatorIconIndex(activeIndex)
-        iconChanged = true
-      }
-      if (progress < 1) {
-        animationFrame = requestAnimationFrame(animate)
-      } else {
-        positionRef.current = activeIndex
-        setIndicatorPosition(activeIndex)
-        setIndicatorIconIndex(activeIndex)
-      }
-    }
-
-    animationFrame = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(animationFrame)
-  }, [activeIndex])
-
-  const notchCenter = ((indicatorPosition + 0.5) / tabs.length) * 390
-  const notchStart = Math.max(18, notchCenter - 39)
-  const notchEnd = Math.min(372, notchCenter + 39)
-  const navPath = [
-    'M 0 20 Q 0 0 20 0',
-    `H ${notchStart}`,
-    `C ${notchCenter - 24} 0 ${notchCenter - 29} 36 ${notchCenter} 36`,
-    `C ${notchCenter + 29} 36 ${notchCenter + 24} 0 ${notchEnd} 0`,
-    `H ${Math.max(370, notchEnd)} Q 390 0 390 20 V 72 Q 390 78 382 78 H 8 Q 0 78 0 70 Z`,
-  ].join(' ')
-
   return (
     <nav className={styles.nav}>
-      <svg className={styles.surface} viewBox="0 0 390 78" preserveAspectRatio="none" aria-hidden="true">
-        <path d={navPath} />
-      </svg>
-      <span className={styles.activeOrb} style={{ left: `${((indicatorPosition + 0.5) / tabs.length) * 100}%` }} aria-hidden="true">
-        {(() => {
-          const ActiveIcon = tabs[indicatorIconIndex].icon
-          return <ActiveIcon />
-        })()}
-      </span>
       {tabs.map(({ to, label, icon: Icon }) => (
         <NavLink
           key={to}
@@ -91,7 +23,7 @@ export default function BottomNav() {
             [styles.tab, isActive ? styles.active : ''].join(' ')
           }
         >
-          <span className={`${styles.iconWrap} ${activeIndex === tabs.findIndex(tab => tab.to === to) ? styles.hiddenActiveIcon : ''}`}>
+          <span className={styles.iconWrap}>
             <Icon />
           </span>
           <span className={styles.label}>{label}</span>
