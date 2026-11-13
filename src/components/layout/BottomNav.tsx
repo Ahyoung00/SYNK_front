@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import { ROUTES } from '@/constants'
 import styles from './BottomNav.module.css'
@@ -18,7 +19,48 @@ export default function BottomNav() {
       ? location.pathname === to
       : location.pathname.startsWith(to),
   ))
-  const notchCenter = ((activeIndex + 0.5) / tabs.length) * 390
+  const [indicatorPosition, setIndicatorPosition] = useState(activeIndex)
+  const [indicatorIconIndex, setIndicatorIconIndex] = useState(activeIndex)
+  const positionRef = useRef(activeIndex)
+
+  useEffect(() => {
+    const from = positionRef.current
+    const distance = activeIndex - from
+    if (distance === 0) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      positionRef.current = activeIndex
+      setIndicatorPosition(activeIndex)
+      setIndicatorIconIndex(activeIndex)
+      return
+    }
+
+    const startedAt = performance.now()
+    let animationFrame = 0
+    let iconChanged = false
+    const animate = (now: number) => {
+      const progress = Math.min(1, (now - startedAt) / 560)
+      const eased = progress * progress * (3 - 2 * progress)
+      const position = from + distance * eased
+      positionRef.current = position
+      setIndicatorPosition(position)
+      if (!iconChanged && progress >= 0.46) {
+        setIndicatorIconIndex(activeIndex)
+        iconChanged = true
+      }
+      if (progress < 1) {
+        animationFrame = requestAnimationFrame(animate)
+      } else {
+        positionRef.current = activeIndex
+        setIndicatorPosition(activeIndex)
+        setIndicatorIconIndex(activeIndex)
+      }
+    }
+
+    animationFrame = requestAnimationFrame(animate)
+    return () => cancelAnimationFrame(animationFrame)
+  }, [activeIndex])
+
+  const notchCenter = ((indicatorPosition + 0.5) / tabs.length) * 390
   const notchStart = Math.max(18, notchCenter - 39)
   const notchEnd = Math.min(372, notchCenter + 39)
   const navPath = [
@@ -34,9 +76,9 @@ export default function BottomNav() {
       <svg className={styles.surface} viewBox="0 0 390 78" preserveAspectRatio="none" aria-hidden="true">
         <path d={navPath} />
       </svg>
-      <span className={styles.activeOrb} style={{ left: `${((activeIndex + 0.5) / tabs.length) * 100}%` }} aria-hidden="true">
+      <span className={styles.activeOrb} style={{ left: `${((indicatorPosition + 0.5) / tabs.length) * 100}%` }} aria-hidden="true">
         {(() => {
-          const ActiveIcon = tabs[activeIndex].icon
+          const ActiveIcon = tabs[indicatorIconIndex].icon
           return <ActiveIcon />
         })()}
       </span>
