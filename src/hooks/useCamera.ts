@@ -55,7 +55,12 @@ export function useCamera(): UseCameraReturn {
   const startPreview = useCallback(async (facing: CameraFacing = 'front') => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: facing === 'front' ? 'user' : 'environment' },
+        video: {
+          facingMode: facing === 'front' ? 'user' : 'environment',
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          frameRate: { ideal: 30 },
+        },
         audio: true,
       })
       streamRef.current = stream
@@ -150,7 +155,11 @@ export function useCamera(): UseCameraReturn {
       stream.getAudioTracks().forEach((t) => recordStream.addTrack(t))
     }
 
-    const recorder = new MediaRecorder(recordStream, { mimeType })
+    const recorder = new MediaRecorder(recordStream, {
+      mimeType,
+      videoBitsPerSecond: 5_000_000,
+      audioBitsPerSecond: 128_000,
+    })
 
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) chunksRef.current.push(e.data)
