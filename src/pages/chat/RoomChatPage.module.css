@@ -148,6 +148,9 @@
 .msgList {
   flex: 1;
   overflow-y: auto;
+  /* Prevent browser scroll anchoring from offsetting the list when the
+     bottom spacer or message rows finish laying out after initial load. */
+  overflow-anchor: none;
   -webkit-overflow-scrolling: touch;
   padding: var(--sp-4) var(--sp-4) var(--sp-2);
   display: flex;
