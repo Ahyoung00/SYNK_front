@@ -180,7 +180,10 @@ export default function RoomChatPage() {
       const el = pageRef.current
       if (el) {
         el.style.height = `${vv.height}px`
-        el.style.transform = `translateY(${vv.offsetTop}px)`
+        // visualViewport.offsetTop can fluctuate while browser chrome settles
+        // on navigation. Apply it only while the keyboard is actually open.
+        const keyboardOpen = vv.height < window.innerHeight * 0.85
+        el.style.transform = keyboardOpen ? `translateY(${vv.offsetTop}px)` : ''
       }
       // 키보드 닫힘(뷰포트 커짐) 또는 바닥에 있던 경우 → 항상 최신 메시지 하단 유지.
       // 높이 변경 직후 레이아웃이 확정되도록 rAF 뒤에 스크롤.
@@ -196,10 +199,8 @@ export default function RoomChatPage() {
     }
     update()
     vv.addEventListener('resize', update)
-    vv.addEventListener('scroll', update)
     return () => {
       vv.removeEventListener('resize', update)
-      vv.removeEventListener('scroll', update)
     }
   }, [])
 
