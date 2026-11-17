@@ -210,15 +210,19 @@ export default function RoomChatPage() {
   useEffect(() => {
     if (didInitialScroll.current) return
     if (messages.length === 0) return
-    didInitialScroll.current = true
     requestAnimationFrame(() => {
       const el = listRef.current
       if (el) el.scrollTop = el.scrollHeight
+      // Mark initialization complete only after the first bottom positioning.
+      // The message-change effect below must not start a competing smooth scroll
+      // during this initial layout pass.
+      didInitialScroll.current = true
     })
   }, [messages.length])
 
   // ── 새 메시지 오면 스크롤 ─────────────────────────────────────────────────
   useEffect(() => {
+    if (!didInitialScroll.current) return
     if (isAtBottomRef.current) {
       const el = listRef.current
       if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' })
